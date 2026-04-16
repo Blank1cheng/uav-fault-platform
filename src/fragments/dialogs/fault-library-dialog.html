@@ -1,0 +1,35 @@
+<div class="overlay" id="ov-ifm">
+  <div class="modal" style="width:520px;height:480px;">
+    <div class="mhead">
+      <div class="mtitle" style="color:var(--red)">导入故障模型</div>
+      <button class="mclose" onclick="closeOv('ov-ifm')">✕</button>
+    </div>
+    <div class="mbody" style="flex-direction:column;">
+      <div class="ifm-body">
+        <!-- 文件拖放区 -->
+        <div class="ifm-top">
+          <div class="ifm-drop" onclick="simulateFileImport()">
+            <div class="ifm-drop-icon">📂</div>
+            <div class="ifm-drop-txt">点击选择 或 拖拽故障模型文件</div>
+            <div class="ifm-drop-sub">支持 .flt · .json · .xml 格式</div>
+          </div>
+        </div>
+        <!-- 已有文件列表 -->
+        <div class="ifm-list">
+          <div style="font-size:9px;color:var(--textd);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">可导入故障模型</div>
+          <div id="ifm-list-container"></div>
+        </div>
+      </div>
+      <!-- ★ 故障建模入口行 ★ -->
+      <div class="ifm-build-row">
+        <div class="ifm-build-hint">没有合适的模型？从模板库新建</div>
+        <button class="btn-build-fault" onclick="openFaultBuild()">⚡ 故障建模</button>
+      </div>
+    </div>
+    <div class="mfoot">
+      <div style="flex:1;font-size:11px;color:var(--textm)" id="ifm-sel-hint">已选：未选择故障模型</div>
+      <button class="btn-cancel" onclick="closeOv('ov-ifm')">取消</button>
+      <button class="btn-ok btn-ok-r" onclick="confirmImportFault()">确认导入</button>
+    </div>
+  </div>
+</div>

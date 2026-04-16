@@ -1,0 +1,7 @@
+dist/
+node_modules/
+.claude/settings.local.json
+.codex_tmp_runtime_check.py
+.superpowers/
+__pycache__/
+*.pyc
