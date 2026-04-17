@@ -31,15 +31,7 @@ function createExportMeta(state = {}) {
 }
 
 function createExportSnapshot(state = {}) {
-  return {
-    modelNodes: state.modelNodes ?? [],
-    modelEdges: state.modelEdges ?? [],
-    nodeSeq: state.nodeSeq ?? 0,
-    edgeSeq: state.edgeSeq ?? 0,
-    activeLineType: state.activeLineType ?? 'normal',
-    faultedBlks: state.faultedBlks ?? [],
-    importedFaultModels: state.importedFaultModels ?? []
-  };
+  return createWorkbenchSnapshot(state);
 }
 
 export function mountLegacyRuntime() {

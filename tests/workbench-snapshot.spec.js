@@ -95,4 +95,51 @@ describe('workbenchSnapshotService', () => {
     expect(restored.edgeSeq).toBe(0);
     expect(restored.activeLineType).toBe('normal');
   });
+
+  it('preserves workspaceSource and layered canvas viewport data through snapshot round-trip', () => {
+    const snapshot = createWorkbenchSnapshot({
+      workspaceSource: 'blank',
+      rootCanvasId: 'canvas-root',
+      activeCanvasId: 'canvas-child',
+      canvasTrail: ['canvas-root', 'canvas-child'],
+      canvases: {
+        'canvas-root': {
+          id: 'canvas-root',
+          name: '顶层',
+          parentSubsystemNodeId: null,
+          viewport: { scale: 1.15, offsetX: 24, offsetY: 12 },
+          nodes: [],
+          edges: []
+        },
+        'canvas-child': {
+          id: 'canvas-child',
+          name: 'Child',
+          parentSubsystemNodeId: 'node-subsystem',
+          viewport: { scale: 1.7, offsetX: 88, offsetY: 46 },
+          nodes: [],
+          edges: []
+        }
+      },
+      nodeSeq: 0,
+      edgeSeq: 0,
+      activeLineType: 'normal',
+      faultedBlks: [],
+      importedFaultModels: []
+    });
+
+    const restored = restoreWorkbenchSnapshot(snapshot);
+
+    expect(restored.workspaceSource).toBe('blank');
+    expect(restored.activeCanvasId).toBe('canvas-child');
+    expect(restored.canvases['canvas-root'].viewport).toMatchObject({
+      scale: 1.15,
+      offsetX: 24,
+      offsetY: 12
+    });
+    expect(restored.canvases['canvas-child'].viewport).toMatchObject({
+      scale: 1.7,
+      offsetX: 88,
+      offsetY: 46
+    });
+  });
 });

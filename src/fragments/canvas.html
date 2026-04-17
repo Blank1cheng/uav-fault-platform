@@ -26,6 +26,7 @@
     </div>
     <div class="simbar-btns">
       <button class="sim-btn sim-btn-disabled" id="sbtn-init" onclick="simInit()" title="初始化">
+        <span class="sim-btn-icon">&#8635;</span>
         <span class="sim-btn-lbl">初始化</span>
       </button>
       <button class="sim-btn sim-btn-run sim-btn-disabled" id="sbtn-run" onclick="simRun()" title="运行">
@@ -33,21 +34,26 @@
         <span class="sim-btn-lbl" id="run-lbl">运行</span>
       </button>
       <button class="sim-btn sim-btn-disabled" id="sbtn-step" onclick="simStep()" title="步进">
+        <span class="sim-btn-icon">&#9197;</span>
         <span class="sim-btn-lbl">步进</span>
       </button>
       <button class="sim-btn sim-btn-disabled" id="sbtn-pause" onclick="simPause()" title="暂停">
+        <span class="sim-btn-icon">&#10074;&#10074;</span>
         <span class="sim-btn-lbl" id="pause-lbl">暂停</span>
       </button>
       <button class="sim-btn sim-btn-stop sim-btn-disabled" id="sbtn-stop" onclick="simStop()" title="终止">
+        <span class="sim-btn-icon">&#9632;</span>
         <span class="sim-btn-lbl">终止</span>
       </button>
     </div>
   </div>
 
+  <div class="canvas-breadcrumbs" id="canvas-breadcrumbs" data-testid="canvas-breadcrumbs"></div>
+
   <div class="empty-state" id="empty">
     <div class="empty-icon">模</div>
-    <div class="empty-txt">请先导入系统模型后开始建模</div>
-    <div class="empty-sub">点击右上角“导入系统模型”开始</div>
+    <div class="empty-txt">可导入系统模型，也可新建空白模型后开始建模</div>
+    <div class="empty-sub">点击右上角“导入系统模型”或“新建空白模型”开始。</div>
   </div>
 
   <div class="diagram" id="diagram">
@@ -63,8 +69,11 @@
       </div>
     </div>
     <div class="canvas-floating">
+      <div class="canvas-group-actions">
+        <button type="button" class="canvas-wrap__button" id="canvas-wrap-selection" onclick="wrapSelectionIntoSubsystem()" disabled>封装为子系统</button>
+      </div>
       <div class="canvas-mode">
-        <span class="canvas-mode__label">当前连线</span>
+        <span class="canvas-mode__label">当前连接</span>
         <span class="canvas-mode__chip" id="line-mode-chip">普通连接线</span>
       </div>
       <div class="canvas-zoom">

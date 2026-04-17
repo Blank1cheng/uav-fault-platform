@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
@@ -167,9 +170,108 @@ const MISSING_MODULE_PACKAGE_FIXTURE = {
   })
 };
 
+const SIGNAL_ROUTING_PACKAGE_FIXTURE = {
+  schemaVersion: 1,
+  packageType: 'flight-control-model',
+  modelId: 'signal-routing-demo',
+  modelName: 'Signal Routing Demo',
+  description: 'Branching and utility block demo package',
+  source: {
+    origin: 'test-fixture'
+  },
+  pythonModules: [],
+  faultLibrary: [],
+  workbenchSnapshot: createWorkbenchSnapshot({
+    rootCanvasId: 'canvas-root',
+    activeCanvasId: 'canvas-root',
+    canvasTrail: ['canvas-root'],
+    canvases: {
+      'canvas-root': {
+        id: 'canvas-root',
+        name: '顶层',
+        parentSubsystemNodeId: null,
+        viewport: { scale: 1, offsetX: 0, offsetY: 0 },
+        nodes: [
+          { id: 'node-source', type: 'signal_source', x: 120, y: 140, w: 164, h: 84, props: { name: 'Source', waveType: '常值', amplitude: '1', frequency: '0', outputFormat: '标量' } },
+          { id: 'node-gain', type: 'gain_block', x: 360, y: 120, w: 156, h: 84, props: { name: 'Gain', gain: '0.5', inputFormat: '标量', outputFormat: '标量' } },
+          { id: 'node-scope', type: 'instrument_scope', x: 640, y: 120, w: 150, h: 74, props: { name: 'Scope', instrumentType: '示波器', sampleRate: '64kHz', signal: '输出' } },
+          { id: 'node-sum', type: 'sum_block', x: 360, y: 280, w: 164, h: 88, props: { name: 'Sum', inputCount: 2, signs: ['+', '+'], outputFormat: '标量' } },
+          { id: 'node-mux', type: 'mux_block', x: 640, y: 280, w: 164, h: 88, props: { name: 'Mux', inputCount: 2, outputFormat: '向量' } }
+        ],
+        edges: [
+          { id: 'edge-source-gain', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-gain', sourcePortIndex: 0, targetPortIndex: 0 },
+          { id: 'edge-source-scope', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-scope', sourcePortIndex: 0, targetPortIndex: 0 },
+          { id: 'edge-gain-sum', lineType: 'normal', sourceNodeId: 'node-gain', targetNodeId: 'node-sum', sourcePortIndex: 0, targetPortIndex: 0 },
+          { id: 'edge-source-sum', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-sum', sourcePortIndex: 0, targetPortIndex: 1 },
+          { id: 'edge-source-mux', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-mux', sourcePortIndex: 0, targetPortIndex: 0 },
+          { id: 'edge-sum-mux', lineType: 'normal', sourceNodeId: 'node-sum', targetNodeId: 'node-mux', sourcePortIndex: 0, targetPortIndex: 1 }
+        ]
+      }
+    },
+    nodeSeq: 5,
+    edgeSeq: 6,
+    activeLineType: 'normal',
+    faultedBlks: [],
+    importedFaultModels: []
+  })
+};
+
+function loadPublicPackage(fileName) {
+  const testDir = path.dirname(fileURLToPath(import.meta.url));
+  const targetPath = path.resolve(testDir, '..', 'public', 'model-packages', fileName);
+
+  return JSON.parse(readFileSync(targetPath, 'utf8'));
+}
+
+function collectLinkedSubsystemNodes(snapshot) {
+  const rootCanvas = snapshot?.canvases?.[snapshot?.rootCanvasId];
+  if (!rootCanvas) {
+    return [];
+  }
+
+  return (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+}
+
 async function flushRuntime() {
   await nextTick();
   await Promise.resolve();
+}
+
+function getScopePeak(samples = []) {
+  if (!samples.length) {
+    return 0;
+  }
+
+  return samples.reduce((peak, sample) => {
+    const value = Number.isFinite(sample?.actual) ? sample.actual : 0;
+    return Math.max(peak, Math.abs(value));
+  }, 0);
+}
+
+async function measurePackageDynamicsScopePeak(fileName) {
+  const wrapper = mount(App, { attachTo: document.body });
+  await flushRuntime();
+
+  const pkg = loadPublicPackage(fileName);
+  const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+  await flushRuntime();
+
+  expect(importResult).toMatchObject({ ok: true });
+
+  window.simInit(true);
+  for (let step = 0; step < 6; step += 1) {
+    window.simStep();
+  }
+  await flushRuntime();
+
+  const scopeSamples = window.__GZ_SIM__?.actual?.scopeSamples?.['node-11']?.ch1 ?? [];
+  const scopePeak = getScopePeak(scopeSamples);
+
+  wrapper.unmount();
+  document.body.innerHTML = '';
+  __resetLegacyRuntimeForTests();
+
+  return { scopeSamples, scopePeak };
 }
 
 describe('Flight model package app integration', () => {
@@ -368,6 +470,185 @@ describe('Flight model package app integration', () => {
     expect(importResult.errors.some((error) => error.includes('missing_controller'))).toBe(true);
 
     wrapper.unmount();
+  });
+
+  it('imports a branched signal-routing package and preserves utility blocks in the workbench state', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(SIGNAL_ROUTING_PACKAGE_FIXTURE);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const rootCanvas = state.canvases[state.rootCanvasId];
+    const sourceEdges = rootCanvas.edges.filter((edge) => edge.sourceNodeId === 'node-source');
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(rootCanvas.nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'gain_block' }),
+      expect.objectContaining({ type: 'sum_block' }),
+      expect.objectContaining({ type: 'mux_block' })
+    ]));
+    expect(sourceEdges).toHaveLength(4);
+    expect(rootCanvas.edges).toEqual(expect.arrayContaining([
+      expect.objectContaining({ targetNodeId: 'node-gain', targetPortIndex: 0 }),
+      expect.objectContaining({ targetNodeId: 'node-scope', targetPortIndex: 0 }),
+      expect.objectContaining({ targetNodeId: 'node-sum', targetPortIndex: 1 }),
+      expect.objectContaining({ targetNodeId: 'node-mux', targetPortIndex: 0 })
+    ]));
+
+    wrapper.unmount();
+  });
+
+  it('imports the hierarchical eVTOL package and restores its child canvas structure', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const hierarchicalPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical.json');
+    const expectedLinkedSubsystemCount = collectLinkedSubsystemNodes(hierarchicalPackage.workbenchSnapshot).length;
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(hierarchicalPackage);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    expect(state.rootCanvasId).toBeTruthy();
+    const rootCanvas = state.canvases[state.rootCanvasId];
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(state.activeModelPackage).toMatchObject({
+      modelId: hierarchicalPackage.modelId,
+      modelName: hierarchicalPackage.modelName
+    });
+    expect(rootCanvas).toBeTruthy();
+    if (!rootCanvas) {
+      throw new Error('Missing imported root canvas');
+    }
+    expect(expectedLinkedSubsystemCount).toBeGreaterThan(0);
+    const linkedSubsystemNodes = (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+    expect(linkedSubsystemNodes).toHaveLength(expectedLinkedSubsystemCount);
+
+    const linkedChildCanvases = linkedSubsystemNodes
+      .map((node) => state.canvases[node.targetCanvasId])
+      .filter(Boolean);
+    expect(linkedChildCanvases).toHaveLength(expectedLinkedSubsystemCount);
+    linkedSubsystemNodes.forEach((node) => {
+      const childCanvas = state.canvases[node.targetCanvasId];
+      expect(childCanvas).toBeTruthy();
+      if (!childCanvas) {
+        throw new Error(`Missing linked child canvas for subsystem ${node.id}`);
+      }
+      expect(childCanvas.parentSubsystemNodeId).toBe(node.id);
+      expect(childCanvas.nodes).toEqual(expect.arrayContaining([
+        expect.objectContaining({ type: 'simulation_block', pythonBinding: expect.objectContaining({ bound: true }) })
+      ]));
+      expect(childCanvas.nodes).toEqual(expect.arrayContaining([
+        expect.objectContaining({ type: 'subsystem_in_port' }),
+        expect.objectContaining({ type: 'subsystem_out_port' })
+      ]));
+    });
+
+    wrapper.unmount();
+  });
+
+  it('imports the hierarchical eVTOL fault package and restores motor_efficiency_loss inside the child canvas', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const hierarchicalFaultPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical_fault_injected.json');
+    const expectedLinkedSubsystemCount = collectLinkedSubsystemNodes(hierarchicalFaultPackage.workbenchSnapshot).length;
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(hierarchicalFaultPackage);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    expect(state.rootCanvasId).toBeTruthy();
+    const rootCanvas = state.canvases[state.rootCanvasId];
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(state.activeModelPackage).toMatchObject({
+      modelId: hierarchicalFaultPackage.modelId,
+      modelName: hierarchicalFaultPackage.modelName
+    });
+    expect(state.availableFaultModels.some((model) => model.id === 'motor_efficiency_loss')).toBe(true);
+    expect(rootCanvas).toBeTruthy();
+    if (!rootCanvas) {
+      throw new Error('Missing imported root canvas');
+    }
+    expect(expectedLinkedSubsystemCount).toBeGreaterThan(0);
+    const rootFaultNodes = (rootCanvas.nodes || []).filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss');
+    expect(rootFaultNodes).toHaveLength(0);
+    const linkedSubsystemNodes = (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+    expect(linkedSubsystemNodes).toHaveLength(expectedLinkedSubsystemCount);
+
+    const linkedChildCanvases = linkedSubsystemNodes
+      .map((node) => state.canvases[node.targetCanvasId])
+      .filter(Boolean);
+    expect(linkedChildCanvases).toHaveLength(expectedLinkedSubsystemCount);
+    linkedSubsystemNodes.forEach((node) => {
+      const childCanvas = state.canvases[node.targetCanvasId];
+      expect(childCanvas).toBeTruthy();
+      if (!childCanvas) {
+        throw new Error(`Missing linked child canvas for subsystem ${node.id}`);
+      }
+      expect(childCanvas.parentSubsystemNodeId).toBe(node.id);
+    });
+
+    const faultedChildCanvases = linkedChildCanvases.filter((childCanvas) => (
+      childCanvas.nodes?.some((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss')
+    ));
+    expect(faultedChildCanvases).toHaveLength(1);
+    const faultedChildCanvas = faultedChildCanvases[0];
+    expect(faultedChildCanvas).toBeTruthy();
+    if (!faultedChildCanvas) {
+      throw new Error('Missing faulted child canvas');
+    }
+    const faultNodes = faultedChildCanvas.nodes.filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss');
+    expect(faultNodes).toHaveLength(1);
+    const totalFaultNodes = linkedChildCanvases.reduce((count, childCanvas) => (
+      count + (childCanvas.nodes || []).filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss').length
+    ), 0);
+    expect(totalFaultNodes).toBe(1);
+    const faultNode = faultNodes[0];
+    expect(faultNode).toBeTruthy();
+    if (!faultNode) {
+      throw new Error('Missing injected fault node in faulted child canvas');
+    }
+    expect(faultNode.type).toBe('simulation_block');
+    expect(faultNode.injectedFault).toMatchObject({
+      modelId: 'motor_efficiency_loss',
+      layer: 'electrical',
+      name: 'Motor Efficiency Loss'
+    });
+
+    wrapper.unmount();
+  });
+
+  it('reduces hierarchical dynamics-scope amplitude when the imported motor_efficiency_loss fault is preloaded', async () => {
+    const { scopeSamples: normalScopeSamples, scopePeak: normalPeak } = await measurePackageDynamicsScopePeak(
+      'evtol_small_nonlinear_hierarchical.json'
+    );
+    const { scopeSamples: faultScopeSamples, scopePeak: faultPeak } = await measurePackageDynamicsScopePeak(
+      'evtol_small_nonlinear_hierarchical_fault_injected.json'
+    );
+
+    expect(normalScopeSamples.length).toBeGreaterThan(0);
+    expect(faultScopeSamples.length).toBeGreaterThan(0);
+    expect(normalPeak).toBeGreaterThan(0.01);
+    expect(faultPeak).toBeGreaterThan(0);
+    expect(faultPeak).toBeLessThan(normalPeak * 0.75);
+  });
+
+  it('reduces flat dynamics-scope amplitude when the imported motor_efficiency_loss fault is preloaded', async () => {
+    const { scopeSamples: normalScopeSamples, scopePeak: normalPeak } = await measurePackageDynamicsScopePeak(
+      'evtol_small_nonlinear.json'
+    );
+    const { scopeSamples: faultScopeSamples, scopePeak: faultPeak } = await measurePackageDynamicsScopePeak(
+      'evtol_small_nonlinear_fault_injected.json'
+    );
+
+    expect(normalScopeSamples.length).toBeGreaterThan(0);
+    expect(faultScopeSamples.length).toBeGreaterThan(0);
+    expect(normalPeak).toBeGreaterThan(0.01);
+    expect(faultPeak).toBeGreaterThan(0);
+    expect(faultPeak).toBeLessThan(normalPeak * 0.75);
   });
 
   it('removes persistent runtime listeners during reset before remounting', async () => {

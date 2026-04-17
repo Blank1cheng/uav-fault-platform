@@ -3,20 +3,36 @@
     <div class="lgroup-head lgroup-head--system" onclick="toggleGroup('g1')">
       <span class="lgroup-icon">&#127959;</span>
       <span>系统建模组件</span>
-      <span class="lgroup-arrow open" id="arr-g1">▸</span>
+      <span class="lgroup-arrow open" id="arr-g1">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g1">
       <div class="citem citem-draggable" draggable="true" data-component="signal_source">
         <span class="citem-icon-badge citem-icon-badge--source">&#12336;</span>
         <span class="citem-label">信号源</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="flow_block">
+      <div class="citem citem-draggable" draggable="true" data-component="flow_block" title="统一输入输出的数据类型和格式">
         <span class="citem-icon-badge citem-icon-badge--flow">&#9638;</span>
-        <span class="citem-label">流程块</span>
+        <span class="citem-label">信号适配块</span>
+      </div>
+      <div class="citem citem-draggable" draggable="true" data-component="gain_block" title="对输入信号做比例缩放">
+        <span class="citem-icon-badge citem-icon-badge--gain">&times;</span>
+        <span class="citem-label">增益块</span>
+      </div>
+      <div class="citem citem-draggable" draggable="true" data-component="sum_block" title="显式汇入多路输入并进行求和">
+        <span class="citem-icon-badge citem-icon-badge--sum">&plus;</span>
+        <span class="citem-label">求和块</span>
+      </div>
+      <div class="citem citem-draggable" draggable="true" data-component="mux_block" title="将多路输入打包为向量输出">
+        <span class="citem-icon-badge citem-icon-badge--mux">M</span>
+        <span class="citem-label">Mux 块</span>
       </div>
       <div class="citem citem-draggable" draggable="true" data-component="simulation_block">
         <span class="citem-icon-badge citem-icon-badge--simulation">&#9655;</span>
         <span class="citem-label">仿真块</span>
+      </div>
+      <div class="citem citem-draggable" draggable="true" data-component="subsystem_block" title="双击进入子系统画布">
+        <span class="citem-icon-badge citem-icon-badge--subsystem">&#9679;</span>
+        <span class="citem-label">子系统块</span>
       </div>
       <div class="citem citem-draggable" draggable="true" data-component="middle_var_assign">
         <span class="citem-icon-badge citem-icon-badge--middle">&#931;</span>
@@ -27,7 +43,7 @@
     <div class="lgroup-head lgroup-head--fault" onclick="toggleGroup('g2')">
       <span class="lgroup-icon">&#9888;</span>
       <span>故障注入组件</span>
-      <span class="lgroup-arrow open" id="arr-g2">▸</span>
+      <span class="lgroup-arrow open" id="arr-g2">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g2">
       <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_bias">
@@ -43,10 +59,10 @@
     <div class="lgroup-head lgroup-head--instrument" onclick="toggleGroup('g3')">
       <span class="lgroup-icon">&#128300;</span>
       <span>测量仪器组件</span>
-      <span class="lgroup-arrow open" id="arr-g3">▸</span>
+      <span class="lgroup-arrow open" id="arr-g3">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g3">
-      <div class="citem citem-scope citem-draggable" draggable="true" data-component="instrument_scope" title="接入信号后可双击查看示波器波形">
+      <div class="citem citem-scope citem-draggable" draggable="true" data-component="instrument_scope" title="接入信号后可双击查看波形">
         <span class="citem-icon-badge citem-icon-badge--scope">&#8767;</span>
         <span class="citem-label">示波器</span>
       </div>
@@ -63,7 +79,7 @@
     <div class="lgroup-head lgroup-head--link" onclick="toggleGroup('g4')">
       <span class="lgroup-icon">&#128279;</span>
       <span>连接线组件</span>
-      <span class="lgroup-arrow open" id="arr-g4">▸</span>
+      <span class="lgroup-arrow open" id="arr-g4">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g4">
       <div class="citem citem-line-tool active" data-line-type="normal" onclick="setConnectionTool('normal')" style="color:var(--text2);">

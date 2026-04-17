@@ -34,15 +34,23 @@ const S={
   protocolInjectSelectionId:''
 };
 
+S.rootCanvasId='canvas-root';
+S.activeCanvasId='canvas-root';
+S.canvasTrail=['canvas-root'];
+S.canvases={};
+
 const CANVAS_STAGE={width:1600,height:980,minScale:0.6,maxScale:1.8,nodePadding:24,nodeMinY:118};
-const NODE_DRAG={active:false,pointerId:null,nodeId:'',startX:0,startY:0,originX:0,originY:0};
-const CANVAS_PAN={active:false,pointerId:null,startX:0,startY:0,originX:0,originY:0};
+const POINTER_DRAG_THRESHOLD=6;
+const SCOPE_WINDOW_LAYOUT={defaultWidth:560,estimatedHeight:356,gutter:16,reservedTop:96,cascadeX:36,cascadeY:32};
+const NODE_DRAG={active:false,engaged:false,pointerId:null,nodeId:'',startX:0,startY:0,originX:0,originY:0,clickSuppressUntil:0};
+const CANVAS_PAN={active:false,engaged:false,clearSelectionOnPointerUp:false,pointerId:null,startX:0,startY:0,originX:0,originY:0};
 const NODE_DOUBLE_CLICK={nodeId:'',timestamp:0};
-const SCOPE_WINDOW_DRAG={active:false,pointerId:null,scopeId:'',startX:0,startY:0,originX:0,originY:0};
+const SCOPE_WINDOW_DRAG={active:false,engaged:false,pointerId:null,scopeId:'',startX:0,startY:0,originX:0,originY:0};
 
 const PORT_FORMATS=['标量','向量','矩阵','布尔','事件'];
 const SIM_MODULE_TYPES=['一阶函数','微分','积分'];
 const SIM_INTERFACE_LIMITS={inputs:[1,6],outputs:[1,6],middleVars:[0,6]};
+const SUBSYSTEM_INTERFACE_LIMITS={inputs:[0,6],outputs:[0,6]};
 
 const COMPONENT_LIBRARY={
   signal_source:{
@@ -148,6 +156,31 @@ const COMPONENT_LIBRARY={
     height:64,
     defaults:{name:'CAN 总线',linkType:'CAN 总线',sourcePort:'节点 A',targetPort:'节点 B'}
   }
+};
+
+COMPONENT_LIBRARY.subsystem_block={
+  label:'子系统块',
+  badge:'子系统',
+  className:'b-subsystem',
+  width:180,
+  height:92,
+  defaults:{name:'子系统块',description:'',targetCanvasId:''}
+};
+COMPONENT_LIBRARY.subsystem_in_port={
+  label:'子系统输入口',
+  badge:'IN',
+  className:'b-subsystem-port-in',
+  width:132,
+  height:72,
+  defaults:{name:'子系统输入口'}
+};
+COMPONENT_LIBRARY.subsystem_out_port={
+  label:'子系统输出口',
+  badge:'OUT',
+  className:'b-subsystem-port-out',
+  width:132,
+  height:72,
+  defaults:{name:'子系统输出口'}
 };
 
 const TPLS={
@@ -278,6 +311,210 @@ function cloneDefaults(value){
   return JSON.parse(JSON.stringify(value));
 }
 
+function createEmptyCanvasRecord(id,name,parentSubsystemNodeId=null){
+  return {
+    id,
+    name,
+    parentSubsystemNodeId,
+    viewport:{scale:1,offsetX:0,offsetY:0},
+    nodes:[],
+    edges:[]
+  };
+}
+
+function ensureWorkbenchCanvasState(){
+  if(!S.canvases||typeof S.canvases!=='object'){
+    S.canvases={};
+  }
+  if(!S.canvases[S.rootCanvasId]){
+    S.canvases[S.rootCanvasId]=createEmptyCanvasRecord(S.rootCanvasId,'顶层',null);
+  }
+  if(!S.activeCanvasId||!S.canvases[S.activeCanvasId]){
+    S.activeCanvasId=S.rootCanvasId;
+  }
+  if(!Array.isArray(S.canvasTrail)||S.canvasTrail.length===0){
+    S.canvasTrail=[S.rootCanvasId];
+  }
+  if(S.canvasTrail[0]!==S.rootCanvasId){
+    S.canvasTrail=[S.rootCanvasId,...S.canvasTrail.filter(Boolean).filter(canvasId=>canvasId!==S.rootCanvasId)];
+  }
+  if(S.canvasTrail[S.canvasTrail.length-1]!==S.activeCanvasId){
+    S.canvasTrail=[...S.canvasTrail.filter(Boolean),S.activeCanvasId];
+  }
+  if(!S.canvases[S.activeCanvasId]){
+    S.canvases[S.activeCanvasId]=createEmptyCanvasRecord(
+      S.activeCanvasId,
+      S.activeCanvasId===S.rootCanvasId?'顶层':'未命名画布',
+      null
+    );
+  }
+}
+
+function getCanvasRecord(canvasId=S.activeCanvasId){
+  ensureWorkbenchCanvasState();
+  return S.canvases[canvasId]||null;
+}
+
+function getActiveCanvasRecord(){
+  return getCanvasRecord(S.activeCanvasId);
+}
+
+function syncActiveCanvasViewportFromState(){
+  ensureWorkbenchCanvasState();
+  const canvas=getActiveCanvasRecord();
+  if(!canvas){return;}
+  canvas.viewport={
+    scale:S.canvasScale,
+    offsetX:S.canvasOffsetX,
+    offsetY:S.canvasOffsetY
+  };
+}
+
+function restoreActiveCanvasViewport(canvasId=S.activeCanvasId){
+  ensureWorkbenchCanvasState();
+  const viewport=getCanvasRecord(canvasId)?.viewport||{};
+  S.canvasScale=Number.isFinite(viewport.scale)?viewport.scale:1;
+  S.canvasOffsetX=Number.isFinite(viewport.offsetX)?viewport.offsetX:0;
+  S.canvasOffsetY=Number.isFinite(viewport.offsetY)?viewport.offsetY:0;
+}
+
+function setActiveCanvasRecord(canvasId,trail=null){
+  ensureWorkbenchCanvasState();
+  if(!S.canvases[canvasId]){
+    return false;
+  }
+  syncActiveCanvasViewportFromState();
+  S.activeCanvasId=canvasId;
+  if(Array.isArray(trail)&&trail.length){
+    const normalizedTrail=trail.filter(Boolean);
+    if(normalizedTrail[0]!==S.rootCanvasId){
+      normalizedTrail.unshift(S.rootCanvasId);
+    }
+    S.canvasTrail=normalizedTrail;
+  }else{
+    S.canvasTrail=canvasId===S.rootCanvasId?[S.rootCanvasId]:[S.rootCanvasId,canvasId];
+  }
+  restoreActiveCanvasViewport(canvasId);
+  return true;
+}
+
+function getSubsystemCanvasId(nodeId){
+  return `canvas-${nodeId}`;
+}
+
+function createSubsystemCanvas(node){
+  const canvasId=getSubsystemCanvasId(node.id);
+  if(!S.canvases[canvasId]){
+    S.canvases[canvasId]=createEmptyCanvasRecord(canvasId,node.props?.name||'子系统',node.id);
+  }
+  node.targetCanvasId=canvasId;
+  return S.canvases[canvasId];
+}
+
+function openCanvasRecord(canvasId,trail=null){
+  if(!setActiveCanvasRecord(canvasId,trail)){
+    return false;
+  }
+  S.selBlk=null;
+  S.selEdge=null;
+  clearPendingConnection();
+  renderModelNodes();
+  clampCanvasOffset();
+  applyCanvasTransform();
+  renderPropertyPanel(null);
+  syncConfigTargets('');
+  updateUI();
+  return true;
+}
+
+function openSubsystemCanvas(nodeId){
+  const node=getNode(nodeId);
+  if(!node||node.type!=='subsystem_block'||!node.targetCanvasId){
+    return false;
+  }
+  const trail=S.activeCanvasId===S.rootCanvasId
+    ?[S.rootCanvasId,node.targetCanvasId]
+    :[...S.canvasTrail.filter(Boolean),node.targetCanvasId];
+  return openCanvasRecord(node.targetCanvasId,trail);
+}
+
+function goToRootCanvas(){
+  return openCanvasRecord(S.rootCanvasId,[S.rootCanvasId]);
+}
+
+function navigateToCanvas(canvasId){
+  const trailIndex=S.canvasTrail.indexOf(canvasId);
+  if(trailIndex===-1){
+    return false;
+  }
+  return openCanvasRecord(canvasId,S.canvasTrail.slice(0,trailIndex+1));
+}
+
+function renderCanvasBreadcrumbs(){
+  const host=document.getElementById('canvas-breadcrumbs');
+  if(!host){return;}
+  ensureWorkbenchCanvasState();
+  const trail=S.canvasTrail.filter(Boolean);
+  host.innerHTML=trail.map((canvasId,index)=>{
+    const canvas=getCanvasRecord(canvasId);
+    const label=canvasId===S.rootCanvasId?'顶层':(canvas?.name||canvasId);
+    const isLast=index===trail.length-1;
+    return `
+      <button type="button" class="canvas-breadcrumbs__item${isLast?' is-active':''}" data-canvas-id="${canvasId}" ${canvasId===S.rootCanvasId?'data-breadcrumb-root="true"':''} ${isLast?'aria-current="page"':''}>
+        ${escapeHtml(label)}
+      </button>
+      ${!isLast?'<span class="canvas-breadcrumbs__sep">/</span>':''}`;
+  }).join('');
+  host.querySelectorAll('[data-canvas-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const canvasId=btn.dataset.canvasId||S.rootCanvasId;
+      if(canvasId===S.activeCanvasId){return;}
+      navigateToCanvas(canvasId);
+    });
+  });
+}
+
+function ensureSubsystemCanvasNode(node){
+  if(!node||node.type!=='subsystem_block'){
+    return null;
+  }
+  const canvas=createSubsystemCanvas(node);
+  if(canvas&&canvas.parentSubsystemNodeId!==node.id){
+    canvas.parentSubsystemNodeId=node.id;
+  }
+  return canvas;
+}
+
+Object.defineProperty(S,'modelNodes',{
+  configurable:true,
+  enumerable:true,
+  get(){
+    return getActiveCanvasRecord()?.nodes||[];
+  },
+  set(value){
+    const canvas=getActiveCanvasRecord();
+    if(canvas){
+      canvas.nodes=Array.isArray(value)?value:[];
+    }
+  }
+});
+
+Object.defineProperty(S,'modelEdges',{
+  configurable:true,
+  enumerable:true,
+  get(){
+    return getActiveCanvasRecord()?.edges||[];
+  },
+  set(value){
+    const canvas=getActiveCanvasRecord();
+    if(canvas){
+      canvas.edges=Array.isArray(value)?value:[];
+    }
+  }
+});
+
+ensureWorkbenchCanvasState();
+
 const WORKBENCH_STORAGE_KEY='gz-workbench-system-model';
 
 function getRuntimeListenerStore(){
@@ -293,32 +530,47 @@ function getWorkbenchSnapshotApi(){
 
 function createSystemModelSnapshot(){
   const api=getWorkbenchSnapshotApi();
-  const payload={
+  return api?.createWorkbenchSnapshot?api.createWorkbenchSnapshot(S):cloneDefaults({
+    version:1,
     modelNodes:S.modelNodes,
     modelEdges:S.modelEdges,
     nodeSeq:S.nodeSeq,
     edgeSeq:S.edgeSeq,
+    rootCanvasId:S.rootCanvasId,
+    activeCanvasId:S.activeCanvasId,
+    canvasTrail:S.canvasTrail,
+    canvases:S.canvases,
     activeLineType:S.activeLineType,
     faultedBlks:S.faultedBlks,
     importedFaultModels:S.importedFaultModels
-  };
-  return api?.createWorkbenchSnapshot?api.createWorkbenchSnapshot(payload):cloneDefaults(payload);
+  });
 }
 
 function restoreSystemModelSnapshot(snapshot){
   const api=getWorkbenchSnapshotApi();
   const restored=api?.restoreWorkbenchSnapshot?api.restoreWorkbenchSnapshot(snapshot):cloneDefaults(snapshot);
+  S.canvases=restored.canvases||{};
+  S.rootCanvasId=restored.rootCanvasId||'canvas-root';
+  S.activeCanvasId=restored.activeCanvasId||S.rootCanvasId;
+  S.canvasTrail=Array.isArray(restored.canvasTrail)&&restored.canvasTrail.length
+    ?restored.canvasTrail
+    :[S.rootCanvasId];
+  ensureWorkbenchCanvasState();
   S.modelNodes=restored.modelNodes||[];
   S.modelEdges=restored.modelEdges||[];
   S.nodeSeq=restored.nodeSeq||0;
   S.edgeSeq=restored.edgeSeq||0;
   S.activeLineType=restored.activeLineType||'normal';
+  S.workspaceSource=typeof restored.workspaceSource==='string'?restored.workspaceSource:(S.workspaceSource||'');
   S.faultedBlks=restored.faultedBlks||[];
   S.importedFaultModels=restored.importedFaultModels||[];
   S.faultModels=S.importedFaultModels.length;
   S.selBlk=null;
   S.selEdge=null;
+  restoreActiveCanvasViewport(S.activeCanvasId);
+  applyCanvasTransform();
   clearPendingConnection();
+  renderCanvasBreadcrumbs();
   syncAllPythonInputConnectionState();
   renderModelNodes();
   renderPropertyPanel(null);
@@ -525,6 +777,173 @@ function syncSimulationInterfaceCounts(){
   nextProps.inputs=normalizeSimulationInterfaceList(nextProps.inputs.slice(0,inputCount),'输入',nextProps.inputs[0]?.type||'标量',inputCount);
   nextProps.outputs=normalizeSimulationInterfaceList(nextProps.outputs.slice(0,outputCount),'输出',nextProps.outputs[0]?.type||'标量',outputCount);
   nextProps.middleVars=normalizeSimulationInterfaceList(nextProps.middleVars.slice(0,middleCount),'中间量',nextProps.middleVars[0]?.type||'标量',middleCount);
+  const preview={...node,props:nextProps};
+  renderPropertyPanel(preview);
+}
+
+function isSubsystemBoundaryNodeType(type){
+  return type==='subsystem_in_port'||type==='subsystem_out_port';
+}
+
+function normalizeSubsystemInterfaceList(items,prefix,minCount=0){
+  const base=Array.isArray(items)?items:[];
+  const normalized=base
+    .map((item,index)=>({
+      id:String(item?.id||`${prefix.toLowerCase()}-${index+1}`).trim()||`${prefix.toLowerCase()}-${index+1}`,
+      name:String(item?.name||`${prefix} ${index+1}`).trim()||`${prefix} ${index+1}`,
+      type:PORT_FORMATS.includes(item?.type)?item.type:'标量',
+      order:Number.isFinite(Number(item?.order))?Number(item.order):index
+    }))
+    .filter(Boolean);
+  while(normalized.length<minCount){
+    normalized.push({
+      id:`${prefix.toLowerCase()}-${normalized.length+1}`,
+      name:`${prefix} ${normalized.length+1}`,
+      type:'标量',
+      order:normalized.length
+    });
+  }
+  return normalized.map((item,index)=>({
+    ...item,
+    order:index
+  }));
+}
+
+function ensureSubsystemInterface(nodeOrProps){
+  const props=nodeOrProps?.props||nodeOrProps||{};
+  if(!props.interface||typeof props.interface!=='object'){
+    props.interface={};
+  }
+  props.interface.inputs=normalizeSubsystemInterfaceList(props.interface.inputs,'输入',0);
+  props.interface.outputs=normalizeSubsystemInterfaceList(props.interface.outputs,'输出',0);
+  return props.interface;
+}
+
+function buildSubsystemInterfaceRows(items,role){
+  return items.map((item,index)=>`
+    <div class="sim-intf-row subsystem-intf-row" data-subsystem-role="${role}" data-index="${index}" data-port-id="${escapeHtml(item.id)}">
+      <div class="props-field">
+        <label>${role==='input'?'输入':'输出'}名称 ${index+1}</label>
+        <input data-subsystem-field="name" value="${escapeHtml(item.name)}">
+      </div>
+      <div class="props-field">
+        <label>${role==='input'?'输入':'输出'}类型</label>
+        <select data-subsystem-field="type">${buildSelectOptions(PORT_FORMATS,item.type)}</select>
+      </div>
+    </div>`).join('');
+}
+
+function buildSubsystemBlockFields(node){
+  const canvas=ensureSubsystemCanvasNode(node);
+  const intf=ensureSubsystemInterface(node);
+  return `
+    <div class="pgroup">
+      <div class="pglbl">子系统设置</div>
+      <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+      <div class="props-field"><label>模块说明</label><textarea id="prop-description" rows="3" placeholder="可填写子系统职责、输入输出说明">${escapeHtml(node.props.description||'')}</textarea></div>
+      <div class="prow"><span class="pk">子画布 ID</span><span class="pv">${escapeHtml(node.targetCanvasId||canvas?.id||'--')}<</span></div>
+    </div>
+    <div class="sim-intf-toolbar">
+      <div class="sim-intf-counts">
+        <div class="props-field"><label>输入数量</label><input id="subsystem-input-count" type="number" min="${SUBSYSTEM_INTERFACE_LIMITS.inputs[0]}" max="${SUBSYSTEM_INTERFACE_LIMITS.inputs[1]}" value="${intf.inputs.length}"></div>
+        <div class="props-field"><label>输出数量</label><input id="subsystem-output-count" type="number" min="${SUBSYSTEM_INTERFACE_LIMITS.outputs[0]}" max="${SUBSYSTEM_INTERFACE_LIMITS.outputs[1]}" value="${intf.outputs.length}"></div>
+      </div>
+      <button class="props-secondary" type="button" onclick="syncSubsystemInterfaceCounts()">同步接口数量</button>
+      <div class="sim-intf-note">父层子系统块显示这些稳定端口；进入子系统后会自动同步为内部边界输入/输出节点。</div>
+    </div>
+    <div class="sim-intf-group">
+      <div class="sim-intf-head">
+        <div class="sim-intf-title">输入接口</div>
+        <div class="sim-intf-meta">${intf.inputs.length} 个父层输入</div>
+      </div>
+      <div class="sim-intf-list">${intf.inputs.length?buildSubsystemInterfaceRows(intf.inputs,'input'):'<div class="sim-intf-note">当前没有输入接口。</div>'}</div>
+    </div>
+    <div class="sim-intf-group">
+      <div class="sim-intf-head">
+        <div class="sim-intf-title">输出接口</div>
+        <div class="sim-intf-meta">${intf.outputs.length} 个父层输出</div>
+      </div>
+      <div class="sim-intf-list">${intf.outputs.length?buildSubsystemInterfaceRows(intf.outputs,'output'):'<div class="sim-intf-note">当前没有输出接口。</div>'}</div>
+    </div>`;
+}
+
+function readSubsystemInterfaceRows(role){
+  return [...document.querySelectorAll(`.subsystem-intf-row[data-subsystem-role="${role}"]`)].map((row,index)=>({
+    id:row.dataset.portId||`${role}-${index+1}`,
+    name:(row.querySelector('[data-subsystem-field="name"]')?.value||`${role==='input'?'输入':'输出'} ${index+1}`).trim()||`${role==='input'?'输入':'输出'} ${index+1}`,
+    type:row.querySelector('[data-subsystem-field="type"]')?.value||'标量',
+    order:index
+  }));
+}
+
+function getSubsystemBoundaryNodeId(subsystemNodeId,role,portId){
+  return `node-${subsystemNodeId}-${role}-${portId}`;
+}
+
+function createSubsystemBoundaryNode(subsystemNode,role,item,index,existingNode=null){
+  const type=role==='input'?'subsystem_in_port':'subsystem_out_port';
+  const meta=COMPONENT_LIBRARY[type];
+  const defaultX=role==='input'?64:(CANVAS_STAGE.width-meta.width-64);
+  const defaultY=160+(index*92);
+  return {
+    id:existingNode?.id||getSubsystemBoundaryNodeId(subsystemNode.id,role,item.id),
+    type,
+    x:existingNode?.x ?? defaultX,
+    y:existingNode?.y ?? defaultY,
+    w:meta.width,
+    h:meta.height,
+    props:{
+      ...(existingNode?.props||{}),
+      name:item.name,
+      interfacePortId:item.id,
+      interfaceRole:role,
+      portType:item.type,
+      order:item.order
+    },
+    pythonBinding:null
+  };
+}
+
+function syncSubsystemBoundaryNodes(node){
+  if(!node||node.type!=='subsystem_block'){return null;}
+  const canvas=ensureSubsystemCanvasNode(node);
+  const intf=ensureSubsystemInterface(node);
+  canvas.name=node.props.name;
+  const existingBoundaryByKey=new Map(
+    (canvas.nodes||[])
+      .filter(item=>isSubsystemBoundaryNodeType(item.type))
+      .map(item=>[`${item.props?.interfaceRole||'input'}:${item.props?.interfacePortId||item.id}`,item])
+  );
+  const nextBoundaryNodes=[
+    ...intf.inputs.map((item,index)=>createSubsystemBoundaryNode(node,'input',item,index,existingBoundaryByKey.get(`input:${item.id}`))),
+    ...intf.outputs.map((item,index)=>createSubsystemBoundaryNode(node,'output',item,index,existingBoundaryByKey.get(`output:${item.id}`)))
+  ];
+  const nextBoundaryIds=new Set(nextBoundaryNodes.map(item=>item.id));
+  const removedBoundaryIds=(canvas.nodes||[])
+    .filter(item=>isSubsystemBoundaryNodeType(item.type)&&!nextBoundaryIds.has(item.id))
+    .map(item=>item.id);
+
+  canvas.nodes=[
+    ...nextBoundaryNodes,
+    ...(canvas.nodes||[]).filter(item=>!isSubsystemBoundaryNodeType(item.type))
+  ];
+  if(removedBoundaryIds.length){
+    canvas.edges=(canvas.edges||[]).filter(edge=>!removedBoundaryIds.includes(edge.sourceNodeId)&&!removedBoundaryIds.includes(edge.targetNodeId));
+  }
+  return canvas;
+}
+
+function syncSubsystemInterfaceCounts(){
+  const node=getNode(S.selBlk);
+  if(!node||node.type!=='subsystem_block'){return;}
+  const nextProps=cloneDefaults(node.props);
+  ensureSubsystemInterface(nextProps);
+  nextProps.interface.inputs=readSubsystemInterfaceRows('input');
+  nextProps.interface.outputs=readSubsystemInterfaceRows('output');
+  const inputCount=clampInterfaceCount(document.getElementById('subsystem-input-count')?.value,SUBSYSTEM_INTERFACE_LIMITS.inputs);
+  const outputCount=clampInterfaceCount(document.getElementById('subsystem-output-count')?.value,SUBSYSTEM_INTERFACE_LIMITS.outputs);
+  nextProps.interface.inputs=normalizeSubsystemInterfaceList(nextProps.interface.inputs.slice(0,inputCount),'输入',inputCount);
+  nextProps.interface.outputs=normalizeSubsystemInterfaceList(nextProps.interface.outputs.slice(0,outputCount),'输出',outputCount);
   const preview={...node,props:nextProps};
   renderPropertyPanel(preview);
 }
@@ -772,7 +1191,7 @@ function buildPythonPortTooltip(meta,kind='input'){
   const parts=[meta.displayName||meta.varName||'端口'];
   if(meta.type){parts.push(`类型: ${meta.type}`);}
   if(kind==='input'&&meta.default!==null&&meta.default!==undefined&&meta.default!==''){
-    parts.push(`榛樿鍊? ${meta.default}`);
+    parts.push(`默认值: ${meta.default}`);
   }
   if(meta.comment){parts.push(meta.comment);}
   return parts.join('\\n');
@@ -1041,6 +1460,10 @@ function clientToStagePoint(clientX,clientY){
   };
 }
 
+function movedBeyondPointerThreshold(startX,startY,currentX,currentY,threshold=POINTER_DRAG_THRESHOLD){
+  return Math.hypot((currentX||0)-(startX||0),(currentY||0)-(startY||0))>=threshold;
+}
+
 function clampCanvasOffset(){
   const viewport=getCanvasViewport();
   if(!viewport){return;}
@@ -1078,6 +1501,7 @@ function applyCanvasTransform(){
   if(reset){
     reset.textContent=`${percent}%`;
   }
+  syncActiveCanvasViewportFromState();
 }
 
 function setCanvasZoom(nextScale,pivotClientX,pivotClientY){
@@ -1168,23 +1592,23 @@ function buildNodeSubtitle(node){
     case 'signal_source':
       return `${props.waveType} · 幅值${props.amplitude} · ${props.outputFormat}`;
     case 'flow_block':
-      return `${props.inputName} / ${props.inputFormat} 鈫?${props.outputName} / ${props.outputFormat}${faultNote}`;
+      return `${props.inputName} / ${props.inputFormat} → ${props.outputName} / ${props.outputFormat}${faultNote}`;
     case 'simulation_block':
       normalizeSimulationInterfaces(props);
-      return `${props.inputs.length}鍏?路 ${props.outputs.length}鍑?路 ${props.middleVars.length}涓棿 · ${props.moduleType}${faultNote}`;
+      return `${props.inputs.length}输入 · ${props.outputs.length}输出 · ${props.middleVars.length}中间量 · ${props.moduleType}${faultNote}`;
     case 'fault_bias':
     case 'fault_noise':
     case 'fault_stuck':
     case 'fault_drift':
       return `${props.faultType} · ${props.layer}`;
     case 'instrument_scope':
-      return `${props.instrumentType} · 鍙屽嚮查看波形`;
+      return `${props.instrumentType} · 双击查看波形`;
     case 'instrument_spectrum':
     case 'instrument_logger':
       return `${props.instrumentType} · ${props.sampleRate}`;
     case 'link_normal':
     case 'link_can':
-      return `${props.sourcePort} 鈫?${props.targetPort}`;
+      return `${props.sourcePort} → ${props.targetPort}`;
     default:
       return '';
   }
@@ -1274,34 +1698,15 @@ function beginNodeDrag(event,nodeId){
   if(event.button!==0||event.target.closest('.node-port')){return;}
   const node=getNode(nodeId);
   if(!node){return;}
-  if(node.type==='instrument_scope'){
-    const now=Date.now();
-    if(NODE_DOUBLE_CLICK.nodeId===nodeId&&(now-NODE_DOUBLE_CLICK.timestamp)<320){
-      NODE_DOUBLE_CLICK.nodeId='';
-      NODE_DOUBLE_CLICK.timestamp=0;
-      openScope(nodeId);
-      event.preventDefault();
-      return;
-    }
-    NODE_DOUBLE_CLICK.nodeId=nodeId;
-    NODE_DOUBLE_CLICK.timestamp=now;
-  }
   selectNode(nodeId);
   NODE_DRAG.active=true;
+  NODE_DRAG.engaged=false;
   NODE_DRAG.pointerId=event.pointerId;
   NODE_DRAG.nodeId=nodeId;
   NODE_DRAG.startX=event.clientX;
   NODE_DRAG.startY=event.clientY;
   NODE_DRAG.originX=node.x;
   NODE_DRAG.originY=node.y;
-  const el=document.getElementById(`b-${nodeId}`);
-  if(el){
-    el.classList.add('is-dragging');
-    if(el.setPointerCapture){
-      el.setPointerCapture(event.pointerId);
-    }
-  }
-  event.preventDefault();
 }
 
 function handlePortClick(event,nodeId,direction,index){
@@ -1426,7 +1831,7 @@ function renderModelNodes(){
       el.style.paddingBottom='';
     }
     const nodeTitle=pythonBound?(node.pythonBinding?.fileName||node.props.name):node.props.name;
-    const nodeSubtitle=pythonBound?`流程鍧?路 ${getPythonBindingSummary(node)}`:buildNodeSubtitle(node);
+    const nodeSubtitle=pythonBound?`流程块 · ${getPythonBindingSummary(node)}`:buildNodeSubtitle(node);
     el.innerHTML=`
       <div class="fbadge">F</div>
       ${pythonBound?'<div class="node-card__python-chip">Py</div>':''}
@@ -1607,7 +2012,7 @@ function syncConfigTargets(preferredId=''){
   const currentValue=preferredId||sel.value;
   const nodes=getConfigurableNodes();
   if(nodes.length===0){
-    sel.innerHTML='<option value="">璇峰厛鍒涘缓系统建模缁勪欢</option>';
+    sel.innerHTML='<option value="">请先创建系统建模组件</option>';
     return;
   }
   sel.innerHTML=nodes.map(node=>`<option value="${node.id}">${escapeHtml(node.props.name)} · ${COMPONENT_LIBRARY[node.type].label}</option>`).join('');
@@ -1725,16 +2130,14 @@ function bindCanvasInteractions(){
       clearPendingConnection();
       return;
     }
-    if(S.selBlk||S.selEdge){
-      clearCanvasSelection();
-    }
     CANVAS_PAN.active=true;
+    CANVAS_PAN.engaged=false;
+    CANVAS_PAN.clearSelectionOnPointerUp=Boolean(S.selBlk||S.selEdge);
     CANVAS_PAN.pointerId=event.pointerId;
     CANVAS_PAN.startX=event.clientX;
     CANVAS_PAN.startY=event.clientY;
     CANVAS_PAN.originX=S.canvasOffsetX;
     CANVAS_PAN.originY=S.canvasOffsetY;
-    viewport.classList.add('panning');
     if(viewport.setPointerCapture){
       viewport.setPointerCapture(event.pointerId);
     }
@@ -1751,6 +2154,17 @@ function bindCanvasInteractions(){
     if(NODE_DRAG.active&&NODE_DRAG.pointerId===event.pointerId){
       const node=getNode(NODE_DRAG.nodeId);
       if(!node){return;}
+      if(!NODE_DRAG.engaged){
+        if(!movedBeyondPointerThreshold(NODE_DRAG.startX,NODE_DRAG.startY,event.clientX,event.clientY)){return;}
+        NODE_DRAG.engaged=true;
+        const dragEl=document.getElementById(`b-${NODE_DRAG.nodeId}`);
+        if(dragEl){
+          dragEl.classList.add('is-dragging');
+          if(dragEl.setPointerCapture){
+            dragEl.setPointerCapture(event.pointerId);
+          }
+        }
+      }
       const deltaX=(event.clientX-NODE_DRAG.startX)/S.canvasScale;
       const deltaY=(event.clientY-NODE_DRAG.startY)/S.canvasScale;
       node.x=clamp(Math.round(NODE_DRAG.originX+deltaX),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-node.w-CANVAS_STAGE.nodePadding);
@@ -1761,6 +2175,11 @@ function bindCanvasInteractions(){
     }
 
     if(CANVAS_PAN.active&&CANVAS_PAN.pointerId===event.pointerId){
+      if(!CANVAS_PAN.engaged){
+        if(!movedBeyondPointerThreshold(CANVAS_PAN.startX,CANVAS_PAN.startY,event.clientX,event.clientY)){return;}
+        CANVAS_PAN.engaged=true;
+        viewport.classList.add('panning');
+      }
       S.canvasOffsetX=CANVAS_PAN.originX+(event.clientX-CANVAS_PAN.startX);
       S.canvasOffsetY=CANVAS_PAN.originY+(event.clientY-CANVAS_PAN.startY);
       clampCanvasOffset();
@@ -1772,17 +2191,25 @@ function bindCanvasInteractions(){
     if(NODE_DRAG.active&&NODE_DRAG.pointerId===event.pointerId){
       const draggedNode=getNode(NODE_DRAG.nodeId);
       const draggedEl=document.getElementById(`b-${NODE_DRAG.nodeId}`);
+      const wasDragging=NODE_DRAG.engaged;
       if(draggedEl){
         draggedEl.classList.remove('is-dragging');
       }
       NODE_DRAG.active=false;
+      NODE_DRAG.engaged=false;
       NODE_DRAG.pointerId=null;
       NODE_DRAG.nodeId='';
-      if(draggedNode){renderEdges();}
+      NODE_DRAG.clickSuppressUntil=wasDragging?Date.now()+220:0;
+      if(draggedNode&&wasDragging){renderEdges();}
     }
 
     if(CANVAS_PAN.active&&CANVAS_PAN.pointerId===event.pointerId){
+      if(!CANVAS_PAN.engaged&&CANVAS_PAN.clearSelectionOnPointerUp){
+        clearCanvasSelection();
+      }
       CANVAS_PAN.active=false;
+      CANVAS_PAN.engaged=false;
+      CANVAS_PAN.clearSelectionOnPointerUp=false;
       CANVAS_PAN.pointerId=null;
       viewport.classList.remove('panning');
     }
@@ -1826,17 +2253,17 @@ function bindCanvasInteractions(){
 
 function buildPythonBindingPortRows(items,kind){
   if(!items.length){
-    return '<div class="props-help">当前娌℃湁鍙敤端口</div>';
+    return '<div class="props-help">当前没有可用端口</div>';
   }
   return items.map(item=>{
     const status=kind==='inputs'
-      ?(item.connected?'<span class="pv pv-ok">已连接</span>':'<span class="pv pv-fault">鏈繛鎺?</span>')
+      ?(item.connected?'<span class="pv pv-ok">已连接</span>':'<span class="pv pv-fault">未连接</span>')
       :'<span class="pv pv-ok">已暴露</span>';
     const title=escapeHtml(item.displayName||item.varName||'-');
     const type=escapeHtml(item.type||'any');
     const note=item.comment?`<div class="props-help">${escapeHtml(item.comment)}</div>`:'';
     const defaultRow=kind==='inputs'&&item.default!==null&&item.default!==undefined&&item.default!==''
-      ?`<div class="prow"><span class="pk">榛樿鍊?</span><span class="pv">${escapeHtml(item.default)}<</span></div>`
+      ?`<div class="prow"><span class="pk">默认值<</span><span class="pv">${escapeHtml(item.default)}<</span></div>`
       :'';
     return `
       <div class="pgroup pgroup--compact">
@@ -1857,8 +2284,8 @@ function buildFlowBlockFields(node){
         <div class="pglbl">Python 绑定</div>
         <div class="prow"><span class="pk">文件<</span><span class="pv">${escapeHtml(binding.fileName||'-')}<</span></div>
         <div class="prow"><span class="pk">模块<</span><span class="pv">${escapeHtml(binding.moduleName||'-')}<</span></div>
-        <div class="prow"><span class="pk">鍏ュ彛鍑芥暟<</span><span class="pv">${escapeHtml(binding.entryFunction||'process')}<</span></div>
-        <div class="prow"><span class="pk">端口鎽樿<</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}<</span></div>
+        <div class="prow"><span class="pk">入口函数<</span><span class="pv">${escapeHtml(binding.entryFunction||'process')}<</span></div>
+        <div class="prow"><span class="pk">端口摘要<</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}<</span></div>
         ${binding.description?`<div class="props-help">${escapeHtml(binding.description)}</div>`:''}
       </div>
       <div class="pgroup">
@@ -1952,6 +2379,9 @@ function renderPropertyPanel(node){
   const meta=COMPONENT_LIBRARY[node.type];
   const fault=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault);
   const pythonBound=isPythonBoundFlowBlock(node);
+  const simulationPackageRows=pythonBound
+    ?buildSimulationBlockPackageRows(node)
+    :'';
   let fields='';
 
   if(node.type==='signal_source'){
@@ -2260,7 +2690,7 @@ function toggleTpl(t,card){
 
 function showTplDetail(t){
   if(!t?.id){
-    document.getElementById('tdetail').innerHTML='<div class="tdph">鈫?选择模板查看璇︽儏</div>';
+    document.getElementById('tdetail').innerHTML='<div class="tdph">→ 选择模板查看详情</div>';
     return;
   }
   document.getElementById('tdetail').innerHTML=`
@@ -2337,7 +2767,7 @@ function renderElectricalInjectModal(){
 
   const importedElectrical=S.importedFaultModels.filter(model=>model.layer==='electrical');
   if(importedElectrical.length===0){
-    importedList.innerHTML='<div class="ifm-empty">当前杩樻病鏈夊凡导入鐨勭數姘斿眰故障妯型。可先从右上角导入，或直接在右侧模板库中选择并注入。</div>';
+    importedList.innerHTML='<div class="ifm-empty">当前还没有已导入的电气层故障模型。可先从右上角导入，或直接在右侧模板库中选择并注入。</div>';
   }else{
     importedList.innerHTML=importedElectrical.map(model=>`
       <div class="ifm-item${S.injectSelectionMode==='imported'&&S.injectSelectionId===model.id?' on':''}" onclick="selectElectricalInject('imported','${model.id}')">
@@ -2351,10 +2781,10 @@ function renderElectricalInjectModal(){
   }
 
   targetCard.innerHTML=`
-    <div class="einj-target-kicker">鐩爣模块</div>
+    <div class="einj-target-kicker">目标模块</div>
     <div class="einj-target-name">${escapeHtml(target.props.name)}</div>
-    <div class="einj-target-sub">电气层故障将以模块内部编辑的形式作用在当前{COMPONENT_LIBRARY[target.type].label}涓婏紝涓嶉渶瑕侀澶栨嫋鎷芥晠闅滃潡銆?</div>
-    ${target.injectedFault?`<div class="einj-current">宸叉敞鍏ワ細${escapeHtml(target.injectedFault.name)}</div>`:''}`;
+    <div class="einj-target-sub">电气层故障将以模块内部编辑的形式作用在当前 ${COMPONENT_LIBRARY[target.type].label} 上，无需额外拖拽故障块。</div>
+    ${target.injectedFault?`<div class="einj-current">已注入：${escapeHtml(target.injectedFault.name)}</div>`:''}`;
 
   grid.innerHTML=(TPLS.electrical||[]).map(template=>`
     <div class="einj-card${S.injectSelectionMode==='template'&&S.injectSelectionId===template.id?' on':''}" onclick="selectElectricalInject('template','${template.id}')">
@@ -2378,14 +2808,14 @@ function renderElectricalInjectModal(){
   detail.innerHTML=`
     <div class="tdtitle">${escapeHtml(selectedName)}</div>
     <div style="font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:10px">${escapeHtml(selectedDesc)}</div>
-    <div class="einj-row"><span>鏉ユ簮<</span><span>${sourceLabel}<</span></div>
+    <div class="einj-row"><span>来源<</span><span>${sourceLabel}<</span></div>
     <div class="einj-row"><span>层级<</span><span>${selectedLayer}<</span></div>
-    <div class="einj-row"><span>作用瀵硅薄<</span><span>${escapeHtml(target.props.name)}<</span></div>
-    <div class="tdlbl">鏍囩</div>
+    <div class="einj-row"><span>作用对象<</span><span>${escapeHtml(target.props.name)}<</span></div>
+    <div class="tdlbl">标签</div>
     <div class="einj-tags" style="margin-top:6px">${selectedTags.map(tag=>`<span class="einj-tag">${escapeHtml(tag)}<</span>`).join('')}</div>
     <div class="tdlbl">注入璇存槑</div>
     <div style="font-size:10px;color:var(--text2);line-height:1.7;margin-top:4px">确认后将把该电气层故障绑定到当前模块，模块卡片会标红，并纳入后续仿真分析。</div>`;
-  hint.textContent=`已选：${selectedName}锛岀‘璁ゅ悗灏嗘敞鍏ュ埌 ${target.props.name}`;
+  hint.textContent=`已选：${selectedName}，确认后将注入到 ${target.props.name}`;
 }
 
 function openElectricalFaultImport(){
@@ -2493,7 +2923,7 @@ function renderProtocolInjectModal(){
   }else{
     importedList.innerHTML=importedProtocol.map(model=>`
       <div class="ifm-item${S.protocolInjectSelectionMode==='imported'&&S.protocolInjectSelectionId===model.id?' on':''}" onclick="selectProtocolInject('imported','${model.id}')">
-        <div class="ifm-icon">馃摗</div>
+        <div class="ifm-icon">协</div>
         <div style="min-width:0;flex:1">
           <div class="ifm-name">${escapeHtml(model.name)}</div>
           <div class="ifm-meta">${escapeHtml(buildFaultCatalogMeta(model))}</div>
@@ -2503,10 +2933,10 @@ function renderProtocolInjectModal(){
   }
 
   targetCard.innerHTML=`
-    <div class="einj-target-kicker">鐩爣连线</div>
+    <div class="einj-target-kicker">目标连线</div>
     <div class="einj-target-name">CAN 总线</div>
-    <div class="einj-target-sub">杩炴帴 ${escapeHtml(sourceName)} 鈫?${escapeHtml(targetName)}。协议层故障会直接作用在这条 CAN 通信链路上。</div>
-    ${target.injectedFault?`<div class="einj-current">宸叉敞鍏ワ細${escapeHtml(target.injectedFault.name)}</div>`:''}`;
+    <div class="einj-target-sub">连接 ${escapeHtml(sourceName)} → ${escapeHtml(targetName)}。协议层故障会直接作用在这条 CAN 通信链路上。</div>
+    ${target.injectedFault?`<div class="einj-current">已注入：${escapeHtml(target.injectedFault.name)}</div>`:''}`;
 
   grid.innerHTML=(TPLS.protocol||[]).map(template=>`
     <div class="einj-card${S.protocolInjectSelectionMode==='template'&&S.protocolInjectSelectionId===template.id?' on':''}" onclick="selectProtocolInject('template','${template.id}')">
@@ -2525,20 +2955,20 @@ function renderProtocolInjectModal(){
   const selectedName=selected.name;
   const selectedDesc=selected.desc||'未提供说明';
   const selectedTags=selected.tags||[];
-  const selectedKind=selected.faultKind||selected.tags?.[0]||'协议故障';
+  const selectedKind=selected.faultKind||selected.tags?.[0]||'协议层故障';
   const sourceLabel=S.protocolInjectSelectionMode==='imported'?'已导入模型':'模板直注';
   detail.innerHTML=`
     <div class="tdtitle">${escapeHtml(selectedName)}</div>
     <div style="font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:10px">${escapeHtml(selectedDesc)}</div>
-    <div class="einj-row"><span>鏉ユ簮<</span><span>${sourceLabel}<</span></div>
-    <div class="einj-row"><span>层级<</span><span>协议层</span></div>
+    <div class="einj-row"><span>来源<</span><span>${sourceLabel}<</span></div>
+    <div class="einj-row"><span>层级<</span><span>协议层</span></div>
     <div class="einj-row"><span>故障类型<</span><span>${escapeHtml(selectedKind)}<</span></div>
-    <div class="einj-row"><span>作用瀵硅薄<</span><span>CAN 总线<</span></div>
-    <div class="tdlbl">鏍囩</div>
+    <div class="einj-row"><span>作用对象<</span><span>CAN 总线<</span></div>
+    <div class="tdlbl">标签</div>
     <div class="einj-tags" style="margin-top:6px">${selectedTags.map(tag=>`<span class="einj-tag">${escapeHtml(tag)}<</span>`).join('')}</div>
     <div class="tdlbl">注入璇存槑</div>
-    <div style="font-size:10px;color:var(--text2);line-height:1.7;margin-top:4px">确认鍚庡皢鎶婅协议灞傛晠闅滅粦瀹氬埌当前 CAN 总线涓婏紝连线浼氭爣绾㈠苟鍒囨崲涓鸿櫄绾匡紝鐢ㄤ簬鍚庣画仿真分析銆?</div>`;
-  hint.textContent=`已选：${selectedName}锛岀‘璁ゅ悗灏嗘敞鍏ュ埌当前 CAN 总线`;
+    <div style="font-size:10px;color:var(--text2);line-height:1.7;margin-top:4px">确认后将把该协议层故障绑定到当前 CAN 总线上，连线会标红并切换为虚线，用于后续仿真分析。</div>`;
+  hint.textContent=`已选：${selectedName}，确认后将注入到当前 CAN 总线`;
 }
 
 function openProtocolFaultImport(){
@@ -2566,7 +2996,7 @@ function openProtocolFaultImport(){
 function confirmProtocolFaultInjection(){
   const target=getEdge(S.protocolInjectTargetId);
   if(!isProtocolInjectableEdge(target)){
-    toast('当前娌℃湁鍙敞鍏ョ殑 CAN 总线','w');
+    toast('当前没有可注入的 CAN 总线','w');
     return;
   }
   const selected=getCurrentProtocolSelection();
@@ -2584,7 +3014,7 @@ function confirmProtocolFaultInjection(){
       layer:'protocol',
       desc:selected.desc,
       tags:selected.tags,
-      faultKind:selected.faultKind||selected.tags?.[0]||'协议故障',
+      faultKind:selected.faultKind||selected.tags?.[0]||'协议层故障',
       faultCode:selected.faultCode||'',
       createdAt:new Date().toLocaleDateString('zh-CN'),
       origin:'template',
@@ -2599,7 +3029,7 @@ function confirmProtocolFaultInjection(){
     layer:'protocol',
     tags:cloneDefaults(importedModel.tags||[]),
     desc:importedModel.desc||'',
-    faultKind:importedModel.faultKind||importedModel.tags?.[0]||'协议故障',
+    faultKind:importedModel.faultKind||importedModel.tags?.[0]||'协议层故障',
     faultCode:importedModel.faultCode||''
   };
   renderFaultCatalogList();
@@ -2636,7 +3066,7 @@ function upPrev(){
     np.push(`${x},${y}`);
     let fy=y;
     if(t>=s&&t<=s+d){
-      if(typ.includes('鍗℃'))fy=mid+18;
+      if(typ.includes('卡死'))fy=mid+18;
       else if(typ.includes('婕傜Щ'))fy=y+(t-s)*mag*4;
       else fy=y+mag*18;
     }
@@ -2646,10 +3076,10 @@ function upPrev(){
   document.getElementById('tlf').setAttribute('points',fp.join(' '));
   const tgt=document.getElementById('cftgt')?.selectedOptions?.[0]?.textContent||'未选择目标';
   document.getElementById('csumm').innerHTML=`
-    <div class="srow"><span class="sk">鐩爣<</span><span class="sv">${tgt.split('路')[0].trim()}<</span></div>
+    <div class="srow"><span class="sk">目标<</span><span class="sv">${tgt.split('路')[0].trim()}<</span></div>
     <div class="srow"><span class="sk">层级<</span><span class="sv">${S.activeLayer}<</span></div>
     <div class="srow"><span class="sk">类型<</span><span class="sv">${typ.split('(')[0].trim()}<</span></div>
-    <div class="srow"><span class="sk">璧峰<</span><span class="sv">${s}s<</span></div>
+    <div class="srow"><span class="sk">起始<</span><span class="sv">${s}s<</span></div>
     <div class="srow"><span class="sk">鏃堕暱<</span><span class="sv">${d}s<</span></div>
     <div class="srow"><span class="sk">骞呭害<</span><span class="sv">${mag}<</span></div>`;
 }
@@ -2742,6 +3172,39 @@ function ensureScopeWindowStore(){
   if(!Number.isFinite(SIM.scopeWindowZ)){SIM.scopeWindowZ=10;}
 }
 
+function getScopeWindowHostMetrics(){
+  const host=document.getElementById('scope-window-layer');
+  const viewport=getCanvasViewport();
+  const target=host||viewport;
+  const rect=target?.getBoundingClientRect?.();
+  return {
+    width:Math.max(
+      host?.clientWidth||0,
+      viewport?.clientWidth||0,
+      Math.round(rect?.width||0),
+      window.innerWidth||0,
+      320
+    ),
+    height:Math.max(
+      host?.clientHeight||0,
+      viewport?.clientHeight||0,
+      Math.round(rect?.height||0),
+      window.innerHeight||0,
+      240
+    )
+  };
+}
+
+function clampScopeWindowPosition(scopeWindow){
+  if(!scopeWindow){return scopeWindow;}
+  const hostMetrics=getScopeWindowHostMetrics();
+  const maxX=Math.max(SCOPE_WINDOW_LAYOUT.gutter,hostMetrics.width-SCOPE_WINDOW_LAYOUT.defaultWidth-SCOPE_WINDOW_LAYOUT.gutter);
+  const maxY=Math.max(SCOPE_WINDOW_LAYOUT.reservedTop,hostMetrics.height-SCOPE_WINDOW_LAYOUT.estimatedHeight-SCOPE_WINDOW_LAYOUT.gutter);
+  scopeWindow.x=clamp(Math.round(scopeWindow.x),SCOPE_WINDOW_LAYOUT.gutter,maxX);
+  scopeWindow.y=clamp(Math.round(scopeWindow.y),SCOPE_WINDOW_LAYOUT.reservedTop,maxY);
+  return scopeWindow;
+}
+
 function listOpenScopeWindows(){
   ensureScopeWindowStore();
   return Object.values(SIM.scopeWindows).filter(scopeWindow=>scopeWindow.open!==false&&getNode(scopeWindow.scopeId));
@@ -2759,11 +3222,11 @@ function ensureScopeWindow(scopeId){
     scopeId,
     open:true,
     mode:'overlay',
-    x:48+index*28,
-    y:44+index*24,
+    x:SCOPE_WINDOW_LAYOUT.gutter+index*SCOPE_WINDOW_LAYOUT.cascadeX,
+    y:SCOPE_WINDOW_LAYOUT.reservedTop+index*SCOPE_WINDOW_LAYOUT.cascadeY,
     z:++SIM.scopeWindowZ
   };
-  SIM.scopeWindows[scopeId]=created;
+  SIM.scopeWindows[scopeId]=clampScopeWindowPosition(created);
   return created;
 }
 
@@ -2938,11 +3401,11 @@ function findInputCouplingConflicts(){
 function validateSimulationTopology(){
   if(!S.sysLoaded){toast('请先导入系统模型','w');return false;}
   if(!S.modelNodes.some(node=>node.type==='signal_source')){
-    toast('璇疯嚦灏戞斁缃竴涓俊鍙锋簮','w');
+    toast('请至少放置一个信号源','w');
     return false;
   }
   if(getScopeNodes().length===0){
-    toast('璇疯嚦灏戞斁缃竴涓ず娉㈠櫒鐢ㄤ簬瑙傚療信号','w');
+    toast('请至少放置一个示波器用于观察信号','w');
     return false;
   }
   if(getConnectedScopeNodes().length===0){
@@ -2952,7 +3415,7 @@ function validateSimulationTopology(){
   const conflicts=findInputCouplingConflicts();
   if(conflicts.length){
     selectEdge(conflicts[0].id);
-    toast('检测到同一输入端口存在多条连线，请先删除多余连线以避免信号鑰﹀悎','w');
+    toast('检测到同一输入端口存在多条连线，请先删除多余连线以避免信号耦合','w');
     return false;
   }
   return true;
@@ -2973,6 +3436,20 @@ function computeSourceSignal(node,time){
 
 function applyElectricalFault(node,inputValue,outputValue,time){
   if(!node.injectedFault){return outputValue;}
+  const modelId=node.injectedFault.modelId||'';
+  const importedModel=modelId?getImportedFaultModel(modelId):null;
+  const faultValue=parseScalar(importedModel?.defaultValue,0);
+  if(modelId==='motor_efficiency_loss'){
+    const efficiency=faultValue>0?faultValue:0.55;
+    return outputValue*efficiency;
+  }
+  if(modelId==='motor_lock'){
+    return 0;
+  }
+  if(modelId==='motor_thrust_saturation'){
+    const saturation=faultValue>0?faultValue:8;
+    return Math.max(-saturation,Math.min(saturation,outputValue));
+  }
   const name=node.injectedFault.name||'';
   if(name.includes('过流')){
     return Math.abs(inputValue)>1.2?0:outputValue*0.78;
@@ -2980,7 +3457,7 @@ function applyElectricalFault(node,inputValue,outputValue,time){
   if(name.includes('短路')||name.includes('断路')||name.includes('开路')){
     return 0;
   }
-  if(name.includes('鐢靛帇')){
+  if(name.includes('电压')){
     return outputValue*(0.94+0.08*Math.sin(time*7.4));
   }
   return outputValue*0.85;
@@ -3005,10 +3482,12 @@ function flipBitValue(value){
 function transmitEdgeSignal(edge,value,modeKey,time){
   const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
   const edgeState=ensureEdgeRuntime(bucket,edge);
-  const base=Number.isFinite(value)?value:0;
+  const base=Array.isArray(value)
+    ?value.map(sanitizeSignalValue)
+    :(Number.isFinite(value)?value:0);
   let nextValue=base;
 
-  if(modeKey==='actual'&&edge.injectedFault?.layer==='protocol'){
+  if(modeKey==='actual'&&edge.injectedFault?.layer==='protocol'&&!Array.isArray(base)){
     const kind=edge.injectedFault.faultKind||'';
     const faultCode=edge.injectedFault.faultCode||'';
     const held=Number.isFinite(edgeState.lastOutput)?edgeState.lastOutput:0;
@@ -3030,11 +3509,14 @@ function transmitEdgeSignal(edge,value,modeKey,time){
   }
 
   edgeState.lastOutput=nextValue;
-  pushLimitedSample(edgeState.history,base,40);
+  pushLimitedSample(edgeState.history,Array.isArray(base)?sanitizeSignalValue(base[0]??0):base,40);
   return nextValue;
 }
 
 function sanitizeSignalValue(value){
+  if(Array.isArray(value)){
+    return value.map(sanitizeSignalValue);
+  }
   return Number.isFinite(value)?value:0;
 }
 
@@ -3060,10 +3542,10 @@ function buildSimulationResult(node,nodeState,inputValues,modeKey,time,dt){
   let coreOutput=0;
   let stateValue=0;
 
-  if(node.props.moduleType==='寰垎'){
+  if(node.props.moduleType==='微分'){
     coreOutput=(activeInput-(nodeState.prevAggregateInput||0))/Math.max(dt,0.001);
     stateValue=activeInput;
-  }else if(node.props.moduleType==='绉垎'){
+  }else if(node.props.moduleType==='积分'){
     nodeState.integrator=(nodeState.integrator||0)+activeInput*dt;
     coreOutput=nodeState.integrator;
     stateValue=nodeState.integrator;
@@ -3265,12 +3747,12 @@ function getScopeSignalName(scopeNode){
   const incoming=getIncomingEdgesForNode(scopeNode.id)[0];
   if(!incoming){return '未接入信号';}
   const sourceNode=getNode(incoming.sourceNodeId);
-  if(!sourceNode){return '涓婃父信号';}
+  if(!sourceNode){return '上游信号';}
   const outputPort=getNodePorts(sourceNode).outputs[incoming.sourcePortIndex||0];
   if(outputPort){
-    return `${sourceNode.props?.name||'涓婃父信号'} · ${outputPort.label}`;
+    return `${sourceNode.props?.name||'上游信号'} · ${outputPort.label}`;
   }
-  return sourceNode.props?.name||'涓婃父信号';
+  return sourceNode.props?.name||'上游信号';
 }
 
 function updateScopeChrome(){
@@ -3391,7 +3873,7 @@ function drawScope(){
   const ctx2=ch2.getContext('2d');
   if(!scopeNode){
     drawScopeEmpty(ctx1,ch1.width,ch1.height,'请先在画布中放置示波器');
-    drawScopeEmpty(ctx2,ch2.width,ch2.height,'绛夊緟频谱数据');
+    drawScopeEmpty(ctx2,ch2.width,ch2.height,'等待频谱数据');
     return;
   }
 
@@ -3399,7 +3881,7 @@ function drawScope(){
   const referenceSeries=(SIM.reference.scopeSamples[scopeNode.id]||[]).slice(-240);
   if(actualSeries.length===0){
     drawScopeEmpty(ctx1,ch1.width,ch1.height,'双击示波器后，开始仿真即可看到波形');
-    drawScopeEmpty(ctx2,ch2.width,ch2.height,'鏆傛棤频谱数据');
+    drawScopeEmpty(ctx2,ch2.width,ch2.height,'暂无频谱数据');
     return;
   }
 
@@ -3487,10 +3969,10 @@ function simInit(silent=false){
   }
   if(!silent){
     if(autoSaved){
-      toast(`系统妯″瀷宸茶嚜鍔ㄤ繚瀛橈紝骞跺畬鎴愪豢鐪熷垵濮嬪寲锛?{SIM.datasetName} · 鏃堕暱 ${SIM.duration}s · 姝ラ暱 ${SIM.stepSize}s`,'s');
+      toast(`系统模型已自动保存，并完成仿真初始化：${SIM.datasetName} · 时长 ${SIM.duration}s · 步长 ${SIM.stepSize}s`,'s');
       return;
     }
-    toast(`仿真鍒濆鍖栧畬鎴愶細${SIM.datasetName} · 鏃堕暱 ${SIM.duration}s · 姝ラ暱 ${SIM.stepSize}s`,'s');
+    toast(`仿真初始化完成：${SIM.datasetName} · 时长 ${SIM.duration}s · 步长 ${SIM.stepSize}s`,'s');
   }
 }
 
@@ -3517,7 +3999,7 @@ function simStep(){
     if(!SIM.inited){return;}
   }
   if(SIM.time>=SIM.duration){
-    toast('当前仿真宸茬粨鏉燂紝璇烽噸鏂板垵濮嬪寲鍚庡啀姝ヨ繘','w');
+    toast('当前仿真已经结束，请重新初始化后再步进','w');
     return;
   }
   const completed=runSimulationTick();
@@ -3525,7 +4007,7 @@ function simStep(){
   if(completed){
     simStop('completed');
   }else{
-    toast(`姝ヨ繘瀹屾垚 · t = ${SIM.time.toFixed(2)}s`,'s');
+    toast(`步进完成 · t = ${SIM.time.toFixed(2)}s`,'s');
   }
 }
 
@@ -3537,7 +4019,7 @@ function simPause(){
     toast('仿真已暂停','w');
   }else{
     startSimulationLoop();
-    toast('仿真继续杩愯','s');
+    toast('仿真继续运行','s');
   }
   updateSimbarEnabled();
   updateUI();
@@ -3602,17 +4084,17 @@ if(!window.__GZ_PYTHON_BINDING_EVENTS__){
 
 function buildPythonBindingPortRows(items,kind){
   if(!items.length){
-    return '<div class="props-help">当前娌℃湁鍙敤端口銆?</div>';
+    return '<div class="props-help">?????????</div>';
   }
   return items.map(item=>{
     const status=kind==='inputs'
-      ?(item.connected?'<span class="pv pv-ok">已连接</span>':'<span class="pv pv-fault">鏈繛鎺?</span>')
+      ?(item.connected?'<span class="pv pv-ok">???</span>':'<span class="pv pv-fault">???</span>')
       :'<span class="pv pv-ok">已暴露</span>';
     const title=escapeHtml(item.displayName||item.varName||'-');
     const type=escapeHtml(item.type||'any');
     const note=item.comment?`<div class="props-help">${escapeHtml(item.comment)}</div>`:'';
     const defaultRow=kind==='inputs'&&item.default!==null&&item.default!==undefined&&item.default!==''
-      ?`<div class="prow"><span class="pk">榛樿鍊?</span><span class="pv">${escapeHtml(item.default)}<</span></div>`
+      ?`<div class="prow"><span class="pk">???</span><span class="pv">${escapeHtml(item.default)}<</span></div>`
       :'';
     return `
       <div class="pgroup pgroup--compact">
@@ -3634,7 +4116,7 @@ function buildFlowBlockFields(node){
         <div class="prow"><span class="pk">文件<</span><span class="pv">${escapeHtml(binding.fileName||'-')}<</span></div>
         <div class="prow"><span class="pk">模块<</span><span class="pv">${escapeHtml(binding.moduleName||'-')}<</span></div>
         <div class="prow"><span class="pk">鍏ュ彛鍑芥暟<</span><span class="pv">${escapeHtml(binding.entryFunction||'process')}<</span></div>
-        <div class="prow"><span class="pk">端口鎽樿<</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}<</span></div>
+        <div class="prow"><span class="pk">????<</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}<</span></div>
         ${binding.description?`<div class="props-help">${escapeHtml(binding.description)}</div>`:''}
       </div>
       <div class="pgroup">
@@ -3730,6 +4212,9 @@ function renderPropertyPanel(node){
   const meta=COMPONENT_LIBRARY[node.type];
   const fault=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault);
   const pythonBound=isPythonBoundFlowBlock(node);
+  const simulationPackageRows=pythonBound
+    ?buildSimulationBlockPackageRows(node)
+    :'';
   let fields='';
 
   if(node.type==='signal_source'){
@@ -3795,7 +4280,7 @@ function renderPropertyPanel(node){
   pd.innerHTML=`
     <div class="pgroup">
       <div class="props-title">${escapeHtml(node.props.name)}</div>
-      <div class="props-sub">${pythonBound?(escapeHtml(node.pythonBinding?.fileName||'')+' · '):''}${meta.label} · 鑺傜偣 ${node.id.replace('node-','#')}</div>
+      <div class="props-sub">${pythonBound?(escapeHtml(node.pythonBinding?.fileName||'')+' · '):''}${meta.label} · 节点 ${node.id.replace('node-','#')}</div>
     </div>
     <div class="pgroup">
       <div class="pglbl">当前状态</div>
@@ -3840,6 +4325,7 @@ Object.assign(window,{
 
 updateUI();
 
+
 // ─── 弹窗控制 ───
 function openOv(id){document.getElementById(id).classList.add('open');if(id==='ov-scope')setTimeout(drawScope,50);if(id==='ov-cfg')setTimeout(upPrev,50);}
 function closeOv(id){document.getElementById(id).classList.remove('open');}
@@ -3858,7 +4344,7 @@ function toast(msg,type='w'){
   const tm=document.getElementById('tm');
   el.className='toast '+(type==='s'?'toast-s':'toast-w')+' on';
   ti.className=type==='s'?'ti-s':'ti-w';
-  ti.textContent=type==='s'?'鉁?':'⚡';
+  ti.textContent=type==='s'?'成功':'⚡';
   tm.textContent=msg;
   clearTimeout(toastT);
   toastT=setTimeout(()=>el.classList.remove('on'),3500);
@@ -3873,6 +4359,128 @@ const __legacyResolveNodeOutputs = resolveNodeOutputs;
 const __legacyResolveNodeOutput = resolveNodeOutput;
 const __legacyBuildSimulationBlockFields = buildSimulationBlockFields;
 const __legacySyncSimulationInterfaceCounts = syncSimulationInterfaceCounts;
+
+const SIGNAL_ADAPTER_FORMATS=['标量','向量','矩阵','布尔','事件'];
+const SIGNAL_UTILITY_INPUT_LIMITS=[2,6];
+
+COMPONENT_LIBRARY.flow_block={
+  ...COMPONENT_LIBRARY.flow_block,
+  label:'信号适配块',
+  badge:'适配',
+  defaults:{
+    name:'信号适配块',
+    inputName:'输入信号',
+    inputFormat:'标量',
+    outputName:'输出信号',
+    outputFormat:'标量'
+  }
+};
+COMPONENT_LIBRARY.gain_block={
+  label:'增益块',
+  badge:'增益',
+  className:'b-gain',
+  width:156,
+  height:84,
+  defaults:{name:'增益块',gain:'1.0',inputFormat:'标量',outputFormat:'标量'}
+};
+COMPONENT_LIBRARY.sum_block={
+  label:'求和块',
+  badge:'求和',
+  className:'b-sum',
+  width:164,
+  height:88,
+  defaults:{name:'求和块',inputCount:2,signs:['+','+'],outputFormat:'标量'}
+};
+COMPONENT_LIBRARY.mux_block={
+  label:'Mux 块',
+  badge:'Mux',
+  className:'b-mux',
+  width:164,
+  height:88,
+  defaults:{name:'Mux 块',inputCount:2,outputFormat:'向量'}
+};
+
+function clampSignalUtilityInputCount(value,fallback=2){
+  const numeric=Math.round(Number(value));
+  if(Number.isFinite(numeric)){
+    return clamp(numeric,SIGNAL_UTILITY_INPUT_LIMITS[0],SIGNAL_UTILITY_INPUT_LIMITS[1]);
+  }
+  return clamp(fallback,SIGNAL_UTILITY_INPUT_LIMITS[0],SIGNAL_UTILITY_INPUT_LIMITS[1]);
+}
+
+function normalizeSignalSigns(signs,count){
+  const list=Array.isArray(signs)
+    ?signs
+    :String(signs||'')
+      .split(/[,\s]+/)
+      .map(item=>item.trim())
+      .filter(Boolean);
+  return Array.from({length:count},(_,index)=>list[index]==='-'?'-':'+');
+}
+
+function normalizeSignalUtilityNode(node){
+  if(!node?.props){return;}
+  if(node.type==='gain_block'){
+    node.props.gain=String(node.props.gain??'1.0');
+    node.props.inputFormat=SIGNAL_ADAPTER_FORMATS.includes(node.props.inputFormat)?node.props.inputFormat:'标量';
+    node.props.outputFormat=SIGNAL_ADAPTER_FORMATS.includes(node.props.outputFormat)?node.props.outputFormat:'标量';
+    return;
+  }
+  if(node.type==='sum_block'){
+    const inputCount=clampSignalUtilityInputCount(node.props.inputCount,2);
+    node.props.inputCount=inputCount;
+    node.props.signs=normalizeSignalSigns(node.props.signs,inputCount);
+    node.props.outputFormat=SIGNAL_ADAPTER_FORMATS.includes(node.props.outputFormat)?node.props.outputFormat:'标量';
+    return;
+  }
+  if(node.type==='mux_block'){
+    node.props.inputCount=clampSignalUtilityInputCount(node.props.inputCount,2);
+    node.props.outputFormat=SIGNAL_ADAPTER_FORMATS.includes(node.props.outputFormat)?node.props.outputFormat:'向量';
+  }
+}
+
+function buildSignalUtilityFields(node){
+  normalizeSignalUtilityNode(node);
+  if(node.type==='gain_block'){
+    return `
+      <div class="pgroup">
+        <div class="pglbl">增益配置</div>
+        <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+        <div class="props-row">
+          <div class="props-field"><label>增益系数</label><input id="prop-gain" value="${escapeHtml(node.props.gain||'1.0')}"></div>
+          <div class="props-field"><label>输入类型</label><select id="prop-inputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.inputFormat||'标量')}</select></div>
+        </div>
+        <div class="props-field"><label>输出类型</label><select id="prop-outputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.outputFormat||'标量')}</select></div>
+        <div class="props-help">增益块对单路输入做比例缩放，用于显式表达放大、衰减和标定换算。</div>
+      </div>`;
+  }
+  if(node.type==='sum_block'){
+    return `
+      <div class="pgroup">
+        <div class="pglbl">求和配置</div>
+        <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+        <div class="props-row">
+          <div class="props-field"><label>输入数量</label><input id="prop-inputCount" type="number" min="${SIGNAL_UTILITY_INPUT_LIMITS[0]}" max="${SIGNAL_UTILITY_INPUT_LIMITS[1]}" value="${escapeHtml(String(node.props.inputCount||2))}"></div>
+          <div class="props-field"><label>符号序列</label><input id="prop-signs" value="${escapeHtml((node.props.signs||[]).join(', '))}" placeholder="+, +, -"></div>
+        </div>
+        <div class="props-field"><label>输出类型</label><select id="prop-outputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.outputFormat||'标量')}</select></div>
+        <div class="props-help">求和块显式汇入多路输入，避免把多根线直接插入同一个输入端口。</div>
+      </div>`;
+  }
+  if(node.type==='mux_block'){
+    return `
+      <div class="pgroup">
+        <div class="pglbl">Mux 配置</div>
+        <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+        <div class="props-row">
+          <div class="props-field"><label>输入数量</label><input id="prop-inputCount" type="number" min="${SIGNAL_UTILITY_INPUT_LIMITS[0]}" max="${SIGNAL_UTILITY_INPUT_LIMITS[1]}" value="${escapeHtml(String(node.props.inputCount||2))}"></div>
+          <div class="props-field"><label>输出类型</label><select id="prop-outputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.outputFormat||'向量')}</select></div>
+        </div>
+        <div class="props-help">Mux 块把多路输入打包为单路向量输出，用于向 Python 仿真块传递组合信号。</div>
+      </div>`;
+  }
+  return '';
+}
 
 getPythonBindingSummary = function(node){
   const binding = ensureFlowNodePythonBinding(node);
@@ -4390,8 +4998,10 @@ function renderAll(){
   S.selEdge=null;
   document.getElementById('empty').style.display='none';
   document.getElementById('diagram').classList.add('on');
-  handleCanvasZoomReset();
+  restoreActiveCanvasViewport(S.activeCanvasId);
+  applyCanvasTransform();
   clearPendingConnection();
+  renderCanvasBreadcrumbs();
   syncAllPythonInputConnectionState();
   renderModelNodes();
   renderPropertyPanel(null);
@@ -4820,6 +5430,20 @@ computeSourceSignal = function(node,time){
 
 applyElectricalFault = function(node,inputValue,outputValue,time){
   if(!node.injectedFault){return outputValue;}
+  const modelId=node.injectedFault.modelId||'';
+  const importedModel=modelId?getImportedFaultModel(modelId):null;
+  const faultValue=parseScalar(importedModel?.defaultValue,0);
+  if(modelId==='motor_efficiency_loss'){
+    const efficiency=faultValue>0?faultValue:0.55;
+    return outputValue*efficiency;
+  }
+  if(modelId==='motor_lock'){
+    return 0;
+  }
+  if(modelId==='motor_thrust_saturation'){
+    const saturation=faultValue>0?faultValue:8;
+    return Math.max(-saturation,Math.min(saturation,outputValue));
+  }
   const name=node.injectedFault.name||'';
   if(name.includes('过流')){
     return Math.abs(inputValue)>1.2?0:outputValue*0.78;
@@ -5315,6 +5939,18 @@ buildNodeSubtitle = function(node){
 };
 
 createNode = function(type,rawX,rawY){
+  if(type==='subsystem_block'){
+    const result=__legacyCreateNodeClean(type,rawX,rawY);
+    const node=getNode(S.selBlk)||S.modelNodes[S.modelNodes.length-1];
+    if(!node){return result;}
+    node.props.name=`子系统块 ${getNodeTypeCount(type)}`;
+    ensureSubsystemCanvasNode(node);
+    renderModelNodes();
+    syncConfigTargets(node.id);
+    selectNode(node.id);
+    updateUI();
+    return result;
+  }
   if(type!=='middle_var_assign'){
     return __legacyCreateNodeClean(type,rawX,rawY);
   }
@@ -5383,6 +6019,7 @@ renderModelNodes = function(){
     el.addEventListener('pointerdown',event=>beginNodeDrag(event,node.id));
     el.addEventListener('click',event=>{
       if(event.target.closest('.node-port')){return;}
+      if(Date.now()<NODE_DRAG.clickSuppressUntil){return;}
       selectNode(node.id);
       const now=Date.now();
       const isDouble=NODE_DOUBLE_CLICK.nodeId===node.id&&(now-NODE_DOUBLE_CLICK.timestamp)<320;
@@ -5393,6 +6030,8 @@ renderModelNodes = function(){
         openScope(node.id);
       }else if(node.type==='simulation_block'){
         openPythonBindingDialog(node.id);
+      }else if(node.type==='subsystem_block'){
+        openSubsystemCanvas(node.id);
       }
     });
 
@@ -5474,7 +6113,7 @@ renderPropertyPanel = function(node){
   if(!node||node.sourceNodeId&&node.targetNodeId&&!node.type){
     return __legacyRenderPropertyPanel(node);
   }
-  if(node.type!=='signal_source'&&node.type!=='flow_block'&&node.type!=='simulation_block'&&node.type!=='middle_var_assign'&&!node.type.startsWith('instrument_')){
+  if(node.type!=='signal_source'&&node.type!=='flow_block'&&node.type!=='simulation_block'&&node.type!=='middle_var_assign'&&node.type!=='subsystem_block'&&!node.type.startsWith('instrument_')){
     return __legacyRenderPropertyPanel(node);
   }
 
@@ -5506,6 +6145,15 @@ renderPropertyPanel = function(node){
     fields=buildSimulationBlockFields(node);
   }else if(node.type==='middle_var_assign'){
     fields=buildMiddleAssignmentFields(node);
+  }else if(node.type==='subsystem_block'){
+    const canvas=ensureSubsystemCanvasNode(node);
+    fields=`
+      <div class="pgroup">
+        <div class="pglbl">子系统设置</div>
+        <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+        <div class="props-field"><label>模块说明</label><textarea id="prop-description" rows="3" placeholder="可填写子系统职责、输入输出说明">${escapeHtml(node.props.description||'')}</textarea></div>
+        <div class="prow"><span class="pk">子画布 ID</span><span class="pv">${escapeHtml(node.targetCanvasId||canvas?.id||'--')}<</span></div>
+      </div>`;
   }else if(node.type.startsWith('instrument_')){
     fields=buildInstrumentFields(node);
   }
@@ -5606,6 +6254,13 @@ saveSelectedNode = function(){
     node.props.targetVarName=options.some(item=>item.name===selectedVar)?selectedVar:(options[0]?.name||'');
     node.props.assignMode=document.getElementById('prop-assignMode').value;
     node.props.constantValue=document.getElementById('prop-constantValue').value.trim()||'0';
+  }else if(node.type==='subsystem_block'){
+    node.props.name=document.getElementById('prop-name').value.trim()||node.props.name;
+    node.props.description=document.getElementById('prop-description')?.value.trim()||'';
+    const canvas=ensureSubsystemCanvasNode(node);
+    if(canvas){
+      canvas.name=node.props.name;
+    }
   }else if(node.type.startsWith('instrument_')){
     node.props.name=document.getElementById('prop-name').value.trim()||node.props.name;
     node.props.sampleRate=document.getElementById('prop-sampleRate').value.trim()||node.props.sampleRate;
@@ -5627,6 +6282,130 @@ buildSimulationResult = function(node,nodeState,inputValues,modeKey,time,dt){
   return applyAssignedMiddleValues(node,nodeState,resolved);
 };
 
+function getCanvasNodeById(canvasId,nodeId){
+  return S.canvases?.[canvasId]?.nodes?.find(node=>node.id===nodeId)||null;
+}
+
+function getIncomingEdgesForCanvasNode(canvasId,nodeId){
+  return (S.canvases?.[canvasId]?.edges||[])
+    .filter(edge=>edge.targetNodeId===nodeId)
+    .sort((a,b)=>(a.targetPortIndex||0)-(b.targetPortIndex||0)||a.id.localeCompare(b.id));
+}
+
+function getSubsystemBoundaryNodeForPort(canvasId,role,interfacePortId){
+  const nodeType=role==='input'?'subsystem_in_port':'subsystem_out_port';
+  return (S.canvases?.[canvasId]?.nodes||[]).find(node=>
+    node.type===nodeType&&node.props?.interfacePortId===interfacePortId
+  )||null;
+}
+
+function finalizeResolvedNodeOutputs(node,nodeState,inputValues,resolved){
+  resolved.outputs=(resolved.outputs||[0]).map(sanitizeSignalValue);
+  resolved.middleValues=(resolved.middleValues||[]).map(sanitizeSignalValue);
+  nodeState.lastInputValues=inputValues.slice();
+  nodeState.lastInput=inputValues[0]||0;
+  nodeState.lastOutputs=resolved.outputs.slice();
+  nodeState.lastMiddleValues=resolved.middleValues.slice();
+  nodeState.lastOutput=nodeState.lastOutputs[0]||0;
+  return resolved;
+}
+
+function resolveCanvasNodeOutput(canvasId,nodeId,outputIndex,modeKey,time,dt,context){
+  const node=getCanvasNodeById(canvasId,nodeId);
+  const resolved=resolveCanvasNodeOutputs(canvasId,nodeId,modeKey,time,dt,context);
+  if(!node){return 0;}
+  if(node.type==='simulation_block'){
+    normalizeSimulationInterfaces(node.props);
+    const mainCount=node.props.outputs.length;
+    if(outputIndex<mainCount){
+      return sanitizeSignalValue(resolved.outputs[outputIndex]??resolved.outputs[0]??0);
+    }
+    return sanitizeSignalValue(resolved.middleValues[outputIndex-mainCount]??resolved.outputs[0]??0);
+  }
+  return sanitizeSignalValue(resolved.outputs[outputIndex]??resolved.outputs[0]??0);
+}
+
+function evaluateSubsystemOutputsFromInputs(node,inputValues,modeKey,time,dt){
+  const canvas=ensureSubsystemCanvasNode(node);
+  const intf=ensureSubsystemInterface(node);
+  const boundaryInputs={};
+  intf.inputs.forEach((item,index)=>{
+    boundaryInputs[item.id]=sanitizeSignalValue(inputValues[index]??0);
+  });
+  const context={
+    cache:new Map(),
+    visiting:new Set(),
+    boundaryInputs
+  };
+  return {
+    outputs:intf.outputs.map(item=>{
+      const outputNode=getSubsystemBoundaryNodeForPort(canvas.id,'output',item.id);
+      return outputNode
+        ?resolveCanvasNodeOutput(canvas.id,outputNode.id,0,modeKey,time,dt,context)
+        :0;
+    }),
+    middleValues:[]
+  };
+}
+
+function resolveCanvasNodeOutputs(canvasId,nodeId,modeKey,time,dt,context){
+  const cacheKey=`${canvasId}:${nodeId}`;
+  if(context.cache.has(cacheKey)){
+    return context.cache.get(cacheKey);
+  }
+  const node=getCanvasNodeById(canvasId,nodeId);
+  if(!node){
+    return {outputs:[0],middleValues:[]};
+  }
+  const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+  const nodeState=ensureNodeRuntime(bucket,node);
+  if(context.visiting.has(cacheKey)){
+    return {
+      outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+      middleValues:nodeState.lastMiddleValues||[]
+    };
+  }
+  context.visiting.add(cacheKey);
+  const inputPorts=getNodePorts(node).inputs||[];
+  const incoming=getIncomingEdgesForCanvasNode(canvasId,node.id);
+  const inputValues=node.type==='subsystem_in_port'
+    ?[]
+    :inputPorts.map((_,portIndex)=>{
+      const edge=incoming.find(item=>(item.targetPortIndex||0)===portIndex);
+      if(!edge){return 0;}
+      const upstream=resolveCanvasNodeOutput(canvasId,edge.sourceNodeId,edge.sourcePortIndex||0,modeKey,time,dt,context);
+      return transmitEdgeSignal(edge,upstream,modeKey,time);
+    });
+  let resolved={outputs:[0],middleValues:[]};
+  if(node.type==='signal_source'){
+    resolved={outputs:[computeSourceSignal(node,time)],middleValues:[]};
+  }else if(node.type==='flow_block'){
+    resolved=isPythonBoundFlowBlock(node)
+      ?executeBoundFlowBlock(node,nodeState,inputValues,modeKey,time,dt)
+      :{outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }else if(node.type==='simulation_block'){
+    resolved=isPythonBoundFlowBlock(node)
+      ?applyAssignedMiddleValues(node,nodeState,executeBoundFlowBlock(node,nodeState,inputValues,modeKey,time,dt))
+      :buildSimulationResult(node,nodeState,inputValues,modeKey,time,dt);
+  }else if(node.type==='subsystem_in_port'){
+    resolved={outputs:[sanitizeSignalValue(context.boundaryInputs?.[node.props?.interfacePortId]??0)],middleValues:[]};
+  }else if(node.type==='subsystem_out_port'){
+    resolved={outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }else if(node.type==='subsystem_block'){
+    resolved=evaluateSubsystemOutputsFromInputs(node,inputValues,modeKey,time,dt);
+  }else if(node.type?.startsWith('fault_')){
+    resolved={outputs:[applyPhysicalFaultNode(node,sanitizeSignalValue(inputValues[0]||0),time,modeKey)],middleValues:[]};
+  }else if(node.type?.startsWith('instrument_')){
+    resolved={outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }else{
+    resolved={outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }
+  finalizeResolvedNodeOutputs(node,nodeState,inputValues,resolved);
+  context.visiting.delete(cacheKey);
+  context.cache.set(cacheKey,resolved);
+  return resolved;
+}
+
 resolveNodeOutputs = function(nodeId,modeKey,time,dt,cache,visiting){
   const node=getNode(nodeId);
   if(node?.type==='middle_var_assign'){
@@ -5641,6 +6420,54 @@ resolveNodeOutputs = function(nodeId,modeKey,time,dt,cache,visiting){
     cache.set(nodeId,resolved);
     return resolved;
   }
+  if(node?.type==='subsystem_block'){
+    if(cache.has(nodeId)){
+      return cache.get(nodeId);
+    }
+    const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+    const nodeState=ensureNodeRuntime(bucket,node);
+    if(visiting.has(nodeId)){
+      return {
+        outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+        middleValues:nodeState.lastMiddleValues||[]
+      };
+    }
+    visiting.add(nodeId);
+    const inputValues=resolveNodeInputValues(node,modeKey,time,dt,cache,visiting);
+    const resolved=finalizeResolvedNodeOutputs(
+      node,
+      nodeState,
+      inputValues,
+      evaluateSubsystemOutputsFromInputs(node,inputValues,modeKey,time,dt)
+    );
+    visiting.delete(nodeId);
+    cache.set(nodeId,resolved);
+    return resolved;
+  }
+  if(node?.type==='simulation_block'&&isPythonBoundFlowBlock(node)){
+    if(cache.has(nodeId)){
+      return cache.get(nodeId);
+    }
+    const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+    const nodeState=ensureNodeRuntime(bucket,node);
+    if(visiting.has(nodeId)){
+      return {
+        outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+        middleValues:nodeState.lastMiddleValues||[]
+      };
+    }
+    visiting.add(nodeId);
+    const inputValues=resolveNodeInputValues(node,modeKey,time,dt,cache,visiting);
+    const resolved=finalizeResolvedNodeOutputs(
+      node,
+      nodeState,
+      inputValues,
+      applyAssignedMiddleValues(node,nodeState,executeBoundFlowBlock(node,nodeState,inputValues,modeKey,time,dt))
+    );
+    visiting.delete(nodeId);
+    cache.set(nodeId,resolved);
+    return resolved;
+  }
   const resolved=__legacyResolveNodeOutputsClean(nodeId,modeKey,time,dt,cache,visiting);
   if(node?.type==='simulation_block'&&isPythonBoundFlowBlock(node)){
     const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
@@ -5649,15 +6476,228 @@ resolveNodeOutputs = function(nodeId,modeKey,time,dt,cache,visiting){
   return resolved;
 };
 
+function getNodeFromCanvas(canvasId,nodeId){
+  return getCanvasRecord(canvasId)?.nodes?.find(node=>node.id===nodeId)||null;
+}
+
+function getIncomingEdgesForNodeFromCanvas(canvasId,nodeId){
+  return (getCanvasRecord(canvasId)?.edges||[])
+    .filter(edge=>edge.targetNodeId===nodeId)
+    .sort((a,b)=>(a.targetPortIndex||0)-(b.targetPortIndex||0)||a.id.localeCompare(b.id));
+}
+
+function findCanvasIdForNodeId(nodeId,preferredCanvasId=''){
+  if(preferredCanvasId&&getNodeFromCanvas(preferredCanvasId,nodeId)){
+    return preferredCanvasId;
+  }
+  return Object.keys(S.canvases||{}).find(canvasId=>getNodeFromCanvas(canvasId,nodeId))||'';
+}
+
+function getCanvasTargetNodeForMiddleAssignment(node,canvasId){
+  const targetNode=getNodeFromCanvas(canvasId,node?.props?.targetNodeId||'');
+  if(!targetNode||targetNode.type!=='simulation_block'){
+    return null;
+  }
+  const defs=getSimulationMiddleVarDefinitions(targetNode);
+  const targetVar=defs.find(item=>item.name===node.props.targetVarName)||defs[0]||null;
+  if(!targetVar){
+    return null;
+  }
+  return {targetNode,targetVar};
+}
+
+function resetAssignedMiddleValuesBucket(bucket){
+  Object.values(bucket?.nodeStates||{}).forEach(nodeState=>{
+    if(nodeState&&nodeState.assignedMiddleValues){
+      nodeState.assignedMiddleValues={};
+    }
+  });
+}
+
+function resolveNodeInputValuesInCanvas(node,canvasId,modeKey,time,dt,cache,visiting){
+  const inputPorts=getNodePorts(node).inputs;
+  if(!inputPorts.length){
+    return [];
+  }
+  const incoming=getIncomingEdgesForNodeFromCanvas(canvasId,node.id);
+  return inputPorts.map((_,portIndex)=>{
+    const edge=incoming.find(item=>(item.targetPortIndex||0)===portIndex);
+    if(!edge){
+      return 0;
+    }
+    const upstream=resolveNodeOutputInCanvas(
+      edge.sourceNodeId,
+      canvasId,
+      edge.sourcePortIndex||0,
+      modeKey,
+      time,
+      dt,
+      cache,
+      visiting
+    );
+    return transmitEdgeSignal(edge,upstream,modeKey,time);
+  });
+}
+
+function readMiddleAssignmentValueInCanvas(node,canvasId,modeKey,time,dt,cache,visiting){
+  if(node.props.assignMode==='input'){
+    const inputValues=resolveNodeInputValuesInCanvas(node,canvasId,modeKey,time,dt,cache,visiting);
+    return sanitizeSignalValue(inputValues[0]??0);
+  }
+  return sanitizeSignalValue(parseScalar(node.props.constantValue,0));
+}
+
+function applyMiddleAssignmentsForCanvas(modeKey,canvasId,time,dt,cache,visiting){
+  const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+  (getCanvasRecord(canvasId)?.nodes||[])
+    .filter(node=>node.type==='middle_var_assign')
+    .forEach(node=>{
+      const targetInfo=getCanvasTargetNodeForMiddleAssignment(node,canvasId);
+      const nodeState=ensureNodeRuntime(bucket,node);
+      if(!targetInfo){
+        nodeState.lastAssignedValue=0;
+        return;
+      }
+      const value=readMiddleAssignmentValueInCanvas(node,canvasId,modeKey,time,dt,cache,visiting);
+      nodeState.lastAssignedValue=value;
+      const targetState=ensureNodeRuntime(bucket,targetInfo.targetNode);
+      if(!targetState.assignedMiddleValues){
+        targetState.assignedMiddleValues={};
+      }
+      targetState.assignedMiddleValues[targetInfo.targetVar.name]=value;
+    });
+}
+
+function applyMiddleAssignmentsForAllCanvases(modeKey,time,dt,cache,visiting){
+  Object.keys(S.canvases||{}).forEach(canvasId=>{
+    applyMiddleAssignmentsForCanvas(modeKey,canvasId,time,dt,cache,visiting);
+  });
+}
+
+function resolveSubsystemInputBoundary(node,canvasId,modeKey,time,dt,cache,visiting){
+  const childCanvas=getCanvasRecord(canvasId);
+  const parentNodeId=childCanvas?.parentSubsystemNodeId||'';
+  const parentCanvasId=findCanvasIdForNodeId(parentNodeId,S.rootCanvasId);
+  const parentNode=getNodeFromCanvas(parentCanvasId,parentNodeId);
+  if(!parentNode){
+    return {outputs:[0],middleValues:[]};
+  }
+  const intf=ensureSubsystemInterface(parentNode);
+  const inputIndex=intf.inputs.findIndex(item=>item.id===node.props?.interfacePortId);
+  if(inputIndex<0){
+    return {outputs:[0],middleValues:[]};
+  }
+  const parentInputValues=resolveNodeInputValuesInCanvas(parentNode,parentCanvasId,modeKey,time,dt,cache,visiting);
+  return {outputs:[sanitizeSignalValue(parentInputValues[inputIndex]??0)],middleValues:[]};
+}
+
+function resolveSubsystemBlockOutputs(node,modeKey,time,dt,cache,visiting){
+  const childCanvasId=node.targetCanvasId||ensureSubsystemCanvasNode(node)?.id||'';
+  const intf=ensureSubsystemInterface(node);
+  const outputs=intf.outputs.map(item=>{
+    const boundaryNodeId=getSubsystemBoundaryNodeId(node.id,'output',item.id);
+    return resolveNodeOutputInCanvas(boundaryNodeId,childCanvasId,0,modeKey,time,dt,cache,visiting);
+  });
+  return {outputs:outputs.length?outputs:[0],middleValues:[]};
+}
+
+function resolveNodeOutputsInCanvas(nodeId,canvasId,modeKey,time,dt,cache,visiting){
+  if(cache.has(nodeId)){
+    return cache.get(nodeId);
+  }
+  const effectiveCanvasId=findCanvasIdForNodeId(nodeId,canvasId);
+  const node=getNodeFromCanvas(effectiveCanvasId,nodeId);
+  if(!node){
+    return {outputs:[0],middleValues:[]};
+  }
+  const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+  const nodeState=ensureNodeRuntime(bucket,node);
+  if(visiting.has(nodeId)){
+    return {
+      outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+      middleValues:nodeState.lastMiddleValues||[]
+    };
+  }
+  visiting.add(nodeId);
+
+  if(node.type==='middle_var_assign'){
+    const value=readMiddleAssignmentValueInCanvas(node,effectiveCanvasId,modeKey,time,dt,cache,visiting);
+    nodeState.lastAssignedValue=value;
+    const resolved={outputs:[value],middleValues:[]};
+    cache.set(nodeId,resolved);
+    visiting.delete(nodeId);
+    return resolved;
+  }
+
+  const inputValues=resolveNodeInputValuesInCanvas(node,effectiveCanvasId,modeKey,time,dt,cache,visiting);
+  let resolved={outputs:[0],middleValues:[]};
+
+  if(node.type==='signal_source'){
+    resolved={outputs:[computeSourceSignal(node,time)],middleValues:[]};
+  }else if(node.type==='subsystem_block'){
+    resolved=resolveSubsystemBlockOutputs(node,modeKey,time,dt,cache,visiting);
+  }else if(node.type==='subsystem_in_port'){
+    resolved=resolveSubsystemInputBoundary(node,effectiveCanvasId,modeKey,time,dt,cache,visiting);
+  }else if(node.type==='flow_block'){
+    resolved={outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }else if(node.type==='simulation_block'){
+    resolved=isPythonBoundFlowBlock(node)
+      ?applyAssignedMiddleValues(node,nodeState,executeBoundFlowBlock(node,nodeState,inputValues,modeKey,time,dt))
+      :buildSimulationResult(node,nodeState,inputValues,modeKey,time,dt);
+  }else if(node.type.startsWith('fault_')){
+    resolved={outputs:[applyPhysicalFaultNode(node,sanitizeSignalValue(inputValues[0]||0),time,modeKey)],middleValues:[]};
+  }else{
+    resolved={outputs:[sanitizeSignalValue(inputValues[0]||0)],middleValues:[]};
+  }
+
+  resolved.outputs=(resolved.outputs||[0]).map(sanitizeSignalValue);
+  resolved.middleValues=(resolved.middleValues||[]).map(sanitizeSignalValue);
+  nodeState.lastInputValues=inputValues.slice();
+  nodeState.lastInput=inputValues[0]||0;
+  nodeState.lastOutputs=resolved.outputs.slice();
+  nodeState.lastMiddleValues=resolved.middleValues.slice();
+  nodeState.lastOutput=nodeState.lastOutputs[0]||0;
+  visiting.delete(nodeId);
+  cache.set(nodeId,resolved);
+  return resolved;
+}
+
+function resolveNodeOutputInCanvas(nodeId,canvasId,outputIndex,modeKey,time,dt,cache,visiting){
+  const effectiveCanvasId=findCanvasIdForNodeId(nodeId,canvasId);
+  const node=getNodeFromCanvas(effectiveCanvasId,nodeId);
+  const resolved=resolveNodeOutputsInCanvas(nodeId,effectiveCanvasId,modeKey,time,dt,cache,visiting);
+  if(!node){
+    return 0;
+  }
+  if(node.type==='simulation_block'){
+    const mainCount=isPythonBoundFlowBlock(node)
+      ?(node.pythonBinding?.portMapping?.outputs?.length||0)
+      :(normalizeSimulationInterfaces(node.props),node.props.outputs.length);
+    if(outputIndex<mainCount){
+      return sanitizeSignalValue(resolved.outputs[outputIndex]??resolved.outputs[0]??0);
+    }
+    return sanitizeSignalValue(resolved.middleValues[outputIndex-mainCount]??resolved.outputs[0]??0);
+  }
+  return sanitizeSignalValue(resolved.outputs[outputIndex]??resolved.outputs[0]??0);
+}
+
+resolveNodeOutputs = function(nodeId,modeKey,time,dt,cache,visiting){
+  return resolveNodeOutputsInCanvas(nodeId,findCanvasIdForNodeId(nodeId,S.activeCanvasId),modeKey,time,dt,cache,visiting);
+};
+
+resolveNodeOutput = function(nodeId,outputIndex,modeKey,time,dt,cache,visiting){
+  return resolveNodeOutputInCanvas(nodeId,findCanvasIdForNodeId(nodeId,S.activeCanvasId),outputIndex,modeKey,time,dt,cache,visiting);
+};
+
 recordScopeSamples = function(time,dt){
   const actualCache=new Map();
   const referenceCache=new Map();
   const actualVisiting=new Set();
   const referenceVisiting=new Set();
-  clearAssignedMiddleValues(SIM.actual);
-  clearAssignedMiddleValues(SIM.reference);
-  applyMiddleAssignmentsForMode('actual',time,dt,actualCache,actualVisiting);
-  applyMiddleAssignmentsForMode('reference',time,dt,referenceCache,referenceVisiting);
+  resetAssignedMiddleValuesBucket(SIM.actual);
+  resetAssignedMiddleValuesBucket(SIM.reference);
+  applyMiddleAssignmentsForAllCanvases('actual',time,dt,actualCache,actualVisiting);
+  applyMiddleAssignmentsForAllCanvases('reference',time,dt,referenceCache,referenceVisiting);
   getScopeNodes().forEach(scopeNode=>{
     const actualValue=resolveNodeSignal(scopeNode.id,'actual',time,dt,actualCache,actualVisiting);
     const referenceValue=resolveNodeSignal(scopeNode.id,'reference',time,dt,referenceCache,referenceVisiting);
@@ -5827,9 +6867,20 @@ renderPropertyPanel = function(node){
 
 const __task5ApplyFlightModelPackage = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
 window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__ = function(pkg,prepared){
-  const result=__task5ApplyFlightModelPackage(pkg,prepared);
+  const restored=prepared?.snapshot||pkg?.workbenchSnapshot||{};
+  restoreSystemModelSnapshot(restored);
+  S.availableFaultModels=cloneDefaults(prepared?.faultLibrary||pkg?.faultLibrary||[]);
+  S.selectedFaultCatalogId=S.availableFaultModels[0]?.id||'';
+  S.activeModelPackage={
+    modelId:pkg?.modelId??prepared?.descriptor?.modelId??null,
+    modelName:pkg?.modelName??prepared?.descriptor?.modelName??null,
+    description:pkg?.description??prepared?.descriptor?.description??'',
+    source:cloneDefaults(pkg?.source||{})
+  };
+  renderAll();
   updateModelPackageStatus();
-  return result;
+  toast(`飞控模型包“${S.activeModelPackage.modelName||'未命名模型'}”已导入`,'s');
+  return {ok:true};
 };
 
 function ensureScopeChannelBucket(bucket,scopeId){
@@ -5854,7 +6905,8 @@ function getSampleValue(sample){
 }
 
 function formatScopeMetric(value){
-  return Number.isFinite(value)?value.toFixed(2):'--';
+  const numeric=Number(value);
+  return Number.isFinite(numeric)?numeric.toFixed(2):'--';
 }
 
 function summarizeScopeChannel(samples){
@@ -5979,33 +7031,14 @@ function setScopeDisplayMode(scopeId,mode){
 function startScopeWindowDrag(event,scopeId){
   const scopeWindow=ensureScopeWindow(scopeId);
   focusScopeWindow(scopeId);
-  const startX=event.clientX;
-  const startY=event.clientY;
-  const originX=scopeWindow.x;
-  const originY=scopeWindow.y;
-  const handleMove=moveEvent=>{
-    scopeWindow.x=Math.round(originX+(moveEvent.clientX-startX));
-    scopeWindow.y=Math.round(originY+(moveEvent.clientY-startY));
-    renderScopeWindows();
-  };
-  const handleUp=()=>{
-    window.removeEventListener('pointermove',handleMove);
-    window.removeEventListener('pointerup',handleUp);
-    window.removeEventListener('mousemove',handleMove);
-    window.removeEventListener('mouseup',handleUp);
-    document.removeEventListener('pointermove',handleMove);
-    document.removeEventListener('pointerup',handleUp);
-    document.removeEventListener('mousemove',handleMove);
-    document.removeEventListener('mouseup',handleUp);
-  };
-  window.addEventListener('pointermove',handleMove);
-  window.addEventListener('pointerup',handleUp);
-  window.addEventListener('mousemove',handleMove);
-  window.addEventListener('mouseup',handleUp);
-  document.addEventListener('pointermove',handleMove);
-  document.addEventListener('pointerup',handleUp);
-  document.addEventListener('mousemove',handleMove);
-  document.addEventListener('mouseup',handleUp);
+  SCOPE_WINDOW_DRAG.active=true;
+  SCOPE_WINDOW_DRAG.engaged=false;
+  SCOPE_WINDOW_DRAG.pointerId=Number.isFinite(Number(event.pointerId))?Number(event.pointerId):null;
+  SCOPE_WINDOW_DRAG.scopeId=scopeId;
+  SCOPE_WINDOW_DRAG.startX=event.clientX;
+  SCOPE_WINDOW_DRAG.startY=event.clientY;
+  SCOPE_WINDOW_DRAG.originX=scopeWindow.x;
+  SCOPE_WINDOW_DRAG.originY=scopeWindow.y;
   if(event.stopPropagation){event.stopPropagation();}
   if(event.preventDefault){event.preventDefault();}
 }
@@ -6016,20 +7049,35 @@ function bindScopeWindowDragListeners(){
   const runtimeListeners=getRuntimeListenerStore();
   runtimeListeners.scopeWindowDragPointerMove=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
+    if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
     const scopeWindow=SIM.scopeWindows?.[SCOPE_WINDOW_DRAG.scopeId];
+    if(!scopeWindow){return;}
+    if(!SCOPE_WINDOW_DRAG.engaged){
+      if(!movedBeyondPointerThreshold(SCOPE_WINDOW_DRAG.startX,SCOPE_WINDOW_DRAG.startY,event.clientX,event.clientY)){return;}
+      SCOPE_WINDOW_DRAG.engaged=true;
+    }
     if(!scopeWindow){return;}
     scopeWindow.x=Math.round(SCOPE_WINDOW_DRAG.originX+(event.clientX-SCOPE_WINDOW_DRAG.startX));
     scopeWindow.y=Math.round(SCOPE_WINDOW_DRAG.originY+(event.clientY-SCOPE_WINDOW_DRAG.startY));
+    clampScopeWindowPosition(scopeWindow);
     renderScopeWindows();
   };
   runtimeListeners.scopeWindowDragPointerUp=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
+    if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
     SCOPE_WINDOW_DRAG.active=false;
+    SCOPE_WINDOW_DRAG.engaged=false;
     SCOPE_WINDOW_DRAG.pointerId=null;
     SCOPE_WINDOW_DRAG.scopeId='';
   };
   window.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   window.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
+  window.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
+  window.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
+  document.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
+  document.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
+  document.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
+  document.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
 }
 
 const __dualScopeRecordScopeSamples = recordScopeSamples;
@@ -6079,47 +7127,72 @@ renderScopeWindows = function(){
   host.innerHTML=listOpenScopeWindows()
     .sort((left,right)=>left.z-right.z)
     .map(scopeWindow=>{
+      clampScopeWindowPosition(scopeWindow);
       const node=getNode(scopeWindow.scopeId);
       const bucket=ensureScopeChannelBucket(SIM.actual,scopeWindow.scopeId);
       const ch1=summarizeScopeChannel(bucket.ch1);
       const ch2=summarizeScopeChannel(bucket.ch2);
+      const ch1Metrics={
+        current:formatScopeMetric(ch1.current),
+        min:formatScopeMetric(ch1.min),
+        max:formatScopeMetric(ch1.max),
+        pp:formatScopeMetric(ch1.pp)
+      };
+      const ch2Metrics={
+        current:formatScopeMetric(ch2.current),
+        min:formatScopeMetric(ch2.min),
+        max:formatScopeMetric(ch2.max),
+        pp:formatScopeMetric(ch2.pp)
+      };
       const ch1Signal=getScopeChannelSignalName(node,'ch1');
       const ch2Signal=getScopeChannelSignalName(node,'ch2');
+      const ch1TagLabel=`CH1: ${ch1Signal}`;
+      const ch2TagLabel=`CH2: ${ch2Signal}`;
       const mode=scopeWindow.mode||'overlay';
       return `
         <section class="scope-window" data-scope-id="${scopeWindow.scopeId}" style="left:${scopeWindow.x}px;top:${scopeWindow.y}px;z-index:${scopeWindow.z}">
           <header class="scope-window__header" data-scope-drag-handle="${scopeWindow.scopeId}">
-            <div class="scope-window__identity">
-              <div class="scope-window__title">${escapeHtml(node?.props?.name||node?.name||'示波器')}</div>
-              <div class="scope-window__signals">
-                <span class="scope-window__tag" data-scope-tag="ch1" data-connected="${ch1.connected}">CH1: ${escapeHtml(ch1Signal)}</span>
-                <span class="scope-window__tag" data-scope-tag="ch2" data-connected="${ch2.connected}">CH2: ${escapeHtml(ch2Signal)}</span>
+            <div class="scope-window__header-main">
+              <div class="scope-window__identity">
+                <div class="scope-window__title">${escapeHtml(node?.props?.name||node?.name||'示波器')}</div>
+              </div>
+              <div class="scope-window__toolbar">
+                <button type="button" class="scope-window__mode${mode==='overlay'?' is-active':''}" data-scope-mode="overlay" data-scope-id="${scopeWindow.scopeId}">叠加</button>
+                <button type="button" class="scope-window__mode${mode==='ch1'?' is-active':''}" data-scope-mode="ch1" data-scope-id="${scopeWindow.scopeId}">CH1</button>
+                <button type="button" class="scope-window__mode${mode==='ch2'?' is-active':''}" data-scope-mode="ch2" data-scope-id="${scopeWindow.scopeId}">CH2</button>
+                <button type="button" class="scope-window__close" data-scope-close="${scopeWindow.scopeId}">关闭 ×</button>
               </div>
             </div>
-            <div class="scope-window__toolbar">
-              <button type="button" class="scope-window__mode${mode==='overlay'?' is-active':''}" data-scope-mode="overlay" data-scope-id="${scopeWindow.scopeId}">叠加</button>
-              <button type="button" class="scope-window__mode${mode==='ch1'?' is-active':''}" data-scope-mode="ch1" data-scope-id="${scopeWindow.scopeId}">CH1</button>
-              <button type="button" class="scope-window__mode${mode==='ch2'?' is-active':''}" data-scope-mode="ch2" data-scope-id="${scopeWindow.scopeId}">CH2</button>
-              <button type="button" class="scope-window__close" data-scope-close="${scopeWindow.scopeId}">关闭 ×</button>
-            </div>
           </header>
+          <div class="scope-window__signal-band">
+            <div class="scope-window__signals">
+              <span class="scope-window__tag" data-scope-tag="ch1" data-connected="${ch1.connected}" title="${escapeHtml(ch1TagLabel)}">
+                <span class="scope-window__tag-prefix">CH1:</span>
+                <span class="scope-window__tag-text">${escapeHtml(ch1Signal)}</span>
+              </span>
+              <span class="scope-window__tag" data-scope-tag="ch2" data-connected="${ch2.connected}" title="${escapeHtml(ch2TagLabel)}">
+                <span class="scope-window__tag-prefix">CH2:</span>
+                <span class="scope-window__tag-text">${escapeHtml(ch2Signal)}</span>
+              </span>
+            </div>
+          </div>
           <div class="scope-window__plot">
             <canvas data-scope-role="wave-canvas"></canvas>
           </div>
           <div class="scope-window__stats scope-window__stats--strip">
             <article class="scope-readout scope-readout--strip" data-scope-channel="ch1" data-connected="${ch1.connected}">
               <div class="scope-readout__title">CH1</div>
-              <div class="scope-readout__metric"><span>当前</span><strong data-field="current">${ch1.current}</strong></div>
-              <div class="scope-readout__metric"><span>最小</span><strong data-field="min">${ch1.min}</strong></div>
-              <div class="scope-readout__metric"><span>最大</span><strong data-field="max">${ch1.max}</strong></div>
-              <div class="scope-readout__metric"><span>峰峰</span><strong data-field="pp">${ch1.pp}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">当前</span><strong class="scope-readout__metric-value" data-field="current">${ch1Metrics.current}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">最小</span><strong class="scope-readout__metric-value" data-field="min">${ch1Metrics.min}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">最大</span><strong class="scope-readout__metric-value" data-field="max">${ch1Metrics.max}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">峰峰</span><strong class="scope-readout__metric-value" data-field="pp">${ch1Metrics.pp}</strong></div>
             </article>
             <article class="scope-readout scope-readout--strip" data-scope-channel="ch2" data-connected="${ch2.connected}">
               <div class="scope-readout__title">CH2</div>
-              <div class="scope-readout__metric"><span>当前</span><strong data-field="current">${ch2.current}</strong></div>
-              <div class="scope-readout__metric"><span>最小</span><strong data-field="min">${ch2.min}</strong></div>
-              <div class="scope-readout__metric"><span>最大</span><strong data-field="max">${ch2.max}</strong></div>
-              <div class="scope-readout__metric"><span>峰峰</span><strong data-field="pp">${ch2.pp}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">当前</span><strong class="scope-readout__metric-value" data-field="current">${ch2Metrics.current}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">最小</span><strong class="scope-readout__metric-value" data-field="min">${ch2Metrics.min}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">最大</span><strong class="scope-readout__metric-value" data-field="max">${ch2Metrics.max}</strong></div>
+              <div class="scope-readout__metric"><span class="scope-readout__metric-label">峰峰</span><strong class="scope-readout__metric-value" data-field="pp">${ch2Metrics.pp}</strong></div>
             </article>
           </div>
         </section>`;
@@ -6154,6 +7227,25 @@ renderScopeWindows = function(){
 
 renderModelNodes = function(){
   __dualScopeRenderModelNodes();
+  renderCanvasBreadcrumbs();
+  S.modelNodes.forEach(node=>{
+    if(node.type!=='subsystem_block'){return;}
+    ensureSubsystemCanvasNode(node);
+    const el=document.getElementById('b-' + node.id);
+    if(!el){return;}
+    const kicker=el.querySelector('.blk-kicker');
+    const sub=el.querySelector('.blk-sub');
+    el.title='双击进入子画布';
+    if(kicker){kicker.textContent='子系统';}
+    if(sub){sub.textContent=node.targetCanvasId?'双击进入子画布':'子画布未创建';}
+    if(el.dataset.subsystemNavBound!=='1'){
+      el.dataset.subsystemNavBound='1';
+      el.addEventListener('dblclick',event=>{
+        event.stopPropagation();
+        openSubsystemCanvas(node.id);
+      });
+    }
+  });
   renderScopeWindows();
 };
 
@@ -6189,9 +7281,254 @@ togCmp = function(){
   }
 };
 
+const __task3BuildNodeSubtitle = buildNodeSubtitle;
+buildNodeSubtitle = function(node){
+  if(!node){return '';}
+  const props=node.props||{};
+  const faultNote=node.injectedFault?' · 电气故障':'';
+  switch(node.type){
+    case 'signal_source':
+      return `${props.waveType||'信号'} · 幅值 ${props.amplitude||'1'} · ${props.outputFormat||'标量'}`;
+    case 'flow_block':
+      return `${props.inputName||'输入'} / ${props.inputFormat||'标量'} → ${props.outputName||'输出'} / ${props.outputFormat||'标量'}${faultNote}`;
+    case 'simulation_block':
+      normalizeSimulationInterfaces(props);
+      return `${props.inputs.length}输入 · ${props.outputs.length}输出 · ${props.middleVars.length}中间变量 · ${props.moduleType||'函数块'}${faultNote}`;
+    case 'subsystem_block':{
+      const intf=ensureSubsystemInterface(node);
+      return `${intf.inputs.length} 输入 · ${intf.outputs.length} 输出 · 双击进入子画布`;
+    }
+    case 'subsystem_in_port':
+      return `父层输入映射 · ${props.portType||'标量'}`;
+    case 'subsystem_out_port':
+      return `父层输出映射 · ${props.portType||'标量'}`;
+    case 'instrument_scope':
+      return `${props.instrumentType||'波形监测'} · 双击查看波形`;
+    case 'instrument_spectrum':
+    case 'instrument_logger':
+      return `${props.instrumentType||'仪器'} · ${props.sampleRate||'-'}`;
+    case 'link_normal':
+    case 'link_can':
+      return `${props.sourcePort||'源端口'} → ${props.targetPort||'目标端口'}`;
+    default:
+      return __task3BuildNodeSubtitle(node);
+  }
+};
+
+const __task3GetNodePorts = getNodePorts;
+getNodePorts = function(node){
+  if(node?.type==='subsystem_block'){
+    const intf=ensureSubsystemInterface(node);
+    return {
+      inputs:intf.inputs.map((item,index)=>({
+        key:`subsystem-input-${item.id}`,
+        label:item.name,
+        kind:'input',
+        side:'left',
+        meta:item,
+        index
+      })),
+      outputs:intf.outputs.map((item,index)=>({
+        key:`subsystem-output-${item.id}`,
+        label:item.name,
+        kind:'output',
+        side:'right',
+        meta:item,
+        index
+      }))
+    };
+  }
+  if(node?.type==='subsystem_in_port'){
+    return {
+      inputs:[],
+      outputs:[{
+        key:`boundary-out-${node.props?.interfacePortId||node.id}`,
+        label:node.props?.name||'子系统输入',
+        kind:'output',
+        side:'right'
+      }]
+    };
+  }
+  if(node?.type==='subsystem_out_port'){
+    return {
+      inputs:[{
+        key:`boundary-in-${node.props?.interfacePortId||node.id}`,
+        label:node.props?.name||'子系统输出',
+        kind:'input',
+        side:'left'
+      }],
+      outputs:[]
+    };
+  }
+  return __task3GetNodePorts(node);
+};
+
+const __task3CreateNode = createNode;
+createNode = function(type,rawX,rawY){
+  __task3CreateNode(type,rawX,rawY);
+  if(type!=='subsystem_block'){
+    return;
+  }
+  const node=getNode(S.selBlk)||S.modelNodes[S.modelNodes.length-1];
+  if(!node||node.type!=='subsystem_block'){
+    return;
+  }
+  ensureSubsystemInterface(node);
+  syncSubsystemBoundaryNodes(node);
+  renderModelNodes();
+  renderPropertyPanel(node);
+};
+
+const __task3OpenSubsystemCanvas = openSubsystemCanvas;
+openSubsystemCanvas = function(nodeId){
+  const node=getNode(nodeId);
+  if(node?.type==='subsystem_block'){
+    ensureSubsystemInterface(node);
+    syncSubsystemBoundaryNodes(node);
+  }
+  return __task3OpenSubsystemCanvas(nodeId);
+};
+
+function removeSubsystemCanvasTree(canvasId){
+  const canvas=S.canvases?.[canvasId];
+  if(!canvas){return;}
+  (canvas.nodes||[])
+    .filter(node=>node.type==='subsystem_block'&&node.targetCanvasId)
+    .forEach(node=>removeSubsystemCanvasTree(node.targetCanvasId));
+  delete S.canvases[canvasId];
+  S.canvasTrail=(S.canvasTrail||[]).filter(item=>item!==canvasId);
+  if(S.activeCanvasId===canvasId){
+    S.activeCanvasId=S.rootCanvasId;
+  }
+}
+
+const __task3DeleteSelectedNode = deleteSelectedNode;
+deleteSelectedNode = function(){
+  const node=getNode(S.selBlk);
+  if(node&&isSubsystemBoundaryNodeType(node.type)){
+    toast('边界端口请在父层子系统块中调整', 'w');
+    return;
+  }
+  const childCanvasId=node?.type==='subsystem_block'?node.targetCanvasId:'';
+  const result=__task3DeleteSelectedNode();
+  if(childCanvasId){
+    removeSubsystemCanvasTree(childCanvasId);
+  }
+  return result;
+};
+
+function renderTask3SubsystemPropertyPanel(node){
+  const pe=document.getElementById('pe');
+  const pd=document.getElementById('pd');
+  const meta=COMPONENT_LIBRARY[node.type];
+  const canvas=ensureSubsystemCanvasNode(node);
+  ensureSubsystemInterface(node);
+  pe.style.display='none';
+  pd.style.display='block';
+  pd.innerHTML=`
+    <div class="pgroup">
+      <div class="props-title">${escapeHtml(node.props.name)}</div>
+      <div class="props-sub">${meta.label} · 节点 ${node.id.replace('node-','#')}</div>
+    </div>
+    <div class="pgroup">
+      <div class="pglbl">当前状态</div>
+      <div class="prow"><span class="pk">节点类别<</span><span class="pv">${meta.label}<</span></div>
+      <div class="prow"><span class="pk">子画布 ID</span><span class="pv">${escapeHtml(node.targetCanvasId||canvas?.id||'--')}<</span></div>
+    </div>
+    <div class="props-form">
+      ${buildSubsystemBlockFields(node)}
+      <div class="props-actions">
+        <button class="props-secondary" onclick="openSubsystemCanvas('${node.id}')">进入子系统</button>
+        <button class="props-save" onclick="saveSelectedNode()">保存设置</button>
+        <button class="props-danger" onclick="deleteSelectedNode()">删除模块</button>
+      </div>
+    </div>`;
+}
+
+function renderTask3BoundaryPortPanel(node){
+  const pe=document.getElementById('pe');
+  const pd=document.getElementById('pd');
+  const meta=COMPONENT_LIBRARY[node.type];
+  const role=node.type==='subsystem_in_port'?'输入边界':'输出边界';
+  pe.style.display='none';
+  pd.style.display='block';
+  pd.innerHTML=`
+    <div class="pgroup">
+      <div class="props-title">${escapeHtml(node.props?.name||meta.label)}</div>
+      <div class="props-sub">${meta.label} · 节点 ${node.id.replace('node-','#')}</div>
+    </div>
+    <div class="pgroup">
+      <div class="pglbl">边界映射</div>
+      <div class="prow"><span class="pk">边界类型<</span><span class="pv">${role}<</span></div>
+      <div class="prow"><span class="pk">接口 ID</span><span class="pv">${escapeHtml(node.props?.interfacePortId||'--')}<</span></div>
+      <div class="prow"><span class="pk">信号类型</span><span class="pv">${escapeHtml(node.props?.portType||'标量')}<</span></div>
+    </div>
+    <div class="pgroup">
+      <div class="props-help">边界端口由父层子系统接口自动生成。请返回父层子系统块编辑接口，不要直接修改这里。</div>
+    </div>`;
+}
+
+const __task3RenderPropertyPanel = renderPropertyPanel;
+renderPropertyPanel = function(node){
+  if(node?.type==='subsystem_block'){
+    renderTask3SubsystemPropertyPanel(node);
+    return;
+  }
+  if(node&&isSubsystemBoundaryNodeType(node.type)){
+    renderTask3BoundaryPortPanel(node);
+    return;
+  }
+  return __task3RenderPropertyPanel(node);
+};
+
+const __task3SaveSelectedNode = saveSelectedNode;
+saveSelectedNode = function(){
+  const node=getNode(S.selBlk);
+  if(node?.type==='subsystem_block'){
+    node.props.name=document.getElementById('prop-name')?.value.trim()||node.props.name;
+    node.props.description=document.getElementById('prop-description')?.value.trim()||'';
+    ensureSubsystemInterface(node);
+    const inputCount=clampInterfaceCount(document.getElementById('subsystem-input-count')?.value,SUBSYSTEM_INTERFACE_LIMITS.inputs);
+    const outputCount=clampInterfaceCount(document.getElementById('subsystem-output-count')?.value,SUBSYSTEM_INTERFACE_LIMITS.outputs);
+    node.props.interface.inputs=normalizeSubsystemInterfaceList(readSubsystemInterfaceRows('input').slice(0,inputCount),'输入',inputCount);
+    node.props.interface.outputs=normalizeSubsystemInterfaceList(readSubsystemInterfaceRows('output').slice(0,outputCount),'输出',outputCount);
+    const canvas=syncSubsystemBoundaryNodes(node);
+    pruneInvalidEdgesForNode(node);
+    if(canvas){
+      canvas.name=node.props.name;
+    }
+    markTopologyDirty('system');
+    renderModelNodes();
+    renderPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    return;
+  }
+  if(node&&isSubsystemBoundaryNodeType(node.type)){
+    toast('边界端口请在父层子系统块中调整', 'w');
+    return;
+  }
+  return __task3SaveSelectedNode();
+};
+
+const __task3RenderModelNodes = renderModelNodes;
+renderModelNodes = function(){
+  S.modelNodes.forEach(node=>{
+    if(node.type==='subsystem_block'){
+      ensureSubsystemInterface(node);
+      syncSubsystemBoundaryNodes(node);
+    }
+  });
+  __task3RenderModelNodes();
+};
+
 Object.assign(window,{
   createNode,
   renderModelNodes,
+  openSubsystemCanvas,
+  goToRootCanvas,
+  navigateToCanvas,
+  syncSubsystemInterfaceCounts,
   refreshMiddleAssignEditor,
   startScopeWindowDrag,
   __GZ_STATE__:S,
@@ -6200,3 +7537,991 @@ Object.assign(window,{
 
 updateUI();
 
+if(!Array.isArray(S.selectedNodeIds)){
+  S.selectedNodeIds=[];
+}
+if(typeof S.selectionAnchorId!=='string'){
+  S.selectionAnchorId='';
+}
+
+function cloneIfPresentTask5(value){
+  return value===undefined||value===null?value:cloneDefaults(value);
+}
+
+function getTask5SelectedNodeIds(){
+  const next=[...new Set((Array.isArray(S.selectedNodeIds)?S.selectedNodeIds:[]).filter(id=>typeof id==='string'&&!!getNode(id)))];
+  S.selectedNodeIds=next;
+  if(S.selectionAnchorId&&!next.includes(S.selectionAnchorId)){
+    S.selectionAnchorId=next[next.length-1]||'';
+  }
+  if(!next.length){
+    S.selBlk=null;
+  }else if(!next.includes(S.selBlk)){
+    S.selBlk=next[next.length-1];
+  }
+  return next;
+}
+
+function clearTask5NodeSelectionState(){
+  S.selectedNodeIds=[];
+  S.selectionAnchorId='';
+}
+
+function applyTask5NodeSelection(ids,focusId=''){
+  const next=[...new Set((Array.isArray(ids)?ids:[]).filter(id=>typeof id==='string'&&!!getNode(id)))];
+  S.selectedNodeIds=next;
+  S.selectionAnchorId=focusId&&next.includes(focusId)?focusId:(next[next.length-1]||'');
+  S.selBlk=next.length?(S.selectionAnchorId||next[next.length-1]):null;
+  S.selEdge=null;
+  return next;
+}
+
+function eventWantsTask5MultiSelect(event){
+  return !!(event&&(event.ctrlKey||event.metaKey||event.shiftKey));
+}
+
+function getTask5PortInfo(node,direction,index){
+  const info=getPortInfo(node,direction,index);
+  if(info){return info;}
+  return {
+    kind:direction==='input'?'input':'output',
+    label:'',
+    meta:{type:'any'}
+  };
+}
+
+function getTask5PortMeta(node,direction,index){
+  const info=getTask5PortInfo(node,direction,index);
+  return buildEdgePortMeta(info);
+}
+
+function getTask5PortLabel(node,direction,index,fallback=''){
+  const info=getTask5PortInfo(node,direction,index);
+  return getPortDisplayName(info)||info.label||fallback;
+}
+
+function normalizeTask5InterfaceType(type){
+  return PORT_FORMATS.includes(type)?type:'标量';
+}
+
+function computeTask5SelectionBounds(nodes){
+  const left=Math.min(...nodes.map(node=>node.x));
+  const top=Math.min(...nodes.map(node=>node.y));
+  const right=Math.max(...nodes.map(node=>node.x+node.w));
+  const bottom=Math.max(...nodes.map(node=>node.y+node.h));
+  return {left,top,right,bottom,width:right-left,height:bottom-top};
+}
+
+function makeTask5Edge(lineType,sourceNodeId,targetNodeId,sourcePortIndex,targetPortIndex,sourceMeta,targetMeta,injectedFault){
+  const edge={
+    id:`edge-${++S.edgeSeq}`,
+    lineType:lineType||'normal',
+    sourceNodeId,
+    targetNodeId,
+    sourcePortIndex:Number.isFinite(Number(sourcePortIndex))?Number(sourcePortIndex):0,
+    targetPortIndex:Number.isFinite(Number(targetPortIndex))?Number(targetPortIndex):0
+  };
+  if(sourceMeta){
+    edge.sourcePort=cloneDefaults(sourceMeta);
+    edge.sourcePortMeta=cloneDefaults(sourceMeta);
+  }
+  if(targetMeta){
+    edge.targetPort=cloneDefaults(targetMeta);
+    edge.targetPortMeta=cloneDefaults(targetMeta);
+  }
+  if(injectedFault){
+    edge.injectedFault=cloneDefaults(injectedFault);
+  }
+  return edge;
+}
+
+function renderTask5MultiSelectionPanel(ids=getTask5SelectedNodeIds()){
+  const pe=document.getElementById('pe');
+  const pd=document.getElementById('pd');
+  if(!pe||!pd){return;}
+  const nodes=ids.map(id=>getNode(id)).filter(Boolean);
+  const names=nodes.slice(0,6).map(node=>escapeHtml(node.props?.name||node.id)).join(' · ');
+  const moreCount=Math.max(0,nodes.length-6);
+  pe.style.display='none';
+  pd.style.display='block';
+  pd.innerHTML=`
+    <div class="pgroup">
+      <div class="props-title">已选择 ${nodes.length} 个模块</div>
+      <div class="props-sub">可将当前选择封装成一个新的子系统块，父层仅保留边界接口。</div>
+    </div>
+    <div class="pgroup">
+      <div class="pglbl">当前选择</div>
+      <div class="props-help">${names}${moreCount?` 等 ${nodes.length} 个模块`:''}</div>
+    </div>
+    <div class="props-actions">
+      <button class="props-secondary" onclick="wrapSelectionIntoSubsystem()">封装为子系统</button>
+      <button class="props-danger" onclick="deleteSelectedNodeGroup()">删除所选模块</button>
+      <button class="props-secondary" onclick="clearCanvasSelection()">清空选择</button>
+    </div>`;
+}
+
+function updateTask5WrapButtonState(){
+  const btn=document.getElementById('canvas-wrap-selection');
+  if(!btn){return;}
+  const validIds=getTask5SelectedNodeIds().filter(id=>{
+    const node=getNode(id);
+    return node&&!isSubsystemBoundaryNodeType(node.type);
+  });
+  btn.disabled=validIds.length===0;
+  btn.textContent=validIds.length>1?`封装 ${validIds.length} 个模块`:validIds.length===1?'封装为子系统':'封装为子系统';
+}
+
+function bindTask5SelectionGestures(){
+  document.querySelectorAll('.blk[id^="b-"]').forEach(el=>{
+    if(el.dataset.task5SelectionBound==='1'){return;}
+    el.dataset.task5SelectionBound='1';
+    const nodeId=el.id.replace(/^b-/,'');
+    el.addEventListener('pointerdown',event=>{
+      if(!eventWantsTask5MultiSelect(event)){return;}
+      if(event.target.closest('.node-port')){return;}
+      event.stopImmediatePropagation();
+    },true);
+    el.addEventListener('click',event=>{
+      if(!eventWantsTask5MultiSelect(event)){return;}
+      if(event.target.closest('.node-port')){return;}
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      selectNode(nodeId,{multi:true});
+    },true);
+  });
+}
+
+function deleteSelectedNodeGroup(){
+  const ids=getTask5SelectedNodeIds();
+  if(ids.length<=1){
+    deleteCurrentSelection();
+    return;
+  }
+  const nodes=ids.map(id=>getNode(id)).filter(Boolean);
+  if(!nodes.length){
+    clearCanvasSelection();
+    return;
+  }
+  if(nodes.some(node=>isSubsystemBoundaryNodeType(node.type))){
+    toast('边界端口请在父层子系统块中调整','w');
+    return;
+  }
+  const removedNodeIds=new Set(nodes.map(node=>node.id));
+  const removedEdgeIds=new Set(
+    S.modelEdges
+      .filter(edge=>removedNodeIds.has(edge.sourceNodeId)||removedNodeIds.has(edge.targetNodeId))
+      .map(edge=>edge.id)
+  );
+  const childCanvasIds=nodes
+    .filter(node=>node.type==='subsystem_block'&&node.targetCanvasId)
+    .map(node=>node.targetCanvasId)
+    .filter(Boolean);
+
+  S.modelNodes=S.modelNodes.filter(node=>!removedNodeIds.has(node.id));
+  S.modelEdges=S.modelEdges.filter(edge=>!removedEdgeIds.has(edge.id));
+  S.faultedBlks=S.faultedBlks.filter(id=>!removedNodeIds.has(id));
+  if(S.injectTargetId&&removedNodeIds.has(S.injectTargetId)){
+    S.injectTargetId='';
+  }
+  if(S.protocolInjectTargetId&&removedEdgeIds.has(S.protocolInjectTargetId)){
+    S.protocolInjectTargetId='';
+    S.protocolInjectSelectionMode='';
+    S.protocolInjectSelectionId='';
+  }
+  if(S.pendingConnection&&removedNodeIds.has(S.pendingConnection.sourceNodeId)){
+    clearPendingConnection();
+  }
+  childCanvasIds.forEach(removeSubsystemCanvasTree);
+  clearTask5NodeSelectionState();
+  S.selBlk=null;
+  S.selEdge=null;
+  markTopologyDirty('system');
+  syncAllPythonInputConnectionState();
+  renderModelNodes();
+  renderPropertyPanel(null);
+  syncConfigTargets();
+  updateUI();
+  toast(`已删除 ${nodes.length} 个模块`,'s');
+}
+
+function wrapSelectionIntoSubsystem(){
+  const canvas=getActiveCanvasRecord();
+  if(!canvas){return null;}
+  const selectedNodes=getTask5SelectedNodeIds().map(id=>getNode(id)).filter(Boolean);
+  if(!selectedNodes.length){
+    toast('请先选中至少一个模块','w');
+    return null;
+  }
+  if(selectedNodes.some(node=>isSubsystemBoundaryNodeType(node.type))){
+    toast('边界端口请在父层子系统块中调整','w');
+    return null;
+  }
+  const selectedById=new Map(selectedNodes.map(node=>[node.id,node]));
+  const selectedIds=new Set(selectedById.keys());
+  const originalEdges=(canvas.edges||[]).map(edge=>cloneDefaults(edge));
+  const internalEdges=[];
+  const incomingEdges=[];
+  const outgoingEdges=[];
+  const untouchedEdges=[];
+
+  originalEdges.forEach(edge=>{
+    const sourceSelected=selectedIds.has(edge.sourceNodeId);
+    const targetSelected=selectedIds.has(edge.targetNodeId);
+    if(sourceSelected&&targetSelected){
+      internalEdges.push(edge);
+    }else if(!sourceSelected&&!targetSelected){
+      untouchedEdges.push(edge);
+    }else if(!sourceSelected&&targetSelected){
+      incomingEdges.push(edge);
+    }else{
+      outgoingEdges.push(edge);
+    }
+  });
+
+  const subsystemMeta=COMPONENT_LIBRARY.subsystem_block;
+  const nextSubsystemIndex=getNodeTypeCount('subsystem_block');
+  const selectionBounds=computeTask5SelectionBounds(selectedNodes);
+  const subsystemProps=cloneDefaults(subsystemMeta.defaults);
+  subsystemProps.name=`子系统 ${nextSubsystemIndex}`;
+  subsystemProps.description=`包含 ${selectedNodes.length} 个内部模块`;
+  const subsystemNode={
+    id:`node-${++S.nodeSeq}`,
+    type:'subsystem_block',
+    x:clamp(Math.round((selectionBounds.left+selectionBounds.right-subsystemMeta.width)/2),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-subsystemMeta.width-CANVAS_STAGE.nodePadding),
+    y:clamp(Math.round((selectionBounds.top+selectionBounds.bottom-subsystemMeta.height)/2),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-subsystemMeta.height-CANVAS_STAGE.nodePadding),
+    w:subsystemMeta.width,
+    h:subsystemMeta.height,
+    props:subsystemProps,
+    pythonBinding:null
+  };
+
+  const inputInterfaces=incomingEdges.map((edge,index)=>{
+    const targetNode=selectedById.get(edge.targetNodeId);
+    const targetMeta=cloneIfPresentTask5(edge.targetPortMeta)||cloneIfPresentTask5(edge.targetPort)||getTask5PortMeta(targetNode,'input',edge.targetPortIndex||0);
+    return {
+      id:`input-${index+1}`,
+      name:getTask5PortLabel(targetNode,'input',edge.targetPortIndex||0,`输入 ${index+1}`),
+      type:normalizeTask5InterfaceType(targetMeta?.type),
+      order:index,
+      edge
+    };
+  });
+
+  const outputGroups=new Map();
+  outgoingEdges.forEach(edge=>{
+    const key=`${edge.sourceNodeId}:${edge.sourcePortIndex||0}`;
+    if(!outputGroups.has(key)){
+      const sourceNode=selectedById.get(edge.sourceNodeId);
+      const sourceMeta=cloneIfPresentTask5(edge.sourcePortMeta)||cloneIfPresentTask5(edge.sourcePort)||getTask5PortMeta(sourceNode,'output',edge.sourcePortIndex||0);
+      outputGroups.set(key,{
+        sourceNodeId:edge.sourceNodeId,
+        sourcePortIndex:edge.sourcePortIndex||0,
+        sourceMeta,
+        name:getTask5PortLabel(sourceNode,'output',edge.sourcePortIndex||0,`输出 ${outputGroups.size+1}`),
+        type:normalizeTask5InterfaceType(sourceMeta?.type),
+        edges:[]
+      });
+    }
+    outputGroups.get(key).edges.push(edge);
+  });
+
+  subsystemNode.props.interface={
+    inputs:normalizeSubsystemInterfaceList(inputInterfaces.map(({edge,...item})=>item),'输入',0),
+    outputs:normalizeSubsystemInterfaceList(
+      [...outputGroups.values()].map((group,index)=>({
+        id:`output-${index+1}`,
+        name:group.name,
+        type:group.type,
+        order:index
+      })),
+      '输出',
+      0
+    )
+  };
+
+  canvas.nodes=canvas.nodes.filter(node=>!selectedIds.has(node.id));
+  canvas.nodes.push(subsystemNode);
+
+  const childCanvas=ensureSubsystemCanvasNode(subsystemNode);
+  childCanvas.nodes=selectedNodes;
+  childCanvas.edges=internalEdges.map(edge=>cloneDefaults(edge));
+  syncSubsystemBoundaryNodes(subsystemNode);
+
+  const childInputNodes=new Map(
+    childCanvas.nodes
+      .filter(node=>node.type==='subsystem_in_port')
+      .map(node=>[node.props.interfacePortId,node])
+  );
+  const childOutputNodes=new Map(
+    childCanvas.nodes
+      .filter(node=>node.type==='subsystem_out_port')
+      .map(node=>[node.props.interfacePortId,node])
+  );
+
+  const nextRootEdges=untouchedEdges.map(edge=>cloneDefaults(edge));
+
+  subsystemNode.props.interface.inputs.forEach((item,index)=>{
+    const mapping=inputInterfaces[index];
+    if(!mapping){return;}
+    const edge=mapping.edge;
+    const targetNode=selectedById.get(edge.targetNodeId);
+    const shellTargetMeta=getTask5PortMeta(subsystemNode,'input',item.order);
+    const sourceMeta=cloneIfPresentTask5(edge.sourcePortMeta)||cloneIfPresentTask5(edge.sourcePort)||getTask5PortMeta(getNode(edge.sourceNodeId),'output',edge.sourcePortIndex||0);
+    nextRootEdges.push(
+      makeTask5Edge(
+        edge.lineType,
+        edge.sourceNodeId,
+        subsystemNode.id,
+        edge.sourcePortIndex||0,
+        item.order,
+        sourceMeta,
+        shellTargetMeta,
+        edge.injectedFault
+      )
+    );
+
+    const boundaryNode=childInputNodes.get(item.id);
+    if(boundaryNode&&targetNode){
+      childCanvas.edges.push(
+        makeTask5Edge(
+          'normal',
+          boundaryNode.id,
+          edge.targetNodeId,
+          0,
+          edge.targetPortIndex||0,
+          getTask5PortMeta(boundaryNode,'output',0),
+          cloneIfPresentTask5(edge.targetPortMeta)||cloneIfPresentTask5(edge.targetPort)||getTask5PortMeta(targetNode,'input',edge.targetPortIndex||0)
+        )
+      );
+    }
+  });
+
+  subsystemNode.props.interface.outputs.forEach((item,index)=>{
+    const group=[...outputGroups.values()][index];
+    if(!group){return;}
+    const sourceNode=selectedById.get(group.sourceNodeId);
+    const boundaryNode=childOutputNodes.get(item.id);
+    if(boundaryNode&&sourceNode){
+      childCanvas.edges.push(
+        makeTask5Edge(
+          'normal',
+          group.sourceNodeId,
+          boundaryNode.id,
+          group.sourcePortIndex||0,
+          0,
+          cloneIfPresentTask5(group.sourceMeta)||getTask5PortMeta(sourceNode,'output',group.sourcePortIndex||0),
+          getTask5PortMeta(boundaryNode,'input',0)
+        )
+      );
+    }
+    group.edges.forEach(edge=>{
+      nextRootEdges.push(
+        makeTask5Edge(
+          edge.lineType,
+          subsystemNode.id,
+          edge.targetNodeId,
+          item.order,
+          edge.targetPortIndex||0,
+          getTask5PortMeta(subsystemNode,'output',item.order),
+          cloneIfPresentTask5(edge.targetPortMeta)||cloneIfPresentTask5(edge.targetPort)||getTask5PortMeta(getNode(edge.targetNodeId),'input',edge.targetPortIndex||0),
+          edge.injectedFault
+        )
+      );
+    });
+  });
+
+  canvas.edges=nextRootEdges;
+  clearPendingConnection();
+  markTopologyDirty('system');
+  syncAllPythonInputConnectionState();
+  selectNode(subsystemNode.id);
+  syncConfigTargets(subsystemNode.id);
+  updateUI();
+  toast(`已将 ${selectedNodes.length} 个模块封装为子系统`,'s');
+  return subsystemNode;
+}
+
+const __task5FinalSelectNode = selectNode;
+selectNode = function(id,options={}){
+  const node=getNode(id);
+  if(!node){return;}
+  if(!options.multi){
+    applyTask5NodeSelection([id],id);
+    __task5FinalSelectNode(id);
+    return;
+  }
+  const next=new Set(getTask5SelectedNodeIds());
+  if(next.has(id)){
+    next.delete(id);
+  }else{
+    next.add(id);
+  }
+  const nextIds=[...next];
+  if(!nextIds.length){
+    clearTask5NodeSelectionState();
+    S.selBlk=null;
+    S.selEdge=null;
+    renderModelNodes();
+    renderPropertyPanel(null);
+    updateUI();
+    return;
+  }
+  applyTask5NodeSelection(nextIds,id);
+  renderModelNodes();
+  if(nextIds.length>1){
+    renderTask5MultiSelectionPanel(nextIds);
+  }else{
+    __task5FinalSelectNode(nextIds[0]);
+  }
+  updateUI();
+};
+
+const __task5FinalSelectEdge = selectEdge;
+selectEdge = function(id){
+  clearTask5NodeSelectionState();
+  return __task5FinalSelectEdge(id);
+};
+
+const __task5FinalClearCanvasSelection = clearCanvasSelection;
+clearCanvasSelection = function(){
+  clearTask5NodeSelectionState();
+  return __task5FinalClearCanvasSelection();
+};
+
+const __task5FinalRestoreSystemModelSnapshot = restoreSystemModelSnapshot;
+restoreSystemModelSnapshot = function(snapshot){
+  clearTask5NodeSelectionState();
+  return __task5FinalRestoreSystemModelSnapshot(snapshot);
+};
+
+const __task5FinalDeleteCurrentSelection = deleteCurrentSelection;
+deleteCurrentSelection = function(){
+  if(getTask5SelectedNodeIds().length>1){
+    deleteSelectedNodeGroup();
+    return;
+  }
+  __task5FinalDeleteCurrentSelection();
+};
+
+const __task5FinalRenderPropertyPanel = renderPropertyPanel;
+renderPropertyPanel = function(node){
+  const ids=getTask5SelectedNodeIds();
+  if(ids.length>1){
+    renderTask5MultiSelectionPanel(ids);
+    return;
+  }
+  return __task5FinalRenderPropertyPanel(node);
+};
+
+const __task5FinalRenderModelNodes = renderModelNodes;
+renderModelNodes = function(){
+  __task5FinalRenderModelNodes();
+  const selectedIds=new Set(getTask5SelectedNodeIds());
+  document.querySelectorAll('.blk[id^="b-"]').forEach(el=>{
+    const nodeId=el.id.replace(/^b-/,'');
+    if(selectedIds.has(nodeId)){
+      el.classList.add('sel','sel-multi');
+    }else{
+      el.classList.remove('sel-multi');
+    }
+  });
+  bindTask5SelectionGestures();
+  updateTask5WrapButtonState();
+};
+
+const __task5FinalUpdateUI = updateUI;
+updateUI = function(){
+  __task5FinalUpdateUI();
+  updateTask5WrapButtonState();
+};
+
+Object.assign(window,{
+  selectNode,
+  clearCanvasSelection,
+  deleteCurrentSelection,
+  deleteSelectedNodeGroup,
+  wrapSelectionIntoSubsystem,
+  renderModelNodes,
+  updateUI
+});
+
+if(typeof S.workspaceSource!=='string'){
+  S.workspaceSource='';
+}
+
+function resetSimulationRuntimeForBlankWorkspace(){
+  if(typeof SIM==='undefined'){return;}
+  if(typeof clearSimLoop==='function'){
+    clearSimLoop();
+  }
+  SIM.inited=false;
+  SIM.running=false;
+  SIM.paused=false;
+  SIM.hasSamples=false;
+  SIM.time=0;
+  SIM.stepIndex=0;
+  SIM.activeScopeId='';
+  SIM.datasetName=document.getElementById('sim-name')?.value?.trim?.()||'test';
+  SIM.actual=createRuntimeBucket();
+  SIM.reference=createRuntimeBucket();
+  SIM.scopeWindows={};
+  SIM.scopeWindowZ=10;
+}
+
+function applyBlankWorkspaceState(toastMessage=''){
+  if(typeof clearTask5NodeSelectionState==='function'){
+    clearTask5NodeSelectionState();
+  }
+  S.rootCanvasId='canvas-root';
+  S.activeCanvasId='canvas-root';
+  S.canvasTrail=['canvas-root'];
+  S.canvases={
+    'canvas-root':createEmptyCanvasRecord('canvas-root','顶层',null)
+  };
+  S.nodeSeq=0;
+  S.edgeSeq=0;
+  S.activeLineType='normal';
+  S.selBlk=null;
+  S.selEdge=null;
+  S.selTpls=[];
+  S.pendingConnection=null;
+  S.injectTargetId='';
+  S.injectSelectionMode='';
+  S.injectSelectionId='';
+  S.protocolInjectTargetId='';
+  S.protocolInjectSelectionMode='';
+  S.protocolInjectSelectionId='';
+  S.activeModelPackage=null;
+  S.faultedBlks=[];
+  S.sysLoaded=true;
+  S.systemSaved=false;
+  S.simDone=false;
+  S.step=1;
+  S.workspaceSource='blank';
+  initializeFaultCatalog();
+  resetSimulationRuntimeForBlankWorkspace();
+  document.getElementById('empty')?.style?.setProperty('display','none');
+  document.getElementById('diagram')?.classList?.add('on');
+  handleCanvasZoomReset();
+  clearPendingConnection();
+  renderCanvasBreadcrumbs();
+  renderModelNodes();
+  renderPropertyPanel(null);
+  setConnectionTool('normal');
+  syncConfigTargets('');
+  renderFaultCatalogList();
+  renderScopeWindows();
+  updateModelPackageStatus();
+  updateUI();
+  if(toastMessage){
+    toast(toastMessage,'s');
+  }
+}
+
+function doCreateBlankWorkspace(){
+  applyBlankWorkspaceState('空白模型工作区已创建');
+}
+
+function doResetWorkspace(){
+  const confirmed=window.confirm('确认重置当前画布吗？此操作会清空当前系统及其子系统内容。');
+  if(!confirmed){
+    return false;
+  }
+  applyBlankWorkspaceState('画布已重置为空白模型工作区');
+  return true;
+}
+
+const __blankWorkspaceRestoreSystemModelSnapshot = restoreSystemModelSnapshot;
+restoreSystemModelSnapshot = function(snapshot){
+  const result=__blankWorkspaceRestoreSystemModelSnapshot(snapshot);
+  if(!S.workspaceSource&&!S.activeModelPackage){
+    S.workspaceSource='legacy';
+  }
+  updateModelPackageStatus();
+  updateUI();
+  return result;
+};
+
+const __blankWorkspaceApplyFlightModelPackage = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
+window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__ = function(pkg,prepared){
+  const result=__blankWorkspaceApplyFlightModelPackage(pkg,prepared);
+  if(result?.ok!==false){
+    S.workspaceSource='imported';
+    updateModelPackageStatus();
+    updateUI();
+  }
+  return result;
+};
+
+const __blankWorkspaceDoSaveSys = doSaveSys;
+doSaveSys = function(){
+  if(!S.sysLoaded){
+    toast('请先新建空白模型或导入系统模型','w');
+    return;
+  }
+  return __blankWorkspaceDoSaveSys();
+};
+
+const __blankWorkspaceDoImportFault = doImportFault;
+doImportFault = function(){
+  if(!S.sysLoaded){
+    toast('请先新建空白模型或导入系统模型','w');
+    return;
+  }
+  return __blankWorkspaceDoImportFault();
+};
+
+const __blankWorkspaceValidateSimulationTopology = validateSimulationTopology;
+validateSimulationTopology = function(){
+  if(!S.sysLoaded){
+    toast('请先新建空白模型或导入系统模型','w');
+    return false;
+  }
+  return __blankWorkspaceValidateSimulationTopology();
+};
+
+const __blankWorkspaceUpdateModelPackageStatus = updateModelPackageStatus;
+updateModelPackageStatus = function(node=null){
+  const status=ensureModelPackageStatusElement();
+  const propsBody=document.querySelector('.props-body');
+  if(propsBody&&status.parentElement!==propsBody){
+    propsBody.appendChild(status);
+  }
+  if(S.workspaceSource==='blank'&&!S.activeModelPackage){
+    status.textContent='当前模型包：空白模型工作区';
+    return;
+  }
+  if(!S.sysLoaded&&!S.activeModelPackage){
+    status.textContent='当前模型包：未加载';
+    return;
+  }
+  return __blankWorkspaceUpdateModelPackageStatus(node);
+};
+
+const __blankWorkspaceUpdateUI = updateUI;
+updateUI = function(){
+  __blankWorkspaceUpdateUI();
+  const statusEl=document.getElementById('stxt');
+  if(!statusEl){return;}
+  const hasSimulationStatus=typeof SIM!=='undefined'&&(
+    (SIM.running&&!SIM.paused)||
+    SIM.paused||
+    (SIM.hasSamples&&S.step===3)
+  );
+  if(hasSimulationStatus){
+    return;
+  }
+  if(!S.sysLoaded){
+    statusEl.textContent='就绪 · 可导入系统模型或新建空白模型';
+    return;
+  }
+  if(S.workspaceSource==='blank'){
+    if(!S.modelNodes.length){
+      statusEl.textContent='空白模型工作区 · 请拖拽组件到画布';
+    }else if(canInitializeSimulation()){
+      statusEl.textContent='空白模型工作区 · 当前链路已可运行，可直接初始化仿真';
+    }else{
+      statusEl.textContent='空白模型工作区 · 单击模块后可在右侧保存设置';
+    }
+    return;
+  }
+  if(S.workspaceSource==='legacy'&&!S.modelNodes.length){
+    statusEl.textContent='就绪 · 已恢复本地系统模型';
+  }
+};
+
+window.doCreateBlankWorkspace=doCreateBlankWorkspace;
+window.doResetWorkspace=doResetWorkspace;
+window.doSaveSys=doSaveSys;
+window.doImportFault=doImportFault;
+
+Object.assign(window,{
+  doCreateBlankWorkspace,
+  doResetWorkspace,
+  doSaveSys,
+  doImportFault,
+  validateSimulationTopology,
+  updateUI
+});
+
+const __signalRoutingBuildNodeSubtitle = buildNodeSubtitle;
+const __signalRoutingBuildFlowBlockFields = buildFlowBlockFields;
+
+buildFlowBlockFields = function(node){
+  return `
+    <div class="pgroup">
+      <div class="pglbl">信号适配配置</div>
+      <div class="props-field"><label>模块名称</label><input id="prop-name" value="${escapeHtml(node.props.name)}"></div>
+      <div class="props-field"><label>输入名称</label><input id="prop-inputName" value="${escapeHtml(node.props.inputName||'输入信号')}"></div>
+      <div class="props-row">
+        <div class="props-field"><label>输入类型</label><select id="prop-inputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.inputFormat||'标量')}</select></div>
+        <div class="props-field"><label>输出类型</label><select id="prop-outputFormat">${buildSelectOptions(SIGNAL_ADAPTER_FORMATS,node.props.outputFormat||'标量')}</select></div>
+      </div>
+      <div class="props-field"><label>输出名称</label><input id="prop-outputName" value="${escapeHtml(node.props.outputName||'输出信号')}"></div>
+      <div class="props-help">信号适配块只负责统一端口名称、类型和格式，不承担 Python 脚本执行职责。</div>
+    </div>`;
+};
+
+buildNodeSubtitle = function(node){
+  if(!node?.props){
+    return __signalRoutingBuildNodeSubtitle(node);
+  }
+  const props=node.props;
+  const faultNote=node.injectedFault?' / 已注入故障':'';
+  if(node.type==='flow_block'){
+    return `${props.inputName||'输入信号'} / ${props.inputFormat||'标量'} -> ${props.outputName||'输出信号'} / ${props.outputFormat||'标量'} / 类型适配${faultNote}`;
+  }
+  if(node.type==='gain_block'){
+    normalizeSignalUtilityNode(node);
+    return `系数 ${props.gain||'1.0'} / ${props.inputFormat||'标量'} -> ${props.outputFormat||'标量'}${faultNote}`;
+  }
+  if(node.type==='sum_block'){
+    normalizeSignalUtilityNode(node);
+    return `${props.inputCount||2} 路输入 / ${props.signs?.join(' ')||'+ +'} / ${props.outputFormat||'标量'}${faultNote}`;
+  }
+  if(node.type==='mux_block'){
+    normalizeSignalUtilityNode(node);
+    return `${props.inputCount||2} 路输入打包 / 输出 ${props.outputFormat||'向量'}${faultNote}`;
+  }
+  return __signalRoutingBuildNodeSubtitle(node);
+};
+
+const __signalRoutingGetNodePorts = getNodePorts;
+getNodePorts = function(node){
+  if(node?.type==='gain_block'){
+    normalizeSignalUtilityNode(node);
+    return {
+      inputs:[{key:'gain-input',label:'输入',kind:'input',side:'left'}],
+      outputs:[{key:'gain-output',label:'输出',kind:'output',side:'right'}]
+    };
+  }
+  if(node?.type==='sum_block'){
+    normalizeSignalUtilityNode(node);
+    return {
+      inputs:Array.from({length:node.props.inputCount},(_,index)=>({
+        key:`sum-input-${index}`,
+        label:`输入 ${index+1}`,
+        kind:'input',
+        side:'left'
+      })),
+      outputs:[{key:'sum-output',label:'和',kind:'output',side:'right'}]
+    };
+  }
+  if(node?.type==='mux_block'){
+    normalizeSignalUtilityNode(node);
+    return {
+      inputs:Array.from({length:node.props.inputCount},(_,index)=>({
+        key:`mux-input-${index}`,
+        label:`输入 ${index+1}`,
+        kind:'input',
+        side:'left'
+      })),
+      outputs:[{key:'mux-output',label:'向量',kind:'output',side:'right'}]
+    };
+  }
+  return __signalRoutingGetNodePorts(node);
+};
+
+const __signalRoutingCreateNode = createNode;
+createNode = function(type,rawX,rawY){
+  const beforeLength=S.modelNodes.length;
+  __signalRoutingCreateNode(type,rawX,rawY);
+  if(S.modelNodes.length!==beforeLength+1){return;}
+  const node=S.modelNodes[S.modelNodes.length-1];
+  if(!node){return;}
+  if(type==='flow_block'){
+    node.props.name=`信号适配块 ${getNodeTypeCount(type)}`;
+    node.props.inputName=node.props.inputName||'输入信号';
+    node.props.outputName=node.props.outputName||'输出信号';
+    node.props.inputFormat=node.props.inputFormat||'标量';
+    node.props.outputFormat=node.props.outputFormat||'标量';
+  }
+  if(type==='gain_block'||type==='sum_block'||type==='mux_block'){
+    node.props.name=`${COMPONENT_LIBRARY[type].label} ${getNodeTypeCount(type)}`;
+    normalizeSignalUtilityNode(node);
+  }
+  applyNodeGeometry(node);
+  renderModelNodes();
+  if(S.selBlk===node.id){
+    renderPropertyPanel(node);
+  }
+  updateUI();
+};
+
+const __signalRoutingRenderPropertyPanel = renderPropertyPanel;
+renderPropertyPanel = function(node){
+  if(typeof getTask5SelectedNodeIds==='function'&&getTask5SelectedNodeIds().length>1){
+    return __signalRoutingRenderPropertyPanel(node);
+  }
+  if(node?.type==='gain_block'||node?.type==='sum_block'||node?.type==='mux_block'){
+    const pe=document.getElementById('pe');
+    const pd=document.getElementById('pd');
+    const meta=COMPONENT_LIBRARY[node.type];
+    pe.style.display='none';
+    pd.style.display='block';
+    pd.innerHTML=`
+      <div class="pgroup">
+        <div class="props-title">${escapeHtml(node.props.name)}</div>
+        <div class="props-sub">${meta.label} / 节点 ${node.id.replace('node-','#')}</div>
+      </div>
+      <div class="pgroup">
+        <div class="pglbl">当前状态</div>
+        <div class="prow"><span class="pk">节点类别</span><span class="pv">${meta.label}</span></div>
+      </div>
+      <div class="props-form">
+        ${buildSignalUtilityFields(node)}
+        <div class="props-actions">
+          <button class="props-save" onclick="saveSelectedNode()">保存设置</button>
+          <button class="props-danger" onclick="deleteSelectedNode()">删除模块</button>
+        </div>
+      </div>`;
+    return;
+  }
+  return __signalRoutingRenderPropertyPanel(node);
+};
+
+const __signalRoutingSaveSelectedNode = saveSelectedNode;
+saveSelectedNode = function(){
+  const node=getNode(S.selBlk);
+  if(node?.type==='gain_block'){
+    node.props.name=document.getElementById('prop-name')?.value.trim()||node.props.name;
+    node.props.gain=document.getElementById('prop-gain')?.value.trim()||'1.0';
+    node.props.inputFormat=document.getElementById('prop-inputFormat')?.value||'标量';
+    node.props.outputFormat=document.getElementById('prop-outputFormat')?.value||'标量';
+    normalizeSignalUtilityNode(node);
+    markTopologyDirty(getMutationScopeForType(node.type));
+    renderModelNodes();
+    renderPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    return;
+  }
+  if(node?.type==='sum_block'){
+    node.props.name=document.getElementById('prop-name')?.value.trim()||node.props.name;
+    node.props.inputCount=clampSignalUtilityInputCount(document.getElementById('prop-inputCount')?.value,2);
+    node.props.signs=normalizeSignalSigns(document.getElementById('prop-signs')?.value,node.props.inputCount);
+    node.props.outputFormat=document.getElementById('prop-outputFormat')?.value||'标量';
+    normalizeSignalUtilityNode(node);
+    pruneInvalidEdgesForNode(node);
+    markTopologyDirty(getMutationScopeForType(node.type));
+    renderModelNodes();
+    renderPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    return;
+  }
+  if(node?.type==='mux_block'){
+    node.props.name=document.getElementById('prop-name')?.value.trim()||node.props.name;
+    node.props.inputCount=clampSignalUtilityInputCount(document.getElementById('prop-inputCount')?.value,2);
+    node.props.outputFormat=document.getElementById('prop-outputFormat')?.value||'向量';
+    normalizeSignalUtilityNode(node);
+    pruneInvalidEdgesForNode(node);
+    markTopologyDirty(getMutationScopeForType(node.type));
+    renderModelNodes();
+    renderPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    return;
+  }
+  return __signalRoutingSaveSelectedNode();
+};
+
+function evaluateSignalUtilityOutputs(node,inputValues){
+  if(node.type==='gain_block'){
+    const inputValue=sanitizeSignalValue(inputValues[0]??0);
+    const gain=parseScalar(node.props?.gain,1);
+    return {outputs:[sanitizeSignalValue(inputValue*gain)],middleValues:[]};
+  }
+  if(node.type==='sum_block'){
+    normalizeSignalUtilityNode(node);
+    let total=0;
+    for(let index=0; index<node.props.inputCount; index+=1){
+      const value=sanitizeSignalValue(inputValues[index]??0);
+      const sign=node.props.signs?.[index]==='-'?-1:1;
+      total+=sign*value;
+    }
+    return {outputs:[sanitizeSignalValue(total)],middleValues:[]};
+  }
+  if(node.type==='mux_block'){
+    normalizeSignalUtilityNode(node);
+    const packed=Array.from({length:node.props.inputCount},(_,index)=>sanitizeSignalValue(inputValues[index]??0));
+    return {outputs:[packed],middleValues:[]};
+  }
+  return null;
+}
+
+const __signalRoutingResolveCanvasNodeOutputs = resolveCanvasNodeOutputs;
+resolveCanvasNodeOutputs = function(canvasId,nodeId,modeKey,time,dt,context){
+  const node=getCanvasNodeById(canvasId,nodeId);
+  if(node?.type==='gain_block'||node?.type==='sum_block'||node?.type==='mux_block'){
+    const cacheKey=`${canvasId}:${nodeId}`;
+    if(context.cache.has(cacheKey)){
+      return context.cache.get(cacheKey);
+    }
+    const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+    const nodeState=ensureNodeRuntime(bucket,node);
+    if(context.visiting.has(cacheKey)){
+      return {
+        outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+        middleValues:nodeState.lastMiddleValues||[]
+      };
+    }
+    context.visiting.add(cacheKey);
+    const inputPorts=getNodePorts(node).inputs||[];
+    const incoming=getIncomingEdgesForCanvasNode(canvasId,node.id);
+    const inputValues=inputPorts.map((_,portIndex)=>{
+      const edge=incoming.find(item=>(item.targetPortIndex||0)===portIndex);
+      if(!edge){return 0;}
+      const upstream=resolveCanvasNodeOutput(canvasId,edge.sourceNodeId,edge.sourcePortIndex||0,modeKey,time,dt,context);
+      return transmitEdgeSignal(edge,upstream,modeKey,time);
+    });
+    const resolved=finalizeResolvedNodeOutputs(node,nodeState,inputValues,evaluateSignalUtilityOutputs(node,inputValues));
+    context.visiting.delete(cacheKey);
+    context.cache.set(cacheKey,resolved);
+    return resolved;
+  }
+  return __signalRoutingResolveCanvasNodeOutputs(canvasId,nodeId,modeKey,time,dt,context);
+};
+
+const __signalRoutingResolveNodeOutputsInCanvas = resolveNodeOutputsInCanvas;
+resolveNodeOutputsInCanvas = function(nodeId,canvasId,modeKey,time,dt,cache,visiting){
+  const effectiveCanvasId=findCanvasIdForNodeId(nodeId,canvasId);
+  const node=getNodeFromCanvas(effectiveCanvasId,nodeId);
+  if(node?.type==='gain_block'||node?.type==='sum_block'||node?.type==='mux_block'){
+    if(cache.has(nodeId)){
+      return cache.get(nodeId);
+    }
+    const bucket=modeKey==='reference'?SIM.reference:SIM.actual;
+    const nodeState=ensureNodeRuntime(bucket,node);
+    if(visiting.has(nodeId)){
+      return {
+        outputs:nodeState.lastOutputs?.length?nodeState.lastOutputs:[nodeState.lastOutput||0],
+        middleValues:nodeState.lastMiddleValues||[]
+      };
+    }
+    visiting.add(nodeId);
+    const inputValues=resolveNodeInputValuesInCanvas(node,effectiveCanvasId,modeKey,time,dt,cache,visiting);
+    const resolved=evaluateSignalUtilityOutputs(node,inputValues);
+    resolved.outputs=(resolved.outputs||[0]).map(sanitizeSignalValue);
+    resolved.middleValues=(resolved.middleValues||[]).map(sanitizeSignalValue);
+    nodeState.lastInputValues=inputValues.slice();
+    nodeState.lastInput=inputValues[0]||0;
+    nodeState.lastOutputs=resolved.outputs.slice();
+    nodeState.lastMiddleValues=resolved.middleValues.slice();
+    nodeState.lastOutput=nodeState.lastOutputs[0]||0;
+    visiting.delete(nodeId);
+    cache.set(nodeId,resolved);
+    return resolved;
+  }
+  return __signalRoutingResolveNodeOutputsInCanvas(nodeId,canvasId,modeKey,time,dt,cache,visiting);
+};
+
+Object.assign(window,{
+  buildNodeSubtitle,
+  getNodePorts,
+  createNode,
+  renderPropertyPanel,
+  saveSelectedNode,
+  resolveCanvasNodeOutputs,
+  resolveNodeOutputsInCanvas
+});

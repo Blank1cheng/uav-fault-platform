@@ -152,6 +152,73 @@ describe('Python binding app integration', () => {
     wrapper.unmount();
   });
 
+  it('creates a blank workspace that allows direct modeling and saving', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    expect(typeof window.doCreateBlankWorkspace).toBe('function');
+
+    window.doCreateBlankWorkspace();
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.sysLoaded).toBe(true);
+    expect(window.__GZ_STATE__.workspaceSource).toBe('blank');
+    expect(document.getElementById('stxt')?.textContent).toContain('空白模型工作区');
+
+    window.createNode('simulation_block', 420, 320);
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.modelNodes).toHaveLength(1);
+
+    window.doSaveSys();
+    await flushRuntime();
+
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(setItemSpy).toHaveBeenCalled();
+    expect(window.__GZ_STATE__.workspaceSource).toBe('blank');
+
+    wrapper.unmount();
+    setItemSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
+
+  it('restores blank workspace mode from a saved snapshot without falling back to legacy mode', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    window.doCreateBlankWorkspace();
+    await flushRuntime();
+    window.createNode('signal_source', 320, 220);
+    await flushRuntime();
+
+    const snapshot = window.__GZ_WORKBENCH_SNAPSHOT__.createWorkbenchSnapshot(window.__GZ_STATE__);
+    expect(snapshot.workspaceSource).toBe('blank');
+
+    window.__GZ_STATE__.workspaceSource = 'legacy';
+    window.restoreSystemModelSnapshot(snapshot);
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.workspaceSource).toBe('blank');
+    expect(document.getElementById('stxt')?.textContent?.length || 0).toBeGreaterThan(0);
+
+    wrapper.unmount();
+  });
+
+  it('shows both import and blank-workspace actions in the empty state', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const empty = document.getElementById('empty');
+    expect(empty?.textContent).toContain('导入系统模型');
+    expect(empty?.textContent).toContain('新建空白模型');
+    expect(document.getElementById('btn-new-sys')).not.toBeNull();
+    expect(document.getElementById('btn-reset-sys')).not.toBeNull();
+
+    wrapper.unmount();
+  });
+
   it('persists python binding snapshots when saving the system model', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();

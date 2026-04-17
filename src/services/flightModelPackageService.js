@@ -2,7 +2,10 @@ export const FLIGHT_MODEL_SCHEMA_VERSION = 1;
 export const FLIGHT_MODEL_PACKAGE_TYPE = 'flight-control-model';
 
 import { createSimulationBlockPythonBinding } from '../composables/useWorkbenchState.js';
-import { restoreWorkbenchSnapshot } from './workbenchSnapshotService.js';
+import {
+  createWorkbenchSnapshot,
+  restoreWorkbenchSnapshot
+} from './workbenchSnapshotService.js';
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -39,6 +42,66 @@ function createModuleRegistry(pythonModules) {
   });
 
   return registry;
+}
+
+function collectSnapshotNodes(snapshot) {
+  const nodes = [];
+  const seenNodeIds = new Set();
+  const appendNodes = (items) => {
+    if (!Array.isArray(items)) {
+      return;
+    }
+
+    items.forEach((node) => {
+      if (!isPlainObject(node)) {
+        nodes.push(node);
+        return;
+      }
+
+      const nodeId = hasUsableText(node.id) ? node.id : null;
+      if (nodeId && seenNodeIds.has(nodeId)) {
+        return;
+      }
+
+      if (nodeId) {
+        seenNodeIds.add(nodeId);
+      }
+      nodes.push(node);
+    });
+  };
+
+  appendNodes(snapshot?.modelNodes);
+
+  if (isPlainObject(snapshot?.canvases)) {
+    Object.values(snapshot.canvases).forEach((canvas) => {
+      appendNodes(canvas?.nodes);
+    });
+  }
+
+  return nodes;
+}
+
+function mapSnapshotNodes(snapshot, transformNode) {
+  const safeSnapshot = clone(snapshot ?? {});
+
+  safeSnapshot.modelNodes = Array.isArray(safeSnapshot.modelNodes)
+    ? safeSnapshot.modelNodes.map(transformNode)
+    : [];
+
+  if (isPlainObject(safeSnapshot.canvases)) {
+    Object.entries(safeSnapshot.canvases).forEach(([canvasId, canvas]) => {
+      if (!isPlainObject(canvas)) {
+        return;
+      }
+
+      safeSnapshot.canvases[canvasId] = {
+        ...canvas,
+        nodes: Array.isArray(canvas.nodes) ? canvas.nodes.map(transformNode) : []
+      };
+    });
+  }
+
+  return safeSnapshot;
 }
 
 function isHydratedBinding(binding) {
@@ -92,7 +155,7 @@ function hydrateSimulationBinding(binding, moduleEntry) {
 function hydrateSnapshotBindings(snapshot, pythonModules) {
   const registry = createModuleRegistry(pythonModules);
   const errors = [];
-  const modelNodes = (Array.isArray(snapshot.modelNodes) ? snapshot.modelNodes : []).map((node) => {
+  const hydrateNode = (node) => {
     if (!isPlainObject(node) || node.type !== 'simulation_block' || !node?.pythonBinding?.bound) {
       return node;
     }
@@ -119,15 +182,77 @@ function hydrateSnapshotBindings(snapshot, pythonModules) {
       ...node,
       pythonBinding: hydratedBinding
     };
-  });
+  };
 
   return {
-    snapshot: {
-      ...snapshot,
-      modelNodes
-    },
+    snapshot: mapSnapshotNodes(snapshot, hydrateNode),
     errors
   };
+}
+
+function exportSimulationNode(node) {
+  if (!isPlainObject(node)) {
+    return node;
+  }
+
+  if (node?.type !== 'simulation_block') {
+    return clone(node);
+  }
+
+  const binding = node.pythonBinding ?? null;
+  if (!binding || !binding.bound) {
+    return {
+      ...clone(node),
+      pythonBinding: binding ? clone(binding) : null
+    };
+  }
+
+  const moduleId = binding.moduleId;
+  const fileName = binding.fileName;
+  const entryFunction = binding.entryFunction;
+  const source = binding.rawSource ?? binding.source ?? '';
+  const exportable = hasUsableText(moduleId)
+    && hasUsableText(fileName)
+    && hasUsableText(entryFunction)
+    && hasUsableText(source);
+
+  return {
+    ...clone(node),
+    pythonBinding: exportable ? clone(binding) : null
+  };
+}
+
+function collectPythonModulesFromSnapshot(snapshot) {
+  return collectSnapshotNodes(snapshot).reduce((modules, node) => {
+    if (!isPlainObject(node) || node.type !== 'simulation_block' || !node?.pythonBinding?.bound) {
+      return modules;
+    }
+
+    const binding = node.pythonBinding;
+    const moduleId = binding.moduleId;
+    const fileName = binding.fileName;
+    const entryFunction = binding.entryFunction;
+    const source = binding.rawSource ?? binding.source ?? '';
+
+    if (!hasUsableText(moduleId) || !hasUsableText(fileName) || !hasUsableText(entryFunction) || !hasUsableText(source)) {
+      return modules;
+    }
+
+    if (!modules.has(moduleId)) {
+      modules.set(moduleId, normalizeModule({
+        moduleId,
+        fileName,
+        entryFunction,
+        category: binding.moduleCategory ?? 'uncategorized',
+        sourcePackageId: binding.sourcePackageId ?? null,
+        sourcePackageName: binding.sourcePackageName ?? null,
+        source,
+        parsedInterface: binding.parsedInterface ?? null
+      }));
+    }
+
+    return modules;
+  }, new Map());
 }
 
 function hasUsableText(value) {
@@ -214,9 +339,54 @@ export function validateFlightModelPackage(pkg) {
   if (!isPlainObject(pkg.workbenchSnapshot)) {
     errors.push('workbenchSnapshot must be an object.');
   } else {
-    validatePlainObjectArray(errors, pkg.workbenchSnapshot.modelNodes, 'workbenchSnapshot.modelNodes');
-    validatePlainObjectArray(errors, pkg.workbenchSnapshot.modelEdges, 'workbenchSnapshot.modelEdges');
+    const hasCanvasRegistry = isPlainObject(pkg.workbenchSnapshot.canvases);
+
+    if (Array.isArray(pkg.workbenchSnapshot.modelNodes)) {
+      validatePlainObjectArray(errors, pkg.workbenchSnapshot.modelNodes, 'workbenchSnapshot.modelNodes');
+    } else if (!hasCanvasRegistry) {
+      errors.push('workbenchSnapshot.modelNodes must be an array.');
+    }
+
+    if (Array.isArray(pkg.workbenchSnapshot.modelEdges)) {
+      validatePlainObjectArray(errors, pkg.workbenchSnapshot.modelEdges, 'workbenchSnapshot.modelEdges');
+    } else if (!hasCanvasRegistry) {
+      errors.push('workbenchSnapshot.modelEdges must be an array.');
+    }
   }
+
+  const availableFaultIds = new Set();
+  const registerFaultIds = (collection) => {
+    if (!Array.isArray(collection)) {
+      return;
+    }
+
+    collection.forEach((faultModel) => {
+      if (isPlainObject(faultModel) && hasUsableText(faultModel.id)) {
+        availableFaultIds.add(faultModel.id);
+      }
+    });
+  };
+
+  registerFaultIds(pkg.faultLibrary);
+  registerFaultIds(pkg.workbenchSnapshot?.importedFaultModels);
+
+  collectSnapshotNodes(pkg.workbenchSnapshot).forEach((node, index) => {
+    if (!isPlainObject(node) || !isPlainObject(node.injectedFault)) {
+      return;
+    }
+
+    const nodeLabel = hasUsableText(node.id) ? node.id : `index-${index}`;
+    const faultModelId = node.injectedFault.modelId;
+
+    if (!hasUsableText(faultModelId)) {
+      errors.push(`workbenchSnapshot.modelNodes node "${nodeLabel}" has injectedFault without a modelId.`);
+      return;
+    }
+
+    if (!availableFaultIds.has(faultModelId)) {
+      errors.push(`workbenchSnapshot.modelNodes node "${nodeLabel}" references unknown fault modelId "${faultModelId}".`);
+    }
+  });
 
   return {
     ok: errors.length === 0,
@@ -266,71 +436,9 @@ export function applyFlightModelPackage(pkg) {
 }
 
 export function buildFlightModelPackage({ meta = {}, snapshot = {}, faultLibrary = [] } = {}) {
-  const snapshotModelNodes = Array.isArray(snapshot.modelNodes) ? snapshot.modelNodes : [];
-  const snapshotModelEdges = Array.isArray(snapshot.modelEdges) ? snapshot.modelEdges : [];
-
-  const exportedModelNodes = snapshotModelNodes.map((node) => {
-    if (!isPlainObject(node)) {
-      return node;
-    }
-
-    if (node?.type !== 'simulation_block') {
-      return clone(node);
-    }
-
-    const binding = node.pythonBinding ?? null;
-    if (!binding || !binding.bound) {
-      return {
-        ...clone(node),
-        pythonBinding: binding ? clone(binding) : null
-      };
-    }
-
-    const moduleId = binding.moduleId;
-    const fileName = binding.fileName;
-    const entryFunction = binding.entryFunction;
-    const source = binding.rawSource ?? binding.source ?? '';
-    const exportable = hasUsableText(moduleId)
-      && hasUsableText(fileName)
-      && hasUsableText(entryFunction)
-      && hasUsableText(source);
-
-    return {
-      ...clone(node),
-      pythonBinding: exportable ? clone(binding) : null
-    };
-  });
-
-  const pythonModulesById = exportedModelNodes.reduce((modules, node) => {
-    if (!isPlainObject(node) || node.type !== 'simulation_block' || !node?.pythonBinding?.bound) {
-      return modules;
-    }
-
-    const binding = node.pythonBinding;
-    const moduleId = binding.moduleId;
-    const fileName = binding.fileName;
-    const entryFunction = binding.entryFunction;
-    const source = binding.rawSource ?? binding.source ?? '';
-
-    if (!hasUsableText(moduleId) || !hasUsableText(fileName) || !hasUsableText(entryFunction) || !hasUsableText(source)) {
-      return modules;
-    }
-
-    if (!modules.has(moduleId)) {
-      modules.set(moduleId, normalizeModule({
-        moduleId,
-        fileName,
-        entryFunction,
-        category: binding.moduleCategory ?? 'uncategorized',
-        sourcePackageId: binding.sourcePackageId ?? null,
-        sourcePackageName: binding.sourcePackageName ?? null,
-        source,
-        parsedInterface: binding.parsedInterface ?? null
-      }));
-    }
-
-    return modules;
-  }, new Map());
+  const normalizedSnapshot = createWorkbenchSnapshot(snapshot);
+  const exportedSnapshot = mapSnapshotNodes(normalizedSnapshot, exportSimulationNode);
+  const pythonModulesById = collectPythonModulesFromSnapshot(normalizedSnapshot);
 
   return {
     schemaVersion: FLIGHT_MODEL_SCHEMA_VERSION,
@@ -341,11 +449,7 @@ export function buildFlightModelPackage({ meta = {}, snapshot = {}, faultLibrary
     source: clone(meta.source ?? {}),
     pythonModules: Array.from(pythonModulesById.values()),
     faultLibrary: clone(faultLibrary ?? []),
-    workbenchSnapshot: {
-      ...clone(snapshot ?? {}),
-      modelNodes: exportedModelNodes,
-      modelEdges: clone(snapshotModelEdges)
-    }
+    workbenchSnapshot: exportedSnapshot
   };
 }
 

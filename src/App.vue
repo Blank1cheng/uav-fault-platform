@@ -15,6 +15,7 @@ import PythonBindingDialog from './components/dialogs/PythonBindingDialog.vue';
 import ToastHost from './components/dialogs/ToastHost.vue';
 import { useWorkbenchState } from './composables/useWorkbenchState.js';
 import { mountLegacyRuntime } from './services/legacyRuntimeBootstrap.js';
+import './services/simulationRuntime.js';
 
 const workbench = useWorkbenchState();
 

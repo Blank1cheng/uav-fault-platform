@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "packageType": "flight-control-model",
-  "modelId": "evtol-small-nonlinear",
-  "modelName": "eVTOL Small Nonlinear Flight Control",
-  "description": "Manually decomposed eVTOL flight-control reference package derived from the Simulink validation model",
+  "modelId": "evtol-small-nonlinear-fault-injected",
+  "modelName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
+  "description": "Manually decomposed eVTOL flight-control reference package derived from the Simulink validation model Includes a preloaded local actuator-side fault sample.",
   "source": {
     "origin": "manual-from-slx",
     "slxFile": "eVTOL_Small_nonandlin_algorithm_validation.slx",
@@ -15,8 +15,8 @@
       "fileName": "imu_gyro.py",
       "entryFunction": "process",
       "category": "sensors",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: imu_gyro\nDescription: Gyro sensing with optional bias injection\n\"\"\"\n\n\ndef process(body_rate: float, bias: float = 0.0, scale: float = 1.0):\n    # @observable\n    measured_rate = (body_rate + bias) * scale  # gyro measurement\n    return measured_rate\n",
       "parsedInterface": {
         "fileName": "imu_gyro.py",
@@ -65,8 +65,8 @@
       "fileName": "imu_accel.py",
       "entryFunction": "process",
       "category": "sensors",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: imu_accel\nDescription: Accelerometer sensing with scale distortion\n\"\"\"\n\n\ndef process(vertical_accel: float, scale: float = 1.0, offset: float = 0.0):\n    # @observable\n    measured_accel = vertical_accel * scale + offset  # accel measurement\n    return measured_accel\n",
       "parsedInterface": {
         "fileName": "imu_accel.py",
@@ -115,8 +115,8 @@
       "fileName": "barometer.py",
       "entryFunction": "process",
       "category": "sensors",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: barometer\nDescription: Barometric altitude channel with drift\n\"\"\"\n\n\ndef process(altitude: float, drift: float = 0.0):\n    # @observable\n    estimated_altitude = altitude + drift  # barometer estimate\n    return estimated_altitude\n",
       "parsedInterface": {
         "fileName": "barometer.py",
@@ -159,8 +159,8 @@
       "fileName": "gps_velocity.py",
       "entryFunction": "process",
       "category": "sensors",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: gps_velocity\nDescription: GPS velocity channel with held-sample freeze approximation\n\"\"\"\n\n\ndef process(true_velocity: float, held_velocity: float = 0.0, freeze: float = 0.0):\n    # @observable\n    reported_velocity = held_velocity if freeze >= 1.0 else true_velocity  # gps report\n    return reported_velocity\n",
       "parsedInterface": {
         "fileName": "gps_velocity.py",
@@ -209,8 +209,8 @@
       "fileName": "attitude_pid.py",
       "entryFunction": "process",
       "category": "controllers",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: attitude_pid\nDescription: Simplified attitude PID control block\n\"\"\"\n\n\ndef process(\n    attitude_error: float,\n    rate_feedback: float,\n    dt: float = 0.01,\n    kp: float = 1.2,\n    ki: float = 0.25,\n    kd: float = 0.08\n):\n    # @observable\n    integral_state = attitude_error * dt  # integral state\n    # @observable\n    derivative_state = -rate_feedback * kd  # derivative term\n    command = kp * attitude_error + ki * integral_state + derivative_state\n    return command\n",
       "parsedInterface": {
         "fileName": "attitude_pid.py",
@@ -282,8 +282,8 @@
       "fileName": "control_allocation.py",
       "entryFunction": "process",
       "category": "allocation",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: control_allocation\nDescription: Convert total thrust and roll command into left and right motor references\n\"\"\"\n\n\ndef process(total_thrust: float, roll_command: float):\n    # @observable\n    left_cmd = total_thrust * 0.5 - roll_command * 0.5  # left motor command\n    # @observable\n    right_cmd = total_thrust * 0.5 + roll_command * 0.5  # right motor command\n    return left_cmd, right_cmd\n",
       "parsedInterface": {
         "fileName": "control_allocation.py",
@@ -336,8 +336,8 @@
       "fileName": "motor_model.py",
       "entryFunction": "process",
       "category": "actuators",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: motor_model\nDescription: Motor efficiency and saturation model\n\"\"\"\n\n\ndef process(\n    left_cmd: float,\n    right_cmd: float,\n    efficiency: float = 1.0,\n    left_lock: float = 0.0,\n    saturation: float = 20.0\n):\n    # @observable\n    left_efficiency = 0.0 if left_lock >= 1.0 else efficiency  # left motor availability\n    # @observable\n    left_thrust = min(max(left_cmd * left_efficiency, 0.0), saturation)  # left thrust\n    # @observable\n    right_thrust = min(max(right_cmd * efficiency, 0.0), saturation)  # right thrust\n    return left_thrust, right_thrust\n",
       "parsedInterface": {
         "fileName": "motor_model.py",
@@ -413,8 +413,8 @@
       "fileName": "vehicle_dynamics.py",
       "entryFunction": "process",
       "category": "dynamics",
-      "sourcePackageId": "evtol-small-nonlinear",
-      "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+      "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+      "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
       "source": "\"\"\"\nModule: vehicle_dynamics\nDescription: Reduced-order vertical and roll dynamics\n\"\"\"\n\n\ndef process(\n    left_thrust: float,\n    right_thrust: float,\n    mass: float = 8.0,\n    drag: float = 0.12\n):\n    total_thrust = left_thrust + right_thrust\n    # @observable\n    roll_moment = right_thrust - left_thrust  # roll moment\n    vertical_accel = total_thrust / max(mass, 0.1) - drag\n    return vertical_accel, roll_moment\n",
       "parsedInterface": {
         "fileName": "vehicle_dynamics.py",
@@ -518,15 +518,6 @@
       "defaultValue": 2.4
     },
     {
-      "id": "motor_efficiency_loss",
-      "name": "Motor Efficiency Loss",
-      "moduleTargets": [
-        "motor_model"
-      ],
-      "parameter": "efficiency",
-      "defaultValue": 0.55
-    },
-    {
       "id": "motor_lock",
       "name": "Single Motor Lock",
       "moduleTargets": [
@@ -561,6 +552,24 @@
       ],
       "parameter": "drag",
       "defaultValue": 0.35
+    },
+    {
+      "id": "motor_efficiency_loss",
+      "name": "Motor Efficiency Loss",
+      "moduleTargets": [
+        "motor_model"
+      ],
+      "parameter": "efficiency",
+      "defaultValue": 0.55,
+      "layer": "electrical",
+      "desc": "Preloaded electrical fault that reduces motor-side actuation efficiency.",
+      "tags": [
+        "motor",
+        "electrical",
+        "preloaded"
+      ],
+      "createdAt": "2026-04-16",
+      "origin": "package"
     }
   ],
   "workbenchSnapshot": {
@@ -627,8 +636,8 @@
           "fileName": "imu_gyro.py",
           "moduleName": "imu_gyro",
           "moduleCategory": "sensors",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Gyro sensing with optional bias injection",
           "entryFunction": "process",
           "parsedInterface": {
@@ -762,8 +771,8 @@
           "fileName": "imu_accel.py",
           "moduleName": "imu_accel",
           "moduleCategory": "sensors",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Accelerometer sensing with scale distortion",
           "entryFunction": "process",
           "parsedInterface": {
@@ -897,8 +906,8 @@
           "fileName": "barometer.py",
           "moduleName": "barometer",
           "moduleCategory": "sensors",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Barometric altitude channel with drift",
           "entryFunction": "process",
           "parsedInterface": {
@@ -1021,8 +1030,8 @@
           "fileName": "gps_velocity.py",
           "moduleName": "gps_velocity",
           "moduleCategory": "sensors",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "GPS velocity channel with held-sample freeze approximation",
           "entryFunction": "process",
           "parsedInterface": {
@@ -1164,8 +1173,8 @@
           "fileName": "attitude_pid.py",
           "moduleName": "attitude_pid",
           "moduleCategory": "controllers",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Simplified attitude PID control block",
           "entryFunction": "process",
           "parsedInterface": {
@@ -1368,8 +1377,8 @@
           "fileName": "control_allocation.py",
           "moduleName": "control_allocation",
           "moduleCategory": "allocation",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Convert total thrust and roll command into left and right motor references",
           "entryFunction": "process",
           "parsedInterface": {
@@ -1532,8 +1541,8 @@
           "fileName": "motor_model.py",
           "moduleName": "motor_model",
           "moduleCategory": "actuators",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Motor efficiency and saturation model",
           "entryFunction": "process",
           "parsedInterface": {
@@ -1698,6 +1707,17 @@
               }
             ]
           }
+        },
+        "injectedFault": {
+          "modelId": "motor_efficiency_loss",
+          "name": "Motor Efficiency Loss",
+          "layer": "electrical",
+          "tags": [
+            "motor",
+            "electrical",
+            "preloaded"
+          ],
+          "desc": "Preloaded electrical fault that reduces motor-side actuation efficiency."
         }
       },
       {
@@ -1741,8 +1761,8 @@
           "fileName": "vehicle_dynamics.py",
           "moduleName": "vehicle_dynamics",
           "moduleCategory": "dynamics",
-          "sourcePackageId": "evtol-small-nonlinear",
-          "sourcePackageName": "eVTOL Small Nonlinear Flight Control",
+          "sourcePackageId": "evtol-small-nonlinear-fault-injected",
+          "sourcePackageName": "eVTOL Small Nonlinear Flight Control (Fault Injected)",
           "description": "Reduced-order vertical and roll dynamics",
           "entryFunction": "process",
           "parsedInterface": {
@@ -2046,7 +2066,28 @@
     "nodeSeq": 13,
     "edgeSeq": 17,
     "activeLineType": "normal",
-    "faultedBlks": [],
-    "importedFaultModels": []
+    "faultedBlks": [
+      "node-9"
+    ],
+    "importedFaultModels": [
+      {
+        "id": "motor_efficiency_loss",
+        "name": "Motor Efficiency Loss",
+        "moduleTargets": [
+          "motor_model"
+        ],
+        "parameter": "efficiency",
+        "defaultValue": 0.55,
+        "layer": "electrical",
+        "desc": "Preloaded electrical fault that reduces motor-side actuation efficiency.",
+        "tags": [
+          "motor",
+          "electrical",
+          "preloaded"
+        ],
+        "createdAt": "2026-04-16",
+        "origin": "package"
+      }
+    ]
   }
 }

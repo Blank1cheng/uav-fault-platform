@@ -1,7 +1,11 @@
 export const systemModelingComponents = [
   { type: 'signal_source', label: '信号源' },
-  { type: 'flow_block', label: '流程块' },
-  { type: 'simulation_block', label: '仿真块' }
+  { type: 'flow_block', label: '信号适配块' },
+  { type: 'gain_block', label: '增益块' },
+  { type: 'sum_block', label: '求和块' },
+  { type: 'mux_block', label: 'Mux 块' },
+  { type: 'simulation_block', label: '仿真块' },
+  { type: 'subsystem_block', label: '子系统块' }
 ];
 
 export const faultInjectionComponents = [

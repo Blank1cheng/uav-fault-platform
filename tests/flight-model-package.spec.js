@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import evtolReferencePackage from '../public/model-packages/evtol_small_nonlinear.json';
 import {
+  applyFlightModelPackage,
   buildFlightModelPackage,
   validateFlightModelPackage
 } from '../src/services/flightModelPackageService.js';
@@ -11,6 +12,9 @@ import {
   createWorkbenchSnapshot,
   restoreWorkbenchSnapshot
 } from '../src/services/workbenchSnapshotService.js';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const VALID_PACKAGE = {
   schemaVersion: 1,
@@ -50,6 +54,22 @@ const VALID_PACKAGE = {
   }
 };
 
+function loadPublicPackage(fileName) {
+  const testDir = path.dirname(fileURLToPath(import.meta.url));
+  const targetPath = path.resolve(testDir, '..', 'public', 'model-packages', fileName);
+
+  return JSON.parse(readFileSync(targetPath, 'utf8'));
+}
+
+function collectLinkedSubsystemNodes(snapshot) {
+  const rootCanvas = snapshot?.canvases?.[snapshot?.rootCanvasId];
+  if (!rootCanvas) {
+    return [];
+  }
+
+  return (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+}
+
 describe('flightModelPackageService', () => {
   it('validates a well-formed flight model package and rejects malformed packages', () => {
     const valid = validateFlightModelPackage(VALID_PACKAGE);
@@ -82,6 +102,36 @@ describe('flightModelPackageService', () => {
     expect(result.ok).toBe(false);
     expect(result.errors).toContain('workbenchSnapshot.modelNodes[0] must be an object.');
     expect(result.errors).toContain('workbenchSnapshot.modelEdges[0] must be an object.');
+  });
+
+  it('rejects injected faults that are not backed by the package fault library', () => {
+    const result = validateFlightModelPackage({
+      ...VALID_PACKAGE,
+      faultLibrary: [
+        {
+          id: 'motor_efficiency_loss',
+          name: 'Motor Efficiency Loss',
+          layer: 'electrical'
+        }
+      ],
+      workbenchSnapshot: {
+        ...VALID_PACKAGE.workbenchSnapshot,
+        modelNodes: [
+          {
+            id: 'node-faulty-1',
+            type: 'simulation_block',
+            injectedFault: {
+              modelId: 'missing_fault_model'
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.errors).toContain(
+      'workbenchSnapshot.modelNodes node "node-faulty-1" references unknown fault modelId "missing_fault_model".'
+    );
   });
 
   it('rejects whitespace-only module fields and missing entry functions', () => {
@@ -374,6 +424,68 @@ describe('flightModelPackageService', () => {
     expect(packageData.workbenchSnapshot.modelEdges[0].targetPort.displayName).toBe('Edited Input');
   });
 
+  it('preserves branched edges and signal utility block types through package export', () => {
+    const snapshot = createWorkbenchSnapshot({
+      rootCanvasId: 'canvas-root',
+      activeCanvasId: 'canvas-root',
+      canvasTrail: ['canvas-root'],
+      canvases: {
+        'canvas-root': {
+          id: 'canvas-root',
+          name: '顶层',
+          parentSubsystemNodeId: null,
+          viewport: { scale: 1, offsetX: 0, offsetY: 0 },
+          nodes: [
+            { id: 'node-source', type: 'signal_source', x: 120, y: 140, w: 164, h: 84, props: { name: 'Source', waveType: '常值', amplitude: '1', frequency: '0', outputFormat: '标量' } },
+            { id: 'node-gain', type: 'gain_block', x: 360, y: 120, w: 156, h: 84, props: { name: 'Gain', gain: '0.5', inputFormat: '标量', outputFormat: '标量' } },
+            { id: 'node-scope', type: 'instrument_scope', x: 640, y: 120, w: 150, h: 74, props: { name: 'Scope', instrumentType: '示波器', sampleRate: '64kHz', signal: '输出' } },
+            { id: 'node-sum', type: 'sum_block', x: 360, y: 280, w: 164, h: 88, props: { name: 'Sum', inputCount: 2, signs: ['+', '+'], outputFormat: '标量' } },
+            { id: 'node-mux', type: 'mux_block', x: 640, y: 280, w: 164, h: 88, props: { name: 'Mux', inputCount: 2, outputFormat: '向量' } },
+            { id: 'node-adapter', type: 'flow_block', x: 900, y: 280, w: 168, h: 88, props: { name: 'Adapter', inputName: 'sum', inputFormat: '标量', outputName: 'packed', outputFormat: '向量' } }
+          ],
+          edges: [
+            { id: 'edge-source-gain', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-gain', sourcePortIndex: 0, targetPortIndex: 0 },
+            { id: 'edge-source-scope', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-scope', sourcePortIndex: 0, targetPortIndex: 0 },
+            { id: 'edge-gain-sum', lineType: 'normal', sourceNodeId: 'node-gain', targetNodeId: 'node-sum', sourcePortIndex: 0, targetPortIndex: 0 },
+            { id: 'edge-source-sum', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-sum', sourcePortIndex: 0, targetPortIndex: 1 },
+            { id: 'edge-source-mux', lineType: 'normal', sourceNodeId: 'node-source', targetNodeId: 'node-mux', sourcePortIndex: 0, targetPortIndex: 0 },
+            { id: 'edge-sum-mux', lineType: 'normal', sourceNodeId: 'node-sum', targetNodeId: 'node-mux', sourcePortIndex: 0, targetPortIndex: 1 },
+            { id: 'edge-mux-adapter', lineType: 'normal', sourceNodeId: 'node-mux', targetNodeId: 'node-adapter', sourcePortIndex: 0, targetPortIndex: 0 }
+          ]
+        }
+      },
+      nodeSeq: 6,
+      edgeSeq: 7,
+      activeLineType: 'normal',
+      faultedBlks: [],
+      importedFaultModels: []
+    });
+
+    const packageData = buildFlightModelPackage({
+      meta: {
+        modelId: 'signal-routing-demo',
+        modelName: 'Signal Routing Demo',
+        description: 'Branching and utility block demo',
+        source: { origin: 'workbench' }
+      },
+      snapshot,
+      faultLibrary: []
+    });
+
+    const restored = restoreWorkbenchSnapshot(packageData.workbenchSnapshot);
+    const rootCanvas = restored.canvases[restored.rootCanvasId];
+    const sourceEdges = rootCanvas.edges.filter((edge) => edge.sourceNodeId === 'node-source');
+
+    expect(packageData.pythonModules).toEqual([]);
+    expect(sourceEdges).toHaveLength(4);
+    expect(rootCanvas.nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'gain_block' }),
+      expect.objectContaining({ type: 'sum_block' }),
+      expect.objectContaining({ type: 'mux_block' }),
+      expect.objectContaining({ type: 'flow_block' })
+    ]));
+  });
+
   it('infers moduleId for UI-created python bindings when exporting a flight model package', () => {
     const parsedInterface = {
       fileName: 'attitude_pid.py',
@@ -586,6 +698,132 @@ describe('flightModelPackageService', () => {
     ]);
     expect(evtolReferencePackage.faultLibrary.length).toBeGreaterThanOrEqual(5);
     expect(evtolReferencePackage.workbenchSnapshot.modelNodes.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('loads the hierarchical eVTOL fixture file with nested child canvases', () => {
+    const hierarchicalPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical.json');
+    const hierarchicalValidation = validateFlightModelPackage(hierarchicalPackage);
+    const hierarchicalApplied = applyFlightModelPackage(hierarchicalPackage);
+    const expectedLinkedSubsystemCount = collectLinkedSubsystemNodes(hierarchicalPackage.workbenchSnapshot).length;
+
+    expect(hierarchicalValidation).toEqual({ ok: true, errors: [] });
+    expect(expectedLinkedSubsystemCount).toBeGreaterThan(0);
+    expect(hierarchicalApplied.ok).toBe(true);
+    if (!hierarchicalApplied.ok) {
+      throw new Error(`Failed to apply hierarchical package: ${(hierarchicalApplied.errors || []).join('; ')}`);
+    }
+    const rootCanvasId = hierarchicalApplied.snapshot.rootCanvasId;
+    const rootCanvas = hierarchicalApplied.snapshot.canvases[rootCanvasId];
+    expect(rootCanvasId).toBeTruthy();
+    expect(rootCanvas).toBeTruthy();
+    if (!rootCanvas) {
+      throw new Error('Missing imported root canvas');
+    }
+    const linkedSubsystemNodes = (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+    expect(linkedSubsystemNodes).toHaveLength(expectedLinkedSubsystemCount);
+
+    const linkedChildCanvases = linkedSubsystemNodes
+      .map((node) => hierarchicalApplied.snapshot.canvases[node.targetCanvasId])
+      .filter(Boolean);
+    expect(linkedChildCanvases).toHaveLength(expectedLinkedSubsystemCount);
+    linkedSubsystemNodes.forEach((node) => {
+      const childCanvas = hierarchicalApplied.snapshot.canvases[node.targetCanvasId];
+      expect(childCanvas).toBeTruthy();
+      if (!childCanvas) {
+        throw new Error(`Missing linked child canvas for subsystem ${node.id}`);
+      }
+      expect(childCanvas.parentSubsystemNodeId).toBe(node.id);
+      expect(childCanvas.nodes).toEqual(expect.arrayContaining([
+        expect.objectContaining({ type: 'simulation_block', pythonBinding: expect.objectContaining({ bound: true }) })
+      ]));
+      expect(childCanvas.nodes).toEqual(expect.arrayContaining([
+        expect.objectContaining({ type: 'subsystem_in_port' }),
+        expect.objectContaining({ type: 'subsystem_out_port' })
+      ]));
+    });
+  });
+
+  it('loads the hierarchical eVTOL fault fixture file with child-local motor fault state', () => {
+    const hierarchicalFaultPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical_fault_injected.json');
+    const hierarchicalFaultValidation = validateFlightModelPackage(hierarchicalFaultPackage);
+    const hierarchicalFaultApplied = applyFlightModelPackage(hierarchicalFaultPackage);
+    const expectedLinkedSubsystemCount = collectLinkedSubsystemNodes(hierarchicalFaultPackage.workbenchSnapshot).length;
+
+    expect(hierarchicalFaultValidation).toEqual({ ok: true, errors: [] });
+    expect(expectedLinkedSubsystemCount).toBeGreaterThan(0);
+    expect(hierarchicalFaultApplied.ok).toBe(true);
+    if (!hierarchicalFaultApplied.ok) {
+      throw new Error(`Failed to apply hierarchical fault package: ${(hierarchicalFaultApplied.errors || []).join('; ')}`);
+    }
+    const rootCanvasId = hierarchicalFaultApplied.snapshot.rootCanvasId;
+    const rootCanvas = hierarchicalFaultApplied.snapshot.canvases[rootCanvasId];
+    expect(rootCanvasId).toBeTruthy();
+    expect(rootCanvas).toBeTruthy();
+    if (!rootCanvas) {
+      throw new Error('Missing imported fault root canvas');
+    }
+    const rootFaultNodes = (rootCanvas.nodes || []).filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss');
+    expect(rootFaultNodes).toHaveLength(0);
+    const linkedSubsystemNodes = (rootCanvas.nodes || []).filter((node) => node?.type === 'subsystem_block' && node.targetCanvasId);
+    expect(linkedSubsystemNodes).toHaveLength(expectedLinkedSubsystemCount);
+
+    const linkedChildCanvases = linkedSubsystemNodes
+      .map((node) => hierarchicalFaultApplied.snapshot.canvases[node.targetCanvasId])
+      .filter(Boolean);
+    expect(linkedChildCanvases).toHaveLength(expectedLinkedSubsystemCount);
+    linkedSubsystemNodes.forEach((node) => {
+      const childCanvas = hierarchicalFaultApplied.snapshot.canvases[node.targetCanvasId];
+      expect(childCanvas).toBeTruthy();
+      if (!childCanvas) {
+        throw new Error(`Missing linked child canvas for subsystem ${node.id}`);
+      }
+      expect(childCanvas.parentSubsystemNodeId).toBe(node.id);
+    });
+
+    const faultedChildCanvases = linkedChildCanvases.filter((childCanvas) => (
+      childCanvas.nodes?.some((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss')
+    ));
+    expect(faultedChildCanvases).toHaveLength(1);
+    const faultedChildCanvas = faultedChildCanvases[0];
+    expect(faultedChildCanvas).toBeTruthy();
+    if (!faultedChildCanvas) {
+      throw new Error('Missing faulted child canvas');
+    }
+    const faultNodes = faultedChildCanvas.nodes.filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss');
+    expect(faultNodes).toHaveLength(1);
+    const totalFaultNodes = linkedChildCanvases.reduce((count, childCanvas) => (
+      count + (childCanvas.nodes || []).filter((node) => node?.injectedFault?.modelId === 'motor_efficiency_loss').length
+    ), 0);
+    expect(totalFaultNodes).toBe(1);
+    const faultNode = faultNodes[0];
+    expect(faultNode).toBeTruthy();
+    if (!faultNode) {
+      throw new Error('Missing injected fault node in faulted child canvas');
+    }
+    expect(faultNode.type).toBe('simulation_block');
+    expect(faultNode.injectedFault).toMatchObject({
+      modelId: 'motor_efficiency_loss',
+      layer: 'electrical',
+      name: 'Motor Efficiency Loss'
+    });
+  });
+
+  it('loads the flat fault-injected eVTOL fixture file with the canonical motor_efficiency_loss fault id', () => {
+    const flatFaultPackage = loadPublicPackage('evtol_small_nonlinear_fault_injected.json');
+    const flatFaultValidation = validateFlightModelPackage(flatFaultPackage);
+    const flatFaultApplied = applyFlightModelPackage(flatFaultPackage);
+    const faultNodes = flatFaultPackage.workbenchSnapshot.modelNodes.filter((node) => node?.injectedFault?.modelId);
+    const matchingFaultModels = flatFaultPackage.faultLibrary.filter((faultModel) => faultModel?.id === 'motor_efficiency_loss');
+
+    expect(flatFaultValidation).toEqual({ ok: true, errors: [] });
+    expect(flatFaultApplied.ok).toBe(true);
+    expect(faultNodes).toHaveLength(1);
+    expect(matchingFaultModels).toHaveLength(1);
+    expect(faultNodes[0].injectedFault).toMatchObject({
+      modelId: 'motor_efficiency_loss',
+      layer: 'electrical',
+      name: 'Motor Efficiency Loss'
+    });
   });
 
   it('keeps the reference package compatible with the current local runtime', () => {

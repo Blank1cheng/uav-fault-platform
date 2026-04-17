@@ -141,12 +141,12 @@ describe('Oscilloscope app integration', () => {
     const scopeId = scopeNode.id.replace('b-', '');
     window.__GZ_SIM__.actual.scopeSamples[scopeId] = {
       ch1: [
-        { t: 0, actual: -1 },
-        { t: 1, actual: 1 }
+        { t: 0, actual: -1.236 },
+        { t: 1, actual: 1.234567 }
       ],
       ch2: [
-        { t: 0, actual: -0.5 },
-        { t: 1, actual: 0.5 }
+        { t: 0, actual: -0.505 },
+        { t: 1, actual: 0.5049 }
       ]
     };
 
@@ -171,11 +171,37 @@ describe('Oscilloscope app integration', () => {
     expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-tag="ch1"]`)).not.toBeNull();
     expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-tag="ch2"]`)).not.toBeNull();
     expect(document.querySelector(`[data-scope-id="${scopeId}"] .scope-window__signals`)).not.toBeNull();
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] .scope-window__header-main`)).not.toBeNull();
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] .scope-window__signal-band`)).not.toBeNull();
     expect(document.querySelector(`[data-scope-id="${scopeId}"] .scope-window__stats`)?.classList.contains('scope-window__stats--strip')).toBe(true);
     expect(document.querySelectorAll(`[data-scope-id="${scopeId}"] .scope-readout.scope-readout--strip`)).toHaveLength(2);
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-tag="ch1"]`)?.getAttribute('title')).toContain('CH1:');
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-tag="ch1"] .scope-window__tag-text`)).not.toBeNull();
 
-    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-channel="ch1"] [data-field="pp"]`)?.textContent).toContain('2.00');
-    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-channel="ch2"] [data-field="pp"]`)?.textContent).toContain('1.00');
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-channel="ch1"] [data-field="current"]`)?.textContent?.trim()).toBe('1.23');
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-channel="ch1"] [data-field="pp"]`)?.textContent?.trim()).toBe('2.47');
+    expect(document.querySelector(`[data-scope-id="${scopeId}"] [data-scope-channel="ch2"] [data-field="pp"]`)?.textContent?.trim()).toBe('1.01');
+
+    wrapper.unmount();
+  });
+
+  it('shows icons for every simulation toolbar action button', async () => {
+    const wrapper = await mountWorkbench();
+
+    const toolbarButtons = [
+      document.getElementById('sbtn-init'),
+      document.getElementById('sbtn-run'),
+      document.getElementById('sbtn-step'),
+      document.getElementById('sbtn-pause'),
+      document.getElementById('sbtn-stop')
+    ];
+
+    expect(toolbarButtons.every(Boolean)).toBe(true);
+    toolbarButtons.forEach((button) => {
+      const icon = button.querySelector('.sim-btn-icon');
+      expect(icon).not.toBeNull();
+      expect(icon.textContent?.trim().length).toBeGreaterThan(0);
+    });
 
     wrapper.unmount();
   });
@@ -250,6 +276,39 @@ describe('Oscilloscope app integration', () => {
     const movedWindow = document.querySelector('.scope-window');
     expect(movedWindow.style.left).not.toBe(beforeLeft);
     expect(movedWindow.style.top).not.toBe(beforeTop);
+
+    wrapper.unmount();
+  });
+
+  it('opens scope windows below the simulation toolbar and clamps upward dragging', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.createNode('instrument_scope', 360, 220);
+    await flushRuntime();
+
+    const scopeNode = document.querySelector('.blk.b-inst');
+    dispatchDoubleClick(scopeNode);
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window');
+    const initialTop = Number.parseInt(scopeWindow.style.top || '0', 10);
+    expect(initialTop).toBeGreaterThanOrEqual(96);
+
+    window.startScopeWindowDrag(
+      {
+        clientX: 180,
+        clientY: initialTop + 12,
+        stopPropagation() {},
+        preventDefault() {}
+      },
+      scopeWindow.dataset.scopeId
+    );
+    dispatchPointer(document, 'mousemove', { pointerId: 9, clientX: 150, clientY: 0 });
+    dispatchPointer(document, 'mouseup', { pointerId: 9, clientX: 150, clientY: 0 });
+    await flushRuntime();
+
+    const movedTop = Number.parseInt(document.querySelector('.scope-window').style.top || '0', 10);
+    expect(movedTop).toBeGreaterThanOrEqual(96);
 
     wrapper.unmount();
   });
