@@ -113,20 +113,20 @@ tools/              UI 审计等辅助工具
 
 ## 发布方式
 
-本仓库配置了 GitHub Pages 工作流：
+当前仓库使用 GitHub Pages 的分支发布模式：
 
 ```text
-.github/workflows/deploy-pages.yml
+发布分支：gh-pages
+发布目录：/
 ```
 
-推送到 `main` 分支后，GitHub Actions 会自动执行：
+更新线上版本时，在本地执行：
 
 ```bash
-npm ci
 npm run build
 ```
 
-构建产物会从 `dist/` 发布到 GitHub Pages。
+然后将 `dist/` 目录中的构建产物推送到 `gh-pages` 分支。`main` 分支保存源代码，`gh-pages` 分支保存可直接访问的静态页面。
 
 ## 技术栈
 
