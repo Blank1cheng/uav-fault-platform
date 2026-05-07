@@ -11,6 +11,90 @@ import {
 import faultTypeCatalog from '../../fault-types/fault-type-catalog.json';
 
 let mounted = false;
+const DEFAULT_FLIGHT_MODEL_PACKAGE_PATH = 'model-packages/evtol_closed_loop_fault_demo.json';
+
+function normalizeBaseUrl(baseUrl = './') {
+  return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+}
+
+function getAppPublicBaseUrl() {
+  const configuredBaseUrl = normalizeBaseUrl(import.meta.env.BASE_URL || './');
+  if (configuredBaseUrl !== './') {
+    return new URL(configuredBaseUrl, window.location.origin).toString();
+  }
+
+  const moduleScript = document.querySelector('script[type="module"][src]');
+  if (moduleScript?.src) {
+    return new URL(moduleScript.src.includes('/assets/') ? '../' : './', moduleScript.src).toString();
+  }
+
+  return new URL('./', window.location.href).toString();
+}
+
+function getDefaultFlightModelPackageUrl() {
+  return new URL(DEFAULT_FLIGHT_MODEL_PACKAGE_PATH, getAppPublicBaseUrl()).toString();
+}
+
+function shouldSkipDefaultFlightModelLoad({ force = false } = {}) {
+  if (force) {
+    return false;
+  }
+
+  if (import.meta.env.MODE === 'test' || window.__GZ_DISABLE_DEFAULT_MODEL__) {
+    return true;
+  }
+
+  const state = window.__GZ_STATE__;
+  return Boolean(state?.sysLoaded || state?.modelNodes?.length || window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__);
+}
+
+export async function loadDefaultFlightModelPackage(options = {}) {
+  if (shouldSkipDefaultFlightModelLoad(options)) {
+    return { ok: false, skipped: true, reason: 'default-model-load-skipped' };
+  }
+
+  const packageApi = window.__GZ_FLIGHT_MODEL_PACKAGE__;
+  if (typeof packageApi?.importObject !== 'function') {
+    return { ok: false, errors: ['Flight model package bridge is not ready.'] };
+  }
+
+  window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__ = true;
+
+  try {
+    const pkg = options.packageObject ?? await fetchDefaultFlightModelPackage(options.url);
+    const result = packageApi.importObject(pkg);
+
+    window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__ = {
+      loaded: Boolean(result?.ok),
+      modelId: result?.descriptor?.modelId ?? pkg?.modelId ?? null,
+      modelName: result?.descriptor?.modelName ?? pkg?.modelName ?? null,
+      source: options.packageObject ? 'provided-object' : options.url ?? getDefaultFlightModelPackageUrl(),
+      errors: result?.errors ?? []
+    };
+
+    return result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to load default flight model package.';
+    window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__ = {
+      loaded: false,
+      modelId: null,
+      modelName: null,
+      source: options.url ?? getDefaultFlightModelPackageUrl(),
+      errors: [message]
+    };
+    return { ok: false, errors: [message] };
+  } finally {
+    window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__ = false;
+  }
+}
+
+async function fetchDefaultFlightModelPackage(url = getDefaultFlightModelPackageUrl()) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch default flight model package: ${response.status}`);
+  }
+  return response.json();
+}
 
 function createExportMeta(state = {}) {
   const activeModelPackage = state.activeModelPackage ?? null;
@@ -78,7 +162,20 @@ export function mountLegacyRuntime() {
       });
     }
   };
+  window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__ = loadDefaultFlightModelPackage;
   window.eval(`${runtimeSource}\n//# sourceURL=gz-legacy-runtime.js`);
+
+  queueMicrotask(() => {
+    loadDefaultFlightModelPackage().catch((error) => {
+      window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__ = {
+        loaded: false,
+        modelId: null,
+        modelName: null,
+        source: getDefaultFlightModelPackageUrl(),
+        errors: [error instanceof Error ? error.message : 'Failed to load default flight model package.']
+      };
+    });
+  });
 
   window.__GZ_LEGACY_RUNTIME_BOOTED__ = true;
   mounted = true;
@@ -128,6 +225,10 @@ export function __resetLegacyRuntimeForTests() {
   delete window.__GZ_WORKBENCH_SNAPSHOT__;
   delete window.__GZ_FAULT_TYPE_CATALOG__;
   delete window.__GZ_FLIGHT_MODEL_PACKAGE__;
+  delete window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__;
+  delete window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__;
+  delete window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__;
+  delete window.__GZ_DISABLE_DEFAULT_MODEL__;
   delete window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   delete window.__GZ_PYTHON_BINDING_EVENTS__;
   delete window.__GZ_SCOPE_WINDOW_DRAG_BOUND__;

@@ -311,6 +311,70 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('loads the closed-loop eVTOL package as the default flight-control model on demand', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    expect(typeof window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__).toBe('function');
+    expect(window.__GZ_STATE__.sysLoaded).not.toBe(true);
+
+    const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = await window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__({
+      force: true,
+      packageObject: defaultPackage
+    });
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.sysLoaded).toBe(true);
+    expect(window.__GZ_STATE__.activeModelPackage).toMatchObject({
+      modelId: defaultPackage.modelId,
+      modelName: defaultPackage.modelName,
+      systemFamily: 'uav-flight-control'
+    });
+    expect(window.__GZ_STATE__.modelNodes).toHaveLength(11);
+    expect(window.__GZ_STATE__.modelEdges.some((edge) => edge.id === 'edge-imu-error')).toBe(true);
+    expect(window.__GZ_STATE__.availableFaultModels.some((model) => model.id === 'sensor_additive_bias')).toBe(true);
+    expect(window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__).toMatchObject({
+      loaded: true,
+      modelId: defaultPackage.modelId,
+      modelName: defaultPackage.modelName,
+      source: 'provided-object'
+    });
+
+    wrapper.unmount();
+  });
+
+  it('fetches the default package from the configured public base path', async () => {
+    const originalFetch = window.fetch;
+    const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    window.fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => defaultPackage
+    }));
+
+    const wrapper = mount(App, { attachTo: document.body });
+    try {
+      await flushRuntime();
+
+      const importResult = await window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__({ force: true });
+      await flushRuntime();
+
+      expect(importResult).toMatchObject({ ok: true });
+      expect(window.fetch).toHaveBeenCalledWith(
+        'http://localhost:3000/model-packages/evtol_closed_loop_fault_demo.json'
+      );
+      expect(window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__).toMatchObject({
+        loaded: true,
+        modelId: defaultPackage.modelId,
+        source: 'http://localhost:3000/model-packages/evtol_closed_loop_fault_demo.json'
+      });
+    } finally {
+      window.fetch = originalFetch;
+      wrapper.unmount();
+    }
+  });
+
   it('opens a dedicated fault injection window for a compatible UAV flight-control model', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
