@@ -298,7 +298,8 @@ describe('Flight model package app integration', () => {
       modelId: MODEL_ID,
       modelName: MODEL_NAME
     });
-    expect(window.__GZ_STATE__.availableFaultModels).toHaveLength(1);
+    expect(window.__GZ_STATE__.availableFaultModels.some((model) => model.id === 'fault-actuator-saturation')).toBe(true);
+    expect(window.__GZ_STATE__.availableFaultModels.some((model) => model.id === 'physical_parameter_bias')).toBe(true);
     expect(document.getElementById('tm')?.textContent).toContain(`飞控模型包“${MODEL_NAME}”已导入`);
 
     const exportedPackage = window.__GZ_FLIGHT_MODEL_PACKAGE__.exportCurrent();
@@ -306,6 +307,91 @@ describe('Flight model package app integration', () => {
     expect(exportedPackage.modelId).toBe(MODEL_ID);
     expect(exportedPackage.pythonModules[0].moduleId).toBe('attitude_pid');
     expect(exportedPackage.workbenchSnapshot.modelNodes[0].pythonBinding.sourcePackageId).toBe(MODEL_ID);
+
+    wrapper.unmount();
+  });
+
+  it('opens a dedicated fault injection window for a compatible UAV flight-control model', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const hierarchicalPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(hierarchicalPackage);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(document.getElementById('btn-imp-flt')?.textContent).toContain('注入故障');
+
+    window.doImportFault();
+    await flushRuntime();
+
+    expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
+    expect(document.querySelector('#ov-ifm .mtitle')?.textContent).toContain('注入故障');
+    expect(document.querySelector('[data-fault-id="actuator_lock_or_failure"]')).toBeTruthy();
+    expect(document.querySelector('#ifm-list-container')?.textContent).not.toContain('当前系统不支持无人机飞控故障库');
+
+    wrapper.unmount();
+  });
+
+  it('keeps fault injection available immediately after importing a compatible model even before saving', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const hierarchicalPackage = loadPublicPackage('evtol_small_nonlinear_hierarchical.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(hierarchicalPackage);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.sysLoaded).toBe(true);
+    expect(window.__GZ_STATE__.activeModelPackage?.systemFamily).toBe('uav-flight-control');
+
+    window.__GZ_STATE__.systemSaved = false;
+    window.updateUI();
+    await flushRuntime();
+
+    const injectButton = document.getElementById('btn-imp-flt');
+    expect(injectButton?.disabled).toBe(false);
+    expect(injectButton?.classList.contains('tbtn-disabled')).toBe(false);
+    expect(injectButton?.getAttribute('aria-disabled')).toBe('false');
+
+    window.doImportFault();
+    await flushRuntime();
+
+    expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
+    expect(document.querySelector('[data-fault-id="actuator_lock_or_failure"]')).toBeTruthy();
+
+    wrapper.unmount();
+  });
+
+  it('blocks the UAV flight-control fault library for an incompatible system model', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const incompatiblePackage = {
+      ...PACKAGE_FIXTURE,
+      systemFamily: 'thermal-control',
+      supportedFaultLibraries: [],
+      modelId: 'thermal-loop',
+      modelName: 'Thermal Loop',
+      description: 'A non-flight-control thermal system package'
+    };
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(incompatiblePackage);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.activeModelPackage).toMatchObject({
+      modelId: 'thermal-loop',
+      systemFamily: 'thermal-control',
+      supportedFaultLibraries: []
+    });
+
+    window.doImportFault();
+    await flushRuntime();
+
+    expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
+    expect(document.querySelector('[data-fault-id="physical_parameter_bias"]')).toBeNull();
+    expect(document.querySelector('#ifm-list-container')?.textContent).toContain('当前系统不支持无人机飞控故障库');
+    expect(document.querySelector('#ov-ifm .btn-ok-r')?.disabled).toBe(true);
 
     wrapper.unmount();
   });
@@ -468,6 +554,60 @@ describe('Flight model package app integration', () => {
 
     expect(importResult.ok).toBe(false);
     expect(importResult.errors.some((error) => error.includes('missing_controller'))).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('shows the compatible UAV fault catalog in the injection dialog and injects a selected fault', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    state.sysLoaded = true;
+    state.systemSaved = true;
+    state.activeModelPackage = {
+      modelId: 'evtol-catalog-test',
+      modelName: 'eVTOL Catalog Test',
+      systemFamily: 'uav-flight-control',
+      supportedFaultLibraries: ['uav-flight-control-faults']
+    };
+    state.modelNodes = [
+      {
+        id: 'node-catalog-target',
+        type: 'simulation_block',
+        x: 300,
+        y: 200,
+        props: {
+          name: 'Catalog Target',
+          moduleType: 'control',
+          inputs: [{ name: 'Input', type: 'scalar' }],
+          outputs: [{ name: 'Output', type: 'scalar' }],
+          middleVars: []
+        }
+      }
+    ];
+
+    expect(window.__GZ_FAULT_TYPE_CATALOG__.faultTypes).toHaveLength(18);
+
+    window.doImportFault();
+    await flushRuntime();
+
+    expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
+    expect(document.getElementById('ifm-total-count')?.textContent).toBe('18');
+    expect(document.querySelector('[data-fault-id="physical_parameter_bias"]')).toBeTruthy();
+
+    window.selectFaultCatalogModel('sensor_additive_bias');
+    await flushRuntime();
+
+    const detail = document.getElementById('fault-type-detail');
+    expect(detail?.textContent).toContain('y_fault = y + b');
+    expect(detail?.textContent).toContain('fault_sensor_bias');
+
+    window.confirmImportFault();
+    await flushRuntime();
+
+    expect(state.importedFaultModels.some((model) => model.id === 'sensor_additive_bias')).toBe(true);
+    expect(state.faultModels).toBeGreaterThan(0);
 
     wrapper.unmount();
   });

@@ -1,8 +1,17 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import App from '../src/App.vue';
 import { __resetLegacyRuntimeForTests } from '../src/services/legacyRuntimeBootstrap.js';
+
+function loadPublicPackage(fileName) {
+  const testDir = path.dirname(fileURLToPath(import.meta.url));
+  const targetPath = path.resolve(testDir, '..', 'public', 'model-packages', fileName);
+  return JSON.parse(readFileSync(targetPath, 'utf8'));
+}
 
 async function flushRuntime() {
   await nextTick();
@@ -39,6 +48,11 @@ function dispatchPointer(target, type, init = {}) {
 
 function getScopeWindows() {
   return [...document.querySelectorAll('.scope-window')];
+}
+
+function peakToPeak(samples = []) {
+  const values = samples.map((sample) => sample.actual ?? sample.v).filter((value) => Number.isFinite(value));
+  return values.length ? Math.max(...values) - Math.min(...values) : 0;
 }
 
 function createCanvasContextStub() {
@@ -103,6 +117,181 @@ describe('Oscilloscope app integration', () => {
     const windows = getScopeWindows();
     expect(windows).toHaveLength(2);
     expect(windows[0].dataset.scopeId).not.toBe(windows[1].dataset.scopeId);
+
+    wrapper.unmount();
+  });
+
+  it('opens waveform readouts for the imported fault-injected eVTOL demo package', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_small_nonlinear_fault_injected.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.injectedFault)).toBe(true);
+
+    window.simInit(true);
+    for (let step = 0; step < 8; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    window.openScope('node-11');
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window[data-scope-id="node-11"]');
+    expect(scopeWindow).not.toBeNull();
+    expect(scopeWindow?.querySelector('[data-scope-tag="ch1"]')?.getAttribute('data-connected')).toBe('true');
+    expect(scopeWindow?.querySelector('[data-scope-tag="ch2"]')?.getAttribute('data-connected')).toBe('true');
+    expect(scopeWindow?.querySelector('[data-scope-channel="ch1"] [data-field="current"]')?.textContent?.trim()).not.toBe('--');
+    expect(scopeWindow?.querySelector('[data-scope-channel="ch2"] [data-field="current"]')?.textContent?.trim()).not.toBe('--');
+
+    wrapper.unmount();
+  });
+
+  it('imports the compact fault scope demo with prewired scope waveforms', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_fault_scope_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.injectedFault?.modelId === 'motor_efficiency_loss')).toBe(true);
+    expect(window.__GZ_STATE__.modelEdges.filter((edge) => edge.targetNodeId === 'demo-scope')).toHaveLength(2);
+
+    window.simInit(true);
+    for (let step = 0; step < 10; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    window.openScope('demo-scope');
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window[data-scope-id="demo-scope"]');
+    expect(scopeWindow).not.toBeNull();
+    expect(scopeWindow?.querySelector('[data-scope-channel="ch1"] [data-field="pp"]')?.textContent?.trim()).not.toBe('--');
+    expect(scopeWindow?.querySelector('[data-scope-channel="ch2"] [data-field="pp"]')?.textContent?.trim()).not.toBe('--');
+
+    wrapper.unmount();
+  });
+
+  it('imports a normal-versus-fault comparison demo and shows different scope amplitudes', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_fault_comparison_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.id === 'compare-normal-motor' && !node.injectedFault)).toBe(true);
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.id === 'compare-fault-motor' && node.injectedFault?.modelId === 'motor_efficiency_loss')).toBe(true);
+    expect(window.__GZ_STATE__.modelEdges.filter((edge) => edge.targetNodeId === 'compare-scope')).toHaveLength(2);
+
+    window.simInit(true);
+    for (let step = 0; step < 28; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    window.selectNode('compare-scope');
+    await flushRuntime();
+
+    expect(document.querySelector('[data-scope-panel-channel="ch1"]')?.textContent).toContain('正常响应');
+    expect(document.querySelector('[data-scope-panel-channel="ch2"]')?.textContent).toContain('故障响应');
+
+    window.openScope('compare-scope');
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window[data-scope-id="compare-scope"]');
+    expect(scopeWindow).not.toBeNull();
+    expect(scopeWindow?.querySelector('[data-scope-tag="ch1"]')?.getAttribute('data-connected')).toBe('true');
+    expect(scopeWindow?.querySelector('[data-scope-tag="ch2"]')?.getAttribute('data-connected')).toBe('true');
+
+    const samples = window.__GZ_SIM__.actual.scopeSamples['compare-scope'];
+    const normalPeak = peakToPeak(samples.ch1);
+    const faultPeak = peakToPeak(samples.ch2);
+    expect(normalPeak).toBeGreaterThan(0.1);
+    expect(faultPeak).toBeGreaterThan(0.1);
+    expect(faultPeak).toBeLessThan(normalPeak * 0.8);
+
+    wrapper.unmount();
+  });
+
+  it('records logger and spectrum instrument samples with dedicated inspectors', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_fault_comparison_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.type === 'instrument_logger')).toBe(true);
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.type === 'instrument_spectrum')).toBe(true);
+
+    window.simInit(true);
+    for (let step = 0; step < 16; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    const loggerSamples = window.__GZ_SIM__.actual.instrumentSamples?.['compare-logger'] ?? [];
+    const spectrumSamples = window.__GZ_SIM__.actual.instrumentSamples?.['compare-spectrum'] ?? [];
+    expect(loggerSamples.length).toBeGreaterThan(0);
+    expect(spectrumSamples.length).toBeGreaterThan(0);
+
+    window.selectNode('compare-logger');
+    await flushRuntime();
+
+    const loggerPanel = document.querySelector('[data-instrument-panel="logger"]');
+    expect(loggerPanel).not.toBeNull();
+    expect(loggerPanel?.textContent).toContain('数据记录仪');
+    expect(loggerPanel?.textContent).toContain('记录样本');
+    expect(loggerPanel?.textContent).toContain('导出数据');
+    expect(loggerPanel?.querySelectorAll('[data-instrument-row]').length).toBeGreaterThan(0);
+
+    dispatchClick(loggerPanel.querySelector('[data-instrument-action="export"]'));
+    await flushRuntime();
+    expect(window.__GZ_LAST_INSTRUMENT_EXPORT__?.nodeId).toBe('compare-logger');
+    expect(window.__GZ_LAST_INSTRUMENT_EXPORT__?.csv).toContain('time,actual,reference');
+
+    window.selectNode('compare-spectrum');
+    await flushRuntime();
+
+    const spectrumPanel = document.querySelector('[data-instrument-panel="spectrum"]');
+    expect(spectrumPanel).not.toBeNull();
+    expect(spectrumPanel?.textContent).toContain('频谱分析仪');
+    expect(spectrumPanel?.textContent).toContain('峰值频点');
+    expect(spectrumPanel?.querySelectorAll('[data-spectrum-bin]').length).toBeGreaterThan(0);
+
+    wrapper.unmount();
+  });
+
+  it('renders dedicated scope property actions that open waveform windows', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_fault_scope_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    window.selectNode('demo-scope');
+    await flushRuntime();
+
+    const openButton = document.querySelector('[data-scope-action="open"]');
+    expect(openButton).not.toBeNull();
+    expect(openButton?.textContent).toContain('查看波形');
+    expect(document.querySelector('[data-scope-panel="oscilloscope"]')).not.toBeNull();
+    expect(document.querySelector('[data-scope-panel-channel="ch1"]')?.textContent).toContain('故障响应');
+    expect(document.querySelector('[data-scope-panel-channel="ch2"]')?.textContent).toContain('指令输入');
+
+    dispatchClick(openButton);
+    await flushRuntime();
+
+    expect(document.querySelector('.scope-window[data-scope-id="demo-scope"]')).not.toBeNull();
 
     wrapper.unmount();
   });

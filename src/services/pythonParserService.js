@@ -18,7 +18,8 @@ function parseModuleMetadata(source, fileName) {
 }
 
 function collectTopLevelFunctions(source) {
-  const regex = /(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:/g;
+  const regex =
+    /(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g;
   const functions = [];
   let match;
 
@@ -36,7 +37,8 @@ function collectTopLevelFunctions(source) {
       isEntry: Boolean(match[3]),
       name: match[5],
       paramsSource: match[6],
-      returnAnnotation: match[7]?.trim() ?? ''
+      returnAnnotation: match[7]?.trim() ?? '',
+      headerComment: match[8]?.trim() ?? ''
     });
   }
 
@@ -97,64 +99,106 @@ function splitTopLevelCommaList(text) {
   return parts;
 }
 
-function parseParams(paramsSource, baseLine) {
-  const paramLines = paramsSource
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
+function stripRolePrefix(comment) {
+  return String(comment ?? '')
+    .trim()
+    .replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u, '')
+    .trim();
+}
 
-  if (paramLines.length === 0) {
-    return [];
+function cleanDisplayName({ name, comment }) {
+  const cleanedComment = stripRolePrefix(comment);
+  return cleanedComment || name;
+}
+
+function parseRoleCommentList(comment) {
+  const cleaned = stripRolePrefix(comment);
+  return cleaned ? splitTopLevelCommaList(cleaned) : [];
+}
+
+function splitParamSignatureAndComment(segment) {
+  const hashIndex = segment.indexOf('#');
+  if (hashIndex < 0) {
+    return {
+      signature: segment.trim().replace(/,$/, ''),
+      comment: ''
+    };
   }
 
-  const segments = [];
-  paramLines.forEach((line) => {
-    const normalized = line.replace(/,$/, '');
-    const commentIndex = normalized.indexOf('#');
-    const signature = commentIndex >= 0 ? normalized.slice(0, commentIndex).trim() : normalized.trim();
-    const rawComment = commentIndex >= 0 ? normalized.slice(commentIndex + 1).trim() : '';
-    const parts = splitTopLevelCommaList(signature);
+  return {
+    signature: segment.slice(0, hashIndex).trim().replace(/,$/, ''),
+    comment: segment.slice(hashIndex + 1).trim()
+  };
+}
 
-    parts.forEach((part, index) => {
-      segments.push({
-        signature: part,
-        comment: index === parts.length - 1 ? rawComment : ''
+function parseParams(paramsSource, baseLine, headerComment = '') {
+  const compactComments = parseRoleCommentList(headerComment);
+  const rawParts = [];
+
+  if (paramsSource.includes('#')) {
+    paramsSource
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .forEach((line) => {
+        const { signature, comment } = splitParamSignatureAndComment(line);
+        const parts = splitTopLevelCommaList(signature.replace(/,$/, '')).filter(Boolean);
+        const inlineComments = parseRoleCommentList(comment);
+        parts.forEach((part, index) => {
+          rawParts.push({
+            signature: part,
+            comment: inlineComments[index] ?? (parts.length === 1 ? stripRolePrefix(comment) : '')
+          });
+        });
       });
-    });
-  });
+  } else {
+    splitTopLevelCommaList(paramsSource)
+      .filter(Boolean)
+      .forEach((signature, index) => {
+        rawParts.push({
+          signature,
+          comment: compactComments[index] ?? ''
+        });
+      });
+  }
 
-  return segments.map((segment, index) => {
-    const match = segment.signature
+  return rawParts.map((part, index) => {
+    const { signature, comment: inlineComment } = typeof part === 'string'
+      ? splitParamSignatureAndComment(part)
+      : part;
+    const match = signature
       .trim()
       .match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);
 
     if (!match) {
-      throw createParseError(`无法解析参数定义: ${segment.signature}`, baseLine + index);
+      throw createParseError(`无法解析参数定义: ${signature}`, baseLine + index);
     }
 
+    const comment = stripRolePrefix(inlineComment || compactComments[index] || '');
     return {
       name: match[1],
+      displayName: cleanDisplayName({ name: match[1], comment }),
       type: match[2]?.trim() ?? 'any',
       default: match[3]?.trim() ?? null,
-      comment: segment.comment.trim().replace(/^输入：/, '')
+      comment
     };
   });
 }
 
 function getFunctionBody(source, fn) {
   const fullSlice = source.slice(fn.startIndex, fn.endIndex);
-  const headerEndIndex = fullSlice.indexOf(':\n');
+  const headerEndIndex = fullSlice.indexOf('\n');
   if (headerEndIndex === -1) {
     return '';
   }
-  return fullSlice.slice(headerEndIndex + 2);
+  return fullSlice.slice(headerEndIndex + 1);
 }
 
 function parseOutputs(body, returnAnnotation) {
   const bodyLines = body.split('\n');
   const returnLine = [...bodyLines].reverse().find((line) => line.trim().startsWith('return '));
-  const returnMatch = returnLine?.match(/return\s+(.+?)(?:\s*#\s*输出：(.+))?$/);
-  const outputCommentParts = returnMatch?.[2]?.split(',').map((item) => item.trim()) ?? [];
+  const returnMatch = returnLine?.match(/return\s+(.+?)(?:\s*#\s*(.+))?$/);
+  const outputCommentParts = parseRoleCommentList(returnMatch?.[2] ?? '');
 
   let outputCount = 1;
   if (returnMatch?.[1]) {
@@ -163,11 +207,16 @@ function parseOutputs(body, returnAnnotation) {
     outputCount = splitTopLevelCommaList(returnAnnotation.replace(/^Tuple?\[/, '').replace(/\]$/, '')).length;
   }
 
-  return Array.from({ length: Math.max(1, outputCount) }, (_, index) => ({
-    name: `output_${index}`,
-    type: 'float',
-    comment: outputCommentParts[index] ?? ''
-  }));
+  return Array.from({ length: Math.max(1, outputCount) }, (_, index) => {
+    const name = `output_${index}`;
+    const comment = stripRolePrefix(outputCommentParts[index] ?? '');
+    return {
+      name,
+      displayName: cleanDisplayName({ name, comment }),
+      type: 'float',
+      comment
+    };
+  });
 }
 
 function parseObservableVars(body) {
@@ -186,10 +235,12 @@ function parseObservableVars(body) {
       }
       const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=.*?(?:#\s*(.+))?$/);
       if (match) {
+        const comment = stripRolePrefix(match[2] ?? '');
         vars.push({
           name: match[1],
+          displayName: cleanDisplayName({ name: match[1], comment }),
           type: 'float',
-          comment: (match[2] ?? '').trim().replace(/^中间变量：/, '')
+          comment
         });
       }
       break;
@@ -211,7 +262,7 @@ export function parsePythonBindingSource({ fileName, source }) {
     moduleName,
     description,
     entryFunction: entryFunction.name,
-    inputs: parseParams(entryFunction.paramsSource, entryFunction.line),
+    inputs: parseParams(entryFunction.paramsSource, entryFunction.line, entryFunction.headerComment),
     outputs: parseOutputs(body, entryFunction.returnAnnotation),
     middleVars: parseObservableVars(body),
     rawSource: normalizedSource

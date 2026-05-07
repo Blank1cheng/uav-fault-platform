@@ -1,7 +1,15 @@
 dist/
 node_modules/
-.claude/settings.local.json
+.claude/
+.codex/
 .codex_tmp_runtime_check.py
 .superpowers/
+artifacts/
+backups/
 __pycache__/
 *.pyc
+*.log
+*.pdf
+*.docx
+*.slx
+演示视频/

@@ -138,7 +138,8 @@ describe('Python binding app integration', () => {
     expect(reboundBlock?.querySelectorAll('.node-port--input').length).toBe(2);
     expect(reboundBlock?.querySelectorAll('.node-port--output:not(.node-port--top)').length).toBe(1);
     expect(reboundBlock?.querySelectorAll('.node-port--top').length).toBe(1);
-    expect(reboundBlock?.querySelectorAll('.node-port__label')).toHaveLength(0);
+    const portLabels = [...reboundBlock.querySelectorAll('.node-port__label')].map((item) => item.textContent);
+    expect(portLabels).toEqual(expect.arrayContaining(['error signal', 'step', 'control', 'integral state']));
     expect(reboundBlock?.querySelectorAll('button.node-port').length).toBe(4);
 
     const inputPorts = [...reboundBlock.querySelectorAll('.node-port--input')];
@@ -498,10 +499,11 @@ describe('Python binding app integration', () => {
     await flushRuntime();
 
     const inspector = document.getElementById('pd');
-    expect(inspector?.textContent).toContain('测量配置');
+    expect(inspector?.querySelector('[data-scope-panel="oscilloscope"]')).not.toBeNull();
+    expect(inspector?.textContent).toContain('示波器配置');
     expect(inspector?.textContent).toContain('模块名称');
     expect(inspector?.textContent).toContain('采样率');
-    expect(inspector?.textContent).toContain('观测信号');
+    expect(inspector?.textContent).toContain('通道说明');
     expect(inspector?.textContent).toContain('查看波形');
 
     wrapper.unmount();

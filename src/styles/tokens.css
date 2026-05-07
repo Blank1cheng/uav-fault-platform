@@ -1,5 +1,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
+  --font-ui:"Microsoft YaHei UI","Noto Sans SC","PingFang SC","Segoe UI",sans-serif;
+  --font-data:"Fira Code","Cascadia Mono","JetBrains Mono","Consolas",monospace;
   --sidebar-w:192px;
   --sidebar-w-md:184px;
   --bg-base:#f0f5fb;
@@ -28,4 +30,8 @@
   --text2:#4a6a8a;
   --textm:#7a9ab8;
   --textd:#b3c8da;
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.05);
+  --shadow-md:0 10px 28px rgba(30,58,95,0.10);
+  --shadow-lg:0 18px 46px rgba(30,58,95,0.14);
+  --ring-blue:0 0 0 3px rgba(37,99,235,0.13);
 }

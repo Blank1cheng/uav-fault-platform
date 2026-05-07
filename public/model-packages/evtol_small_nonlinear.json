@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
   "packageType": "flight-control-model",
+  "systemFamily": "uav-flight-control",
+  "supportedFaultLibraries": ["uav-flight-control-faults"],
   "modelId": "evtol-small-nonlinear",
   "modelName": "eVTOL Small Nonlinear Flight Control",
   "description": "Manually decomposed eVTOL flight-control reference package derived from the Simulink validation model",

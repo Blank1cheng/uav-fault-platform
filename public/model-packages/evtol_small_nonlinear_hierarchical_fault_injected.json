@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
   "packageType": "flight-control-model",
+  "systemFamily": "uav-flight-control",
+  "supportedFaultLibraries": ["uav-flight-control-faults"],
   "modelId": "evtol-small-nonlinear-hierarchical-fault-injected",
   "modelName": "eVTOL Small Nonlinear Flight Control (Hierarchical Fault Injected)",
   "description": "Manually decomposed eVTOL flight-control reference package derived from the Simulink validation model Layered hierarchical example package with one preloaded motor_efficiency_loss fault in the actuation child canvas.",

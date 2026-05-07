@@ -36,9 +36,9 @@ function cloneInterfaceForEditing(parsedInterface) {
 
   editableInterface.value = {
     ...parsedInterface,
-    inputs: (parsedInterface.inputs ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.name })),
-    outputs: (parsedInterface.outputs ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.name })),
-    middleVars: (parsedInterface.middleVars ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.name }))
+    inputs: (parsedInterface.inputs ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.comment ?? item.name })),
+    outputs: (parsedInterface.outputs ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.comment ?? item.name })),
+    middleVars: (parsedInterface.middleVars ?? []).map((item) => ({ ...item, displayName: item.displayName ?? item.comment ?? item.name }))
   };
 }
 
@@ -173,7 +173,7 @@ onBeforeUnmount(() => {
                   @input="updateDisplayName('inputs', index, $event.target.value)"
                 >
                 <span class="python-binding-row__type">{{ item.type }}</span>
-                <span class="python-binding-row__note">{{ item.comment || '无注释' }}</span>
+                <span class="python-binding-row__note">{{ item.name }} · {{ item.comment || '无注释' }}</span>
               </div>
             </div>
 
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
                   @input="updateDisplayName('outputs', index, $event.target.value)"
                 >
                 <span class="python-binding-row__type">{{ item.type }}</span>
-                <span class="python-binding-row__note">{{ item.comment || '无注释' }}</span>
+                <span class="python-binding-row__note">{{ item.name }} · {{ item.comment || '无注释' }}</span>
               </div>
             </div>
 
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
                   @input="updateDisplayName('middleVars', index, $event.target.value)"
                 >
                 <span class="python-binding-row__type">{{ item.type }}</span>
-                <span class="python-binding-row__note">{{ item.comment || '无注释' }}</span>
+                <span class="python-binding-row__note">{{ item.name }} · {{ item.comment || '无注释' }}</span>
               </div>
             </div>
           </div>
@@ -240,9 +240,9 @@ onBeforeUnmount(() => {
 .python-binding-modal__toolbar{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--border);}
 .python-binding-modal__input{display:none;}
 .python-binding-modal__error{margin:0 18px 12px;padding:10px 12px;border:1px solid #f3b2b2;border-radius:8px;background:#fff4f4;color:#c62828;font-size:12px;line-height:1.6;}
-.python-binding-modal__summary{padding:0 18px 14px;border-bottom:1px solid var(--border);}
+.python-binding-modal__summary{padding:14px 18px;border-bottom:1px solid var(--border);}
 .python-binding-modal__file{font-size:14px;font-weight:700;color:var(--text);}
-.python-binding-modal__meta{font-size:10px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-top:3px;}
+.python-binding-modal__meta{font-size:10px;color:var(--blue);font-family:'Cascadia Mono','Consolas',monospace;margin-top:3px;}
 .python-binding-modal__desc{font-size:11px;color:var(--text2);line-height:1.7;margin-top:8px;}
 .python-binding-modal__groups{flex:1;overflow:auto;padding:14px 18px 18px;display:flex;flex-direction:column;gap:14px;}
 .python-binding-group{border:1px solid rgba(174,194,221,0.72);border-radius:12px;background:rgba(255,255,255,0.94);padding:12px;display:flex;flex-direction:column;gap:10px;}
@@ -251,7 +251,7 @@ onBeforeUnmount(() => {
 .python-binding-row{display:grid;grid-template-columns:minmax(0,1fr) 86px minmax(0,1.1fr);gap:10px;align-items:center;}
 .python-binding-row__name{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--bg-card);font-size:12px;color:var(--text);outline:none;}
 .python-binding-row__name:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,158,255,0.12);}
-.python-binding-row__type{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;}
+.python-binding-row__type{font-size:11px;color:var(--blue);font-family:'Cascadia Mono','Consolas',monospace;}
 .python-binding-row__note{font-size:10px;color:var(--textm);line-height:1.6;}
 .python-binding-modal__code{margin:0;flex:1;overflow:auto;padding:16px 18px;background:transparent;color:#24456d;font-size:12px;line-height:1.7;font-family:'Cascadia Mono','Consolas',monospace;white-space:pre-wrap;word-break:break-word;}
 

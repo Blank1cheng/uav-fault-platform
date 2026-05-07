@@ -8,6 +8,7 @@ import {
   createWorkbenchSnapshot,
   restoreWorkbenchSnapshot
 } from './workbenchSnapshotService.js';
+import faultTypeCatalog from '../../fault-types/fault-type-catalog.json';
 
 let mounted = false;
 
@@ -43,6 +44,7 @@ export function mountLegacyRuntime() {
     createWorkbenchSnapshot,
     restoreWorkbenchSnapshot
   };
+  window.__GZ_FAULT_TYPE_CATALOG__ = faultTypeCatalog;
   window.__GZ_FLIGHT_MODEL_PACKAGE__ = {
     validate(pkg) {
       return validateFlightModelPackage(pkg);
@@ -106,11 +108,25 @@ export function __resetLegacyRuntimeForTests() {
     if (runtimeListeners.scopeWindowDragPointerUp) {
       window.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp);
     }
+    if (runtimeListeners.canvasCommandPointerEnd) {
+      window.removeEventListener('pointerup', runtimeListeners.canvasCommandPointerEnd);
+      window.removeEventListener('pointercancel', runtimeListeners.canvasCommandPointerEnd);
+    }
+    if (runtimeListeners.canvasCommandKeydown) {
+      window.removeEventListener('keydown', runtimeListeners.canvasCommandKeydown);
+    }
+    if (runtimeListeners.canvasCommandToolbarClick) {
+      document.removeEventListener('click', runtimeListeners.canvasCommandToolbarClick);
+    }
+    if (runtimeListeners.canvasCommandFullscreenChange) {
+      document.removeEventListener('fullscreenchange', runtimeListeners.canvasCommandFullscreenChange);
+    }
   }
 
   mounted = false;
   delete window.__GZ_LEGACY_RUNTIME_BOOTED__;
   delete window.__GZ_WORKBENCH_SNAPSHOT__;
+  delete window.__GZ_FAULT_TYPE_CATALOG__;
   delete window.__GZ_FLIGHT_MODEL_PACKAGE__;
   delete window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   delete window.__GZ_PYTHON_BINDING_EVENTS__;

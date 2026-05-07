@@ -1,0 +1,576 @@
+{
+  "schemaVersion": 1,
+  "packageType": "flight-control-model",
+  "systemFamily": "uav-flight-control",
+  "supportedFaultLibraries": ["uav-flight-control-faults"],
+  "modelId": "evtol-closed-loop-fault-demo",
+  "modelName": "eVTOL Closed-Loop Fault Demo",
+  "description": "A stable closed-loop eVTOL flight-control demo for importing a full control chain, injecting relevant faults, and comparing nominal versus degraded behavior.",
+  "source": {
+    "origin": "workbench-demo",
+    "notes": "Closed-loop pitch-control demo with small command amplitude, simple first-order blocks, CAN IMU feedback, and residual monitoring for normal/fault comparison."
+  },
+  "pythonModules": [],
+  "faultLibrary": [
+    {
+      "id": "imu_rate_bias",
+      "name": "IMU Rate Bias Drift",
+      "layer": "sensor",
+      "desc": "Adds a small pitch-rate bias in the IMU feedback path.",
+      "defaultValue": 0.04,
+      "moduleTargets": [
+        "node-imu",
+        "imu_gyro"
+      ],
+      "parameter": "bias",
+      "tags": [
+        "demo",
+        "sensor",
+        "imu",
+        "bias"
+      ],
+      "createdAt": "2026-04-30",
+      "origin": "demo"
+    },
+    {
+      "id": "can_bus_delay",
+      "name": "CAN Feedback Delay",
+      "layer": "communication",
+      "desc": "Delays or attenuates the IMU feedback message on the flight-control CAN channel.",
+      "defaultValue": 0.12,
+      "moduleTargets": [
+        "edge-imu-error",
+        "imu_can_link"
+      ],
+      "parameter": "latency",
+      "tags": [
+        "demo",
+        "can",
+        "communication",
+        "feedback"
+      ],
+      "createdAt": "2026-04-30",
+      "origin": "demo"
+    },
+    {
+      "id": "motor_efficiency_loss",
+      "name": "Motor Efficiency Loss",
+      "layer": "electrical",
+      "desc": "Reduces motor response so the controller must work harder to hold the pitch rate.",
+      "defaultValue": 0.78,
+      "moduleTargets": [
+        "node-motor",
+        "motor_model"
+      ],
+      "parameter": "efficiency",
+      "tags": [
+        "demo",
+        "motor",
+        "electrical",
+        "actuator"
+      ],
+      "createdAt": "2026-04-30",
+      "origin": "demo"
+    },
+    {
+      "id": "airframe_inertia_shift",
+      "name": "Airframe Inertia Shift",
+      "layer": "physical",
+      "desc": "Changes the pitch-axis inertia and slightly slows the vehicle response.",
+      "defaultValue": 1.18,
+      "moduleTargets": [
+        "node-dynamics",
+        "vehicle_dynamics"
+      ],
+      "parameter": "inertia",
+      "tags": [
+        "demo",
+        "physical",
+        "dynamics",
+        "airframe"
+      ],
+      "createdAt": "2026-04-30",
+      "origin": "demo"
+    }
+  ],
+  "workbenchSnapshot": {
+    "version": 1,
+    "modelNodes": [
+      {
+        "id": "node-command",
+        "type": "signal_source",
+        "x": 80,
+        "y": 170,
+        "w": 172,
+        "h": 84,
+        "props": {
+          "name": "Pilot Pitch Command",
+          "waveType": "sine",
+          "amplitude": "0.08",
+          "frequency": "0.35",
+          "outputFormat": "scalar"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-command-shaper",
+        "type": "simulation_block",
+        "x": 290,
+        "y": 160,
+        "w": 184,
+        "h": 100,
+        "props": {
+          "name": "Command Shaper",
+          "moduleType": "control-conditioning",
+          "inputs": [
+            {
+              "name": "Pitch Command",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Shaped Command",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "filtered_command",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "Simple first-order command limiter used to keep the closed-loop demo bounded."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-error-sum",
+        "type": "sum_block",
+        "x": 520,
+        "y": 160,
+        "w": 154,
+        "h": 88,
+        "props": {
+          "name": "Pitch Error Sum",
+          "inputCount": 2,
+          "signs": [
+            "+",
+            "-"
+          ],
+          "outputFormat": "scalar"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-controller",
+        "type": "simulation_block",
+        "x": 720,
+        "y": 145,
+        "w": 192,
+        "h": 108,
+        "props": {
+          "name": "Attitude Controller",
+          "moduleType": "control",
+          "inputs": [
+            {
+              "name": "Pitch Error",
+              "type": "scalar"
+            },
+            {
+              "name": "Rate Feedback",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Torque Demand",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "integrator_state",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "Small PID-like controller tuned for gentle closed-loop response."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-allocator",
+        "type": "simulation_block",
+        "x": 965,
+        "y": 145,
+        "w": 188,
+        "h": 100,
+        "props": {
+          "name": "Control Allocation",
+          "moduleType": "allocation",
+          "inputs": [
+            {
+              "name": "Torque Demand",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Motor Command",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "allocation_state",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "Maps a bounded attitude demand into a motor command envelope."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-motor",
+        "type": "simulation_block",
+        "x": 1210,
+        "y": 145,
+        "w": 180,
+        "h": 100,
+        "props": {
+          "name": "Motor Mixer",
+          "moduleType": "actuators",
+          "inputs": [
+            {
+              "name": "Motor Command",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Thrust Response",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "motor_state",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "First-order actuator response with small saturation margin for stable demo playback."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-dynamics",
+        "type": "simulation_block",
+        "x": 1450,
+        "y": 145,
+        "w": 188,
+        "h": 104,
+        "props": {
+          "name": "Vehicle Pitch Dynamics",
+          "moduleType": "vehicle",
+          "inputs": [
+            {
+              "name": "Thrust Response",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Pitch Rate",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "pitch_state",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "Lightly damped vehicle model so the loop remains bounded and easy to compare under faults."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-imu",
+        "type": "simulation_block",
+        "x": 1450,
+        "y": 330,
+        "w": 188,
+        "h": 104,
+        "props": {
+          "name": "IMU Gyro",
+          "moduleType": "sensors",
+          "inputs": [
+            {
+              "name": "Body Rate",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Measured Pitch Rate",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "measured_pitch_rate",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "Pitch-rate sensor path that can carry bias, delay, or scale faults."
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-scope",
+        "type": "instrument_scope",
+        "x": 1710,
+        "y": 150,
+        "w": 176,
+        "h": 92,
+        "props": {
+          "name": "Command vs Rate Scope",
+          "instrumentType": "scope",
+          "sampleRate": "50Hz",
+          "signal": "CH1 pitch command / CH2 measured pitch rate"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-residual-logger",
+        "type": "instrument_logger",
+        "x": 1710,
+        "y": 320,
+        "w": 172,
+        "h": 84,
+        "props": {
+          "name": "Pitch Error Logger",
+          "instrumentType": "logger",
+          "sampleRate": "50Hz",
+          "signal": "pitch error"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-residual-spectrum",
+        "type": "instrument_spectrum",
+        "x": 1710,
+        "y": 450,
+        "w": 176,
+        "h": 84,
+        "props": {
+          "name": "Error Spectrum",
+          "instrumentType": "spectrum",
+          "sampleRate": "50Hz",
+          "signal": "pitch error spectrum"
+        },
+        "pythonBinding": null
+      }
+    ],
+    "modelEdges": [
+      {
+        "id": "edge-command-shaper",
+        "sourceNodeId": "node-command",
+        "targetNodeId": "node-command-shaper",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-shaper-error",
+        "sourceNodeId": "node-command-shaper",
+        "targetNodeId": "node-error-sum",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-imu-error",
+        "sourceNodeId": "node-imu",
+        "targetNodeId": "node-error-sum",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 1,
+        "lineType": "can",
+        "signalId": "imu.pitch_rate",
+        "channelId": "CAN-FC-IMU",
+        "messageId": "0x184",
+        "payloadKind": "float32",
+        "signalUnit": "rad/s",
+        "faultPropagationPolicy": "propagates",
+        "signalChannels": [
+          {
+            "signalId": "imu.pitch_rate",
+            "channelId": "CAN-FC-IMU",
+            "messageId": "0x184",
+            "payloadKind": "float32",
+            "signalUnit": "rad/s",
+            "faultPropagationPolicy": "propagates"
+          }
+        ]
+      },
+      {
+        "id": "edge-error-controller",
+        "sourceNodeId": "node-error-sum",
+        "targetNodeId": "node-controller",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-controller-allocator",
+        "sourceNodeId": "node-controller",
+        "targetNodeId": "node-allocator",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-allocator-motor",
+        "sourceNodeId": "node-allocator",
+        "targetNodeId": "node-motor",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-motor-dynamics",
+        "sourceNodeId": "node-motor",
+        "targetNodeId": "node-dynamics",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-dynamics-imu-can",
+        "sourceNodeId": "node-dynamics",
+        "targetNodeId": "node-imu",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-command-scope",
+        "sourceNodeId": "node-command-shaper",
+        "targetNodeId": "node-scope",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-imu-scope",
+        "sourceNodeId": "node-imu",
+        "targetNodeId": "node-scope",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 1,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-error-logger",
+        "sourceNodeId": "node-error-sum",
+        "targetNodeId": "node-residual-logger",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      },
+      {
+        "id": "edge-error-spectrum",
+        "sourceNodeId": "node-error-sum",
+        "targetNodeId": "node-residual-spectrum",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "normal"
+      }
+    ],
+    "nodeSeq": 11,
+    "edgeSeq": 12,
+    "activeLineType": "normal",
+    "faultedBlks": [],
+    "importedFaultModels": [
+      {
+        "id": "imu_rate_bias",
+        "name": "IMU Rate Bias Drift",
+        "layer": "sensor",
+        "desc": "Adds a small pitch-rate bias in the IMU feedback path.",
+        "defaultValue": 0.04,
+        "moduleTargets": [
+          "node-imu",
+          "imu_gyro"
+        ],
+        "parameter": "bias",
+        "tags": [
+          "demo",
+          "sensor",
+          "imu",
+          "bias"
+        ],
+        "createdAt": "2026-04-30",
+        "origin": "demo"
+      },
+      {
+        "id": "can_bus_delay",
+        "name": "CAN Feedback Delay",
+        "layer": "communication",
+        "desc": "Delays or attenuates the IMU feedback message on the flight-control CAN channel.",
+        "defaultValue": 0.12,
+        "moduleTargets": [
+          "edge-imu-error",
+          "imu_can_link"
+        ],
+        "parameter": "latency",
+        "tags": [
+          "demo",
+          "can",
+          "communication",
+          "feedback"
+        ],
+        "createdAt": "2026-04-30",
+        "origin": "demo"
+      },
+      {
+        "id": "motor_efficiency_loss",
+        "name": "Motor Efficiency Loss",
+        "layer": "electrical",
+        "desc": "Reduces motor response so the controller must work harder to hold the pitch rate.",
+        "defaultValue": 0.78,
+        "moduleTargets": [
+          "node-motor",
+          "motor_model"
+        ],
+        "parameter": "efficiency",
+        "tags": [
+          "demo",
+          "motor",
+          "electrical",
+          "actuator"
+        ],
+        "createdAt": "2026-04-30",
+        "origin": "demo"
+      },
+      {
+        "id": "airframe_inertia_shift",
+        "name": "Airframe Inertia Shift",
+        "layer": "physical",
+        "desc": "Changes the pitch-axis inertia and slightly slows the vehicle response.",
+        "defaultValue": 1.18,
+        "moduleTargets": [
+          "node-dynamics",
+          "vehicle_dynamics"
+        ],
+        "parameter": "inertia",
+        "tags": [
+          "demo",
+          "physical",
+          "dynamics",
+          "airframe"
+        ],
+        "createdAt": "2026-04-30",
+        "origin": "demo"
+      }
+    ]
+  }
+}

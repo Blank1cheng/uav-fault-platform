@@ -48,7 +48,7 @@ describe('Python binding UI and state helpers', () => {
     expect(binding.portMapping.inputs[0]).toMatchObject({
       portId: 'input-0',
       varName: 'error',
-      displayName: 'error',
+      displayName: '误差信号',
       type: 'float',
       connected: false
     });

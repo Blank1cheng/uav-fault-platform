@@ -401,6 +401,11 @@ export function createFlightModelPackageDescriptor(pkg = {}) {
     description: pkg.description ?? '',
     schemaVersion: pkg.schemaVersion ?? null,
     packageType: pkg.packageType ?? null,
+    systemFamily: pkg.systemFamily ?? null,
+    supportedFaultLibraries: Array.isArray(pkg.supportedFaultLibraries)
+      ? clone(pkg.supportedFaultLibraries)
+      : [],
+    capabilities: isPlainObject(pkg.capabilities) ? clone(pkg.capabilities) : {},
     moduleCount: Array.isArray(pkg.pythonModules) ? pkg.pythonModules.length : 0,
     faultCount: Array.isArray(pkg.faultLibrary) ? pkg.faultLibrary.length : 0
   };
@@ -446,6 +451,11 @@ export function buildFlightModelPackage({ meta = {}, snapshot = {}, faultLibrary
     modelId: meta.modelId ?? null,
     modelName: meta.modelName ?? null,
     description: meta.description ?? '',
+    systemFamily: meta.systemFamily ?? null,
+    supportedFaultLibraries: Array.isArray(meta.supportedFaultLibraries)
+      ? clone(meta.supportedFaultLibraries)
+      : [],
+    capabilities: isPlainObject(meta.capabilities) ? clone(meta.capabilities) : {},
     source: clone(meta.source ?? {}),
     pythonModules: Array.from(pythonModulesById.values()),
     faultLibrary: clone(faultLibrary ?? []),

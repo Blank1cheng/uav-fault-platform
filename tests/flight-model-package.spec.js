@@ -9,6 +9,9 @@ import {
   createSimulationBlockPythonBinding
 } from '../src/composables/useWorkbenchState.js';
 import {
+  findCompatibleFaultTarget
+} from '../src/services/faultInjectionService.js';
+import {
   createWorkbenchSnapshot,
   restoreWorkbenchSnapshot
 } from '../src/services/workbenchSnapshotService.js';
@@ -899,6 +902,62 @@ describe('flightModelPackageService', () => {
       parameter: 'freeze',
       defaultValue: 1.0,
       description: 'Simplified reference-package fault that switches GPS velocity output to a predefined held sample instead of latching the live previous sample.'
+    });
+  });
+
+  it('loads the closed-loop fault demo with CAN metadata and UAV fault-library scope', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const validation = validateFlightModelPackage(closedLoopPackage);
+    const applied = applyFlightModelPackage(closedLoopPackage);
+    const edges = closedLoopPackage.workbenchSnapshot.modelEdges;
+    const canEdge = edges.find((edge) => edge.lineType === 'can');
+    const scopeEdges = edges.filter((edge) => edge.targetNodeId === 'node-scope');
+
+    expect(validation).toEqual({ ok: true, errors: [] });
+    expect(applied.ok).toBe(true);
+    expect(closedLoopPackage).toMatchObject({
+      systemFamily: 'uav-flight-control',
+      supportedFaultLibraries: ['uav-flight-control-faults'],
+      modelId: 'evtol-closed-loop-fault-demo'
+    });
+    expect(closedLoopPackage.workbenchSnapshot.modelNodes.length).toBeGreaterThanOrEqual(8);
+    expect(scopeEdges.length).toBeGreaterThanOrEqual(2);
+    expect(canEdge).toMatchObject({
+      signalId: 'imu.pitch_rate',
+      channelId: 'CAN-FC-IMU',
+      messageId: '0x184',
+      payloadKind: 'float32',
+      signalUnit: 'rad/s',
+      faultPropagationPolicy: 'propagates'
+    });
+    expect(canEdge.signalChannels).toEqual([
+      expect.objectContaining({
+        signalId: 'imu.pitch_rate',
+        channelId: 'CAN-FC-IMU',
+        messageId: '0x184'
+      })
+    ]);
+  });
+
+  it('maps every closed-loop demo fault-library entry to a compatible runtime target', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const nodes = closedLoopPackage.workbenchSnapshot.modelNodes;
+    const edges = closedLoopPackage.workbenchSnapshot.modelEdges;
+    const targetsByFaultId = Object.fromEntries(
+      closedLoopPackage.faultLibrary.map((faultModel) => [
+        faultModel.id,
+        findCompatibleFaultTarget(faultModel, { nodes, edges })
+      ])
+    );
+
+    expect(targetsByFaultId).toMatchObject({
+      imu_rate_bias: { kind: 'node', id: 'node-imu' },
+      motor_efficiency_loss: { kind: 'node', id: 'node-motor' },
+      airframe_inertia_shift: { kind: 'node', id: 'node-dynamics' },
+      can_bus_delay: { kind: 'edge', id: 'edge-imu-error' }
+    });
+    Object.entries(targetsByFaultId).forEach(([faultId, target]) => {
+      expect(target, faultId).toBeTruthy();
     });
   });
 });

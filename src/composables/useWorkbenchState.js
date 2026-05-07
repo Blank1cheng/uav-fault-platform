@@ -5,6 +5,10 @@ const shellState = reactive(createInitialWorkbenchState());
 const runtimeReady = ref(false);
 const selectedNodeBinding = ref(null);
 
+function resolvePortDisplayName(item) {
+  return item.displayName ?? item.comment ?? item.name;
+}
+
 export function createDefaultPythonBinding() {
   return {
     bound: false,
@@ -57,7 +61,7 @@ export function createSimulationBlockPythonBinding(parsedInterface, options = {}
       inputs: (parsedInterface.inputs ?? []).map((item, index) => ({
         portId: `input-${index}`,
         varName: item.name,
-        displayName: item.displayName ?? item.name,
+        displayName: resolvePortDisplayName(item),
         type: item.type ?? 'any',
         default: item.default ?? null,
         comment: item.comment ?? '',
@@ -66,14 +70,14 @@ export function createSimulationBlockPythonBinding(parsedInterface, options = {}
       outputs: (parsedInterface.outputs ?? []).map((item, index) => ({
         portId: `output-${index}`,
         varName: item.name,
-        displayName: item.displayName ?? item.name,
+        displayName: resolvePortDisplayName(item),
         type: item.type ?? 'any',
         comment: item.comment ?? ''
       })),
       middleVars: (parsedInterface.middleVars ?? []).map((item, index) => ({
         portId: `middle-${index}`,
         varName: item.name,
-        displayName: item.displayName ?? item.name,
+        displayName: resolvePortDisplayName(item),
         type: item.type ?? 'any',
         comment: item.comment ?? ''
       }))
