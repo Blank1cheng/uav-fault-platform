@@ -7,6 +7,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    exclude: ['node_modules/**', 'dist/**', 'backups/**']
+    exclude: ['node_modules/**', 'dist/**', 'backups/**', 'Jigui_demo/**']
   }
 });

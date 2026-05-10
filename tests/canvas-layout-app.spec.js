@@ -479,7 +479,7 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
-  it('renders the alternate canvas view as a partitioned multi-signal flow graph', async () => {
+  it('renders the multi-signal flow view as a single testpoint diagnosis workbench', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -489,59 +489,36 @@ describe('canvas layout cleanup', () => {
 
     expect(importResult).toMatchObject({ ok: true });
     expect(typeof window.setCanvasView).toBe('function');
-    expect(typeof window.collectDataflowEdges).toBe('function');
+    expect(typeof window.buildDiagnosticTestPointModel).toBe('function');
 
     window.setCanvasView('dataflow');
     await flushRuntime();
 
     const panel = document.getElementById('dataflow-panel');
+    const model = window.buildDiagnosticTestPointModel();
+
     expect(document.getElementById('cw')?.dataset.view).toBe('dataflow');
-    expect(panel?.textContent).toContain('多信号流图');
-    expect(panel?.querySelector('.dataflow-body')).not.toBeNull();
-    expect(panel?.querySelector('.dataflow-side')).not.toBeNull();
-    expect(panel?.querySelector('[data-dataflow-section="signals"]')).not.toBeNull();
-    expect(panel?.querySelector('[data-dataflow-section="faults"]')).not.toBeNull();
-    expect(panel?.querySelector('[data-dataflow-section="diagnostics"]')).not.toBeNull();
-    expect(panel?.querySelectorAll('.signal-flow-lane').length).toBeGreaterThanOrEqual(4);
-    expect(panel?.querySelectorAll('.signal-flow-node').length).toBeGreaterThanOrEqual(4);
-    expect(panel?.querySelectorAll('.signal-flow-edge').length).toBe(window.__GZ_STATE__.modelEdges.length);
-    expect(panel?.querySelector('.signal-flow-edge.is-protocol')).not.toBeNull();
-    expect(panel?.querySelectorAll('[data-dataflow-edge-card]')).toHaveLength(window.__GZ_STATE__.modelEdges.length);
-    expect(panel?.textContent).toContain('edge-imu-error');
-    expect(panel?.textContent).toContain('CAN-FC-IMU');
-    expect(panel?.textContent).toContain('0x184');
-    expect(panel?.querySelector('[data-dataflow-section="faults"]')?.textContent).toContain('edge-imu-error');
-    expect(window.collectDataflowEdges()).toHaveLength(window.__GZ_STATE__.modelEdges.length);
+    expect(panel?.querySelector('[data-dataflow-view="testpoint-diagnosis"]')).not.toBeNull();
+    expect(panel?.querySelector('[data-testpoint-workbench]')).not.toBeNull();
+    expect(panel?.querySelector('[data-testpoint-position-select]')).not.toBeNull();
+    expect(panel?.querySelector('[data-install-testpoint]')).not.toBeNull();
+    expect(panel?.querySelectorAll('[data-fixed-testpoint-position]').length).toBe(model.positions.length);
+    expect(panel?.querySelectorAll('[data-installed-testpoint]').length).toBe(model.installed.length);
+    expect(panel?.textContent).toContain('测点诊断台');
+    expect(panel?.textContent).toContain('固定测点');
+    expect(panel?.textContent).toContain('人工确认');
 
-    const edgeCard = panel?.querySelector('[data-dataflow-edge-card][data-dataflow-edge="edge-imu-error"]');
-    expect(edgeCard).not.toBeNull();
-    edgeCard.click();
-    await flushRuntime();
-
-    expect(window.__GZ_STATE__.selEdge).toBe('edge-imu-error');
-    expect(document.querySelector('[data-props-tab="overview"]')?.classList.contains('is-active')).toBe(true);
-    expect(document.getElementById('pd')?.textContent).toContain('edge-imu-error');
-    expect(document.getElementById('pd')?.textContent).toContain('CAN-FC-IMU');
-    expect(document.getElementById('pd')?.textContent).toContain('0x184');
-    expect(document.querySelector('[data-dataflow-edge-card][data-dataflow-edge="edge-imu-error"]')?.classList.contains('is-selected')).toBe(true);
-
-    window.selectNode(window.__GZ_STATE__.modelNodes[0].id);
-    await flushRuntime();
-    expect(window.__GZ_STATE__.selEdge).not.toBe('edge-imu-error');
-
-    const topologyEdge = document.querySelector('.signal-flow-edge[data-dataflow-edge="edge-imu-error"]');
-    expect(topologyEdge).not.toBeNull();
-    topologyEdge.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-    await flushRuntime();
-
-    expect(window.__GZ_STATE__.selEdge).toBe('edge-imu-error');
-    expect(document.getElementById('pd')?.textContent).toContain('edge-imu-error');
-    expect(document.querySelector('.signal-flow-edge[data-dataflow-edge="edge-imu-error"]')?.classList.contains('is-selected')).toBe(true);
+    expect(panel?.querySelector('[data-measurement-response-panel]')).toBeNull();
+    expect(panel?.querySelector('[data-propagation-groups]')).toBeNull();
+    expect(panel?.querySelector('.signal-chain-map')).toBeNull();
+    expect(panel?.querySelector('.signal-flow-legacy')).toBeNull();
+    expect(panel?.querySelector('[data-dataflow-section="signals"]')).toBeNull();
+    expect(panel?.querySelectorAll('.signal-flow-node')).toHaveLength(0);
 
     wrapper.unmount();
   });
 
-  it('renders the dataflow panel as signal diagnostics measurement-point chains', async () => {
+  it('models measurement points as fixed installable positions in the dataflow view', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -550,213 +527,211 @@ describe('canvas layout cleanup', () => {
     await flushRuntime();
 
     expect(importResult).toMatchObject({ ok: true });
-    expect(typeof window.setCanvasView).toBe('function');
+    expect(typeof window.buildDiagnosticTestPointModel).toBe('function');
+    expect(typeof window.installDiagnosticTestPoint).toBe('function');
+    expect(typeof window.removeDiagnosticTestPoint).toBe('function');
 
-    window.setCanvasView('dataflow');
-    await flushRuntime();
-
-    const panel = document.getElementById('dataflow-panel');
     const semantic = window.buildDataflowSemanticModel();
-    const measurementView = panel?.querySelector('[data-dataflow-view="measurement-first"]');
-    const headSummary = measurementView?.querySelector('.dataflow-head__summary');
-    const measurementPoints = measurementView?.querySelectorAll('[data-measurement-point]');
-    const imuPoint = measurementView?.querySelector('[data-measurement-point][data-dataflow-edge="edge-imu-error"]');
-    const mappingDetailLink = measurementView?.querySelector('[data-dataflow-mapping-detail="edge-imu-error"]');
-    const mappingOverviewButton = measurementView?.querySelector('.signal-flow-legacy__detail[data-dataflow-mapping-detail="__all"]');
-    const routeGrid = measurementView?.querySelector('[data-dataflow-edge-card][data-dataflow-edge="edge-imu-error"] .dataflow-edge-route-grid');
-    const componentsCss = readComponentsCss();
-    const chainMapRule = findCssRule(componentsCss, '.signal-chain-map');
-    const measurementPointRule = findCssRule(componentsCss, '.measurement-point');
+    const initialModel = window.buildDiagnosticTestPointModel();
+    const installablePosition = initialModel.positions.find((point) => !point.installed);
 
-    expect(measurementView).not.toBeNull();
-    expect(measurementView?.textContent).toContain('信号链路诊断');
-    expect(measurementView?.textContent).toContain('关键测点');
-    expect(measurementView?.textContent).not.toContain('中文测点链路');
-    expect(measurementView?.textContent).not.toContain('测点链路');
-    expect(measurementView?.textContent).toContain('传播判定');
-    expect(measurementView?.textContent).toContain('内部映射');
-    expect(headSummary?.textContent).toContain(`测点 ${semantic.measurementPoints.length}`);
-    expect(headSummary?.textContent).toContain(`信号路径 ${window.__GZ_STATE__.modelEdges.length}`);
-    expect(routeGrid).not.toBeNull();
-    expect(routeGrid?.textContent).toContain('起点');
-    expect(routeGrid?.textContent).toContain('终点');
-    expect(mappingDetailLink).not.toBeNull();
-    expect(mappingOverviewButton).not.toBeNull();
-    expect(semantic.stages.map((stage) => stage.labelZh)).toEqual([
-      '指令与参考',
-      '控制与分配',
-      '执行与机体',
-      '测量与估计',
-      '诊断与残差'
-    ]);
-    semantic.stages.forEach((stage) => {
-      expect(measurementView?.textContent).toContain(stage.labelZh);
-    });
-    expect(measurementPoints?.length).toBe(semantic.measurementPoints.length);
-    expect(measurementView?.textContent).toContain('测点 M');
-    expect(measurementView?.textContent).toContain('IMU 测量反馈');
-    expect(measurementView?.textContent).toContain('残差诊断');
-    expect(measurementView?.textContent).toContain('CAN-FC-IMU');
-    expect(measurementView?.textContent).toContain('0x184');
-    expect(measurementView?.textContent).toContain('edge-imu-error');
-    expect(panel?.querySelectorAll('[data-dataflow-edge-card]')).toHaveLength(window.__GZ_STATE__.modelEdges.length);
-    expect(panel?.querySelector('.signal-flow-edge[data-dataflow-edge="edge-imu-error"]')).not.toBeNull();
-    expect(panel?.textContent).toContain('CAN-FC-IMU');
-    expect(panel?.textContent).toContain('0x184');
-    expect(panel?.textContent).toContain('edge-imu-error');
-    expect(chainMapRule).toMatch(/overflow\s*:\s*auto/);
-    expect(measurementPointRule).toMatch(/white-space\s*:\s*normal/);
-    expect(measurementPointRule).toMatch(/overflow-wrap\s*:\s*anywhere/);
+    expect(initialModel.positions).toHaveLength(semantic.measurementPoints.length);
+    expect(initialModel.installed.length).toBe(0);
+    expect(installablePosition).toBeTruthy();
+    expect(initialModel.positions.every((point) =>
+      point.pointId &&
+      point.edgeId &&
+      point.positionNameZh &&
+      typeof point.installed === 'boolean'
+    )).toBe(true);
 
-    expect(imuPoint).not.toBeNull();
-    imuPoint.click();
-    await flushRuntime();
-
-    expect(window.__GZ_STATE__.selEdge).toBe('edge-imu-error');
-    expect(document.getElementById('pd')?.textContent).toContain('edge-imu-error');
-    expect(document.querySelector('[data-measurement-point][data-dataflow-edge="edge-imu-error"]')?.classList.contains('is-selected')).toBe(true);
-
-    document.querySelector('[data-dataflow-mapping-detail="edge-imu-error"]')?.click();
-    await flushRuntime();
-
-    const mappingDialog = document.getElementById('ov-dataflow-map');
-    expect(mappingDialog?.classList.contains('open')).toBe(true);
-    expect(mappingDialog?.textContent).toContain('当前链路映射详情');
-    expect(mappingDialog?.textContent).toContain('边 ID');
-    expect(mappingDialog?.textContent).toContain('edge-imu-error');
-    expect(mappingDialog?.textContent).toContain('CAN-FC-IMU');
-    expect(mappingDialog?.textContent).toContain('0x184');
-    expect(mappingDialog?.textContent).toContain('Python 变量');
-
-    window.closeDataflowMappingDetail();
-    await flushRuntime();
-    expect(mappingDialog?.classList.contains('open')).toBe(false);
-
-    wrapper.unmount();
-  });
-
-  it('renders measurement response controls and a response matrix in the dataflow panel', async () => {
-    const wrapper = mount(App, { attachTo: document.body });
-    await flushRuntime();
-
-    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
-    window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
-    await flushRuntime();
+    expect(window.installDiagnosticTestPoint(installablePosition.pointId)).toBe(true);
+    const afterInstall = window.buildDiagnosticTestPointModel();
+    expect(afterInstall.installed.some((point) => point.pointId === installablePosition.pointId)).toBe(true);
+    expect(afterInstall.installed.length).toBe(1);
 
     window.setCanvasView('dataflow');
     await flushRuntime();
 
     const panel = document.getElementById('dataflow-panel');
-    const operationSelect = panel?.querySelector('[data-measurement-scenario-field="type"]');
-    const targetSelect = panel?.querySelector('[data-measurement-scenario-field="targetId"]');
-    const calculateButton = panel?.querySelector('[data-measurement-response-calculate]');
+    expect(panel?.querySelector('[data-testpoint-workbench]')).not.toBeNull();
+    expect(panel?.querySelector('[data-testpoint-position-select]')).not.toBeNull();
+    expect(panel?.querySelector('[data-install-testpoint]')).not.toBeNull();
+    expect(panel?.querySelectorAll('[data-installed-testpoint]').length).toBe(afterInstall.installed.length);
+    expect(panel?.querySelector(`[data-installed-testpoint="${installablePosition.pointId}"]`)).not.toBeNull();
+    expect(panel?.querySelector(`[data-fixed-testpoint-position="${installablePosition.pointId}"]`)?.textContent).toContain('已安装');
 
-    expect(panel?.querySelector('[data-measurement-response-panel]')).not.toBeNull();
-    expect(panel?.textContent).toContain('测点响应');
-    expect(operationSelect?.textContent).toContain('截断链路');
-    expect(targetSelect?.textContent).toContain('edge-imu-error');
-    expect(calculateButton).not.toBeNull();
+    expect(window.removeDiagnosticTestPoint(installablePosition.pointId)).toBe(true);
+    const afterRemove = window.buildDiagnosticTestPointModel();
+    expect(afterRemove.installed.some((point) => point.pointId === installablePosition.pointId)).toBe(false);
+    expect(afterRemove.installed.length).toBe(0);
 
-    operationSelect.value = 'link_cut';
-    operationSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    window.clearDiagnosticTestPoints();
+    window.setCanvasView('dataflow');
     await flushRuntime();
-
-    const refreshedTargetSelect = document.querySelector('[data-measurement-scenario-field="targetId"]');
-    refreshedTargetSelect.value = 'edge-imu-error';
-    refreshedTargetSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    await flushRuntime();
-
-    const targetOperationSelect = document.querySelector('[data-measurement-scenario-field="type"]');
-    targetOperationSelect.value = 'parameter_shift';
-    targetOperationSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    await flushRuntime();
-
-    const shiftedTargetSelect = document.querySelector('[data-measurement-scenario-field="targetId"]');
-    const shiftedParamInput = document.querySelector('[data-measurement-scenario-field="primaryParam"]');
-    expect(shiftedTargetSelect.value).not.toBe('edge-imu-error');
-    expect(window.__GZ_STATE__.measurementScenario.targetId).toBe(shiftedTargetSelect.value);
-    expect(shiftedParamInput.value).toBe('0.05');
-
-    document.querySelector('[data-measurement-scenario-field="type"]').value = 'link_cut';
-    document.querySelector('[data-measurement-scenario-field="type"]').dispatchEvent(new Event('change', { bubbles: true }));
-    await flushRuntime();
-
-    const linkTargetSelect = document.querySelector('[data-measurement-scenario-field="targetId"]');
-    linkTargetSelect.value = 'edge-imu-error';
-    linkTargetSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    document.querySelector('[data-measurement-response-calculate]')?.click();
-    await flushRuntime();
-
-    const targetPoint = window.__GZ_STATE__.measurementResponse.points.find((point) => point.edgeId === 'edge-imu-error');
-    const expectedPointId = targetPoint.pointId;
-    targetPoint.id = 'stale-response-id';
-    window.renderDataflowPanel();
-    await flushRuntime();
-
-    const rows = document.querySelectorAll('[data-measurement-response-row]');
-    const targetRow = document.querySelector('[data-measurement-response-row][data-edge-id="edge-imu-error"]');
-    expect(rows.length).toBe(window.buildDataflowSemanticModel().measurementPoints.length);
-    expect(targetRow?.dataset.measurementResponseRow).toBe(expectedPointId);
-    expect(targetRow?.textContent).toContain('链路截断');
-    expect(document.querySelector('[data-measurement-response-summary]')?.textContent).toContain('受影响');
-
-    targetRow.click();
-    await flushRuntime();
-
-    const selectedTargetRow = document.querySelector('[data-measurement-response-row][data-edge-id="edge-imu-error"]');
-    expect(window.__GZ_STATE__.selEdge).toBe('edge-imu-error');
-    expect(window.__GZ_STATE__.selectedMeasurementPointId).toBe(expectedPointId);
-    expect(selectedTargetRow?.classList.contains('is-selected')).toBe(true);
+    expect(window.buildDiagnosticTestPointModel().installed).toHaveLength(0);
 
     wrapper.unmount();
   });
 
-  it('links measurement response rows to dataflow selection and mapping details', async () => {
+  it('detects possible fault types from an installed measurement point and records manual confirmations', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
     const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
-    window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
     await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.runDiagnosticTestPointDetection).toBe('function');
+    expect(typeof window.openDiagnosticTestPointDialog).toBe('function');
+    expect(typeof window.toggleDiagnosticFaultConfirmation).toBe('function');
+
+    const model = window.buildDiagnosticTestPointModel();
+    const imuPoint = model.positions.find((point) => point.edgeId === 'edge-imu-error');
+    expect(imuPoint).toBeTruthy();
+    window.installDiagnosticTestPoint(imuPoint.pointId);
+
+    const imuEdge = window.__GZ_STATE__.modelEdges.find((edge) => edge.id === 'edge-imu-error');
+    imuEdge.injectedFault = {
+      id: 'sensor_additive_bias',
+      modelId: 'sensor_additive_bias',
+      name: '传感器加性偏置',
+      layer: 'electrical',
+      runtimeBehavior: 'sensor_bias'
+    };
+
+    const diagnosis = window.runDiagnosticTestPointDetection(imuPoint.pointId);
+    expect(diagnosis).toMatchObject({
+      pointId: imuPoint.pointId,
+      edgeId: 'edge-imu-error',
+      status: 'abnormal'
+    });
+    expect(diagnosis.candidates.some((candidate) => candidate.faultTypeId === 'sensor_additive_bias')).toBe(true);
+    expect(diagnosis.candidates.every((candidate) => typeof candidate.confirmed === 'boolean')).toBe(true);
+
+    const scanResults = window.runAllDiagnosticTestPointDetections();
+    expect(scanResults.some((result) =>
+      result.pointId === imuPoint.pointId &&
+      result.status === 'abnormal' &&
+      result.candidates.some((candidate) => candidate.faultTypeId === 'sensor_additive_bias')
+    )).toBe(true);
 
     window.setCanvasView('dataflow');
     await flushRuntime();
 
-    document.querySelector('[data-measurement-scenario-field="targetId"]').value = 'edge-imu-error';
-    document.querySelector('[data-measurement-scenario-field="targetId"]').dispatchEvent(new Event('change', { bubbles: true }));
+    const panel = document.getElementById('dataflow-panel');
+    expect(panel?.querySelector('[data-run-fault-detection]')).not.toBeNull();
+    expect(panel?.querySelector(`[data-diagnosis-point="${imuPoint.pointId}"].is-abnormal`)).not.toBeNull();
+
+    document.querySelector(`[data-detect-testpoint="${imuPoint.pointId}"]`)?.click();
     await flushRuntime();
 
-    document.querySelector('[data-measurement-response-calculate]')?.click();
-    await flushRuntime();
-
-    const row = document.querySelector('[data-measurement-response-row][data-edge-id="edge-imu-error"]');
-    expect(row).not.toBeNull();
-    row.click();
-    await flushRuntime();
-
-    expect(window.__GZ_STATE__.selEdge).toBe('edge-imu-error');
-    expect(document.querySelector('[data-measurement-response-row][data-edge-id="edge-imu-error"]')?.classList.contains('is-selected')).toBe(true);
-    expect(document.querySelector('.signal-flow-edge[data-dataflow-edge="edge-imu-error"]')?.classList.contains('is-response-target')).toBe(true);
-    expect(document.querySelector('.edge-path[data-edge-id="edge-imu-error"]')?.classList.contains('is-response-target')).toBe(true);
-
-    window.openDataflowMappingDetail('edge-imu-error');
-    await flushRuntime();
-
-    const dialog = document.getElementById('ov-dataflow-map');
+    const dialog = document.getElementById('ov-testpoint-diagnosis');
     expect(dialog?.classList.contains('open')).toBe(true);
-    expect(dialog?.textContent).toContain('测点响应');
-    expect(dialog?.textContent).toContain('链路截断');
-    expect(dialog?.textContent).toContain('目标链路被截断');
+    expect(dialog?.querySelectorAll('[data-fault-candidate]').length).toBeGreaterThan(0);
+    expect(dialog?.querySelector('[data-fault-candidate="sensor_additive_bias"]')).not.toBeNull();
 
-    window.closeDataflowMappingDetail();
+    const confirmBox = dialog?.querySelector('[data-confirm-fault-candidate="sensor_additive_bias"]');
+    confirmBox.checked = true;
+    confirmBox.dispatchEvent(new Event('change', { bubbles: true }));
     await flushRuntime();
 
-    document.querySelector('[data-measurement-response-clear]')?.click();
+    expect(window.__GZ_STATE__.confirmedDiagnosticFaults[imuPoint.pointId]).toContain('sensor_additive_bias');
+    expect(window.__GZ_STATE__.testPointDiagnosis.confirmedFaultTypeIds).toContain('sensor_additive_bias');
+
+    wrapper.unmount();
+  });
+
+  it('distinguishes detectable and non-detectable faults on the same component for one measurement point', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
-    const clearedCanvasEdge = document.querySelector('.edge-path[data-edge-id="edge-imu-error"]');
-    expect(clearedCanvasEdge?.classList.contains('is-response-target')).toBe(false);
-    expect(clearedCanvasEdge?.classList.contains('is-response-cut')).toBe(false);
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const model = window.buildDiagnosticTestPointModel();
+    const imuPoint = model.positions.find((point) => point.edgeId === 'edge-imu-error');
+    const imuNode = window.__GZ_STATE__.modelNodes.find((node) => node.id === 'node-imu');
+    expect(imuPoint).toBeTruthy();
+    expect(imuNode).toBeTruthy();
+
+    window.installDiagnosticTestPoint(imuPoint.pointId);
+    imuNode.faults = [
+      {
+        id: 'sensor_additive_bias',
+        modelId: 'sensor_additive_bias',
+        name: '传感器加性偏置',
+        category: '传感器故障'
+      },
+      {
+        id: 'imu_self_test_warning',
+        modelId: 'imu_self_test_warning',
+        name: 'IMU 自检状态异常',
+        category: '本地状态故障'
+      }
+    ];
+
+    const mixedDiagnosis = window.runDiagnosticTestPointDetection(imuPoint.pointId);
+    expect(mixedDiagnosis.status).toBe('abnormal');
+    expect(mixedDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'sensor_additive_bias')).toBe(true);
+    expect(mixedDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'imu_self_test_warning')).toBe(false);
+
+    imuNode.faults = [
+      {
+        id: 'imu_self_test_warning',
+        modelId: 'imu_self_test_warning',
+        name: 'IMU 自检状态异常',
+        category: '本地状态故障'
+      }
+    ];
+
+    const localOnlyDiagnosis = window.runDiagnosticTestPointDetection(imuPoint.pointId);
+    expect(localOnlyDiagnosis.status).toBe('normal');
+    expect(localOnlyDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'imu_self_test_warning')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('keeps dataflow controls mounted while simulation steps update values', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const model = window.buildDiagnosticTestPointModel();
+    window.installDiagnosticTestPoint(model.positions[0].pointId);
+
+    window.setCanvasView('dataflow');
+    await flushRuntime();
+
+    const panel = document.getElementById('dataflow-panel');
+    const workspaceBefore = panel?.querySelector('.dataflow-workspace');
+    const detectButtonBefore = panel?.querySelector('[data-detect-testpoint]');
+    const scanButtonBefore = panel?.querySelector('[data-run-fault-detection]');
+
+    expect(workspaceBefore).not.toBeNull();
+    expect(detectButtonBefore).not.toBeNull();
+    expect(scanButtonBefore).not.toBeNull();
+
+    window.simInit(true);
+    await flushRuntime();
+
+    expect(panel?.querySelector('.dataflow-workspace')).toBe(workspaceBefore);
+    expect(panel?.querySelector('[data-detect-testpoint]')).toBe(detectButtonBefore);
+
+    window.simStep();
+    await flushRuntime();
+
+    expect(panel?.querySelector('.dataflow-workspace')).toBe(workspaceBefore);
+    expect(panel?.querySelector('[data-detect-testpoint]')).toBe(detectButtonBefore);
 
     wrapper.unmount();
   });
@@ -866,6 +841,35 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
+  it('keeps installed diagnostic point markers after edge rerendering', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.addDiagnosticTestPoint).toBe('function');
+    expect(typeof window.clearDiagnosticTestPoints).toBe('function');
+    expect(typeof window.renderCanvasDiagnosticTestPointMarkers).toBe('function');
+
+    window.setCanvasView?.('canvas', { silent: true });
+    window.clearDiagnosticTestPoints();
+    const point = window.buildDiagnosticTestPointModel().positions[0];
+    expect(point?.pointId).toBeTruthy();
+
+    window.addDiagnosticTestPoint(point.pointId);
+    await flushRuntime();
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(1);
+
+    window.renderEdges();
+    await flushRuntime();
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(1);
+
+    wrapper.unmount();
+  });
+
   it('separates propagating faults from local parameter faults in dataflow semantics', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
@@ -962,6 +966,15 @@ describe('canvas layout cleanup', () => {
     window.setCanvasView('dataflow');
     await flushRuntime();
 
+    const panel = document.getElementById('dataflow-panel');
+    expect(panel?.querySelector('[data-testpoint-workbench]')).not.toBeNull();
+    expect(panel?.querySelector('[data-propagation-groups]')).toBeNull();
+    expect(panel?.textContent).toContain('测点诊断台');
+    expect(panel?.textContent).not.toContain('故障传播分区');
+
+    wrapper.unmount();
+    return;
+
     const partition = document.querySelector('[data-propagation-groups]');
     expect(partition).not.toBeNull();
     expect(partition?.textContent).toContain('故障传播分区');
@@ -979,23 +992,26 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
-  it('keeps dataflow columns responsive and lets edge labels wrap', () => {
+  it('keeps the testpoint diagnosis view Carbon styled and responsive', () => {
     const componentsCss = readComponentsCss();
     const compactCss = componentsCss.replace(/\s+/g, '');
-    const edgeNameRule = findCssRule(componentsCss, '.dataflow-edge-name');
-    const edgeRouteRule = findCssRule(componentsCss, '.dataflow-edge-route');
     const panelRule = findCssRule(componentsCss, '.dataflow-panel');
     const workspaceRule = findCssRule(componentsCss, '.dataflow-workspace');
-    const mainRule = findCssRule(componentsCss, '.dataflow-main');
+    const diagnosisWorkspaceRule = findCssRule(componentsCss, '.dataflow-workspace--diagnosis');
+    const headerRule = findCssRule(componentsCss, '.dataflow-diagnosis-header');
+    const cardRule = findCssRule(componentsCss, '.dataflow-workspace--diagnosis .testpoint-card');
+    const positionRule = findCssRule(componentsCss, '.dataflow-workspace--diagnosis .testpoint-position');
 
-    expect(compactCss).toContain('grid-template-columns:minmax(0,1fr)clamp(420px,38vw,640px)');
-    expect(compactCss).toContain('.dataflow-section__head{display:flex');
-    expect(compactCss).toMatch(/@media\(max-width:[^)]+\)\{[\s\S]*?\.dataflow-body\{[\s\S]*?grid-template-columns:1fr/);
     expect(panelRule).toMatch(/overflow\s*:\s*auto/);
     expect(workspaceRule).toMatch(/height\s*:\s*max\(100%,720px\)/);
-    expect(mainRule).toMatch(/overflow\s*:\s*auto/);
-    expect(edgeNameRule).not.toMatch(/white-space\s*:\s*nowrap[\s\S]*text-overflow\s*:\s*ellipsis|text-overflow\s*:\s*ellipsis[\s\S]*white-space\s*:\s*nowrap/);
-    expect(edgeRouteRule).not.toMatch(/white-space\s*:\s*nowrap[\s\S]*text-overflow\s*:\s*ellipsis|text-overflow\s*:\s*ellipsis[\s\S]*white-space\s*:\s*nowrap/);
+    expect(diagnosisWorkspaceRule).toMatch(/background\s*:\s*#fff/);
+    expect(diagnosisWorkspaceRule).toMatch(/font-family\s*:\s*"IBM Plex Sans"/);
+    expect(headerRule).toMatch(/border-bottom\s*:\s*1px solid #e0e0e0/);
+    expect(cardRule).toMatch(/border-radius\s*:\s*0/);
+    expect(cardRule).toMatch(/background\s*:\s*#fff/);
+    expect(positionRule).toMatch(/border-radius\s*:\s*0/);
+    expect(compactCss).toContain('.dataflow-workspace--diagnosis.testpoint-operator-layout{grid-template-columns:minmax(320px,1fr)minmax(320px,1fr)minmax(280px,.85fr)');
+    expect(compactCss).toMatch(/@media\(max-width:[^)]+\)\{[\s\S]*?\.dataflow-workspace--diagnosis\.testpoint-operator-layout\{[\s\S]*?grid-template-columns:1fr/);
   });
 
   it('removes the improvement guidance panel from the lower inspector area', async () => {

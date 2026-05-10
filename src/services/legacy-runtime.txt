@@ -35,7 +35,11 @@ const S={
   measurementScenario:null,
   measurementResponse:null,
   measurementResponseFilter:'all',
-  selectedMeasurementPointId:''
+  selectedMeasurementPointId:'',
+  installedDiagnosticTestPointIds:[],
+  selectedDiagnosticTestPointId:'',
+  testPointDiagnosis:null,
+  confirmedDiagnosticFaults:{}
 };
 
 S.rootCanvasId='canvas-root';
@@ -8922,6 +8926,10 @@ Object.assign(window,{
       preview.style.display='none';
       preview.setAttribute('d','');
     }
+
+    if(typeof renderCanvasDiagnosticTestPointMarkers==='function'){
+      try{renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnostic-testpoints] marker render after edges failed',err);}
+    }
   };
 
   function typeRank(node){
@@ -9689,6 +9697,164 @@ Object.assign(window,{
     setConnectionTool,
     toast
   });
+})();
+
+;(function installFinalCanvasVisualSemantics(){
+  if(typeof window==='undefined'||window.__canvasVisualSemanticFinalWrapped) return;
+  window.__canvasVisualSemanticFinalWrapped=true;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function nodeText(node){
+    return [
+      node?.id,
+      node?.props?.name,
+      node?.props?.moduleType,
+      node?.props?.instrumentType
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function moduleText(node){
+    return [
+      node?.props?.name,
+      node?.props?.moduleType,
+      node?.props?.instrumentType
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function getVisualKind(node){
+    const text=nodeText(node);
+    if(!node) return 'unknown';
+    if(node.type==='signal_source'||node.type==='subsystem_in_port') return 'source';
+    if(node.type==='sum_block') return 'sum';
+    if(node.type==='gain_block'||node.type==='mux_block'||node.type==='middle_var_assign') return 'utility';
+    if(node.type?.startsWith('fault_')) return 'fault';
+    if(node.type==='subsystem_block'||node.type==='subsystem_out_port') return 'subsystem';
+    if(node.type?.startsWith('instrument_')||node.type==='instrument_signal_flow') return 'instrument';
+    if(/imu|sensor|gyro|测量|反馈/.test(text)) return 'sensor';
+    if(/motor|actuator|mixer|thrust|电机|执行/.test(text)) return 'actuator';
+    if(/dynamic|plant|airframe|vehicle|动力|机体/.test(text)) return 'plant';
+    if(/allocat|分配/.test(text)) return 'allocator';
+    if(/control|controller|pid|控制/.test(text)) return 'control';
+    return 'process';
+  }
+
+  function decorateCanvasNodes(){
+    const state=getState();
+    if(!Array.isArray(state.modelNodes)||typeof document==='undefined') return;
+    const byId=new Map(state.modelNodes.map(node=>[node.id,node]));
+    document.querySelectorAll('.blk[id^="b-"]').forEach(el=>{
+      const node=byId.get(el.id.replace(/^b-/,''));
+      const kind=getVisualKind(node);
+      Array.from(el.classList)
+        .filter(cls=>cls.startsWith('canvas-node--'))
+        .forEach(cls=>el.classList.remove(cls));
+      el.classList.add(`canvas-node--${kind}`);
+      el.dataset.visualKind=kind;
+    });
+  }
+
+  const previousRenderModelNodes=window.renderModelNodes||(typeof renderModelNodes!=='undefined'?renderModelNodes:null);
+  if(previousRenderModelNodes){
+    window.renderModelNodes=function(){
+      const result=previousRenderModelNodes.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof renderModelNodes!=='undefined') renderModelNodes=window.renderModelNodes;
+  }
+
+  const previousUpdateUI=window.updateUI||(typeof updateUI!=='undefined'?updateUI:null);
+  if(previousUpdateUI){
+    window.updateUI=function(){
+      const result=previousUpdateUI.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof updateUI!=='undefined') updateUI=window.updateUI;
+  }
+
+  window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;
+  setTimeout(decorateCanvasNodes,0);
+})();
+
+;(function installCanvasVisualSemantics(){
+  if(typeof window==='undefined') return;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function nodeText(node){
+    return [
+      node?.id,
+      node?.props?.name,
+      node?.props?.moduleType,
+      node?.props?.instrumentType
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function getVisualKind(node){
+    const text=nodeText(node);
+    if(!node) return 'unknown';
+    if(node.type==='signal_source'||node.type==='subsystem_in_port') return 'source';
+    if(node.type==='sum_block') return 'sum';
+    if(node.type==='gain_block'||node.type==='mux_block'||node.type==='middle_var_assign') return 'utility';
+    if(node.type?.startsWith('fault_')) return 'fault';
+    if(node.type==='subsystem_block'||node.type==='subsystem_out_port') return 'subsystem';
+    if(node.type?.startsWith('instrument_')||node.type==='instrument_signal_flow') return 'instrument';
+    if(/imu|sensor|gyro|测量|反馈/.test(text)) return 'sensor';
+    if(/motor|actuator|mixer|thrust|电机|执行/.test(text)) return 'actuator';
+    if(/dynamic|plant|airframe|vehicle|动力|机体/.test(text)) return 'plant';
+    if(/allocat|分配/.test(text)) return 'allocator';
+    if(/control|controller|pid|控制/.test(text)) return 'control';
+    if(node.type==='simulation_block'||node.type==='flow_block') return 'process';
+    return 'process';
+  }
+
+  function decorateCanvasNodes(){
+    const state=getState();
+    if(!Array.isArray(state.modelNodes)) return;
+    const byId=new Map(state.modelNodes.map(node=>[node.id,node]));
+    if(typeof document==='undefined') return;
+    document.querySelectorAll('.blk[id^="b-"]').forEach(el=>{
+      const nodeId=el.id.replace(/^b-/,'');
+      const node=byId.get(nodeId);
+      const kind=getVisualKind(node);
+      Array.from(el.classList)
+        .filter(cls=>cls.startsWith('canvas-node--'))
+        .forEach(cls=>el.classList.remove(cls));
+      el.classList.add(`canvas-node--${kind}`);
+      el.dataset.visualKind=kind;
+    });
+  }
+
+  const previousRenderModelNodes=window.renderModelNodes||(typeof renderModelNodes!=='undefined'?renderModelNodes:null);
+  if(previousRenderModelNodes&&!window.__canvasVisualSemanticRenderWrapped){
+    window.__canvasVisualSemanticRenderWrapped=true;
+    window.renderModelNodes=function(){
+      const result=previousRenderModelNodes.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof renderModelNodes!=='undefined') renderModelNodes=window.renderModelNodes;
+  }
+
+  const previousUpdateUI=window.updateUI||(typeof updateUI!=='undefined'?updateUI:null);
+  if(previousUpdateUI&&!window.__canvasVisualSemanticUpdateWrapped){
+    window.__canvasVisualSemanticUpdateWrapped=true;
+    window.updateUI=function(){
+      const result=previousUpdateUI.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof updateUI!=='undefined') updateUI=window.updateUI;
+  }
+
+  window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;
+  setTimeout(decorateCanvasNodes,0);
 })();
 
 // --- 系统-故障库兼容过滤与独立注入入口 ---
@@ -11011,6 +11177,7 @@ Object.assign(window,{
   };
 
   const DATAFLOW_VALUE_EMPTY='--';
+  let preserveDataflowPanelRender=false;
 
   function formatDataflowNumber(value,digits=3){
     if(value===null||value===undefined||value===''){return DATAFLOW_VALUE_EMPTY;}
@@ -11539,6 +11706,347 @@ Object.assign(window,{
       }
     };
   }
+
+  function getDiagnosticPointDefaults(points=[]){
+    const preferredRoles=['command','control','allocation','actuation','measurement','residual'];
+    const selected=[];
+    preferredRoles.forEach(role=>{
+      const point=points.find(item=>item.role===role&&!selected.includes(item.id));
+      if(point){selected.push(point.id);}
+    });
+    if(selected.length===0&&points[0]?.id){selected.push(points[0].id);}
+    return selected.slice(0,Math.min(4,Math.max(1,points.length-1)));
+  }
+
+function ensureDiagnosticTestPointState(points=null){
+  const configuredDiagnosticPoints=Array.isArray(S.diagnosticTestPoints)?S.diagnosticTestPoints:[];
+  const semanticPointsForState=Array.isArray(points)?points:(configuredDiagnosticPoints.length?configuredDiagnosticPoints:getSemanticTestPoints());
+  const validDiagnosticPointIds=new Set(semanticPointsForState.map(point=>point.pointId));
+  const diagnosticModelSignature=semanticPointsForState
+    .map(point=>[point.pointId,point.edgeId,point.nodeId||'',point.name||''].join(':'))
+    .join('|');
+  const shouldApplyDiagnosticDefaults=S.diagnosticTestPointModelSignature!==diagnosticModelSignature;
+  S.diagnosticTestPointModelSignature=diagnosticModelSignature;
+  if(!Array.isArray(S.installedDiagnosticTestPointIds)){
+    S.installedDiagnosticTestPointIds=[];
+  }
+  S.installedDiagnosticTestPointIds=S.installedDiagnosticTestPointIds.filter(pointId=>validDiagnosticPointIds.has(pointId));
+  if(shouldApplyDiagnosticDefaults&&S.installedDiagnosticTestPointIds.length===0&&semanticPointsForState.length>0){
+    S.installedDiagnosticTestPointIds=getDiagnosticPointDefaults(semanticPointsForState);
+  }
+  if(S.selectedDiagnosticTestPointId&&!validDiagnosticPointIds.has(S.selectedDiagnosticTestPointId)){
+    S.selectedDiagnosticTestPointId=null;
+  }
+  return S.installedDiagnosticTestPointIds;
+    const semanticPoints=points||buildDataflowSemanticModel().measurementPoints||[];
+    if(!Array.isArray(S.installedDiagnosticTestPointIds)){
+      S.installedDiagnosticTestPointIds=[];
+    }
+    const validIds=new Set(semanticPoints.map(point=>point.id));
+    S.installedDiagnosticTestPointIds=S.installedDiagnosticTestPointIds.filter(id=>validIds.has(id));
+    if(S.installedDiagnosticTestPointIds.length===0&&semanticPoints.length>0){
+      S.installedDiagnosticTestPointIds=getDiagnosticPointDefaults(semanticPoints);
+    }
+    if(!S.confirmedDiagnosticFaults||typeof S.confirmedDiagnosticFaults!=='object'){
+      S.confirmedDiagnosticFaults={};
+    }
+    if(S.selectedDiagnosticTestPointId&&!validIds.has(S.selectedDiagnosticTestPointId)){
+      S.selectedDiagnosticTestPointId='';
+    }
+  }
+
+  function buildDiagnosticTestPointModel(){
+    const semantic=buildDataflowSemanticModel();
+    const points=semantic.measurementPoints||[];
+    ensureDiagnosticTestPointState(points);
+    const installedSet=new Set(S.installedDiagnosticTestPointIds);
+    const positions=points.map((point,index)=>({
+      ...point,
+      pointId:point.id,
+      positionIndex:index+1,
+      positionNameZh:point.signalNameZh||point.labelZh||`测点位置 ${index+1}`,
+      installed:installedSet.has(point.id),
+      confirmedFaultTypeIds:cloneDefaults(S.confirmedDiagnosticFaults?.[point.id]||[])
+    }));
+    return {
+      semantic,
+      positions,
+      installed:positions.filter(point=>point.installed),
+      available:positions.filter(point=>!point.installed),
+      selectedPointId:S.selectedDiagnosticTestPointId||''
+    };
+  }
+
+  function installDiagnosticTestPoint(pointId){
+    const model=buildDiagnosticTestPointModel();
+    const point=model.positions.find(item=>item.pointId===pointId);
+    if(!point){return false;}
+    if(!S.installedDiagnosticTestPointIds.includes(pointId)){
+      S.installedDiagnosticTestPointIds.push(pointId);
+    }
+    S.selectedDiagnosticTestPointId=pointId;
+    renderDataflowPanel();
+    return true;
+  }
+
+  function removeDiagnosticTestPoint(pointId){
+    ensureDiagnosticTestPointState();
+    const before=S.installedDiagnosticTestPointIds.length;
+    S.installedDiagnosticTestPointIds=S.installedDiagnosticTestPointIds.filter(id=>id!==pointId);
+    delete S.confirmedDiagnosticFaults[pointId];
+    if(S.selectedDiagnosticTestPointId===pointId){S.selectedDiagnosticTestPointId='';}
+    if(S.testPointDiagnosis?.pointId===pointId){S.testPointDiagnosis=null;}
+    renderDataflowPanel();
+    return S.installedDiagnosticTestPointIds.length!==before;
+  }
+
+  function getDiagnosticPointById(pointId){
+    return buildDiagnosticTestPointModel().positions.find(point=>point.pointId===pointId)||null;
+  }
+
+  function getFaultTypeId(model){
+    return model?.faultTypeId||model?.id||model?.modelId||model?.faultModelId||'';
+  }
+
+  function getDiagnosticFaultCatalogCandidates(){
+    const byId=new Map();
+    const append=model=>{
+      const id=getFaultTypeId(model);
+      if(!id||byId.has(id)){return;}
+      byId.set(id,{
+        ...cloneDefaults(model),
+        id,
+        faultTypeId:id,
+        name:model?.name||id
+      });
+    };
+    (S.availableFaultModels||[]).forEach(append);
+    (S.importedFaultModels||[]).forEach(append);
+    if(typeof window.getFaultTypeCatalogModels==='function'){
+      (window.getFaultTypeCatalogModels()||[]).forEach(append);
+    }
+    return Array.from(byId.values());
+  }
+
+  function getInjectedFaultForDiagnosticPoint(point){
+    const edge=getEdge(point?.edgeId);
+    const edgeFault=getFaultModelForEdge(edge);
+    if(edgeFault){return edgeFault;}
+    const sourceFault=getFaultModelForNode(getNode(point?.sourceNodeId));
+    if(sourceFault){return sourceFault;}
+    return getFaultModelForNode(getNode(point?.targetNodeId));
+  }
+
+  function scoreFaultCandidateForPoint(model,point,injectedFault=null){
+    const id=getFaultTypeId(model);
+    const injectedId=getFaultTypeId(injectedFault);
+    if(id&&injectedId&&id===injectedId){return 0.98;}
+    const layer=String(model?.layer||'').toLowerCase();
+    const behavior=[
+      model?.runtimeBehavior,
+      model?.faultCode,
+      model?.modelClass,
+      model?.name,
+      Array.isArray(model?.observableSignals)?model.observableSignals.join(' '):''
+    ].filter(Boolean).join(' ').toLowerCase();
+    const role=point?.role||'';
+    let score=0.25;
+    if(role==='measurement'&&(layer.includes('sensor')||layer.includes('electrical')||/sensor|imu|gyro|noise|freeze|scale|bias/.test(behavior))){score+=0.45;}
+    if(role==='residual'&&(/residual|diagnostic|fault|alert/.test(behavior)||layer.includes('diagnostic'))){score+=0.45;}
+    if((role==='control'||role==='command'||role==='allocation')&&(layer.includes('control')||layer.includes('protocol')||/gain|delay|packet|command|tamper/.test(behavior))){score+=0.38;}
+    if((role==='plant'||role==='actuation')&&(layer.includes('physical')||layer.includes('electrical')||/actuator|motor|efficiency|lock|saturation|inertia/.test(behavior))){score+=0.38;}
+    if(point?.edgeId&&String(model?.typicalTargets||'').toLowerCase().includes(point.edgeId.toLowerCase())){score+=0.15;}
+    return Math.min(score,0.9);
+  }
+
+  function buildDiagnosticFaultCandidates(point){
+    const injectedFault=getInjectedFaultForDiagnosticPoint(point);
+    const confirmedIds=new Set(S.confirmedDiagnosticFaults?.[point.pointId||point.id]||[]);
+    const byId=new Map();
+    const addCandidate=(model,source='catalog')=>{
+      if(!model){return;}
+      const id=getFaultTypeId(model);
+      if(!id){return;}
+      const score=scoreFaultCandidateForPoint(model,point,injectedFault);
+      if(score<0.42&&source!=='injected'){return;}
+      const previous=byId.get(id);
+      const next={
+        faultTypeId:id,
+        name:model.name||id,
+        layer:model.layer||'',
+        modelClass:model.modelClass||model.faultKind||'',
+        runtimeBehavior:model.runtimeBehavior||'',
+        confidence:source==='injected'?0.98:score,
+        source,
+        confirmed:confirmedIds.has(id),
+        reasonZh:source==='injected'
+          ?'当前测点链路存在已注入故障，优先列为候选。'
+          :'根据测点所在信号类型、故障层级和可观测信号匹配。'
+      };
+      if(!previous||next.confidence>previous.confidence){byId.set(id,next);}
+    };
+    addCandidate(injectedFault,'injected');
+    getDiagnosticFaultCatalogCandidates().forEach(model=>addCandidate(model,'catalog'));
+    return Array.from(byId.values())
+      .sort((a,b)=>b.confidence-a.confidence||a.name.localeCompare(b.name,'zh-Hans-CN'))
+      .slice(0,8);
+  }
+
+  function runDiagnosticTestPointDetection(pointId){
+    const point=getDiagnosticPointById(pointId);
+    if(!point){return null;}
+    if(!point.installed){installDiagnosticTestPoint(pointId);}
+    const candidates=buildDiagnosticFaultCandidates(point);
+    const abnormal=candidates.some(candidate=>candidate.source==='injected')||Boolean(getInjectedFaultForDiagnosticPoint(point));
+    const diagnosis={
+      pointId,
+      edgeId:point.edgeId,
+      pointNameZh:point.positionNameZh||point.signalNameZh||point.labelZh,
+      signalPathZh:point.signalPathZh||'',
+      status:abnormal?'abnormal':'normal',
+      statusLabelZh:abnormal?'疑似故障':'未发现异常',
+      checkedAt:new Date().toISOString(),
+      candidates,
+      confirmedFaultTypeIds:cloneDefaults(S.confirmedDiagnosticFaults?.[pointId]||[])
+    };
+    S.selectedDiagnosticTestPointId=pointId;
+    S.testPointDiagnosis=diagnosis;
+    selectDataflowEdge(point.edgeId);
+    return diagnosis;
+  }
+
+  function toggleDiagnosticFaultConfirmation(pointId,faultTypeId,checked){
+    if(!pointId||!faultTypeId){return false;}
+    if(!S.confirmedDiagnosticFaults||typeof S.confirmedDiagnosticFaults!=='object'){
+      S.confirmedDiagnosticFaults={};
+    }
+    const ids=new Set(S.confirmedDiagnosticFaults[pointId]||[]);
+    if(checked){ids.add(faultTypeId);}else{ids.delete(faultTypeId);}
+    S.confirmedDiagnosticFaults[pointId]=Array.from(ids);
+    if(S.testPointDiagnosis?.pointId===pointId){
+      S.testPointDiagnosis.confirmedFaultTypeIds=Array.from(ids);
+      S.testPointDiagnosis.candidates=(S.testPointDiagnosis.candidates||[]).map(candidate=>({
+        ...candidate,
+        confirmed:ids.has(candidate.faultTypeId)
+      }));
+    }
+    return true;
+  }
+
+  function ensureDiagnosticTestPointDialog(){
+    let overlay=document.getElementById('ov-testpoint-diagnosis');
+    if(overlay){return overlay;}
+    overlay=document.createElement('div');
+    overlay.id='ov-testpoint-diagnosis';
+    overlay.className='overlay testpoint-diagnosis-overlay';
+    overlay.innerHTML=`
+      <div class="modal testpoint-diagnosis-modal" role="dialog" aria-modal="true">
+        <div class="mhead testpoint-diagnosis-head">
+          <div>
+            <div class="mtitle">测点诊断结果</div>
+            <div class="testpoint-diagnosis-subtitle">点击测点后进行一次诊断，候选故障需要人工二次确认。</div>
+          </div>
+          <button type="button" class="dataflow-map-close" data-testpoint-diagnosis-close aria-label="关闭">&times;</button>
+        </div>
+        <div class="mbody testpoint-diagnosis-body" id="testpoint-diagnosis-body"></div>
+      </div>`;
+    overlay.addEventListener('click',event=>{
+      if(event.target===overlay||event.target.closest('[data-testpoint-diagnosis-close]')){
+        overlay.classList.remove('open');
+      }
+    });
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function renderDiagnosticCandidate(candidate,pointId){
+    const confidence=Math.round(Number(candidate.confidence||0)*100);
+    return `
+      <label class="testpoint-candidate" data-fault-candidate="${escapeHtml(candidate.faultTypeId)}">
+        <input type="checkbox" data-confirm-fault-candidate="${escapeHtml(candidate.faultTypeId)}" ${candidate.confirmed?'checked':''}>
+        <span>
+          <strong>${escapeHtml(candidate.name)}</strong>
+          <em>${escapeHtml(getLayerLabel(candidate.layer))} · ${escapeHtml(candidate.modelClass||candidate.runtimeBehavior||'故障类型')} · ${confidence}%</em>
+          <b>${escapeHtml(candidate.reasonZh||'根据测点响应匹配。')}</b>
+        </span>
+      </label>`;
+  }
+
+  function openDiagnosticTestPointDialog(pointId){
+    const diagnosis=runDiagnosticTestPointDetection(pointId);
+    if(!diagnosis){return null;}
+    const overlay=ensureDiagnosticTestPointDialog();
+    const body=overlay.querySelector('#testpoint-diagnosis-body');
+    if(body){
+      body.innerHTML=`
+        <section class="testpoint-diagnosis-summary">
+          <div><span>测点</span><strong>${escapeHtml(diagnosis.pointNameZh)}</strong></div>
+          <div><span>链路</span><strong>${escapeHtml(diagnosis.edgeId)}</strong></div>
+          <div><span>状态</span><strong>${escapeHtml(diagnosis.statusLabelZh)}</strong></div>
+        </section>
+        <section class="testpoint-candidate-list">
+          ${diagnosis.candidates.length
+            ?diagnosis.candidates.map(candidate=>renderDiagnosticCandidate(candidate,pointId)).join('')
+            :'<div class="testpoint-candidate-empty">当前测点没有匹配到候选故障类型。</div>'}
+        </section>`;
+      body.querySelectorAll('[data-confirm-fault-candidate]').forEach(input=>{
+        input.addEventListener('change',()=>{
+          toggleDiagnosticFaultConfirmation(pointId,input.dataset.confirmFaultCandidate,input.checked);
+          renderDataflowPanel();
+        });
+      });
+    }
+    overlay.classList.add('open');
+    return diagnosis;
+  }
+
+  renderDiagnosticCandidate=function(candidate,pointId){
+    const confidence=Math.round(Number(candidate.confidence||0)*100);
+    const modelKind=candidate.modelClass||candidate.runtimeBehavior||'故障类型';
+    return `
+      <label class="testpoint-candidate" data-fault-candidate="${escapeHtml(candidate.faultTypeId)}">
+        <input type="checkbox" data-confirm-fault-candidate="${escapeHtml(candidate.faultTypeId)}" ${candidate.confirmed?'checked':''}>
+        <span class="testpoint-candidate__body">
+          <strong>${escapeHtml(candidate.name)}</strong>
+          <em>${escapeHtml(getLayerLabel(candidate.layer))} · ${escapeHtml(modelKind)} · 匹配度 ${confidence}%</em>
+          <b>${escapeHtml(candidate.reasonZh||'根据测点响应和当前故障注入状态匹配。')}</b>
+        </span>
+      </label>`;
+  };
+
+  openDiagnosticTestPointDialog=function(pointId){
+    const diagnosis=runDiagnosticTestPointDetection(pointId);
+    if(!diagnosis){return null;}
+    const overlay=ensureDiagnosticTestPointDialog();
+    const title=overlay.querySelector('.mtitle');
+    const subtitle=overlay.querySelector('.testpoint-diagnosis-subtitle');
+    const close=overlay.querySelector('[data-testpoint-diagnosis-close]');
+    if(title){title.textContent='测点诊断结果';}
+    if(subtitle){subtitle.textContent='点击测点后执行一次离线诊断；候选故障需要人工二次确认。';}
+    if(close){close.setAttribute('aria-label','关闭');}
+    const body=overlay.querySelector('#testpoint-diagnosis-body');
+    if(body){
+      body.innerHTML=`
+        <section class="testpoint-diagnosis-summary">
+          <div><span>检测测点</span><strong>${escapeHtml(diagnosis.pointNameZh)}</strong></div>
+          <div><span>信号链路</span><strong>${escapeHtml(diagnosis.signalPathZh||diagnosis.edgeId)}</strong></div>
+          <div><span>诊断结论</span><strong>${escapeHtml(diagnosis.statusLabelZh)}</strong></div>
+        </section>
+        <section class="testpoint-candidate-list">
+          ${diagnosis.candidates.length
+            ?diagnosis.candidates.map(candidate=>renderDiagnosticCandidate(candidate,pointId)).join('')
+            :'<div class="testpoint-candidate-empty">当前测点没有匹配到候选故障类型。</div>'}
+        </section>`;
+      body.querySelectorAll('[data-confirm-fault-candidate]').forEach(input=>{
+        input.addEventListener('change',()=>{
+          toggleDiagnosticFaultConfirmation(pointId,input.dataset.confirmFaultCandidate,input.checked);
+          renderDataflowPanel();
+        });
+      });
+    }
+    overlay.classList.add('open');
+    return diagnosis;
+  };
 
   const MEASUREMENT_SCENARIO_DEFS=[
     {type:'link_cut',labelZh:'截断链路',targetKind:'edge',defaultParameters:{time:0}},
@@ -12730,7 +13238,175 @@ Object.assign(window,{
     overlay.classList.add('open');
   }
 
+  function renderDiagnosticTestPointWorkbench(){
+    const model=buildDiagnosticTestPointModel();
+    const selectedAvailable=model.available[0]?.pointId||model.positions[0]?.pointId||'';
+    const diagnosis=S.testPointDiagnosis;
+    return `
+      <section class="testpoint-workbench" data-testpoint-workbench>
+        <div class="testpoint-workbench__head">
+          <div>
+            <div class="testpoint-workbench__eyebrow">测试性诊断</div>
+            <h3>固定测点安装与故障确认</h3>
+            <p>测点位置由当前飞控模型预设，按需要安装测点；注入故障后点击测点执行一次检测，再人工确认候选故障类型。</p>
+          </div>
+          <div class="testpoint-workbench__metrics">
+            <span><em>固定位置</em><b>${model.positions.length}</b></span>
+            <span><em>已安装</em><b>${model.installed.length}</b></span>
+            <span><em>候选</em><b>${diagnosis?.candidates?.length||0}</b></span>
+          </div>
+        </div>
+        <div class="testpoint-install-bar">
+          <label>
+            <span>选择安装位置</span>
+            <select data-testpoint-position-select>
+              ${model.available.length
+                ?model.available.map(point=>`<option value="${escapeHtml(point.pointId)}">${escapeHtml(point.positionNameZh)} · ${escapeHtml(point.edgeId)}</option>`).join('')
+                :'<option value="">暂无可安装位置</option>'}
+            </select>
+          </label>
+          <button type="button" data-install-testpoint="${escapeHtml(selectedAvailable)}" ${selectedAvailable?'':'disabled'}>加入测点</button>
+        </div>
+        <div class="testpoint-board">
+          <div class="testpoint-board__fixed">
+            <div class="testpoint-board__title">固定测点位置</div>
+            <div class="testpoint-position-grid">
+              ${model.positions.map(point=>`
+                <button type="button" class="testpoint-position${point.installed?' is-installed':''}${S.selectedDiagnosticTestPointId===point.pointId?' is-selected':''}" data-fixed-testpoint-position="${escapeHtml(point.pointId)}" data-dataflow-edge="${escapeHtml(point.edgeId)}">
+                  <span>${escapeHtml(point.positionNameZh)}</span>
+                  <em>${escapeHtml(point.signalPathZh||point.edgeId)}</em>
+                  <b>${point.installed?'已安装':'未安装'}</b>
+                </button>`).join('')}
+            </div>
+          </div>
+          <div class="testpoint-board__installed">
+            <div class="testpoint-board__title">已安装测点</div>
+            <div class="installed-testpoint-list">
+              ${model.installed.length?model.installed.map(point=>`
+                <article class="installed-testpoint${S.selectedDiagnosticTestPointId===point.pointId?' is-selected':''}" data-installed-testpoint="${escapeHtml(point.pointId)}">
+                  <div>
+                    <strong>${escapeHtml(point.positionNameZh)}</strong>
+                    <span>${escapeHtml(point.edgeId)} · ${escapeHtml(point.stageLabelZh||'')}</span>
+                  </div>
+                  <div class="installed-testpoint__actions">
+                    <button type="button" data-detect-testpoint="${escapeHtml(point.pointId)}">检测</button>
+                    <button type="button" data-remove-testpoint="${escapeHtml(point.pointId)}">移除</button>
+                  </div>
+                </article>`).join(''):'<div class="testpoint-empty">尚未安装测点。</div>'}
+            </div>
+          </div>
+          <div class="testpoint-board__diagnosis">
+            <div class="testpoint-board__title">最近一次检测</div>
+            ${diagnosis?`
+              <div class="testpoint-last-result is-${escapeHtml(diagnosis.status)}">
+                <strong>${escapeHtml(diagnosis.pointNameZh)}</strong>
+                <span>${escapeHtml(diagnosis.statusLabelZh)} · 候选 ${diagnosis.candidates.length} 项 · 已确认 ${diagnosis.confirmedFaultTypeIds.length} 项</span>
+                <button type="button" data-detect-testpoint="${escapeHtml(diagnosis.pointId)}">重新打开结果</button>
+              </div>`:'<div class="testpoint-empty">点击已安装测点的“检测”后显示候选故障。</div>'}
+          </div>
+        </div>
+      </section>`;
+  }
+
+renderDiagnosticTestPointWorkbench=function(){
+    const model=buildDiagnosticTestPointModel();
+    const selectedAvailable=model.available[0]?.pointId||model.positions[0]?.pointId||'';
+    const diagnosis=S.testPointDiagnosis;
+    return `
+      <section class="testpoint-workbench testpoint-workbench--operator" data-testpoint-workbench>
+        <div class="testpoint-workbench__head">
+          <div>
+            <div class="testpoint-workbench__eyebrow">测点诊断台</div>
+            <h3>安装固定测点，点击后给出候选故障</h3>
+            <p>测点位置由当前飞控系统预设。先选择要安装的位置；注入故障后，点击已安装测点执行一次检测；系统列出可能故障类型，再由人工勾选确认。</p>
+          </div>
+          <div class="testpoint-workbench__metrics">
+            <span><em>固定位置</em><b>${model.positions.length}</b></span>
+            <span><em>已安装</em><b>${model.installed.length}</b></span>
+            <span><em>待确认</em><b>${diagnosis?.candidates?.length||0}</b></span>
+          </div>
+        </div>
+        <div class="testpoint-operator-layout">
+          <section class="testpoint-card testpoint-card--install">
+            <div class="testpoint-card__head">
+              <strong>1. 选择测点位置</strong>
+              <span>固定位置不能新增，只能按需安装。</span>
+            </div>
+            <div class="testpoint-install-bar">
+              <label>
+                <span>可安装位置</span>
+                <select data-testpoint-position-select>
+                  ${model.available.length
+                    ?model.available.map(point=>`<option value="${escapeHtml(point.pointId)}">${escapeHtml(point.positionNameZh)} · ${escapeHtml(point.signalNameZh||point.edgeId)}</option>`).join('')
+                    :'<option value="">暂无可安装位置</option>'}
+                </select>
+              </label>
+              <button type="button" data-install-testpoint="${escapeHtml(selectedAvailable)}" ${selectedAvailable?'':'disabled'}>安装测点</button>
+            </div>
+            <div class="testpoint-position-grid testpoint-position-grid--compact">
+              ${model.positions.map(point=>`
+                <button type="button" class="testpoint-position${point.installed?' is-installed':''}${S.selectedDiagnosticTestPointId===point.pointId?' is-selected':''}" data-fixed-testpoint-position="${escapeHtml(point.pointId)}" data-dataflow-edge="${escapeHtml(point.edgeId)}">
+                  <span>${escapeHtml(point.positionNameZh)}</span>
+                  <em>${escapeHtml(point.signalNameZh||point.signalPathZh||point.edgeId)}</em>
+                  <b>${point.installed?'已安装':'未安装'}</b>
+                </button>`).join('')}
+            </div>
+          </section>
+          <section class="testpoint-card testpoint-card--installed">
+            <div class="testpoint-card__head">
+              <strong>2. 点击测点检测</strong>
+              <span>检测不是实时触发，点击后才计算一次。</span>
+            </div>
+            <div class="installed-testpoint-list">
+              ${model.installed.length?model.installed.map(point=>`
+                <article class="installed-testpoint${S.selectedDiagnosticTestPointId===point.pointId?' is-selected':''}" data-installed-testpoint="${escapeHtml(point.pointId)}">
+                  <div>
+                    <strong>${escapeHtml(point.positionNameZh)}</strong>
+                    <span>${escapeHtml(point.signalNameZh||point.edgeId)} · ${escapeHtml(point.stageLabelZh||'')}</span>
+                  </div>
+                  <div class="installed-testpoint__actions">
+                    <button type="button" data-detect-testpoint="${escapeHtml(point.pointId)}">检测</button>
+                    <button type="button" data-remove-testpoint="${escapeHtml(point.pointId)}">移除</button>
+                  </div>
+                </article>`).join(''):'<div class="testpoint-empty">尚未安装测点。请先从左侧选择固定位置。</div>'}
+            </div>
+          </section>
+          <section class="testpoint-card testpoint-card--result">
+            <div class="testpoint-card__head">
+              <strong>3. 人工确认</strong>
+              <span>弹窗中对候选故障逐项打钩。</span>
+            </div>
+            ${diagnosis?`
+              <div class="testpoint-last-result is-${escapeHtml(diagnosis.status)}">
+                <strong>${escapeHtml(diagnosis.pointNameZh)}</strong>
+                <span>${escapeHtml(diagnosis.statusLabelZh)} · 候选 ${diagnosis.candidates.length} 项 · 已确认 ${diagnosis.confirmedFaultTypeIds.length} 项</span>
+                <button type="button" data-detect-testpoint="${escapeHtml(diagnosis.pointId)}">查看确认结果</button>
+              </div>`:'<div class="testpoint-empty">点击“检测”后，这里会显示最近一次诊断摘要。</div>'}
+          </section>
+        </div>
+      </section>`;
+  };
+
   function bindDataflowPanelSelection(panel){
+    panel.querySelector('[data-install-testpoint]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const selected=panel.querySelector('[data-testpoint-position-select]')?.value||event.currentTarget.dataset.installTestpoint||'';
+      if(selected){installDiagnosticTestPoint(selected);}
+    });
+    panel.querySelectorAll('[data-remove-testpoint]').forEach(element=>{
+      element.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        removeDiagnosticTestPoint(element.dataset.removeTestpoint);
+      });
+    });
+    panel.querySelectorAll('[data-detect-testpoint]').forEach(element=>{
+      element.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        openDiagnosticTestPointDialog(element.dataset.detectTestpoint);
+      });
+    });
     panel.querySelectorAll('[data-measurement-scenario-field]').forEach(element=>{
       element.addEventListener('change',()=>{
         S.measurementScenario=readMeasurementScenarioFromPanel(panel);
@@ -12790,9 +13466,54 @@ Object.assign(window,{
     });
   }
 
+  function isDataflowPanelActive(){
+    return document.getElementById('cw')?.dataset.view==='dataflow';
+  }
+
+  function shouldPreserveDataflowPanel(){
+    const panel=document.getElementById('dataflow-panel');
+    return isDataflowPanelActive()&&Boolean(panel?.querySelector('.dataflow-workspace'));
+  }
+
+  function refreshDataflowRuntimeOnly(){
+    decorateDataflowEdges();
+    const panel=document.getElementById('dataflow-panel');
+    if(!panel){return;}
+    const summary=getDataflowSummary();
+    const stats=panel.querySelectorAll('[data-dataflow-live-stat]');
+    stats.forEach(item=>{
+      const key=item.dataset.dataflowLiveStat;
+      if(key&&Object.prototype.hasOwnProperty.call(summary,key)){
+        item.textContent=String(summary[key]);
+      }
+    });
+    if(S.selEdge){
+      const edge=getEdge(S.selEdge);
+      if(edge){renderPropertyPanel(edge);}
+    }
+  }
+
+  function withDataflowPanelPreserved(work){
+    const preserve=shouldPreserveDataflowPanel();
+    if(!preserve){
+      return work();
+    }
+    preserveDataflowPanelRender=true;
+    try{
+      return work();
+    }finally{
+      preserveDataflowPanelRender=false;
+      refreshDataflowRuntimeOnly();
+    }
+  }
+
   function renderDataflowPanel(){
     const panel=document.getElementById('dataflow-panel');
     if(!panel){return;}
+    if(preserveDataflowPanelRender&&panel.querySelector('.dataflow-workspace')){
+      refreshDataflowRuntimeOnly();
+      return;
+    }
     const summary=getDataflowSummary();
     const rows=collectDataflowEdges();
     if(rows.length===0){
@@ -12827,6 +13548,7 @@ Object.assign(window,{
         </div>
         <div class="dataflow-body dataflow-body--semantic">
           <main class="dataflow-main">
+            ${renderDiagnosticTestPointWorkbench()}
             ${renderMeasurementResponsePanel(semantic)}
             ${renderPropagationGroups(semantic)}
             ${renderMeasurementPointChainMap(semantic)}
@@ -12868,12 +13590,523 @@ Object.assign(window,{
     bindDataflowPanelSelection(panel);
   }
 
+  renderDataflowPanel=function(){
+    const panel=document.getElementById('dataflow-panel');
+    if(!panel){return;}
+    if(preserveDataflowPanelRender&&panel.querySelector('.dataflow-workspace')){
+      refreshDataflowRuntimeOnly();
+      return;
+    }
+    const rows=collectDataflowEdges();
+    const semantic=buildDataflowSemanticModel();
+    const summary=getDataflowSummary();
+    const testPointModel=buildDiagnosticTestPointModel();
+    panel.innerHTML=`
+      <div class="dataflow-workspace dataflow-workspace--diagnosis" data-dataflow-view="testpoint-diagnosis">
+        <header class="dataflow-diagnosis-header">
+          <div>
+            <div class="dataflow-title">多信号流图</div>
+            <h2>测点诊断台</h2>
+            <p>当前视图只保留固定测点安装、点击检测和人工确认。其他链路分析模块已从界面隐藏，避免干扰诊断流程。</p>
+          </div>
+          <div class="dataflow-diagnosis-summary" aria-label="测点诊断摘要">
+            <span><em>固定测点</em><strong>${semantic.measurementPoints.length}</strong></span>
+            <span><em>已安装</em><strong>${testPointModel.installed.length}</strong></span>
+            <span><em>模型连线</em><strong>${rows.length}</strong></span>
+            <span><em>当前故障</em><strong>${summary.fault}</strong></span>
+          </div>
+        </header>
+        ${rows.length?renderDiagnosticTestPointWorkbench():`
+          <section class="testpoint-workbench testpoint-workbench--empty" data-testpoint-workbench>
+            <div class="testpoint-workbench__head">
+              <div>
+                <div class="testpoint-workbench__eyebrow">测点诊断台</div>
+                <h3>当前模型还没有可诊断的信号链路</h3>
+                <p>请先导入完整飞控系统模型，或在画布中连接信号源、控制器、执行器、传感器和诊断模块。</p>
+              </div>
+            </div>
+          </section>`}
+      </div>`;
+    bindDataflowPanelSelection(panel);
+  };
+
   function escapeDataflowSelector(value){
     if(window.CSS?.escape){return CSS.escape(String(value));}
     return String(value).replace(/["\\]/g,'\\$&');
   }
 
-  function decorateDataflowEdges(){
+function getInstalledDiagnosticTestPointsForCanvas(){
+  if(typeof buildDiagnosticTestPointModel!=='function') return [];
+  const model=buildDiagnosticTestPointModel();
+  if(Array.isArray(model.installed)) return model.installed;
+  const installedIds=new Set(Array.isArray(S.installedDiagnosticTestPointIds)?S.installedDiagnosticTestPointIds:[]);
+  const points=Array.isArray(model.points)?model.points:(Array.isArray(model.semanticPoints)?model.semanticPoints:[]);
+  return points.filter(point=>installedIds.has(point.pointId));
+}
+function findCanvasEdgePath(edgeId){
+  if(!edgeId) return null;
+  return Array.from(document.querySelectorAll('.edge-path,path[data-edge-id]')).find(path=>{
+    return path.dataset.edgeId===edgeId||path.getAttribute('data-edge-id')===edgeId||path.id===edgeId||path.id===`edge-${edgeId}`;
+  })||null;
+}
+function getDiagnosticMarkerPosition(point,index){
+  const path=findCanvasEdgePath(point.edgeId);
+  if(path&&typeof path.getTotalLength==='function'&&typeof path.getPointAtLength==='function'){
+    try{
+      const length=path.getTotalLength();
+      if(Number.isFinite(length)&&length>0){
+        const markerPoint=path.getPointAtLength(length*0.52);
+        return {x:markerPoint.x,y:markerPoint.y};
+      }
+    }catch(err){}
+  }
+  const edge=(Array.isArray(S.edges)?S.edges:[]).find(item=>item.id===point.edgeId);
+  const nodes=Array.isArray(S.nodes)?S.nodes:Object.values(S.nodes||{});
+  const sourceId=edge&&(edge.source||edge.from||edge.sourceNodeId||edge.sourceId);
+  const targetId=edge&&(edge.target||edge.to||edge.targetNodeId||edge.targetId);
+  const sourceNode=nodes.find(node=>node.id===sourceId);
+  const targetNode=nodes.find(node=>node.id===targetId);
+  if(sourceNode&&targetNode){
+    const sourceWidth=sourceNode.w||sourceNode.width||150;
+    const sourceHeight=sourceNode.h||sourceNode.height||80;
+    const targetHeight=targetNode.h||targetNode.height||80;
+    return {
+      x:((sourceNode.x||0)+sourceWidth+(targetNode.x||0))/2,
+      y:((sourceNode.y||0)+sourceHeight/2+(targetNode.y||0)+targetHeight/2)/2
+    };
+  }
+  return {x:120+(index%6)*72,y:120+Math.floor(index/6)*48};
+}
+function getDiagnosticMarkerLabel(point,index){
+  const label=String(point.shortName||point.code||`M${index+1}`).replace(/^测点\s*/,'').trim();
+  return label.length>4?`M${index+1}`:label;
+}
+function renderCanvasDiagnosticTestPointMarkers(){
+  if(typeof document==='undefined'||typeof document.getElementById!=='function') return;
+  const svg=document.getElementById('edge-layer');
+  if(!svg||!svg.ownerDocument||typeof svg.ownerDocument.createElementNS!=='function') return;
+  const host=document.getElementById('edge-group')||svg;
+  let layer=document.getElementById('diagnostic-testpoint-marker-layer');
+  if(!layer||layer.parentNode!==host){
+    if(layer) layer.remove();
+    layer=document.createElementNS('http://www.w3.org/2000/svg','g');
+    layer.id='diagnostic-testpoint-marker-layer';
+    host.appendChild(layer);
+  }
+  layer.innerHTML='';
+  const installedPoints=getInstalledDiagnosticTestPointsForCanvas();
+  installedPoints.forEach((point,index)=>{
+    const position=getDiagnosticMarkerPosition(point,index);
+    const markerLabel=getDiagnosticMarkerLabel(point,index);
+    const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
+    marker.setAttribute('class',`canvas-testpoint-marker${S.selectedDiagnosticTestPointId===point.pointId?' is-selected':''}`);
+    marker.setAttribute('data-canvas-testpoint-marker','true');
+    marker.setAttribute('data-testpoint-id',point.pointId||'');
+    marker.setAttribute('data-edge-id',point.edgeId||'');
+    marker.setAttribute('transform',`translate(${position.x} ${position.y})`);
+    marker.setAttribute('role','button');
+    marker.setAttribute('aria-label',`测点 ${markerLabel}`);
+    const halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    halo.setAttribute('class','canvas-testpoint-marker__halo');
+    halo.setAttribute('r','16');
+    const pin=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    pin.setAttribute('class','canvas-testpoint-marker__pin');
+    pin.setAttribute('r','11');
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('class','canvas-testpoint-marker__label');
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('dominant-baseline','central');
+    label.textContent=markerLabel;
+    marker.appendChild(halo);
+    marker.appendChild(pin);
+    marker.appendChild(label);
+    marker.addEventListener('click',event=>{
+      event.stopPropagation();
+      S.selectedDiagnosticTestPointId=point.pointId;
+      if(point.edgeId){
+        S.selEdge=point.edgeId;
+        if(typeof selectDataflowEdge==='function') selectDataflowEdge(point.edgeId);
+      }
+      if(typeof renderDataflowPanel==='function') renderDataflowPanel();
+      renderCanvasDiagnosticTestPointMarkers();
+    });
+    layer.appendChild(marker);
+  });
+}
+function getInjectedFaultCollections(){
+  return [
+    'activeFaults',
+    'injectedFaults',
+    'faultInstances',
+    'selectedFaults',
+    'faultInjectionResults',
+    'appliedFaults'
+  ].filter(key=>Array.isArray(S[key]));
+}
+function faultEntryMatches(entry,faultId){
+  if(!entry||!faultId) return false;
+  if(typeof entry==='string') return entry===faultId;
+  return entry.id===faultId||entry.faultId===faultId||entry.instanceId===faultId||entry.key===faultId||entry.type===faultId;
+}
+function removeInjectedFault(faultId){
+  if(!faultId) return false;
+  let removed=false;
+  getInjectedFaultCollections().forEach(key=>{
+    const before=S[key].length;
+    S[key]=S[key].filter(entry=>!faultEntryMatches(entry,faultId));
+    if(S[key].length!==before) removed=true;
+  });
+  if(S.faultStates&&typeof S.faultStates==='object'){
+    Object.keys(S.faultStates).forEach(key=>{
+      if(key===faultId||faultEntryMatches(S.faultStates[key],faultId)){
+        delete S.faultStates[key];
+        removed=true;
+      }
+    });
+  }
+  if(S.injectedFaultMap&&typeof S.injectedFaultMap==='object'){
+    Object.keys(S.injectedFaultMap).forEach(key=>{
+      if(key===faultId||faultEntryMatches(S.injectedFaultMap[key],faultId)){
+        delete S.injectedFaultMap[key];
+        removed=true;
+      }
+    });
+  }
+  if(Array.isArray(S.edges)){
+    S.edges.forEach(edge=>{
+      if(edge&&faultEntryMatches(edge.fault,faultId)){
+        delete edge.fault;
+        edge.status=edge.status==='fault'?'normal':edge.status;
+        removed=true;
+      }
+      if(edge&&Array.isArray(edge.faults)){
+        const before=edge.faults.length;
+        edge.faults=edge.faults.filter(entry=>!faultEntryMatches(entry,faultId));
+        if(edge.faults.length!==before) removed=true;
+      }
+      if(edge&&Array.isArray(edge.faults)&&edge.faults.length){
+        edge.status='fault';
+      }
+    });
+  }
+  if(Array.isArray(S.nodes)){
+    S.nodes.forEach(node=>{
+      if(node&&faultEntryMatches(node.fault,faultId)){
+        delete node.fault;
+        node.status=node.status==='fault'?'normal':node.status;
+        removed=true;
+      }
+      if(node&&Array.isArray(node.faults)){
+        const before=node.faults.length;
+        node.faults=node.faults.filter(entry=>!faultEntryMatches(entry,faultId));
+        if(node.faults.length!==before) removed=true;
+      }
+      if(node&&Array.isArray(node.faults)&&node.faults.length){
+        node.status='fault';
+      }
+    });
+  }
+  if(S.lastDiagnosticTestPointResult&&Array.isArray(S.lastDiagnosticTestPointResult.candidates)){
+    S.lastDiagnosticTestPointResult.candidates=S.lastDiagnosticTestPointResult.candidates.filter(candidate=>!faultEntryMatches(candidate,faultId));
+  }
+  if(typeof renderAll==='function') renderAll();
+  else{
+    if(typeof renderCanvas==='function') renderCanvas();
+    if(typeof renderDataflowPanel==='function') renderDataflowPanel();
+  }
+  return removed;
+}
+window.removeInjectedFault=removeInjectedFault;
+window.clearInjectedFaults=function(){
+  let removed=false;
+  getInjectedFaultCollections().forEach(key=>{
+    if(S[key].length){
+      S[key]=[];
+      removed=true;
+    }
+  });
+  ['faultStates','injectedFaultMap'].forEach(key=>{
+    if(S[key]&&typeof S[key]==='object'&&Object.keys(S[key]).length){
+      S[key]={};
+      removed=true;
+    }
+  });
+  if(Array.isArray(S.edges)){
+    S.edges.forEach(edge=>{
+      if(edge){
+        if(edge.fault){delete edge.fault; removed=true;}
+        if(Array.isArray(edge.faults)&&edge.faults.length){edge.faults=[]; removed=true;}
+        if(edge.status==='fault'){edge.status='normal'; removed=true;}
+      }
+    });
+  }
+  if(Array.isArray(S.nodes)){
+    S.nodes.forEach(node=>{
+      if(node){
+        if(node.fault){delete node.fault; removed=true;}
+        if(Array.isArray(node.faults)&&node.faults.length){node.faults=[]; removed=true;}
+        if(node.status==='fault'){node.status='normal'; removed=true;}
+      }
+    });
+  }
+  S.lastDiagnosticTestPointResult=null;
+  if(typeof renderAll==='function') renderAll();
+  else{
+    if(typeof renderCanvas==='function') renderCanvas();
+    if(typeof renderDataflowPanel==='function') renderDataflowPanel();
+  }
+  return removed;
+};
+function createUavFaultDiagnosticDemo(){
+  const nodes=[
+    {id:'node-command',type:'source',name:'姿态指令',label:'姿态指令',x:80,y:110,w:150,h:74,category:'command'},
+    {id:'node-shaper',type:'block',name:'指令整形',label:'指令整形',x:290,y:110,w:150,h:74,category:'control'},
+    {id:'node-error',type:'block',name:'俯仰误差求和',label:'俯仰误差求和',x:500,y:110,w:170,h:74,category:'control'},
+    {id:'node-controller',type:'block',name:'俯仰控制器',label:'俯仰控制器',x:740,y:110,w:160,h:74,category:'control'},
+    {id:'node-allocator',type:'block',name:'控制分配',label:'控制分配',x:960,y:110,w:160,h:74,category:'actuator'},
+    {id:'node-motor',type:'block',name:'电机混控器',label:'电机混控器',x:1180,y:110,w:160,h:74,category:'actuator'},
+    {id:'node-dynamics',type:'plant',name:'飞行器俯仰动力学',label:'飞行器俯仰动力学',x:740,y:330,w:200,h:86,category:'plant'},
+    {id:'node-imu',type:'sensor',name:'IMU 陀螺仪',label:'IMU 陀螺仪',x:500,y:330,w:160,h:74,category:'sensor'},
+    {id:'node-logger',type:'scope',name:'残差记录仪',label:'残差记录仪',x:960,y:330,w:160,h:74,category:'diagnostic'},
+    {id:'node-spectrum',type:'scope',name:'频谱分析仪',label:'频谱分析仪',x:1180,y:330,w:160,h:74,category:'diagnostic'}
+  ];
+  const edges=[
+    {id:'edge-command-shaper',source:'node-command',target:'node-shaper',label:'俯仰指令',signalId:'cmd.pitch',channelId:'CMD-PITCH',bus:'internal',status:'normal'},
+    {id:'edge-shaper-error',source:'node-shaper',target:'node-error',label:'整形指令',signalId:'cmd.pitch.shaped',channelId:'CMD-SHAPED',bus:'internal',status:'normal'},
+    {id:'edge-imu-error',source:'node-imu',target:'node-error',label:'IMU 反馈',signalId:'imu.pitch_rate',channelId:'CAN-FC-IMU',bus:'CAN',status:'normal'},
+    {id:'edge-error-controller',source:'node-error',target:'node-controller',label:'俯仰误差',signalId:'err.pitch',channelId:'ERR-PITCH',bus:'internal',status:'normal'},
+    {id:'edge-controller-allocator',source:'node-controller',target:'node-allocator',label:'控制量',signalId:'ctrl.pitch',channelId:'CTRL-PITCH',bus:'internal',status:'normal'},
+    {id:'edge-allocator-motor',source:'node-allocator',target:'node-motor',label:'电机指令',signalId:'motor.command',channelId:'CAN-FC-MOTOR',bus:'CAN',status:'normal'},
+    {id:'edge-motor-dynamics',source:'node-motor',target:'node-dynamics',label:'执行推力',signalId:'plant.thrust',channelId:'ACT-THRUST',bus:'physical',status:'normal'},
+    {id:'edge-dynamics-imu',source:'node-dynamics',target:'node-imu',label:'机体角速度',signalId:'body.pitch_rate',channelId:'BODY-RATE',bus:'physical',status:'normal'},
+    {id:'edge-error-logger',source:'node-error',target:'node-logger',label:'残差诊断',signalId:'diag.residual',channelId:'DIAG-RES',bus:'diagnostic',status:'normal'},
+    {id:'edge-error-spectrum',source:'node-error',target:'node-spectrum',label:'频谱诊断',signalId:'diag.spectrum',channelId:'DIAG-SPEC',bus:'diagnostic',status:'normal'}
+  ];
+  const faultLibrary=[
+    {id:'sensor_bias_imu_pitch',name:'IMU 俯仰角速度偏置',category:'传感器故障',type:'propagating',targetNodeId:'node-imu',targetEdgeId:'edge-imu-error',severity:0.35,description:'测量链路产生固定偏置，可沿反馈链路影响下游误差与控制量。'},
+    {id:'sensor_noise_imu_pitch',name:'IMU 俯仰角速度噪声',category:'传感器故障',type:'propagating',targetNodeId:'node-imu',targetEdgeId:'edge-imu-error',severity:0.25,description:'测量信号叠加随机噪声，可被诊断链路识别为残差波动。'},
+    {id:'actuator_loss_motor',name:'电机推力效率下降',category:'执行器故障',type:'propagating',targetNodeId:'node-motor',targetEdgeId:'edge-motor-dynamics',severity:0.45,description:'执行器输出不足，沿物理链路影响飞行器响应。'},
+    {id:'link_dropout_motor_can',name:'电机 CAN 指令丢包',category:'链路故障',type:'blocking',targetEdgeId:'edge-allocator-motor',severity:0.5,description:'控制分配到电机混控器的指令链路间歇丢包。'},
+    {id:'link_stuck_command',name:'姿态指令保持',category:'链路故障',type:'blocking',targetEdgeId:'edge-command-shaper',severity:0.3,description:'输入指令保持不变，阻断新的目标姿态传入。'},
+    {id:'param_gain_controller',name:'俯仰控制增益异常',category:'参数/本地故障',type:'local',targetNodeId:'node-controller',targetEdgeId:'edge-controller-allocator',severity:0.4,description:'控制器内部参数异常，主要表现为本地输出放大或不足。'},
+    {id:'param_allocator_limit',name:'控制分配限幅异常',category:'参数/本地故障',type:'local',targetNodeId:'node-allocator',targetEdgeId:'edge-allocator-motor',severity:0.35,description:'控制分配模块限幅设置异常，输出指令受限。'},
+    {id:'diagnostic_residual_logger',name:'残差记录异常',category:'诊断/残差型',type:'diagnostic',targetNodeId:'node-logger',targetEdgeId:'edge-error-logger',severity:0.2,description:'只影响诊断显示或记录，不作为主控制故障传播。'},
+    {id:'diagnostic_spectrum_drift',name:'频谱诊断漂移',category:'诊断/残差型',type:'diagnostic',targetNodeId:'node-spectrum',targetEdgeId:'edge-error-spectrum',severity:0.2,description:'只影响频谱分析结果，不直接改变控制链路。'}
+  ];
+  const testPoints=[
+    {pointId:'tp-command',shortName:'M1',name:'姿态指令测点',edgeId:'edge-command-shaper',detects:['link_stuck_command'],position:'指令输入'},
+    {pointId:'tp-shaper',shortName:'M2',name:'整形指令测点',edgeId:'edge-shaper-error',detects:['link_stuck_command'],position:'指令整形输出'},
+    {pointId:'tp-imu',shortName:'M3',name:'IMU 反馈测点',edgeId:'edge-imu-error',detects:['sensor_bias_imu_pitch','sensor_noise_imu_pitch'],position:'传感器反馈'},
+    {pointId:'tp-error',shortName:'M4',name:'误差残差测点',edgeId:'edge-error-controller',detects:['sensor_bias_imu_pitch','sensor_noise_imu_pitch','param_gain_controller'],position:'误差信号'},
+    {pointId:'tp-controller',shortName:'M5',name:'控制器输出测点',edgeId:'edge-controller-allocator',detects:['param_gain_controller'],position:'控制输出'},
+    {pointId:'tp-allocator',shortName:'M6',name:'控制分配测点',edgeId:'edge-allocator-motor',detects:['param_allocator_limit','link_dropout_motor_can'],position:'执行指令'},
+    {pointId:'tp-motor',shortName:'M7',name:'电机执行测点',edgeId:'edge-motor-dynamics',detects:['actuator_loss_motor','link_dropout_motor_can'],position:'执行器输出'},
+    {pointId:'tp-dynamics',shortName:'M8',name:'动力学响应测点',edgeId:'edge-dynamics-imu',detects:['actuator_loss_motor','param_gain_controller','param_allocator_limit'],position:'飞行器响应'},
+    {pointId:'tp-logger',shortName:'M9',name:'残差诊断测点',edgeId:'edge-error-logger',detects:['diagnostic_residual_logger','sensor_bias_imu_pitch','sensor_noise_imu_pitch'],position:'残差诊断'},
+    {pointId:'tp-spectrum',shortName:'M10',name:'频谱诊断测点',edgeId:'edge-error-spectrum',detects:['diagnostic_spectrum_drift','sensor_noise_imu_pitch'],position:'频谱诊断'}
+  ];
+  return {name:'eVTOL 闭环飞控故障诊断 Demo',nodes,edges,faultLibrary,testPoints};
+}
+function normalizeInjectedFaultEntry(entry){
+  if(!entry) return null;
+  if(typeof entry==='string') return {id:entry,name:entry};
+  return {id:entry.id||entry.faultId||entry.instanceId||entry.key||entry.type,name:entry.name||entry.label||entry.id||entry.faultId,type:entry.type,category:entry.category,targetEdgeId:entry.targetEdgeId,targetNodeId:entry.targetNodeId};
+}
+function getInjectedFaultEntries(){
+  const map=new Map();
+  getInjectedFaultCollections().forEach(key=>{
+    S[key].forEach(entry=>{
+      const fault=normalizeInjectedFaultEntry(entry);
+      if(fault&&fault.id&&!map.has(fault.id)) map.set(fault.id,fault);
+    });
+  });
+  if(S.faultStates&&typeof S.faultStates==='object'){
+    Object.keys(S.faultStates).forEach(key=>{
+      const fault=normalizeInjectedFaultEntry(S.faultStates[key])||{id:key,name:key};
+      if(fault.id&&!map.has(fault.id)) map.set(fault.id,fault);
+    });
+  }
+  return Array.from(map.values());
+}
+function findDemoFault(faultId){
+  const library=Array.isArray(S.faultLibrary)?S.faultLibrary:(Array.isArray(S.faults)?S.faults:createUavFaultDiagnosticDemo().faultLibrary);
+  return library.find(fault=>fault.id===faultId||fault.faultId===faultId)||null;
+}
+function injectDemoFault(faultId){
+  const fault=findDemoFault(faultId);
+  if(!fault) return null;
+  if(!Array.isArray(S.injectedFaults)) S.injectedFaults=[];
+  if(!S.injectedFaults.some(entry=>faultEntryMatches(entry,fault.id))){
+    S.injectedFaults.push({...fault,faultId:fault.id,instanceId:fault.id,status:'active'});
+  }
+  if(!S.injectedFaultMap||typeof S.injectedFaultMap!=='object') S.injectedFaultMap={};
+  S.injectedFaultMap[fault.id]={...fault,status:'active'};
+  if(Array.isArray(S.edges)&&fault.targetEdgeId){
+    const edge=S.edges.find(item=>item.id===fault.targetEdgeId);
+    if(edge){
+      edge.status='fault';
+      edge.fault={...fault,faultId:fault.id};
+      edge.faults=Array.isArray(edge.faults)?edge.faults:[];
+      if(!edge.faults.some(entry=>faultEntryMatches(entry,fault.id))) edge.faults.push({...fault,faultId:fault.id});
+    }
+  }
+  if(Array.isArray(S.nodes)&&fault.targetNodeId){
+    const node=S.nodes.find(item=>item.id===fault.targetNodeId);
+    if(node){
+      node.status='fault';
+      node.fault={...fault,faultId:fault.id};
+      node.faults=Array.isArray(node.faults)?node.faults:[];
+      if(!node.faults.some(entry=>faultEntryMatches(entry,fault.id))) node.faults.push({...fault,faultId:fault.id});
+    }
+  }
+  if(typeof renderAll==='function') renderAll();
+  return fault;
+}
+function buildDemoDiagnosticResult(pointId){
+  const demoPoints=Array.isArray(S.diagnosticTestPoints)?S.diagnosticTestPoints:createUavFaultDiagnosticDemo().testPoints;
+  const semanticPoints=typeof getSemanticTestPoints==='function'?getSemanticTestPoints():[];
+  const semanticPoint=semanticPoints.find(item=>item.pointId===pointId||item.id===pointId)||null;
+  const point=demoPoints.find(item=>item.pointId===pointId||item.id===pointId||item.edgeId===(semanticPoint&&semanticPoint.edgeId))||semanticPoint||demoPoints[0];
+  const injected=getInjectedFaultEntries();
+  const library=Array.isArray(S.faultLibrary)?S.faultLibrary:createUavFaultDiagnosticDemo().faultLibrary;
+  const detectable=new Set((point&&Array.isArray(point.detects))?point.detects:[]);
+  const candidates=injected
+    .filter(fault=>detectable.has(fault.id))
+    .map(fault=>{
+      const full=library.find(item=>item.id===fault.id)||fault;
+      return {...full,faultId:full.id,checked:false,confidence:full.type==='diagnostic'?0.72:0.86};
+    });
+  const result={
+    pointId:point?point.pointId:pointId,
+    pointName:point?point.name:'测点',
+    status:candidates.length?'suspect':'normal',
+    candidates,
+    summary:candidates.length?`发现 ${candidates.length} 个候选故障`:'未发现候选故障',
+    time:Date.now()
+  };
+  S.lastDiagnosticTestPointResult=result;
+  return result;
+}
+function loadUavFaultDiagnosticDemo(){
+  const demo=createUavFaultDiagnosticDemo();
+  S.modelName=demo.name;
+  S.nodes=demo.nodes.map(node=>({...node}));
+  S.edges=demo.edges.map(edge=>({...edge}));
+  S.faultLibrary=demo.faultLibrary.map(fault=>({...fault}));
+  S.faults=S.faultLibrary;
+  S.diagnosticTestPoints=demo.testPoints.map(point=>({...point}));
+  const semanticPoints=typeof getSemanticTestPoints==='function'?getSemanticTestPoints():[];
+  S.installedDiagnosticTestPointIds=(semanticPoints.length?semanticPoints:demo.testPoints).map(point=>point.pointId);
+  S.diagnosticTestPointModelSignature='';
+  S.injectedFaults=[];
+  S.injectedFaultMap={};
+  S.lastDiagnosticTestPointResult=null;
+  if(typeof renderAll==='function') renderAll();
+  else{
+    if(typeof renderCanvas==='function') renderCanvas();
+    if(typeof renderDataflowPanel==='function') renderDataflowPanel();
+  }
+  return demo;
+}
+window.createUavFaultDiagnosticDemo=createUavFaultDiagnosticDemo;
+window.loadUavFaultDiagnosticDemo=loadUavFaultDiagnosticDemo;
+window.injectDemoFault=injectDemoFault;
+window.injectAllDemoFaults=function(){
+  const library=Array.isArray(S.faultLibrary)?S.faultLibrary:createUavFaultDiagnosticDemo().faultLibrary;
+  library.forEach(fault=>injectDemoFault(fault.id));
+  if(typeof renderAll==='function') renderAll();
+  return getInjectedFaultEntries();
+};
+window.buildDemoDiagnosticResult=buildDemoDiagnosticResult;
+['detectDiagnosticTestPoint','runDiagnosticTestPointDetection','diagnoseDiagnosticTestPoint','calculateDiagnosticTestPointResponse'].forEach(function(fnName){
+  const original=window[fnName];
+  window[fnName]=function(pointId){
+    const result=buildDemoDiagnosticResult(pointId);
+    if(result.candidates.length||!original){
+      if(typeof renderDataflowPanel==='function') renderDataflowPanel();
+      return result;
+    }
+    return original.apply(this,arguments);
+  };
+});
+function renderInjectedFaultRemovalControls(){
+  if(typeof document==='undefined'||typeof document.querySelector!=='function') return;
+  const faults=getInjectedFaultEntries();
+  const host=document.querySelector('[data-fault-injection-panel],.fault-injection-panel,#fault-injection-panel,.fault-library-panel,.property-panel')||document.body;
+  let panel=document.getElementById('injected-fault-removal-controls');
+  if(!faults.length){
+    if(panel) panel.remove();
+    return;
+  }
+  if(!panel){
+    panel=document.createElement('section');
+    panel.id='injected-fault-removal-controls';
+    panel.className='injected-fault-removal-controls';
+    host.appendChild(panel);
+  }
+  panel.innerHTML=`<div class="injected-fault-removal-controls__head"><strong>已注入故障</strong><button type="button" data-clear-injected-faults>全部移除</button></div><div class="injected-fault-removal-controls__list"></div>`;
+  const list=panel.querySelector('.injected-fault-removal-controls__list');
+  faults.forEach(fault=>{
+    const item=document.createElement('div');
+    item.className='injected-fault-removal-controls__item';
+    item.innerHTML=`<span>${fault.name||fault.id}</span><button type="button" data-remove-injected-fault="${fault.id}">移除</button>`;
+    list.appendChild(item);
+  });
+}
+function renderUavDemoControls(){
+  if(typeof document==='undefined'||typeof document.querySelector!=='function') return;
+  const existing=document.getElementById('uav-fault-demo-controls');
+  if(existing){existing.remove();}
+}
+if(typeof document!=='undefined'&&!window.__uavFaultRemovalEventsBound){
+  window.__uavFaultRemovalEventsBound=true;
+  document.addEventListener('click',function(event){
+    const loadDemoButton=event.target&&event.target.closest?event.target.closest('[data-load-uav-demo]'):null;
+    if(loadDemoButton){
+      event.preventDefault();
+      window.loadUavFaultDiagnosticDemo();
+      renderUavDemoControls();
+      renderInjectedFaultRemovalControls();
+      return;
+    }
+    const injectAllButton=event.target&&event.target.closest?event.target.closest('[data-inject-all-demo-faults]'):null;
+    if(injectAllButton){
+      event.preventDefault();
+      window.injectAllDemoFaults();
+      renderInjectedFaultRemovalControls();
+      return;
+    }
+    const removeButton=event.target&&event.target.closest?event.target.closest('[data-remove-injected-fault]'):null;
+    if(removeButton){
+      event.preventDefault();
+      removeInjectedFault(removeButton.getAttribute('data-remove-injected-fault'));
+      renderInjectedFaultRemovalControls();
+      return;
+    }
+    const clearButton=event.target&&event.target.closest?event.target.closest('[data-clear-injected-faults]'):null;
+    if(clearButton){
+      event.preventDefault();
+      window.clearInjectedFaults();
+      renderInjectedFaultRemovalControls();
+    }
+  });
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',renderUavDemoControls);
+  }else{
+    renderUavDemoControls();
+  }
+}
+const __diagnosticRenderAll=typeof renderAll==='function'?renderAll:null;
+if(__diagnosticRenderAll&&!window.__uavFaultRenderAllWrapped){
+  window.__uavFaultRenderAllWrapped=true;
+  renderAll=function(){
+    const result=__diagnosticRenderAll.apply(this,arguments);
+    try{renderUavDemoControls();}catch(err){console.warn('[demo-controls] render failed',err);}
+    try{renderInjectedFaultRemovalControls();}catch(err){console.warn('[fault-removal] render failed',err);}
+    return result;
+  };
+}
+function decorateDataflowEdges(){
     S.modelEdges.forEach(edge=>{
       const metrics=getDataflowEdgeMetrics(edge);
       const edgeId=escapeDataflowSelector(edge.id);
@@ -12986,10 +14219,24 @@ Object.assign(window,{
     return __dataflowBuildNodeSubtitle(node);
   };
 
+  const __dataflowSimInit=simInit;
+  simInit=function(silent=false){
+    return withDataflowPanelPreserved(()=>__dataflowSimInit(silent));
+  };
+
+  const __dataflowSimRun=simRun;
+  simRun=function(){
+    return withDataflowPanelPreserved(()=>__dataflowSimRun());
+  };
+
   const __dataflowSimStep=simStep;
   simStep=function(){
-    const result=__dataflowSimStep();
-    renderDataflowPanel();
+    const result=withDataflowPanelPreserved(()=>__dataflowSimStep());
+    if(document.getElementById('cw')?.dataset.view==='dataflow'){
+      decorateDataflowEdges();
+    }else{
+      renderDataflowPanel();
+    }
     if(S.selEdge){
       const edge=getEdge(S.selEdge);
       if(edge){renderPropertyPanel(edge);}
@@ -12998,13 +14245,22 @@ Object.assign(window,{
   };
 
   renderDataflowPanel();
+  if(typeof renderCanvasDiagnosticTestPointMarkers==='function'){
+    try{renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnostic-testpoints] canvas marker render failed',err);}
+  }
   Object.assign(window,{
     buildDataflowSemanticModel,
+    buildDiagnosticTestPointModel,
     buildSignalFlowTopology,
     classifyFaultPropagation,
     classifyPropagationPolicy,
     collectDataflowEdges,
     collectMeasurementPoints,
+    installDiagnosticTestPoint,
+    removeDiagnosticTestPoint,
+    runDiagnosticTestPointDetection,
+    openDiagnosticTestPointDialog,
+    toggleDiagnosticFaultConfirmation,
     buildMeasurementScenarioOptions,
     buildMeasurementTargetOptions,
     createMeasurementScenario,
@@ -13034,6 +14290,8 @@ Object.assign(window,{
     renderPropertyPanel,
     renderEdges,
     selectEdge,
+    simInit,
+    simRun,
     simStep
   });
 })();
@@ -14651,7 +15909,6 @@ Object.assign(window,{
       }
     }
 
-    closeOv('ov-ifm');
     renderFaultCatalogList();
     if(injectedTarget){
       refreshAfterBridgeInjection(injectedTarget);
@@ -15079,4 +16336,1109 @@ Object.assign(window,{
     doImportFault,
     renderFaultCatalogList
   });
+})();
+
+;(function installCompactFaultDiagnosisConsole(){
+  if(typeof window==='undefined') return;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function text(value,fallback=''){
+    return value==null?fallback:String(value);
+  }
+
+  function html(value){
+    const raw=text(value);
+    if(typeof escapeHtml==='function') return escapeHtml(raw);
+    return raw.replace(/[&<>"']/g,match=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[match]));
+  }
+
+  function getRuntimeNodes(){
+    const state=getState();
+    return arr(state.nodes).length?arr(state.nodes):arr(state.modelNodes);
+  }
+
+  function getRuntimeEdges(){
+    const state=getState();
+    return arr(state.edges).length?arr(state.edges):arr(state.modelEdges);
+  }
+
+  const NODE_NAME_ZH={
+    'node-command':'姿态指令',
+    'node-command-shaper':'指令整形',
+    'node-shaper':'指令整形',
+    'node-error-sum':'误差求和',
+    'node-error':'误差求和',
+    'node-controller':'姿态控制器',
+    'node-allocator':'控制分配',
+    'node-motor':'电机混控',
+    'node-dynamics':'飞行器动力学',
+    'node-imu':'IMU 测量反馈',
+    'node-command-scope':'指令示波器',
+    'node-imu-scope':'IMU 示波器',
+    'node-logger':'残差记录仪',
+    'node-spectrum':'频谱分析仪'
+  };
+
+  const EDGE_NAME_ZH={
+    'edge-command-shaper':'姿态指令',
+    'edge-shaper-error':'整形指令',
+    'edge-imu-error':'IMU 测量反馈',
+    'edge-error-controller':'俯仰误差',
+    'edge-controller-allocator':'控制量',
+    'edge-allocator-motor':'电机指令',
+    'edge-motor-dynamics':'执行推力',
+    'edge-dynamics-imu':'机体角速度反馈',
+    'edge-dynamics-imu-can':'机体角速度反馈',
+    'edge-command-scope':'指令观测',
+    'edge-imu-scope':'测量观测',
+    'edge-error-logger':'残差诊断',
+    'edge-error-spectrum':'频谱诊断'
+  };
+
+  const DEMO_FAULT_LIBRARY=[
+    {id:'imu_rate_bias',name:'IMU 角速度偏置',category:'传感器故障',type:'propagating',targetNodeId:'node-imu',targetEdgeId:'edge-imu-error',affectedEdges:['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum']},
+    {id:'sensor_additive_bias',name:'传感器加性偏置',category:'传感器故障',type:'propagating',targetNodeId:'node-imu',targetEdgeId:'edge-imu-error',affectedEdges:['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum']},
+    {id:'imu_self_test_warning',name:'IMU 自检状态异常',category:'本地状态故障',type:'local',targetNodeId:'node-imu',targetEdgeId:'edge-imu-scope',affectedEdges:['edge-imu-scope']},
+    {id:'sensor_noise_imu_pitch',name:'IMU 测量噪声增大',category:'传感器故障',type:'propagating',targetNodeId:'node-imu',targetEdgeId:'edge-imu-error',affectedEdges:['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum']},
+    {id:'can_bus_delay',name:'CAN 反馈延迟',category:'协议链路故障',type:'propagating',targetEdgeId:'edge-imu-error',affectedEdges:['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum']},
+    {id:'link_dropout_motor_can',name:'电机 CAN 指令丢包',category:'协议链路故障',type:'blocking',targetEdgeId:'edge-allocator-motor',affectedEdges:['edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'link_stuck_command',name:'姿态指令保持',category:'链路阻断故障',type:'blocking',targetEdgeId:'edge-command-shaper',affectedEdges:['edge-command-shaper','edge-shaper-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-command-scope','edge-imu-scope','edge-error-logger','edge-error-spectrum']},
+    {id:'param_gain_controller',name:'俯仰控制增益异常',category:'本地参数故障',type:'local',targetNodeId:'node-controller',targetEdgeId:'edge-controller-allocator',affectedEdges:['edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'param_allocator_limit',name:'控制分配限幅异常',category:'本地参数故障',type:'local',targetNodeId:'node-allocator',targetEdgeId:'edge-allocator-motor',affectedEdges:['edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'motor_efficiency_loss',name:'电机效率下降',category:'执行器故障',type:'propagating',targetNodeId:'node-motor',targetEdgeId:'edge-motor-dynamics',affectedEdges:['edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'actuator_loss_motor',name:'电机推力效率下降',category:'执行器故障',type:'propagating',targetNodeId:'node-motor',targetEdgeId:'edge-motor-dynamics',affectedEdges:['edge-motor-dynamics','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'airframe_inertia_shift',name:'机体惯量变化',category:'物理层故障',type:'local',targetNodeId:'node-dynamics',targetEdgeId:'edge-dynamics-imu-can',affectedEdges:['edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum']},
+    {id:'diagnostic_residual_logger',name:'残差记录异常',category:'诊断/残差型',type:'diagnostic',targetNodeId:'node-logger',targetEdgeId:'edge-error-logger',affectedEdges:['edge-error-logger']},
+    {id:'diagnostic_spectrum_drift',name:'频谱诊断漂移',category:'诊断/残差型',type:'diagnostic',targetNodeId:'node-spectrum',targetEdgeId:'edge-error-spectrum',affectedEdges:['edge-error-spectrum']}
+  ];
+
+  function getRuntimeFaultLibrary(){
+    const state=getState();
+    const library=[
+      ...DEMO_FAULT_LIBRARY,
+      ...(arr(state.faultLibrary).length?arr(state.faultLibrary):arr(state.availableFaultModels)),
+      ...arr(state.importedFaultModels)
+    ];
+    const merged=new Map();
+    library.forEach(model=>{
+      const id=model.id||model.modelId||model.faultModelId||model.faultId||model.name;
+      if(!id) return;
+      const existing=merged.get(id);
+      merged.set(id,existing?{...model,...existing,id}:{...model,id});
+    });
+    return Array.from(merged.values()).map(model=>({
+      ...model,
+      id:model.id||model.modelId||model.faultModelId||model.faultId||model.name,
+      name:model.name||model.label||model.title||model.id||'故障',
+      category:model.category||model.layer||model.domain||model.faultLayer||'故障库',
+      targetNodeId:model.targetNodeId||model.recommendedModuleId||model.injectionDesign?.targetNodeId||model.injectionDesign?.targetId||model.injectionTarget?.nodeId,
+      targetEdgeId:model.targetEdgeId||model.injectionDesign?.targetEdgeId||model.injectionTarget?.edgeId,
+      detects:arr(model.detects)
+    })).filter(model=>model.id);
+  }
+
+  function edgeEndpointName(edge,key){
+    const nodes=getRuntimeNodes();
+    const id=edge[key]||edge[`${key}Id`]||edge[key==='source'?'from':'to']||edge[key==='source'?'sourceNodeId':'targetNodeId'];
+    const node=nodes.find(item=>item.id===id);
+    return NODE_NAME_ZH[id]||node?.name||node?.label||node?.props?.name||id||'未连接';
+  }
+
+  function pointForEdge(edge,index){
+    const label=EDGE_NAME_ZH[edge.id]||edge.label||edge.signalLabel||edge.name||`${edgeEndpointName(edge,'source')} -> ${edgeEndpointName(edge,'target')}`;
+    return {
+      pointId:edge.testPointId||`tp-${edge.id||index}`,
+      shortName:`M${index+1}`,
+      name:label,
+      edgeId:edge.id||`edge-${index}`,
+      signalId:edge.signalId||edge.signalID||edge.signal||'',
+      channelId:edge.channelId||edge.channelID||edge.channel||'',
+      sourceName:edgeEndpointName(edge,'source'),
+      targetName:edgeEndpointName(edge,'target'),
+      detects:arr(edge.detects)
+    };
+  }
+
+  function edgeSourceId(edge){
+    return edge?.source||edge?.from||edge?.sourceNodeId||edge?.sourceId||'';
+  }
+
+  function edgeTargetId(edge){
+    return edge?.target||edge?.to||edge?.targetNodeId||edge?.targetId||'';
+  }
+
+  function getFaultTargetEdges(fault){
+    const edges=getRuntimeEdges();
+    const moduleTargets=arr(fault?.moduleTargets).concat(arr(fault?.typicalTargets));
+    const explicitEdges=[
+      fault?.targetEdgeId,
+      fault?.targetEdgeID,
+      fault?.injectionDesign?.targetEdgeId,
+      fault?.injectionTarget?.edgeId,
+      ...arr(fault?.affectedEdges),
+      ...arr(fault?.affectedTestPointEdges),
+      ...moduleTargets.filter(target=>String(target).startsWith('edge-'))
+    ].filter(Boolean);
+    if(explicitEdges.length) return Array.from(new Set(explicitEdges));
+    const nodeTargets=[
+      fault?.targetNodeId,
+      fault?.targetNodeID,
+      fault?.recommendedModuleId,
+      fault?.injectionDesign?.targetNodeId,
+      fault?.injectionDesign?.targetId,
+      fault?.injectionTarget?.nodeId,
+      ...moduleTargets.filter(target=>String(target).startsWith('node-'))
+    ].filter(Boolean);
+    const edgeIds=[];
+    nodeTargets.forEach(nodeId=>{
+      edges.forEach(edge=>{
+        if(edgeSourceId(edge)===nodeId||edgeTargetId(edge)===nodeId){
+          edgeIds.push(edge.id);
+        }
+      });
+    });
+    return Array.from(new Set(edgeIds));
+  }
+
+  function getDownstreamEdgesFrom(seedEdgeIds,options={}){
+    const edges=getRuntimeEdges();
+    const outgoing=new Map();
+    edges.forEach(edge=>{
+      const source=edgeSourceId(edge);
+      if(!outgoing.has(source)) outgoing.set(source,[]);
+      outgoing.get(source).push(edge);
+    });
+    const visitedEdges=new Set();
+    const queue=[];
+    seedEdgeIds.filter(Boolean).forEach(edgeId=>{
+      const edge=edges.find(item=>item.id===edgeId);
+      if(edge){
+        visitedEdges.add(edge.id);
+        queue.push(edgeTargetId(edge));
+      }
+    });
+    let guard=0;
+    while(queue.length&&guard<edges.length*4){
+      guard+=1;
+      const nodeId=queue.shift();
+      (outgoing.get(nodeId)||[]).forEach(edge=>{
+        if(visitedEdges.has(edge.id)) return;
+        visitedEdges.add(edge.id);
+        queue.push(edgeTargetId(edge));
+      });
+    }
+    if(options.includeDiagnosticFromError!==false&&visitedEdges.has('edge-error-controller')){
+      ['edge-error-logger','edge-error-spectrum'].forEach(edgeId=>{
+        if(edges.some(edge=>edge.id===edgeId)) visitedEdges.add(edgeId);
+      });
+    }
+    return visitedEdges;
+  }
+
+  function getFaultAffectedEdges(fault){
+    const explicit=arr(fault?.affectedEdges).concat(arr(fault?.affectedTestPointEdges)).filter(Boolean);
+    if(explicit.length) return new Set(explicit);
+    const category=String(fault?.category||fault?.layer||fault?.type||'').toLowerCase();
+    const isDiagnostic=/diagnostic|residual|spectrum|诊断|残差/.test(category);
+    const seeds=getFaultTargetEdges(fault);
+    if(isDiagnostic) return new Set(seeds);
+    const affected=getDownstreamEdgesFrom(seeds,{includeDiagnosticFromError:true});
+    const id=getFaultKey(fault);
+    if(id==='imu_rate_bias'||id==='sensor_bias_imu_pitch'||id==='sensor_noise_imu_pitch'||id==='can_bus_delay'){
+      ['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum'].forEach(edgeId=>affected.add(edgeId));
+    }
+    if(id==='motor_efficiency_loss'||id==='actuator_loss_motor'||id==='airframe_inertia_shift'||id==='param_gain_controller'||id==='param_allocator_limit'){
+      ['edge-motor-dynamics','edge-dynamics-imu','edge-dynamics-imu-can','edge-imu-error','edge-error-controller','edge-error-logger','edge-error-spectrum'].forEach(edgeId=>affected.add(edgeId));
+    }
+    if(id==='link_stuck_command'){
+      getRuntimeEdges().forEach(edge=>affected.add(edge.id));
+    }
+    return affected;
+  }
+
+  function getConfiguredPoints(){
+    const state=getState();
+    const runtimeEdges=getRuntimeEdges();
+    const edgeSignature=runtimeEdges.map(edge=>edge.id).join('|');
+    if(Array.isArray(state.compactDiagnosticFixedPoints)&&state.compactDiagnosticFixedPointSignature===edgeSignature){
+      return state.compactDiagnosticFixedPoints;
+    }
+    const configured=arr(state.diagnosticTestPoints).length?arr(state.diagnosticTestPoints):arr(state.testPoints);
+    let points;
+    if(configured.length){
+      points=configured.map((point,index)=>({
+        ...point,
+        pointId:point.pointId||point.id||`tp-config-${index}`,
+        shortName:point.shortName||point.code||`M${index+1}`,
+        name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId||point.edgeID||point.targetEdgeId]||point.name||point.label||point.position||`测点 ${index+1}`,
+        edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',
+        detects:arr(point.detects)
+      }));
+    }else{
+      const existing=typeof window.getSemanticTestPoints==='function'?arr(window.getSemanticTestPoints()):[];
+      points=existing.length?existing.map((point,index)=>({
+        ...point,
+        pointId:point.pointId||point.id||`tp-semantic-${index}`,
+        shortName:point.shortName||point.code||`M${index+1}`,
+        name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId||point.edgeID||point.targetEdgeId]||point.name||point.label||point.position||`测点 ${index+1}`,
+        edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',
+        detects:arr(point.detects)
+      })):runtimeEdges.map(pointForEdge);
+    }
+    const faultLibrary=getRuntimeFaultLibrary();
+    points=points.map((point,index)=>{
+      const edge=runtimeEdges.find(item=>item.id===point.edgeId);
+      const sourceName=point.sourceName||edgeEndpointName(edge||{},'source');
+      const targetName=point.targetName||edgeEndpointName(edge||{},'target');
+      return {
+        ...point,
+        pointId:point.pointId||`tp-${point.edgeId||index}`,
+        shortName:point.shortName||`M${index+1}`,
+        sourceName,
+        targetName,
+        name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId]||point.name||point.label||`${sourceName} -> ${targetName}`,
+        detects:Array.from(new Set(arr(point.detects).concat(faultLibrary.filter(fault=>getFaultAffectedEdges(fault).has(point.edgeId)).map(fault=>fault.id))))
+      };
+    });
+    if(runtimeEdges.length){
+      state.compactDiagnosticFixedPoints=points;
+      state.compactDiagnosticFixedPointSignature=edgeSignature;
+    }
+    return points;
+  }
+
+  function getInstalledPointIds(points=getConfiguredPoints()){
+    const state=getState();
+    if(!Array.isArray(state.installedDiagnosticTestPointIds)){
+      state.installedDiagnosticTestPointIds=[];
+    }
+    const signature=points.map(point=>point.pointId).join('|');
+    if(state.compactDiagnosticPointSignature!==signature){
+      state.compactDiagnosticPointSignature=signature;
+    }
+    const valid=new Set(points.map(point=>point.pointId));
+    state.installedDiagnosticTestPointIds=Array.from(new Set(state.installedDiagnosticTestPointIds.filter(id=>valid.has(id))));
+    return state.installedDiagnosticTestPointIds;
+  }
+
+  function clearDiagnosticScanState(state=getState()){
+    state.diagnosticScanResults=[];
+    state.lastDiagnosticTestPointResult=null;
+    state.testPointDiagnosis=null;
+    state.diagnosticLastScanAt=0;
+  }
+
+  function getFaultKey(fault){
+    if(!fault) return '';
+    return typeof fault==='string'?fault:(fault.id||fault.faultId||fault.modelId||fault.faultModelId||fault.instanceId||fault.key||fault.name||'');
+  }
+
+  function getInjectedFaults(){
+    const state=getState();
+    const map=new Map();
+    ['injectedFaults','activeFaults','faultInstances','selectedFaults','appliedFaults'].forEach(key=>{
+      arr(state[key]).forEach(item=>{
+        const id=getFaultKey(item);
+        if(id&&!map.has(id)) map.set(id,item);
+      });
+    });
+    getRuntimeNodes().forEach(node=>{
+      arr(node.faults).concat(node.injectedFault?[node.injectedFault]:[]).forEach(item=>{
+        const id=getFaultKey(item);
+        if(id&&!map.has(id)) map.set(id,{...(typeof item==='object'?item:{}),targetNodeId:node.id});
+      });
+    });
+    getRuntimeEdges().forEach(edge=>{
+      arr(edge.faults).concat(edge.injectedFault?[edge.injectedFault]:[]).concat(edge.fault?[edge.fault]:[]).forEach(item=>{
+        const id=getFaultKey(item);
+        if(id&&!map.has(id)) map.set(id,{...(typeof item==='object'?item:{}),targetEdgeId:edge.id});
+      });
+    });
+    return Array.from(map.entries()).map(([id,item])=>({
+      ...(typeof item==='object'?item:{}),
+      id,
+      name:item?.name||item?.label||id,
+      category:item?.category||item?.layer||'已注入'
+    }));
+  }
+
+  function pointDetectsFault(point,fault){
+    if(!point||!fault) return false;
+    const id=getFaultKey(fault);
+    if(arr(point.detects).includes(id)) return true;
+    const model={...(getRuntimeFaultLibrary().find(item=>item.id===id)||{}),...fault};
+    return getFaultAffectedEdges(model).has(point.edgeId);
+  }
+
+  function renderPointCard(point,installed,scanResult){
+    const abnormal=scanResult?.status==='abnormal';
+    return `
+      <button class="tp-console-point${installed?' is-installed':''}${abnormal?' is-abnormal':''}" type="button" data-install-testpoint="${html(point.pointId)}" data-fixed-testpoint-position="${html(point.pointId)}">
+        <span class="tp-console-point__code">${html(point.shortName)}</span>
+        <span class="tp-console-point__main">
+          <strong>${html(point.name)}</strong>
+          <small>${html(point.sourceName||point.signalId||point.edgeId)}${point.targetName?` -> ${html(point.targetName)}`:''}</small>
+        </span>
+        <span class="tp-console-point__state">${abnormal?'异常':(installed?'已安装':'安装')}</span>
+      </button>
+    `;
+  }
+
+  function renderInstalledPoint(point,scanResult){
+    const abnormal=scanResult?.status==='abnormal';
+    const checked=Array.isArray(scanResult?.candidates)?scanResult.candidates.length:0;
+    return `
+      <div class="tp-installed-row${abnormal?' is-abnormal':''}" data-installed-testpoint="${html(point.pointId)}">
+        <button class="tp-installed-row__main" type="button" data-detect-testpoint="${html(point.pointId)}">
+          <span>${html(point.shortName)}</span>
+          <strong>${html(point.name)}</strong>
+          <small>${scanResult?`${abnormal?'疑似异常':'正常'} · ${checked} 个候选`:'待检测'}</small>
+        </button>
+        <button class="tp-installed-row__remove" type="button" data-remove-testpoint="${html(point.pointId)}">移除</button>
+      </div>
+    `;
+  }
+
+  function renderDiagnosisResult(){
+    const state=getState();
+    const results=arr(state.diagnosticScanResults);
+    if(!results.length){
+      return `<div class="tp-empty">点击“检测故障”后，按测点列出候选故障。</div>`;
+    }
+    const abnormalCount=results.filter(result=>result.status==='abnormal').length;
+    return `
+      <div class="tp-result-summary${abnormalCount?' is-abnormal':' is-ok'}">
+        <strong>${abnormalCount?`${abnormalCount} 个测点疑似异常`:'未发现异常测点'}</strong>
+        <span>${results.length} 个已安装测点已检测</span>
+      </div>
+      <div class="tp-result-list">
+        ${results.map(result=>{
+          const candidates=arr(result.candidates);
+          const confirmed=new Set(arr(state.confirmedDiagnosticFaults?.[result.pointId]));
+          const abnormal=result.status==='abnormal';
+          return `
+            <details class="tp-result-accordion${abnormal?' is-abnormal':' is-normal'}" ${abnormal?'open':''} data-diagnosis-point="${html(result.pointId)}">
+              <summary>
+                <span class="tp-result-code">${html(result.shortName||result.pointCode||'M')}</span>
+                <strong>${html(result.pointNameZh||result.pointName||'测点')}</strong>
+                <em>${abnormal?'疑似异常':'正常'}</em>
+                <b>${candidates.length} 个候选</b>
+              </summary>
+              ${candidates.length?`
+                <div class="tp-candidate-list">
+                  ${candidates.map(candidate=>{
+          const id=getFaultKey(candidate);
+          return `
+            <label class="tp-candidate">
+              <input type="checkbox" data-confirm-diagnostic-fault="${html(id)}" data-confirm-point-id="${html(result.pointId)}" ${confirmed.has(id)?'checked':''}>
+              <span>
+                <strong>${html(candidate.name||id)}</strong>
+                <small>${html(candidate.category||candidate.type||'候选故障')}${candidate.active?' · 当前已注入':' · 可能原因'}</small>
+              </span>
+            </label>
+          `;
+                  }).join('')}
+                </div>
+              `:`<div class="tp-result-normal">该测点当前未匹配到受影响链路。</div>`}
+            </details>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  function renderCompactDiagnosisConsole(){
+    const points=getConfiguredPoints();
+    const installedIds=new Set(getInstalledPointIds(points));
+    const installed=points.filter(point=>installedIds.has(point.pointId));
+    const faults=getInjectedFaults();
+    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));
+    return `
+      <section class="tp-console dataflow-workspace" data-dataflow-view="testpoint-diagnosis" data-testpoint-workbench>
+        <header class="tp-console-header">
+          <div>
+            <span>多信号流图</span>
+            <h2>测点诊断台</h2>
+          </div>
+          <div class="tp-console-stats">
+            <span><b>${points.length}</b> 固定测点</span>
+            <span><b>${installed.length}</b> 已安装</span>
+            <span><b>${getRuntimeEdges().length}</b> 模型连线</span>
+            <span><b>${faults.length}</b> 当前故障</span>
+          </div>
+        </header>
+        <div class="tp-console-body">
+          <section class="tp-console-panel tp-console-panel--points">
+            <div class="tp-panel-head">
+              <strong>固定测点</strong>
+              <button type="button" data-clear-testpoints>全部移除</button>
+            </div>
+            <select class="tp-hidden-select" data-testpoint-position-select aria-hidden="true" tabindex="-1">
+              ${points.map(point=>`<option value="${html(point.pointId)}">${html(point.name)}</option>`).join('')}
+            </select>
+            <div class="tp-point-grid">
+              ${points.map(point=>renderPointCard(point,installedIds.has(point.pointId),scanByPoint.get(point.pointId))).join('')}
+            </div>
+          </section>
+          <section class="tp-console-panel">
+            <div class="tp-panel-head">
+              <strong>检测</strong>
+              <span class="tp-panel-actions">
+                <button type="button" data-run-fault-detection ${installed.length?'':'disabled'}>检测故障</button>
+                <button type="button" data-install-all-testpoints>全部安装</button>
+              </span>
+            </div>
+            <div class="tp-installed-list">
+              ${installed.length?installed.map(point=>renderInstalledPoint(point,scanByPoint.get(point.pointId))).join(''):`<div class="tp-empty">先从左侧安装测点。</div>`}
+            </div>
+          </section>
+          <section class="tp-console-panel">
+            <div class="tp-panel-head">
+              <strong>人工确认</strong>
+              <button type="button" data-clear-diagnostic-result>清空</button>
+            </div>
+            ${renderDiagnosisResult()}
+          </section>
+        </div>
+      </section>
+    `;
+  }
+
+  function refreshDiagnosisViews(){
+    if(typeof window.renderDataflowPanel==='function'){
+      try{window.renderDataflowPanel(true);}catch(err){console.warn('[diagnosis-console] renderDataflowPanel failed',err);}
+    }
+    if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
+      try{window.renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnosis-console] marker render failed',err);}
+    }
+  }
+
+  window.buildDiagnosticTestPointModel=function(){
+    const points=getConfiguredPoints();
+    const installedIds=new Set(getInstalledPointIds(points));
+    const positions=points.map((point,index)=>({
+      ...point,
+      positionIndex:index+1,
+      positionNameZh:point.positionNameZh||point.name||`测点 ${index+1}`,
+      signalPathZh:point.signalPathZh||`${point.sourceName||point.signalId||point.edgeId}${point.targetName?` -> ${point.targetName}`:''}`,
+      installed:installedIds.has(point.pointId)
+    }));
+    return {
+      points:positions,
+      positions,
+      semanticPoints:positions,
+      available:positions.filter(point=>!point.installed),
+      installed:positions.filter(point=>point.installed),
+      injectedFaults:getInjectedFaults(),
+      faultLibrary:getRuntimeFaultLibrary()
+    };
+  };
+
+  window.addDiagnosticTestPoint=function(pointId){
+    const points=getConfiguredPoints();
+    const point=points.find(item=>item.pointId===pointId);
+    if(!point) return false;
+    const state=getState();
+    const installed=getInstalledPointIds(points);
+    if(!installed.includes(point.pointId)) installed.push(point.pointId);
+    state.selectedDiagnosticTestPointId=point.pointId;
+    clearDiagnosticScanState(state);
+    refreshDiagnosisViews();
+    return true;
+  };
+  window.installDiagnosticTestPoint=window.addDiagnosticTestPoint;
+
+  window.removeDiagnosticTestPoint=function(pointId){
+    const points=getConfiguredPoints();
+    const state=getState();
+    const before=getInstalledPointIds(points).length;
+    state.installedDiagnosticTestPointIds=state.installedDiagnosticTestPointIds.filter(id=>id!==pointId);
+    if(state.installedDiagnosticTestPointIds.length===0) state.diagnosticTestPointManualCleared=true;
+    if(state.selectedDiagnosticTestPointId===pointId) state.selectedDiagnosticTestPointId=null;
+    if(Array.isArray(state.diagnosticScanResults)){
+      state.diagnosticScanResults=state.diagnosticScanResults.filter(result=>result.pointId!==pointId);
+    }
+    if(state.lastDiagnosticTestPointResult?.pointId===pointId){
+      state.lastDiagnosticTestPointResult=null;
+      state.testPointDiagnosis=null;
+    }
+    refreshDiagnosisViews();
+    return state.installedDiagnosticTestPointIds.length!==before;
+  };
+
+  window.clearDiagnosticTestPoints=function(){
+    const state=getState();
+    state.installedDiagnosticTestPointIds=[];
+    state.selectedDiagnosticTestPointId=null;
+    state.diagnosticTestPointManualCleared=true;
+    clearDiagnosticScanState(state);
+    refreshDiagnosisViews();
+    return true;
+  };
+
+  window.installAllDiagnosticTestPoints=function(){
+    const state=getState();
+    const points=getConfiguredPoints();
+    state.diagnosticTestPointManualCleared=false;
+    state.installedDiagnosticTestPointIds=points.map(point=>point.pointId);
+    clearDiagnosticScanState(state);
+    refreshDiagnosisViews();
+    return true;
+  };
+
+  function buildPointDiagnosis(point,activeFaults=getInjectedFaults()){
+    if(!point) return null;
+    const library=getRuntimeFaultLibrary();
+    const activeAffectsPoint=activeFaults.some(fault=>pointDetectsFault(point,fault));
+    const candidates=activeAffectsPoint?library
+      .filter(fault=>pointDetectsFault(point,fault))
+      .map(fault=>{
+        const active=activeFaults.some(item=>getFaultKey(item)===fault.id);
+        return {
+        ...fault,
+        faultTypeId:fault.id||getFaultKey(fault),
+        active,
+        confidence:active?0.96:(fault.confidence||0.68),
+        confirmed:Boolean(getState().confirmedDiagnosticFaults?.[point.pointId]?.includes(fault.id||getFaultKey(fault)))
+        };
+      }):[];
+    const state=getState();
+    return {
+      pointId:point.pointId,
+      edgeId:point.edgeId,
+      shortName:point.shortName,
+      pointCode:point.shortName,
+      pointName:point.name,
+      pointNameZh:point.name,
+      signalPathZh:point.signalPathZh||`${point.sourceName||point.signalId||point.edgeId}${point.targetName?` -> ${point.targetName}`:''}`,
+      status:activeAffectsPoint?'abnormal':'normal',
+      statusLabelZh:activeAffectsPoint?'疑似故障':'未发现异常',
+      candidates,
+      confirmedFaultTypeIds:arr(state.confirmedDiagnosticFaults?.[point.pointId]),
+      time:Date.now()
+    };
+  }
+
+  window.detectDiagnosticTestPoint=function(pointId){
+    const points=getConfiguredPoints();
+    const point=points.find(item=>item.pointId===pointId);
+    const result=buildPointDiagnosis(point);
+    if(!result) return null;
+    const state=getState();
+    state.lastDiagnosticTestPointResult=result;
+    state.testPointDiagnosis=result;
+    state.selectedDiagnosticTestPointId=point.pointId;
+    refreshDiagnosisViews();
+    return result;
+  };
+  window.runDiagnosticTestPointDetection=window.detectDiagnosticTestPoint;
+  window.diagnoseDiagnosticTestPoint=window.detectDiagnosticTestPoint;
+
+  window.runAllDiagnosticTestPointDetections=function(){
+    const model=window.buildDiagnosticTestPointModel();
+    const activeFaults=getInjectedFaults();
+    const state=getState();
+    const results=model.installed.map(point=>buildPointDiagnosis(point,activeFaults)).filter(Boolean);
+    state.diagnosticScanResults=results;
+    state.lastDiagnosticTestPointResult=results.find(result=>result.status==='abnormal')||results[0]||null;
+    state.testPointDiagnosis=state.lastDiagnosticTestPointResult;
+    state.diagnosticLastScanAt=Date.now();
+    refreshDiagnosisViews();
+    return results;
+  };
+
+  window.toggleDiagnosticFaultConfirmation=function(pointId,faultTypeId,checked){
+    const state=getState();
+    if(!state.confirmedDiagnosticFaults||typeof state.confirmedDiagnosticFaults!=='object'){
+      state.confirmedDiagnosticFaults={};
+    }
+    const ids=new Set(arr(state.confirmedDiagnosticFaults[pointId]));
+    checked?ids.add(faultTypeId):ids.delete(faultTypeId);
+    state.confirmedDiagnosticFaults[pointId]=Array.from(ids);
+    if(state.testPointDiagnosis?.pointId===pointId){
+      state.testPointDiagnosis.confirmedFaultTypeIds=Array.from(ids);
+      state.testPointDiagnosis.candidates=arr(state.testPointDiagnosis.candidates).map(candidate=>({
+        ...candidate,
+        confirmed:ids.has(candidate.faultTypeId||candidate.id)
+      }));
+    }
+    if(Array.isArray(state.diagnosticScanResults)){
+      state.diagnosticScanResults=state.diagnosticScanResults.map(result=>{
+        if(result.pointId!==pointId) return result;
+        return {
+          ...result,
+          confirmedFaultTypeIds:Array.from(ids),
+          candidates:arr(result.candidates).map(candidate=>({
+            ...candidate,
+            confirmed:ids.has(candidate.faultTypeId||candidate.id)
+          }))
+        };
+      });
+    }
+    return true;
+  };
+
+  window.openDiagnosticTestPointDialog=function(pointId){
+    const diagnosis=window.detectDiagnosticTestPoint(pointId);
+    if(!diagnosis) return null;
+    let overlay=document.getElementById('ov-testpoint-diagnosis');
+    if(!overlay){
+      overlay=document.createElement('div');
+      overlay.id='ov-testpoint-diagnosis';
+      overlay.className='overlay testpoint-diagnosis-overlay';
+      overlay.innerHTML=`
+        <div class="modal testpoint-diagnosis-modal" role="dialog" aria-modal="true">
+          <div class="mhead testpoint-diagnosis-head">
+            <div>
+              <div class="mtitle">测点诊断结果</div>
+              <div class="testpoint-diagnosis-subtitle">候选故障需要人工二次确认。</div>
+            </div>
+            <button type="button" class="dataflow-map-close" data-testpoint-diagnosis-close aria-label="关闭">&times;</button>
+          </div>
+          <div class="mbody testpoint-diagnosis-body" id="testpoint-diagnosis-body"></div>
+        </div>`;
+      overlay.addEventListener('click',event=>{
+        if(event.target===overlay||event.target.closest('[data-testpoint-diagnosis-close]')){
+          overlay.classList.remove('open');
+        }
+      });
+      document.body.appendChild(overlay);
+    }
+    const body=overlay.querySelector('#testpoint-diagnosis-body');
+    if(body){
+      body.innerHTML=`
+        <section class="testpoint-diagnosis-summary">
+          <div><span>检测测点</span><strong>${html(diagnosis.pointNameZh||diagnosis.pointName)}</strong></div>
+          <div><span>信号链路</span><strong>${html(diagnosis.signalPathZh||diagnosis.edgeId)}</strong></div>
+          <div><span>诊断结论</span><strong>${html(diagnosis.statusLabelZh)}</strong></div>
+        </section>
+        <section class="testpoint-candidate-list">
+          ${diagnosis.candidates.length
+            ?diagnosis.candidates.map(candidate=>`
+              <label class="testpoint-candidate" data-fault-candidate="${html(candidate.faultTypeId)}">
+                <input type="checkbox" data-confirm-fault-candidate="${html(candidate.faultTypeId)}" ${candidate.confirmed?'checked':''}>
+                <span class="testpoint-candidate__body">
+                  <strong>${html(candidate.name||candidate.faultTypeId)}</strong>
+                  <em>${html(candidate.category||candidate.layer||'候选故障')}</em>
+                </span>
+              </label>`).join('')
+            :'<div class="testpoint-candidate-empty">当前测点没有匹配到候选故障类型。</div>'}
+        </section>`;
+      body.querySelectorAll('[data-confirm-fault-candidate]').forEach(input=>{
+        input.addEventListener('change',()=>{
+          window.toggleDiagnosticFaultConfirmation(pointId,input.dataset.confirmFaultCandidate,input.checked);
+          refreshDiagnosisViews();
+        });
+      });
+    }
+    overlay.classList.add('open');
+    return diagnosis;
+  };
+
+  function isFaultCurrentlyInjected(faultId){
+    const state=getState();
+    if(!faultId){return false;}
+    const matches=(item)=>{
+      if(!item||typeof item!=='object'){return false;}
+      return getFaultKey(item)===faultId
+        || item.id===faultId
+        || item.modelId===faultId
+        || item.faultId===faultId
+        || item.faultModelId===faultId;
+    };
+    if(arr(state.injectedFaults).some(matches)){return true;}
+    if(state.injectedFaultMap&&typeof state.injectedFaultMap==='object'){
+      if(state.injectedFaultMap[faultId]){return true;}
+      if(Object.values(state.injectedFaultMap).some(matches)){return true;}
+    }
+    if(arr(state.modelNodes).some(node=>matches(node?.injectedFault)||arr(node?.faultBindings).some(binding=>matches(binding)||matches(binding?.injectedFault)))){return true;}
+    if(arr(state.modelEdges).some(edge=>matches(edge?.injectedFault)||arr(edge?.faultBindings).some(binding=>matches(binding)||matches(binding?.injectedFault)))){return true;}
+    return false;
+  }
+
+  function normalizeFaultSelectionButton(){
+    if(typeof document==='undefined') return;
+    const selected=getState().selectedFaultCatalogId;
+    const existing=document.querySelectorAll('[data-clear-selected-fault-catalog]');
+    existing.forEach(node=>node.remove());
+    if(!selected) return;
+    const injected=isFaultCurrentlyInjected(selected);
+    if(!injected) return;
+    const footer=document.querySelector('.modal-footer,.dlg-actions,.dialog-actions,.ifm-actions,.modal .actions')||document.querySelector('#faultLibModal,.modal.show,.modal');
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='compact-clear-fault-selection';
+    button.dataset.clearSelectedFaultCatalog='1';
+    button.textContent='移除已注入故障';
+    if(footer) footer.insertBefore(button,footer.firstChild||null);
+    const selectedCard=document.querySelector('.ifm-item.on,.fault-card.on,.fault-item.on');
+    if(selectedCard){
+      const inline=document.createElement('button');
+      inline.type='button';
+      inline.className='compact-clear-fault-selection-inline';
+      inline.dataset.clearSelectedFaultCatalog='1';
+      inline.textContent='移除故障';
+      selectedCard.appendChild(inline);
+    }
+  }
+
+  function removeImportedFaultModelById(id){
+    const state=getState();
+    if(!id||!Array.isArray(state.importedFaultModels)) return false;
+    const before=state.importedFaultModels.length;
+    state.importedFaultModels=state.importedFaultModels.filter(model=>getFaultKey(model)!==id&&model.id!==id&&model.modelId!==id);
+    const removed=state.importedFaultModels.length!==before;
+    if(removed){
+      arr(state.availableFaultModels).forEach(model=>{
+        if(model?.id===id||model?.modelId===id){
+          delete model.imported;
+          delete model.isImported;
+        }
+      });
+      state.faultModels=state.importedFaultModels.length;
+      state.faultLoaded=state.importedFaultModels.length>0;
+      if(state.selectedFaultCatalogId===id) state.selectedFaultCatalogId='';
+      state.faultCatalogSelectionCleared=true;
+      if(state.injectSelectionId===id) state.injectSelectionId='';
+      if(state.protocolInjectSelectionId===id) state.protocolInjectSelectionId='';
+      if(typeof document!=='undefined'){
+        document.querySelectorAll('[data-fault-id]').forEach(item=>{
+          if(item.getAttribute('data-fault-id')===id){
+            item.classList.remove('is-imported');
+            item.querySelectorAll('.ifm-state').forEach(badge=>badge.remove());
+          }
+        });
+      }
+      if(typeof updateUI==='function') updateUI();
+      if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+      if(typeof toast==='function') toast('已撤销该故障导入','s');
+    }
+    return removed;
+  }
+  window.removeImportedFaultModel=removeImportedFaultModelById;
+
+  const previousSelectFaultCatalog=window.selectFaultCatalog||(typeof selectFaultCatalog!=='undefined'?selectFaultCatalog:null);
+  window.selectFaultCatalog=function(id){
+    const state=getState();
+    if(state.selectedFaultCatalogId===id){
+      state.selectedFaultCatalogId='';
+      state.faultCatalogSelectionCleared=true;
+      if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+      normalizeFaultSelectionButton();
+      return;
+    }
+    state.faultCatalogSelectionCleared=false;
+    const result=previousSelectFaultCatalog?previousSelectFaultCatalog(id):undefined;
+    normalizeFaultSelectionButton();
+    return result;
+  };
+  if(typeof selectFaultCatalog!=='undefined') selectFaultCatalog=window.selectFaultCatalog;
+
+  const previousSelectFaultCatalogModel=window.selectFaultCatalogModel||(typeof selectFaultCatalogModel!=='undefined'?selectFaultCatalogModel:null);
+  window.selectFaultCatalogModel=function(id){
+    const state=getState();
+    if(state.selectedFaultCatalogId===id){
+      state.selectedFaultCatalogId='';
+      state.faultCatalogSelectionCleared=true;
+      if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+      normalizeFaultSelectionButton();
+      return;
+    }
+    state.faultCatalogSelectionCleared=false;
+    const result=previousSelectFaultCatalogModel?previousSelectFaultCatalogModel(id):window.selectFaultCatalog(id);
+    normalizeFaultSelectionButton();
+    return result;
+  };
+  if(typeof selectFaultCatalogModel!=='undefined') selectFaultCatalogModel=window.selectFaultCatalogModel;
+
+  const previousRenderFaultCatalogList=window.renderFaultCatalogList||(typeof renderFaultCatalogList!=='undefined'?renderFaultCatalogList:null);
+  window.renderFaultCatalogList=function(){
+    const result=previousRenderFaultCatalogList?previousRenderFaultCatalogList.apply(this,arguments):undefined;
+    const state=getState();
+    if(state.faultCatalogSelectionCleared){
+      state.selectedFaultCatalogId='';
+      document.querySelectorAll('#ifm-list-container .ifm-item.on,.fault-card.on,.fault-item.on').forEach(item=>item.classList.remove('on'));
+      const detail=document.getElementById('fault-type-detail');
+      if(detail){detail.innerHTML='<div class="ifm-detail-empty">请选择一个故障类型。</div>';}
+      const hint=document.getElementById('ifm-sel-hint');
+      if(hint){hint.textContent='已选：未选择故障模型';}
+    }
+    normalizeFaultSelectionButton();
+    return result;
+  };
+  if(typeof renderFaultCatalogList!=='undefined') renderFaultCatalogList=window.renderFaultCatalogList;
+
+  const previousRenderDataflowPanel=window.renderDataflowPanel||(typeof renderDataflowPanel!=='undefined'?renderDataflowPanel:null);
+  window.renderDataflowPanel=function(force=false){
+    const host=document.getElementById('dataflow-panel')||document.querySelector('.dataflow-panel');
+    if(host){
+      const simulationRunning=typeof SIM!=='undefined'&&SIM.running&&!SIM.paused;
+      if(!force&&simulationRunning&&host.querySelector('[data-testpoint-workbench]')){
+        return;
+      }
+      host.innerHTML=renderCompactDiagnosisConsole();
+      return;
+    }
+    try{
+      return previousRenderDataflowPanel?previousRenderDataflowPanel.apply(this,arguments):undefined;
+    }catch(err){
+      console.warn('[diagnosis-console] previous renderDataflowPanel failed',err);
+      return undefined;
+    }
+  };
+  if(typeof renderDataflowPanel!=='undefined') renderDataflowPanel=window.renderDataflowPanel;
+
+  window.renderDiagnosticTestPointWorkbench=function(){
+    return renderCompactDiagnosisConsole();
+  };
+  if(typeof renderDiagnosticTestPointWorkbench!=='undefined') renderDiagnosticTestPointWorkbench=window.renderDiagnosticTestPointWorkbench;
+
+  window.renderCanvasDiagnosticTestPointMarkers=function(){
+    if(typeof document==='undefined') return;
+    const svg=document.getElementById('edge-layer');
+    if(!svg||!svg.ownerDocument?.createElementNS) return;
+    const host=document.getElementById('edge-group')||svg;
+    let layer=document.getElementById('diagnostic-testpoint-marker-layer');
+    if(!layer||layer.parentNode!==host){
+      if(layer) layer.remove();
+      layer=document.createElementNS('http://www.w3.org/2000/svg','g');
+      layer.id='diagnostic-testpoint-marker-layer';
+      host.appendChild(layer);
+    }
+    layer.innerHTML='';
+    const model=window.buildDiagnosticTestPointModel();
+    model.installed.forEach((point,index)=>{
+      const path=point.edgeId
+        ?Array.from(document.querySelectorAll('[data-edge-id],.edge-path,path')).find(item=>item.dataset?.edgeId===point.edgeId||item.id===point.edgeId)
+        :null;
+      let x=120+(index%6)*64;
+      let y=110+Math.floor(index/6)*44;
+      if(path?.getTotalLength&&path?.getPointAtLength){
+        try{
+          const pt=path.getPointAtLength(path.getTotalLength()*0.52);
+          x=pt.x;
+          y=pt.y;
+        }catch(err){}
+      }
+      const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
+      marker.setAttribute('class',`canvas-testpoint-marker${getState().selectedDiagnosticTestPointId===point.pointId?' is-selected':''}`);
+      marker.setAttribute('data-canvas-testpoint-marker','true');
+      marker.setAttribute('data-testpoint-id',point.pointId);
+      marker.setAttribute('transform',`translate(${x} ${y})`);
+      const halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      halo.setAttribute('class','canvas-testpoint-marker__halo');
+      halo.setAttribute('r','15');
+      const pin=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pin.setAttribute('class','canvas-testpoint-marker__pin');
+      pin.setAttribute('r','10');
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('class','canvas-testpoint-marker__label');
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('dominant-baseline','central');
+      label.textContent=point.shortName||`M${index+1}`;
+      marker.appendChild(halo);
+      marker.appendChild(pin);
+      marker.appendChild(label);
+      marker.addEventListener('click',event=>{
+        event.stopPropagation();
+        getState().selectedDiagnosticTestPointId=point.pointId;
+        window.detectDiagnosticTestPoint(point.pointId);
+      });
+      layer.appendChild(marker);
+    });
+  };
+  if(typeof renderCanvasDiagnosticTestPointMarkers!=='undefined') renderCanvasDiagnosticTestPointMarkers=window.renderCanvasDiagnosticTestPointMarkers;
+
+  const previousRenderEdgesForDiagnosticMarkers=window.renderEdges||(typeof renderEdges!=='undefined'?renderEdges:null);
+  if(previousRenderEdgesForDiagnosticMarkers&&!window.__diagnosticMarkersRenderEdgesWrapped){
+    window.__diagnosticMarkersRenderEdgesWrapped=true;
+    window.renderEdges=function(){
+      const state=getState();
+      const installedSnapshot=Array.isArray(state.installedDiagnosticTestPointIds)
+        ?[...state.installedDiagnosticTestPointIds]
+        :null;
+      const selectedSnapshot=state.selectedDiagnosticTestPointId||null;
+      const result=previousRenderEdgesForDiagnosticMarkers.apply(this,arguments);
+      if(installedSnapshot){
+        state.installedDiagnosticTestPointIds=installedSnapshot;
+      }
+      if(selectedSnapshot){
+        state.selectedDiagnosticTestPointId=selectedSnapshot;
+      }
+      if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
+        try{window.renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnosis-console] marker render after edges failed',err);}
+      }
+      return result;
+    };
+    if(typeof renderEdges!=='undefined') renderEdges=window.renderEdges;
+  }
+
+  if(typeof document!=='undefined'&&!window.__compactDiagnosisConsoleEvents){
+    window.__compactDiagnosisConsoleEvents=true;
+    document.addEventListener('click',event=>{
+      const install=event.target.closest?.('[data-install-testpoint]');
+      if(install){
+        event.preventDefault();
+        const id=install.getAttribute('data-install-testpoint');
+        const model=window.buildDiagnosticTestPointModel();
+        const already=model.installed.some(point=>point.pointId===id);
+        already?window.removeDiagnosticTestPoint(id):window.addDiagnosticTestPoint(id);
+        return;
+      }
+      const remove=event.target.closest?.('[data-remove-testpoint]');
+      if(remove){
+        event.preventDefault();
+        window.removeDiagnosticTestPoint(remove.getAttribute('data-remove-testpoint'));
+        return;
+      }
+      const detect=event.target.closest?.('[data-detect-testpoint]');
+      if(detect){
+        event.preventDefault();
+        window.openDiagnosticTestPointDialog(detect.getAttribute('data-detect-testpoint'));
+        return;
+      }
+      if(event.target.closest?.('[data-clear-testpoints]')){
+        event.preventDefault();
+        window.clearDiagnosticTestPoints();
+        return;
+      }
+      if(event.target.closest?.('[data-install-all-testpoints]')){
+        event.preventDefault();
+        window.installAllDiagnosticTestPoints();
+        return;
+      }
+      if(event.target.closest?.('[data-run-fault-detection]')){
+        event.preventDefault();
+        window.runAllDiagnosticTestPointDetections();
+        return;
+      }
+      if(event.target.closest?.('[data-clear-diagnostic-result]')){
+        event.preventDefault();
+        clearDiagnosticScanState(getState());
+        refreshDiagnosisViews();
+        return;
+      }
+      const confirm=event.target.closest?.('[data-confirm-diagnostic-fault]');
+      if(confirm){
+        const state=getState();
+        const id=confirm.getAttribute('data-confirm-diagnostic-fault');
+        const confirmed=new Set(arr(state.confirmedDiagnosticFaultIds));
+        confirm.checked?confirmed.add(id):confirmed.delete(id);
+        state.confirmedDiagnosticFaultIds=Array.from(confirmed);
+        const pointId=confirm.getAttribute('data-confirm-point-id')||state.lastDiagnosticTestPointResult?.pointId;
+        if(pointId){
+          window.toggleDiagnosticFaultConfirmation(pointId,id,confirm.checked);
+        }
+        return;
+      }
+      if(event.target.closest?.('[data-clear-selected-fault-catalog]')){
+        event.preventDefault();
+        const state=getState();
+        const selected=state.selectedFaultCatalogId;
+        if(isFaultCurrentlyInjected(selected)&&typeof window.removeInjectedFault==='function'){
+          window.removeInjectedFault(selected);
+          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+          if(typeof updateUI==='function') updateUI();
+          if(typeof toast==='function') toast('已移除该故障','s');
+        }else if(!removeImportedFaultModelById(selected)){
+          state.selectedFaultCatalogId='';
+          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+        }
+      }
+    });
+  }
+
+  const previousLoadDemo=window.loadUavFaultDiagnosticDemo;
+  if(previousLoadDemo){
+    window.loadUavFaultDiagnosticDemo=function(){
+      const demo=previousLoadDemo.apply(this,arguments);
+      const state=getState();
+      state.availableFaultModels=arr(state.availableFaultModels).length?state.availableFaultModels:arr(state.faultLibrary);
+      state.diagnosticTestPoints=arr(state.diagnosticTestPoints).length?state.diagnosticTestPoints:arr(demo?.testPoints);
+      state.installedDiagnosticTestPointIds=arr(state.diagnosticTestPoints).map(point=>point.pointId||point.id);
+      refreshDiagnosisViews();
+      return demo;
+    };
+  }
+})();
+
+;(function installCanvasVisualSemanticsAfterAllOverrides(){
+  if(typeof window==='undefined') return;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function nodeText(node){
+    return [
+      node?.id,
+      node?.props?.name,
+      node?.props?.moduleType,
+      node?.props?.instrumentType
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function getVisualKind(node){
+    const text=nodeText(node);
+    if(!node) return 'unknown';
+    if(node.type==='signal_source'||node.type==='subsystem_in_port') return 'source';
+    if(node.type==='sum_block') return 'sum';
+    if(node.type==='gain_block'||node.type==='mux_block'||node.type==='middle_var_assign') return 'utility';
+    if(node.type?.startsWith('fault_')) return 'fault';
+    if(node.type==='subsystem_block'||node.type==='subsystem_out_port') return 'subsystem';
+    if(node.type?.startsWith('instrument_')||node.type==='instrument_signal_flow') return 'instrument';
+    if(/imu|sensor|gyro|测量|反馈/.test(text)) return 'sensor';
+    if(/motor|actuator|mixer|thrust|电机|执行/.test(text)) return 'actuator';
+    if(/dynamic|plant|airframe|vehicle|动力|机体/.test(text)) return 'plant';
+    if(/allocat|分配/.test(text)) return 'allocator';
+    if(/control|controller|pid|控制/.test(text)) return 'control';
+    return 'process';
+  }
+
+  function decorateCanvasNodes(){
+    const state=getState();
+    if(!Array.isArray(state.modelNodes)||typeof document==='undefined') return;
+    const byId=new Map(state.modelNodes.map(node=>[node.id,node]));
+    document.querySelectorAll('.blk[id^="b-"]').forEach(el=>{
+      const node=byId.get(el.id.replace(/^b-/,''));
+      const kind=getVisualKind(node);
+      Array.from(el.classList)
+        .filter(cls=>cls.startsWith('canvas-node--'))
+        .forEach(cls=>el.classList.remove(cls));
+      el.classList.add(`canvas-node--${kind}`);
+      el.dataset.visualKind=kind;
+    });
+  }
+
+  const previousRenderModelNodes=window.renderModelNodes||(typeof renderModelNodes!=='undefined'?renderModelNodes:null);
+  if(previousRenderModelNodes&&!window.__canvasVisualSemanticAfterAllRenderWrapped){
+    window.__canvasVisualSemanticAfterAllRenderWrapped=true;
+    window.renderModelNodes=function(){
+      const result=previousRenderModelNodes.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof renderModelNodes!=='undefined') renderModelNodes=window.renderModelNodes;
+  }
+
+  const previousUpdateUI=window.updateUI||(typeof updateUI!=='undefined'?updateUI:null);
+  if(previousUpdateUI&&!window.__canvasVisualSemanticAfterAllUpdateWrapped){
+    window.__canvasVisualSemanticAfterAllUpdateWrapped=true;
+    window.updateUI=function(){
+      const result=previousUpdateUI.apply(this,arguments);
+      decorateCanvasNodes();
+      return result;
+    };
+    if(typeof updateUI!=='undefined') updateUI=window.updateUI;
+  }
+
+  window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;
+  setTimeout(decorateCanvasNodes,0);
 })();
