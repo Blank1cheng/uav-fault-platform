@@ -345,6 +345,59 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('force-loads the public demo over stale blank workspace state and opens fault injection directly', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    window.doCreateBlankWorkspace();
+    window.localStorage.setItem('gz-workbench-system-model', JSON.stringify({
+      modelNodes: [],
+      modelEdges: []
+    }));
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.sysLoaded).toBe(true);
+    expect(window.__GZ_STATE__.modelNodes).toHaveLength(0);
+
+    const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = await window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__({
+      force: true,
+      resetStoredWorkbench: true,
+      publicDemo: true,
+      packageObject: defaultPackage
+    });
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    expect(importResult).toMatchObject({ ok: true });
+    expect(window.localStorage.getItem('gz-workbench-system-model')).toBeNull();
+    expect(window.__GZ_PUBLIC_DEMO_MODE__).toBe(true);
+    expect(window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__).toMatchObject({
+      loaded: true,
+      modelId: defaultPackage.modelId,
+      publicDemo: true
+    });
+    expect(state.sysLoaded).toBe(true);
+    expect(state.activeModelPackage).toMatchObject({
+      modelId: defaultPackage.modelId,
+      modelName: defaultPackage.modelName,
+      systemFamily: 'uav-flight-control'
+    });
+    expect(state.modelNodes).toHaveLength(11);
+    expect(state.modelEdges).toHaveLength(12);
+    expect(state.availableFaultModels.some((model) => model.id === 'sensor_additive_bias')).toBe(true);
+    expect(document.getElementById('btn-imp-flt')?.disabled).toBe(false);
+
+    window.doImportFault();
+    await flushRuntime();
+
+    expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
+    expect(document.querySelector('[data-fault-id="sensor_additive_bias"]')).toBeTruthy();
+    expect(document.querySelector('#ov-ifm .btn-ok-r')?.disabled).toBe(false);
+
+    wrapper.unmount();
+  });
+
   it('fetches the default package from the configured public base path', async () => {
     const originalFetch = window.fetch;
     const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');

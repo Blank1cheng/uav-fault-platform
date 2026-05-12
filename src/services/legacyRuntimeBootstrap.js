@@ -12,6 +12,7 @@ import faultTypeCatalog from '../../fault-types/fault-type-catalog.json';
 
 let mounted = false;
 const DEFAULT_FLIGHT_MODEL_PACKAGE_PATH = 'model-packages/evtol_closed_loop_fault_demo.json';
+const WORKBENCH_STORAGE_KEY = 'gz-workbench-system-model';
 
 function normalizeBaseUrl(baseUrl = './') {
   return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -33,6 +34,45 @@ function getAppPublicBaseUrl() {
 
 function getDefaultFlightModelPackageUrl() {
   return new URL(DEFAULT_FLIGHT_MODEL_PACKAGE_PATH, getAppPublicBaseUrl()).toString();
+}
+
+function isPublicDemoDeployment() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const { hostname, pathname, search } = window.location;
+  const params = new URLSearchParams(search);
+
+  return params.get('demo') === '1'
+    || (
+      hostname === 'blank1cheng.github.io'
+      && pathname.replace(/\/+$/, '').endsWith('/uav-fault-platform')
+    );
+}
+
+function getDefaultFlightModelLoadOptions() {
+  if (!isPublicDemoDeployment()) {
+    return {};
+  }
+
+  return {
+    force: true,
+    resetStoredWorkbench: true,
+    publicDemo: true
+  };
+}
+
+function resetStoredWorkbenchIfRequested(options = {}) {
+  if (!options.resetStoredWorkbench) {
+    return;
+  }
+
+  try {
+    window.localStorage?.removeItem(WORKBENCH_STORAGE_KEY);
+  } catch {
+    // Storage can be unavailable in hardened browser contexts; forced import still proceeds.
+  }
 }
 
 function shouldSkipDefaultFlightModelLoad({ force = false } = {}) {
@@ -59,6 +99,7 @@ export async function loadDefaultFlightModelPackage(options = {}) {
   }
 
   window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__ = true;
+  resetStoredWorkbenchIfRequested(options);
 
   try {
     const pkg = options.packageObject ?? await fetchDefaultFlightModelPackage(options.url);
@@ -69,8 +110,13 @@ export async function loadDefaultFlightModelPackage(options = {}) {
       modelId: result?.descriptor?.modelId ?? pkg?.modelId ?? null,
       modelName: result?.descriptor?.modelName ?? pkg?.modelName ?? null,
       source: options.packageObject ? 'provided-object' : options.url ?? getDefaultFlightModelPackageUrl(),
+      publicDemo: Boolean(options.publicDemo),
       errors: result?.errors ?? []
     };
+
+    if (options.publicDemo) {
+      window.__GZ_PUBLIC_DEMO_MODE__ = true;
+    }
 
     return result;
   } catch (error) {
@@ -166,12 +212,14 @@ export function mountLegacyRuntime() {
   window.eval(`${runtimeSource}\n//# sourceURL=gz-legacy-runtime.js`);
 
   queueMicrotask(() => {
-    loadDefaultFlightModelPackage().catch((error) => {
+    const options = getDefaultFlightModelLoadOptions();
+    loadDefaultFlightModelPackage(options).catch((error) => {
       window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__ = {
         loaded: false,
         modelId: null,
         modelName: null,
         source: getDefaultFlightModelPackageUrl(),
+        publicDemo: Boolean(options.publicDemo),
         errors: [error instanceof Error ? error.message : 'Failed to load default flight model package.']
       };
     });
@@ -228,6 +276,7 @@ export function __resetLegacyRuntimeForTests() {
   delete window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__;
   delete window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__;
   delete window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__;
+  delete window.__GZ_PUBLIC_DEMO_MODE__;
   delete window.__GZ_DISABLE_DEFAULT_MODEL__;
   delete window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   delete window.__GZ_PYTHON_BINDING_EVENTS__;
