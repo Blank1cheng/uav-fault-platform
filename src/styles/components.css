@@ -1627,7 +1627,7 @@ button:focus-visible,
   left:0;
   right:0;
   top:0;
-  z-index:12;
+  z-index:20;
   display:flex;
   flex-direction:column;
   background:rgba(255,255,255,0.94);
@@ -1641,6 +1641,7 @@ button:focus-visible,
   gap:14px;
   padding:0 22px;
   border-bottom:1px solid #e5edf6;
+  background:#fff;
 }
 .canvas-tab{
   height:40px;
@@ -1765,6 +1766,208 @@ button:focus-visible,
   color:#6b7d95;
   font-size:12px;
   line-height:1.7;
+}
+.d-matrix-panel{
+  position:absolute;
+  left:0;
+  right:0;
+  top:46px;
+  bottom:0;
+  z-index:11;
+  display:none;
+  overflow:hidden;
+  border:0;
+  border-top:1px solid #e0e0e0;
+  border-radius:0;
+  background:#fff;
+}
+.canvas-wrap[data-view="dmatrix"] .d-matrix-panel{
+  display:block;
+}
+.canvas-wrap[data-view="dmatrix"] .canvas-tools,
+.canvas-wrap[data-view="dmatrix"] .canvas-sim-dock{
+  display:none;
+}
+.canvas-wrap[data-view="dmatrix"] .dataflow-panel,
+.canvas-wrap[data-view="dmatrix"] .empty-state,
+.canvas-wrap[data-view="dmatrix"] .diagram-guide,
+.canvas-wrap[data-view="dmatrix"] .diagram-placeholder,
+.canvas-wrap[data-view="dmatrix"] .canvas-breadcrumbs,
+.canvas-wrap[data-view="dmatrix"] .canvas-floating{
+  display:none;
+}
+.d-matrix-panel__empty{
+  padding:16px;
+  color:#6b7d95;
+  font-size:12px;
+  line-height:1.7;
+}
+.d-matrix{
+  width:100%;
+  height:100%;
+  min-width:940px;
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr);
+  color:#161616;
+  background:#fff;
+  font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  letter-spacing:.16px;
+}
+.d-matrix-header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:center;
+  min-height:64px;
+  padding:10px 24px;
+  border-bottom:1px solid #e0e0e0;
+  background:#fff;
+}
+.d-matrix-header > div{
+  min-width:0;
+}
+.d-matrix-header span{
+  color:#0f62fe;
+  font-size:12px;
+  line-height:1.33;
+  font-weight:400;
+}
+.d-matrix-header h2{
+  margin:2px 0 0;
+  color:#161616;
+  font-size:22px;
+  line-height:1.2;
+  font-weight:400;
+  letter-spacing:0;
+}
+.d-matrix-header p{
+  display:none;
+  margin:0;
+  color:#525252;
+  font-size:12px;
+  line-height:1.45;
+  font-weight:400;
+}
+.d-matrix-export{
+  min-height:40px;
+  padding:0 16px;
+  border:1px solid #0f62fe;
+  border-radius:0;
+  color:#0f62fe;
+  background:#fff;
+  font-size:14px;
+  line-height:1.29;
+  font-weight:400;
+  cursor:pointer;
+}
+.d-matrix-export:hover{
+  color:#fff;
+  background:#0f62fe;
+}
+.d-matrix-summary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  padding:0;
+  border-bottom:1px solid #e0e0e0;
+  background:#f4f4f4;
+}
+.d-matrix-summary span{
+  padding:12px 24px;
+  border-right:1px solid #e0e0e0;
+  background:#f4f4f4;
+}
+.d-matrix-summary span:last-child{
+  border-right:0;
+}
+.d-matrix-summary b{
+  display:block;
+  color:#161616;
+  font-size:22px;
+  line-height:1.18;
+  font-weight:400;
+}
+.d-matrix-summary em{
+  display:block;
+  margin-top:4px;
+  color:#525252;
+  font-size:12px;
+  line-height:1.33;
+  font-style:normal;
+  font-weight:400;
+}
+.d-matrix-table-wrap{
+  min-height:0;
+  margin:0;
+  overflow:auto;
+  border:0;
+  background:#fff;
+}
+.d-matrix-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  color:#161616;
+  font-size:14px;
+  line-height:1.29;
+}
+.d-matrix-table th,
+.d-matrix-table td{
+  min-width:58px;
+  height:46px;
+  padding:8px 12px;
+  border-right:1px solid #e0e0e0;
+  border-bottom:1px solid #e0e0e0;
+  text-align:center;
+  white-space:nowrap;
+}
+.d-matrix-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  color:#525252;
+  background:#f4f4f4;
+  font-size:14px;
+  font-weight:600;
+}
+.d-matrix-table .d-matrix-sticky{
+  position:sticky;
+  left:0;
+  z-index:3;
+  min-width:260px;
+  max-width:300px;
+  text-align:left;
+  background:#fff;
+  box-shadow:1px 0 0 #e0e0e0;
+}
+.d-matrix-table th.d-matrix-sticky{
+  background:#f4f4f4;
+}
+.d-matrix-table strong,
+.d-matrix-table small{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.d-matrix-table small{
+  margin-top:3px;
+  color:#525252;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:12px;
+  line-height:1.33;
+}
+.d-matrix-cell{
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-weight:600;
+}
+.d-matrix-cell.is-detectable{
+  color:#0e6027;
+  background:#defbe6;
+}
+.d-matrix-cell.is-empty{
+  color:#8d8d8d;
+  background:#fff;
 }
 .dataflow-head{
   padding:12px 14px 10px;
@@ -3770,6 +3973,32 @@ button:focus-visible,
   font-weight: 700;
   pointer-events: none;
 }
+.canvas-testpoint-marker.is-uninstalled .canvas-testpoint-marker__halo{
+  fill: rgba(15,98,254,.06);
+  stroke: rgba(15,98,254,.14);
+}
+.canvas-testpoint-marker.is-uninstalled .canvas-testpoint-marker__pin{
+  fill: rgba(255,255,255,.86);
+  stroke: #8ab5ff;
+  stroke-dasharray: 3 2;
+}
+.canvas-testpoint-marker.is-uninstalled .canvas-testpoint-marker__label{
+  fill: #5b83c8;
+}
+.canvas-testpoint-marker.is-installed .canvas-testpoint-marker__pin{
+  fill: #eaf2ff;
+}
+.canvas-testpoint-marker.is-abnormal .canvas-testpoint-marker__halo{
+  fill: rgba(218,30,40,.16);
+  stroke: rgba(218,30,40,.28);
+}
+.canvas-testpoint-marker.is-abnormal .canvas-testpoint-marker__pin{
+  fill: #fff1f1;
+  stroke: #da1e28;
+}
+.canvas-testpoint-marker.is-abnormal .canvas-testpoint-marker__label{
+  fill: #da1e28;
+}
 .canvas-testpoint-marker.is-selected .canvas-testpoint-marker__halo{
   fill: rgba(218,30,40,.16);
   stroke: rgba(218,30,40,.26);
@@ -3779,6 +4008,85 @@ button:focus-visible,
 }
 .canvas-testpoint-marker.is-selected .canvas-testpoint-marker__label{
   fill: #da1e28;
+}
+.canvas-fault-marker{
+  cursor: pointer;
+  pointer-events: all;
+}
+.canvas-fault-marker__halo{
+  fill: rgba(255,131,43,.12);
+  stroke: rgba(255,131,43,.24);
+  stroke-width: 1;
+}
+.canvas-fault-marker__pin{
+  fill: #fff;
+  stroke: #ff832b;
+  stroke-width: 2;
+}
+.canvas-fault-marker__label{
+  fill: #8a3800;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  pointer-events: none;
+}
+.canvas-fault-marker__count{
+  fill: #8a3800;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3;
+  pointer-events: none;
+}
+.canvas-fault-marker__target{
+  fill: #8a3800;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3;
+  pointer-events: none;
+}
+.canvas-fault-marker.is-active .canvas-fault-marker__halo,
+.canvas-fault-marker.is-selected .canvas-fault-marker__halo{
+  fill: rgba(218,30,40,.16);
+  stroke: rgba(218,30,40,.28);
+}
+.canvas-fault-marker.is-active .canvas-fault-marker__pin,
+.canvas-fault-marker.is-selected .canvas-fault-marker__pin{
+  fill: #fff1f1;
+  stroke: #da1e28;
+}
+.canvas-fault-marker.is-active .canvas-fault-marker__label,
+.canvas-fault-marker.is-selected .canvas-fault-marker__label,
+.canvas-fault-marker.is-active .canvas-fault-marker__count,
+.canvas-fault-marker.is-selected .canvas-fault-marker__count,
+.canvas-fault-marker.is-active .canvas-fault-marker__target,
+.canvas-fault-marker.is-selected .canvas-fault-marker__target{
+  fill: #da1e28;
+}
+.ifm-detail-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex:0 0 auto;
+}
+.ifm-locate-target{
+  min-height:32px;
+  padding:0 12px;
+  border:1px solid #0f62fe;
+  background:#fff;
+  color:#0f62fe;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:600;
+}
+.ifm-locate-target:hover{
+  background:#edf5ff;
 }
 .injected-fault-removal-controls{
   margin: 12px 0;

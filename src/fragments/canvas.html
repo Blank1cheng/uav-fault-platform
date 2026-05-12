@@ -58,6 +58,7 @@
       <button type="button" class="canvas-tab is-active" data-canvas-view="canvas">画布</button>
       <button type="button" class="canvas-tab" data-canvas-view="components">组件视图</button>
       <button type="button" class="canvas-tab" data-canvas-view="dataflow">多信号流图</button>
+      <button type="button" class="canvas-tab" data-canvas-view="dmatrix">D矩阵</button>
     </div>
     <div class="canvas-tools">
       <button type="button" class="canvas-tool is-active" title="选择" data-canvas-command="select">⌖</button>
@@ -82,6 +83,9 @@
     <div class="canvas-breadcrumbs" id="canvas-breadcrumbs" data-testid="canvas-breadcrumbs"></div>
     <div class="dataflow-panel" id="dataflow-panel" aria-live="polite">
       <div class="dataflow-panel__empty">切换到数据流视图后，将显示多信号流图、边状态和故障传播指标。</div>
+    </div>
+    <div class="d-matrix-panel" id="d-matrix-panel" aria-live="polite">
+      <div class="d-matrix-panel__empty">切换到D矩阵后，将显示故障类型与固定测点的可检测关系。</div>
     </div>
 
     <div class="empty-state" id="empty">

@@ -63,6 +63,36 @@ describe('faultInjectionService', () => {
     })).toBeCloseTo(1.42);
   });
 
+  it('exposes explicit bias overlay and noise injection catalog entries for existing fault blocks', () => {
+    const biasOverlay = faultCatalog.faultTypes.find((item) => item.id === 'fault_bias_overlay');
+    const noiseInjection = faultCatalog.faultTypes.find((item) => item.id === 'fault_noise_injection');
+
+    expect(biasOverlay).toMatchObject({
+      name: '偏置叠加故障',
+      layer: 'electrical',
+      platformImplementation: expect.objectContaining({
+        existingModule: 'fault_bias',
+        recommendedModule: 'fault_bias'
+      })
+    });
+    expect(noiseInjection).toMatchObject({
+      name: '噪声注入故障',
+      layer: 'electrical',
+      platformImplementation: expect.objectContaining({
+        existingModule: 'fault_noise',
+        recommendedModule: 'fault_noise'
+      })
+    });
+    expect(getFaultRuntimeBehavior(biasOverlay)).toBe('additive_bias');
+    expect(getFaultRuntimeBehavior(noiseInjection)).toBe('noise');
+    expect(applyScalarFault(1, {
+      faultModel: biasOverlay,
+      injectedFault: createInjectedFaultPayload(biasOverlay, { offset: '0.25' }),
+      time: 0,
+      state: {}
+    })).toBeCloseTo(1.25);
+  });
+
   it('applies representative physical, electrical, and protocol faults with state', () => {
     expect(applyScalarFault(1, {
       faultModel: { id: 'physical_parameter_drift', defaultParameters: { rate: 0.5, start: 2 } },

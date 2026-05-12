@@ -106,6 +106,40 @@
       "displayPlan": "传感器模块属性面板显示 bias、单位、作用轴。"
     },
     {
+      "id": "fault_bias_overlay",
+      "name": "偏置叠加故障",
+      "layer": "electrical",
+      "modelClass": "偏置叠加",
+      "formula": "y_fault = y + offset",
+      "typicalTargets": ["Gyro_Bias_Z", "IMU_Pitch_Rate", "Feedback_Bias", "Command_Bias"],
+      "defaultParameters": { "offset": 0.15, "start": 0, "duration": null },
+      "platformImplementation": {
+        "currentSupport": "supported",
+        "existingModule": "fault_bias",
+        "recommendedModule": "fault_bias",
+        "pythonFunction": "parameter_bias"
+      },
+      "observableSignals": ["imu.pitch_rate", "attitude_error", "residual"],
+      "displayPlan": "故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。"
+    },
+    {
+      "id": "fault_noise_injection",
+      "name": "噪声注入故障",
+      "layer": "electrical",
+      "modelClass": "噪声注入",
+      "formula": "y_fault = y + n(t)",
+      "typicalTargets": ["Gyro_Noise_STD", "IMU_Pitch_Rate", "Feedback_Noise", "Residual_Noise"],
+      "defaultParameters": { "noise_type": "gaussian", "std": 0.08, "amplitude": 0.2, "probability": 0.03, "start": 0, "duration": null },
+      "platformImplementation": {
+        "currentSupport": "supported",
+        "existingModule": "fault_noise",
+        "recommendedModule": "fault_noise",
+        "pythonFunction": "gaussian_noise / white_noise / pulse_noise"
+      },
+      "observableSignals": ["imu.pitch_rate", "rms_noise", "spectrum_peak", "residual"],
+      "displayPlan": "故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。"
+    },
+    {
       "id": "sensor_scale_distortion",
       "name": "传感器比例失真",
       "layer": "electrical",

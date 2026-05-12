@@ -14914,7 +14914,7 @@ function decorateDataflowEdges(){
   }
 
   function setCanvasView(view='canvas',options={}){
-    const allowed=new Set(['canvas','components','dataflow']);
+    const allowed=new Set(['canvas','components','dataflow','dmatrix']);
     const nextView=allowed.has(view)?view:'canvas';
     S.canvasView=nextView;
     const wrap=document.getElementById('cw');
@@ -14926,10 +14926,13 @@ function decorateDataflowEdges(){
       tab.classList.toggle('is-active',active);
       tab.setAttribute('aria-pressed',active?'true':'false');
     });
-    const labels={canvas:'画布视图',components:'组件视图',dataflow:'多信号流图'};
+    const labels={canvas:'画布视图',components:'组件视图',dataflow:'多信号流图',dmatrix:'D矩阵视图'};
     if(nextView==='dataflow'){
       window.renderDataflowPanel?.();
       window.decorateDataflowEdges?.();
+    }
+    if(nextView==='dmatrix'){
+      window.renderDetectionMatrixPanel?.();
     }
     if(!options.silent){
       pushCommandStatus('info',`已切换到${labels[nextView]}`);
@@ -15213,8 +15216,10 @@ function decorateDataflowEdges(){
   };
   const FAULT_TYPE_RUNTIME_BEHAVIOR={
     sensor_additive_bias:'additive_bias',
+    fault_bias_overlay:'additive_bias',
     sensor_scale_distortion:'scale',
     noise_increase:'noise',
+    fault_noise_injection:'noise',
     colored_noise:'colored_noise',
     signal_freeze:'freeze',
     state_jump_or_sign_flip:'jump_or_invert',
@@ -15395,7 +15400,10 @@ function decorateDataflowEdges(){
               <span class="ifm-chip">${escapeHtml(model.origin==='fault-types'?'标准库':'模型包')}</span>
             </div>
           </div>
-          ${getImportedFaultModel(model.id)?'<span class="ifm-state">已导入</span>':''}
+          <div class="ifm-detail-actions">
+            <button type="button" class="ifm-locate-target" data-locate-fault-injection="${escapeHtml(model.id)}">定位注入位置</button>
+            ${getImportedFaultModel(model.id)?'<span class="ifm-state">已导入</span>':''}
+          </div>
         </div>
         <div class="ifm-detail-desc">${escapeHtml(model.desc||'未提供说明')}</div>
       </div>
@@ -16551,7 +16559,7 @@ function decorateDataflowEdges(){
     if(isDiagnostic) return new Set(seeds);
     const affected=getDownstreamEdgesFrom(seeds,{includeDiagnosticFromError:true});
     const id=getFaultKey(fault);
-    if(id==='imu_rate_bias'||id==='sensor_bias_imu_pitch'||id==='sensor_noise_imu_pitch'||id==='can_bus_delay'){
+    if(id==='imu_rate_bias'||id==='sensor_bias_imu_pitch'||id==='sensor_noise_imu_pitch'||id==='can_bus_delay'||id==='sensor_additive_bias'||id==='noise_increase'||id==='colored_noise'||id==='fault_bias_overlay'||id==='fault_noise_injection'){
       ['edge-imu-error','edge-error-controller','edge-controller-allocator','edge-allocator-motor','edge-motor-dynamics','edge-dynamics-imu','edge-dynamics-imu-can','edge-imu-scope','edge-error-logger','edge-error-spectrum'].forEach(edgeId=>affected.add(edgeId));
     }
     if(id==='motor_efficiency_loss'||id==='actuator_loss_motor'||id==='airframe_inertia_shift'||id==='param_gain_controller'||id==='param_allocator_limit'){
@@ -16818,6 +16826,9 @@ function decorateDataflowEdges(){
     if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
       try{window.renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnosis-console] marker render failed',err);}
     }
+    if(document.getElementById('cw')?.dataset.view==='dmatrix'&&typeof window.renderDetectionMatrixPanel==='function'){
+      try{window.renderDetectionMatrixPanel();}catch(err){console.warn('[diagnosis-console] renderDetectionMatrixPanel failed',err);}
+    }
   }
 
   window.buildDiagnosticTestPointModel=function(){
@@ -16839,6 +16850,178 @@ function decorateDataflowEdges(){
       injectedFaults:getInjectedFaults(),
       faultLibrary:getRuntimeFaultLibrary()
     };
+  };
+
+  function getFaultTargetText(fault){
+    const edgeId=fault?.targetEdgeId||fault?.injectionDesign?.targetEdgeId||fault?.injectionTarget?.edgeId;
+    if(edgeId){
+      const edge=getRuntimeEdges().find(item=>item.id===edgeId);
+      const name=EDGE_NAME_ZH[edgeId]||edge?.label||edge?.signalLabel||edge?.name||edgeId;
+      return `连线：${name}`;
+    }
+    const nodeId=fault?.targetNodeId||fault?.recommendedModuleId||fault?.injectionDesign?.targetNodeId||fault?.injectionDesign?.targetId||fault?.injectionTarget?.nodeId;
+    if(nodeId){
+      const node=getRuntimeNodes().find(item=>item.id===nodeId);
+      const name=NODE_NAME_ZH[nodeId]||node?.name||node?.label||node?.props?.name||node?.type||nodeId;
+      return `模块：${name}`;
+    }
+    const seeds=getFaultTargetEdges(fault);
+    if(seeds[0]){
+      const edge=getRuntimeEdges().find(item=>item.id===seeds[0]);
+      return `连线：${EDGE_NAME_ZH[seeds[0]]||edge?.label||edge?.signalLabel||seeds[0]}`;
+    }
+    return '未绑定';
+  }
+
+  function getDetectionCellReason(point,fault,affectedEdges){
+    const id=getFaultKey(fault);
+    if(arr(point.detects).includes(id)) return '测点直接配置为可观测';
+    if(affectedEdges.has(point.edgeId)) return '故障传播路径覆盖该测点';
+    return '不覆盖该测点';
+  }
+
+  function getFaultLayerText(fault){
+    const value=String(fault?.layer||fault?.category||fault?.type||'').toLowerCase();
+    if(/protocol/.test(value)||/协议/.test(value)) return '协议层';
+    if(/electrical|sensor|电气/.test(value)) return '电气层';
+    if(/physical|actuator|plant|物理/.test(value)) return '物理层';
+    if(/diagnostic|residual|spectrum|诊断|残差/.test(value)) return '诊断层';
+    return fault?.category||fault?.layer||'故障';
+  }
+
+  window.buildDetectionMatrixModel=function(){
+    const points=getConfiguredPoints();
+    const faults=getRuntimeFaultLibrary();
+    const rows=faults.map(fault=>{
+      const affectedEdges=getFaultAffectedEdges(fault);
+      const cells=points.map(point=>{
+        const detectable=arr(point.detects).includes(getFaultKey(fault))||affectedEdges.has(point.edgeId);
+        return {
+          pointId:point.pointId,
+          pointCode:point.shortName,
+          pointName:point.name,
+          edgeId:point.edgeId,
+          detectable,
+          value:detectable?1:0,
+          reason:getDetectionCellReason(point,fault,affectedEdges)
+        };
+      });
+      return {
+        faultId:getFaultKey(fault),
+        faultName:fault.name||getFaultKey(fault),
+        layer:getFaultLayerText(fault),
+        category:fault.category||fault.modelClass||fault.layer||'故障',
+        targetLabel:getFaultTargetText(fault),
+        detectableCount:cells.filter(cell=>cell.detectable).length,
+        cells
+      };
+    });
+    return {
+      points,
+      faults,
+      rows,
+      summary:{
+        pointCount:points.length,
+        faultCount:faults.length,
+        detectableCells:rows.reduce((sum,row)=>sum+row.detectableCount,0)
+      },
+      generatedAt:new Date().toISOString()
+    };
+  };
+
+  function renderDetectionMatrixTable(model){
+    const points=arr(model?.points);
+    const rows=arr(model?.rows);
+    return `
+      <div class="d-matrix-table-wrap">
+        <table class="d-matrix-table">
+          <thead>
+            <tr>
+              <th class="d-matrix-sticky">故障类型</th>
+              <th>目标模块/连线</th>
+              <th>层级</th>
+              <th>可测点</th>
+              ${points.map(point=>`<th title="${html(point.name)}">${html(point.shortName)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row=>`
+              <tr>
+                <td class="d-matrix-sticky">
+                  <strong>${html(row.faultName)}</strong>
+                  <small>${html(row.faultId)}</small>
+                </td>
+                <td>${html(row.targetLabel)}</td>
+                <td>${html(row.layer)}</td>
+                <td>${row.detectableCount}/${points.length}</td>
+                ${row.cells.map(cell=>`
+                  <td class="d-matrix-cell${cell.detectable?' is-detectable':' is-empty'}" title="${html(cell.pointCode)} · ${html(cell.pointName)} · ${html(cell.reason)}">${cell.detectable?'1':'0'}</td>
+                `).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  window.renderDetectionMatrixPanel=function(){
+    const host=document.getElementById('d-matrix-panel')||document.querySelector('.d-matrix-panel');
+    if(!host) return;
+    const model=window.buildDetectionMatrixModel();
+    host.innerHTML=`
+      <section class="d-matrix" data-d-matrix-view>
+        <header class="d-matrix-header">
+          <div>
+            <span>故障诊断矩阵</span>
+            <h2>D矩阵</h2>
+            <p>按当前飞控 demo 的固定测点，列出每类故障能否在对应测点被检测到。</p>
+          </div>
+          <button type="button" class="d-matrix-export" data-d-matrix-export>导出 CSV</button>
+        </header>
+        <div class="d-matrix-summary">
+          <span><b>${model.summary.faultCount}</b><em>故障类型</em></span>
+          <span><b>${model.summary.pointCount}</b><em>固定测点</em></span>
+          <span><b>${model.summary.detectableCells}</b><em>可检测关系</em></span>
+        </div>
+        ${renderDetectionMatrixTable(model)}
+      </section>
+    `;
+  };
+
+  function escapeCsvValue(value){
+    const textValue=String(value==null?'':value);
+    return /[",\r\n]/.test(textValue)?`"${textValue.replace(/"/g,'""')}"`:textValue;
+  }
+
+  window.exportDetectionMatrixCsv=function(options={}){
+    const model=window.buildDetectionMatrixModel();
+    const header=['故障类型','故障ID','目标模块/连线','层级','可测点',...model.points.map(point=>point.shortName)];
+    const lines=[header.map(escapeCsvValue).join(',')];
+    model.rows.forEach(row=>{
+      const values=[
+        row.faultName,
+        row.faultId,
+        row.targetLabel,
+        row.layer,
+        `${row.detectableCount}/${model.points.length}`,
+        ...row.cells.map(cell=>cell.detectable?'1':'0')
+      ];
+      lines.push(values.map(escapeCsvValue).join(','));
+    });
+    const csv=`\uFEFF${lines.join('\n')}`;
+    if(options.download===false) return csv;
+    if(typeof document==='undefined') return csv;
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=`uav-d-matrix-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    return csv;
   };
 
   window.addDiagnosticTestPoint=function(pointId){
@@ -17200,6 +17383,269 @@ function decorateDataflowEdges(){
   };
   if(typeof renderDiagnosticTestPointWorkbench!=='undefined') renderDiagnosticTestPointWorkbench=window.renderDiagnosticTestPointWorkbench;
 
+  function getAnnotationVisibility(){
+    const state=getState();
+    if(!state.diagnosticAnnotationVisibility||typeof state.diagnosticAnnotationVisibility!=='object'){
+      state.diagnosticAnnotationVisibility={testpoints:true,faults:true,propagation:false};
+    }
+    return state.diagnosticAnnotationVisibility;
+  }
+
+  function isAnnotationVisible(kind){
+    const visibility=getAnnotationVisibility();
+    return visibility[kind]!==false;
+  }
+
+  function findCanvasPathForEdge(edgeId){
+    if(!edgeId||typeof document==='undefined') return null;
+    return Array.from(document.querySelectorAll('.edge-path[data-edge-id],path[data-edge-id]')).find(item=>{
+      return item.dataset?.edgeId===edgeId||item.getAttribute('data-edge-id')===edgeId||item.id===edgeId;
+    })||null;
+  }
+
+  function getNodeCanvasCenter(nodeId,index=0){
+    const node=getRuntimeNodes().find(item=>item.id===nodeId);
+    if(!node){
+      return {x:120+(index%6)*74,y:110+Math.floor(index/6)*52};
+    }
+    const width=Number(node.w||node.width||node.props?.width||160);
+    const height=Number(node.h||node.height||node.props?.height||84);
+    return {
+      x:Number(node.x||0)+width/2,
+      y:Number(node.y||0)+height/2
+    };
+  }
+
+  function getEdgeCanvasPoint(edgeId,ratio=0.52,index=0){
+    const path=findCanvasPathForEdge(edgeId);
+    if(path?.getTotalLength&&path?.getPointAtLength){
+      try{
+        const length=path.getTotalLength();
+        if(Number.isFinite(length)&&length>0){
+          const point=path.getPointAtLength(length*ratio);
+          return {x:point.x,y:point.y};
+        }
+      }catch(err){}
+    }
+    const edge=getRuntimeEdges().find(item=>item.id===edgeId);
+    if(edge){
+      const source=getNodeCanvasCenter(edgeSourceId(edge),index);
+      const target=getNodeCanvasCenter(edgeTargetId(edge),index);
+      return {x:(source.x+target.x)/2,y:(source.y+target.y)/2};
+    }
+    return {x:140+(index%7)*78,y:130+Math.floor(index/7)*52};
+  }
+
+  function resolveFaultAnnotationTarget(model){
+    if(!model) return null;
+    const nodes=getRuntimeNodes();
+    const edges=getRuntimeEdges();
+    const api=window.__GZ_FAULT_INJECTION_RUNTIME__;
+    const compatible=api?.findCompatibleFaultTarget?.(model,{
+      nodes,
+      edges,
+      selectedNodeId:getState().selBlk,
+      selectedEdgeId:getState().selEdge
+    });
+    if(compatible?.kind==='edge'&&edges.some(edge=>edge.id===compatible.id)){
+      return {kind:'edge',id:compatible.id};
+    }
+    if(compatible?.kind==='node'&&nodes.some(node=>node.id===compatible.id)){
+      return {kind:'node',id:compatible.id};
+    }
+    const edgeIds=[
+      model.targetEdgeId,
+      model.targetEdgeID,
+      model.injectionDesign?.targetEdgeId,
+      model.injectionTarget?.edgeId,
+      ...arr(model.typicalTargets).filter(item=>String(item).startsWith('edge-'))
+    ].filter(Boolean);
+    const edge=edgeIds.map(id=>edges.find(item=>item.id===id)).find(Boolean);
+    if(edge) return {kind:'edge',id:edge.id};
+    const nodeIds=[
+      model.targetNodeId,
+      model.targetNodeID,
+      model.recommendedModuleId,
+      model.injectionDesign?.targetNodeId,
+      model.injectionDesign?.targetId,
+      model.injectionTarget?.nodeId,
+      ...arr(model.typicalTargets).filter(item=>String(item).startsWith('node-'))
+    ].filter(Boolean);
+    const node=nodeIds.map(id=>nodes.find(item=>item.id===id)).find(Boolean);
+    if(node) return {kind:'node',id:node.id};
+    return null;
+  }
+
+  function getFaultAnnotationModels(){
+    const map=new Map();
+    const append=(items)=>{
+      arr(items).forEach(model=>{
+        const id=model?.id||model?.modelId||model?.faultModelId||model?.faultId;
+        if(!id) return;
+        const existing=map.get(id);
+        map.set(id,existing?{...existing,...model,id}:{...model,id});
+      });
+    };
+    append(getRuntimeFaultLibrary());
+    if(typeof window.getFaultTypeCatalogModels==='function'){
+      append(window.getFaultTypeCatalogModels());
+    }
+    append(getState().availableFaultModels);
+    return Array.from(map.values()).filter(model=>resolveFaultAnnotationTarget(model));
+  }
+
+  function getAnnotationTargetLabel(group){
+    if(!group) return '注入位置未绑定';
+    if(group.targetKind==='edge'){
+      const edge=getRuntimeEdges().find(item=>item.id===group.targetId);
+      const edgeName=EDGE_NAME_ZH[group.targetId]||edge?.label||edge?.signalLabel||edge?.name||group.targetId;
+      const source=edge?edgeEndpointName(edge,'source'):'';
+      const target=edge?edgeEndpointName(edge,'target'):'';
+      const path=source&&target?`（${source} → ${target}）`:'';
+      return `连线：${edgeName}${path}`;
+    }
+    const node=getRuntimeNodes().find(item=>item.id===group.targetId);
+    const nodeName=NODE_NAME_ZH[group.targetId]||node?.name||node?.label||node?.props?.name||node?.type||group.targetId;
+    return `模块：${nodeName}`;
+  }
+
+  function shortenAnnotationTargetLabel(label){
+    const clean=String(label||'')
+      .replace(/^模块：/,'')
+      .replace(/^连线：/,'')
+      .replace(/（.*$/,'')
+      .trim();
+    return clean.length>8?`${clean.slice(0,8)}…`:clean;
+  }
+
+  window.buildFaultInjectionAnnotationModel=function(){
+    const groups=new Map();
+    getFaultAnnotationModels().forEach(model=>{
+      const target=resolveFaultAnnotationTarget(model);
+      if(!target) return;
+      const key=`${target.kind}:${target.id}`;
+      if(!groups.has(key)){
+        groups.set(key,{targetKind:target.kind,targetId:target.id,models:[]});
+      }
+      groups.get(key).models.push(model);
+    });
+    return Array.from(groups.values()).map((group,index)=>{
+      const point=group.targetKind==='edge'
+        ?getEdgeCanvasPoint(group.targetId,0.34,index)
+        :getNodeCanvasCenter(group.targetId,index);
+      const first=group.models[0]||{};
+      return {
+        ...group,
+        markerId:`fault-marker-${index+1}`,
+        shortName:`F${index+1}`,
+        label:first.layer==='protocol'?'协议':first.layer==='physical'?'物理':'故障',
+        targetLabel:getAnnotationTargetLabel(group),
+        targetEdgeId:group.targetKind==='edge'?group.targetId:'',
+        targetNodeId:group.targetKind==='node'?group.targetId:'',
+        x:point.x,
+        y:point.y,
+        active:group.models.some(model=>isFaultCurrentlyInjected(model.id||model.modelId||model.faultModelId||model.name))
+      };
+    });
+  };
+
+  window.locateFaultCatalogInjectionTarget=function(faultId){
+    const model=getFaultAnnotationModels().find(item=>{
+      return (item.id||item.modelId||item.faultModelId||item.faultId||item.name)===faultId;
+    })||getRuntimeFaultLibrary().find(item=>item.id===faultId);
+    const target=resolveFaultAnnotationTarget(model);
+    if(!model||!target) return null;
+    const state=getState();
+    state.selectedFaultCatalogId=faultId;
+    state.selectedFaultAnnotationId=faultId;
+    if(target.kind==='edge'){
+      if(typeof selectEdge==='function') selectEdge(target.id);
+      else{
+        state.selEdge=target.id;
+        state.selBlk='';
+      }
+      const edge=getRuntimeEdges().find(item=>item.id===target.id);
+      if(typeof selectEdge!=='function'&&typeof renderEdges==='function') renderEdges();
+      if(typeof selectEdge!=='function'&&edge&&typeof renderPropertyPanel==='function') renderPropertyPanel(edge);
+    }else{
+      if(typeof selectNode==='function') selectNode(target.id);
+      else{
+        state.selBlk=target.id;
+        state.selEdge='';
+      }
+      const node=getRuntimeNodes().find(item=>item.id===target.id);
+      if(typeof selectNode!=='function'&&typeof renderModelNodes==='function') renderModelNodes();
+      if(typeof selectNode!=='function'&&node&&typeof renderPropertyPanel==='function') renderPropertyPanel(node);
+    }
+    if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+    if(typeof window.renderCanvasDiagnosticAnnotations==='function') window.renderCanvasDiagnosticAnnotations();
+    return {faultId,targetKind:target.kind,targetId:target.id};
+  };
+
+  function renderCanvasFaultInjectionMarkers(){
+    if(typeof document==='undefined') return;
+    const svg=document.getElementById('edge-layer');
+    if(!svg||!svg.ownerDocument?.createElementNS) return;
+    const host=document.getElementById('edge-group')||svg;
+    let layer=document.getElementById('diagnostic-fault-marker-layer');
+    if(!layer||layer.parentNode!==host){
+      if(layer) layer.remove();
+      layer=document.createElementNS('http://www.w3.org/2000/svg','g');
+      layer.id='diagnostic-fault-marker-layer';
+      host.appendChild(layer);
+    }
+    layer.innerHTML='';
+    if(!isAnnotationVisible('faults')) return;
+    window.buildFaultInjectionAnnotationModel().forEach(annotation=>{
+      const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
+      marker.setAttribute('class',`canvas-fault-marker${annotation.active?' is-active':''}${getState().selectedFaultAnnotationId&&annotation.models.some(model=>model.id===getState().selectedFaultAnnotationId)?' is-selected':''}`);
+      marker.setAttribute('data-canvas-fault-marker','true');
+      marker.setAttribute('data-target-kind',annotation.targetKind);
+      marker.setAttribute('data-target-id',annotation.targetId);
+      marker.setAttribute('transform',`translate(${annotation.x} ${annotation.y})`);
+      const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent=`${annotation.shortName} ${annotation.label}注入点：${annotation.targetLabel}，${annotation.models.length} 类故障`;
+      const halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      halo.setAttribute('class','canvas-fault-marker__halo');
+      halo.setAttribute('r','14');
+      const pin=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      pin.setAttribute('class','canvas-fault-marker__pin');
+      pin.setAttribute('x','-11');
+      pin.setAttribute('y','-11');
+      pin.setAttribute('width','22');
+      pin.setAttribute('height','22');
+      pin.setAttribute('rx','6');
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('class','canvas-fault-marker__label');
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('dominant-baseline','central');
+      label.textContent=annotation.shortName;
+      const count=document.createElementNS('http://www.w3.org/2000/svg','text');
+      count.setAttribute('class','canvas-fault-marker__count');
+      count.setAttribute('x','14');
+      count.setAttribute('y','-10');
+      count.textContent=String(annotation.models.length);
+      const targetText=document.createElementNS('http://www.w3.org/2000/svg','text');
+      targetText.setAttribute('class','canvas-fault-marker__target');
+      targetText.setAttribute('text-anchor','middle');
+      targetText.setAttribute('x','0');
+      targetText.setAttribute('y','24');
+      targetText.textContent=shortenAnnotationTargetLabel(annotation.targetLabel);
+      marker.appendChild(title);
+      marker.appendChild(halo);
+      marker.appendChild(pin);
+      marker.appendChild(label);
+      marker.appendChild(count);
+      marker.appendChild(targetText);
+      marker.addEventListener('click',event=>{
+        event.stopPropagation();
+        const first=annotation.models[0];
+        if(first?.id) window.locateFaultCatalogInjectionTarget(first.id);
+      });
+      layer.appendChild(marker);
+    });
+  }
+
   window.renderCanvasDiagnosticTestPointMarkers=function(){
     if(typeof document==='undefined') return;
     const svg=document.getElementById('edge-layer');
@@ -17214,24 +17660,21 @@ function decorateDataflowEdges(){
     }
     layer.innerHTML='';
     const model=window.buildDiagnosticTestPointModel();
-    model.installed.forEach((point,index)=>{
-      const path=point.edgeId
-        ?Array.from(document.querySelectorAll('[data-edge-id],.edge-path,path')).find(item=>item.dataset?.edgeId===point.edgeId||item.id===point.edgeId)
-        :null;
-      let x=120+(index%6)*64;
-      let y=110+Math.floor(index/6)*44;
-      if(path?.getTotalLength&&path?.getPointAtLength){
-        try{
-          const pt=path.getPointAtLength(path.getTotalLength()*0.52);
-          x=pt.x;
-          y=pt.y;
-        }catch(err){}
-      }
+    if(!isAnnotationVisible('testpoints')) return;
+    const installedIds=new Set(model.installed.map(point=>point.pointId));
+    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));
+    model.positions.forEach((point,index)=>{
+      const installed=installedIds.has(point.pointId);
+      const abnormal=scanByPoint.get(point.pointId)?.status==='abnormal';
+      const pt=point.edgeId?getEdgeCanvasPoint(point.edgeId,0.52,index):getNodeCanvasCenter(point.nodeId,index);
       const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
-      marker.setAttribute('class',`canvas-testpoint-marker${getState().selectedDiagnosticTestPointId===point.pointId?' is-selected':''}`);
+      marker.setAttribute('class',`canvas-testpoint-marker${installed?' is-installed':' is-uninstalled'}${abnormal?' is-abnormal':''}${getState().selectedDiagnosticTestPointId===point.pointId?' is-selected':''}`);
       marker.setAttribute('data-canvas-testpoint-marker','true');
       marker.setAttribute('data-testpoint-id',point.pointId);
-      marker.setAttribute('transform',`translate(${x} ${y})`);
+      marker.setAttribute('data-edge-id',point.edgeId||'');
+      marker.setAttribute('transform',`translate(${pt.x} ${pt.y})`);
+      const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent=`${point.shortName||`M${index+1}`} ${point.name||''}：${installed?'点击检测':'点击安装'}`;
       const halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
       halo.setAttribute('class','canvas-testpoint-marker__halo');
       halo.setAttribute('r','15');
@@ -17243,18 +17686,34 @@ function decorateDataflowEdges(){
       label.setAttribute('text-anchor','middle');
       label.setAttribute('dominant-baseline','central');
       label.textContent=point.shortName||`M${index+1}`;
+      marker.appendChild(title);
       marker.appendChild(halo);
       marker.appendChild(pin);
       marker.appendChild(label);
       marker.addEventListener('click',event=>{
         event.stopPropagation();
         getState().selectedDiagnosticTestPointId=point.pointId;
-        window.detectDiagnosticTestPoint(point.pointId);
+        if(installed){
+          window.detectDiagnosticTestPoint(point.pointId);
+        }else{
+          window.addDiagnosticTestPoint(point.pointId);
+        }
       });
       layer.appendChild(marker);
     });
   };
   if(typeof renderCanvasDiagnosticTestPointMarkers!=='undefined') renderCanvasDiagnosticTestPointMarkers=window.renderCanvasDiagnosticTestPointMarkers;
+
+  window.renderCanvasDiagnosticAnnotations=function(){
+    window.renderCanvasDiagnosticTestPointMarkers();
+    renderCanvasFaultInjectionMarkers();
+  };
+
+  window.setDiagnosticAnnotationVisibility=function(kind,visible){
+    const visibility=getAnnotationVisibility();
+    visibility[kind]=Boolean(visible);
+    window.renderCanvasDiagnosticAnnotations();
+  };
 
   const previousRenderEdgesForDiagnosticMarkers=window.renderEdges||(typeof renderEdges!=='undefined'?renderEdges:null);
   if(previousRenderEdgesForDiagnosticMarkers&&!window.__diagnosticMarkersRenderEdgesWrapped){
@@ -17272,7 +17731,9 @@ function decorateDataflowEdges(){
       if(selectedSnapshot){
         state.selectedDiagnosticTestPointId=selectedSnapshot;
       }
-      if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
+      if(typeof window.renderCanvasDiagnosticAnnotations==='function'){
+        try{window.renderCanvasDiagnosticAnnotations();}catch(err){console.warn('[diagnosis-console] marker render after edges failed',err);}
+      }else if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
         try{window.renderCanvasDiagnosticTestPointMarkers();}catch(err){console.warn('[diagnosis-console] marker render after edges failed',err);}
       }
       return result;
@@ -17283,6 +17744,13 @@ function decorateDataflowEdges(){
   if(typeof document!=='undefined'&&!window.__compactDiagnosisConsoleEvents){
     window.__compactDiagnosisConsoleEvents=true;
     document.addEventListener('click',event=>{
+      const locateFault=event.target.closest?.('[data-locate-fault-injection]');
+      if(locateFault){
+        event.preventDefault();
+        const located=window.locateFaultCatalogInjectionTarget?.(locateFault.getAttribute('data-locate-fault-injection'));
+        if(located&&typeof toast==='function') toast('已在画布中标出注入位置','s');
+        return;
+      }
       const install=event.target.closest?.('[data-install-testpoint]');
       if(install){
         event.preventDefault();
@@ -17323,6 +17791,11 @@ function decorateDataflowEdges(){
         event.preventDefault();
         clearDiagnosticScanState(getState());
         refreshDiagnosisViews();
+        return;
+      }
+      if(event.target.closest?.('[data-d-matrix-export]')){
+        event.preventDefault();
+        window.exportDetectionMatrixCsv?.();
         return;
       }
       const confirm=event.target.closest?.('[data-confirm-diagnostic-fault]');

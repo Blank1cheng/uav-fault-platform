@@ -651,14 +651,16 @@ describe('Flight model package app integration', () => {
       }
     ];
 
-    expect(window.__GZ_FAULT_TYPE_CATALOG__.faultTypes).toHaveLength(18);
+    expect(window.__GZ_FAULT_TYPE_CATALOG__.faultTypes).toHaveLength(20);
 
     window.doImportFault();
     await flushRuntime();
 
     expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
-    expect(document.getElementById('ifm-total-count')?.textContent).toBe('18');
+    expect(document.getElementById('ifm-total-count')?.textContent).toBe('20');
     expect(document.querySelector('[data-fault-id="physical_parameter_bias"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="fault_bias_overlay"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="fault_noise_injection"]')).toBeTruthy();
 
     window.selectFaultCatalogModel('sensor_additive_bias');
     await flushRuntime();

@@ -841,7 +841,7 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
-  it('keeps installed diagnostic point markers after edge rerendering', async () => {
+  it('shows all fixed diagnostic point positions and keeps installed markers after edge rerendering', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -856,16 +856,133 @@ describe('canvas layout cleanup', () => {
 
     window.setCanvasView?.('canvas', { silent: true });
     window.clearDiagnosticTestPoints();
-    const point = window.buildDiagnosticTestPointModel().positions[0];
+    const positions = window.buildDiagnosticTestPointModel().positions;
+    const point = positions[0];
     expect(point?.pointId).toBeTruthy();
+
+    window.renderCanvasDiagnosticTestPointMarkers();
+    await flushRuntime();
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker].is-uninstalled').length).toBe(positions.length);
 
     window.addDiagnosticTestPoint(point.pointId);
     await flushRuntime();
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(1);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
+    expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${point.pointId}"]`)?.classList.contains('is-installed')).toBe(true);
 
     window.renderEdges();
     await flushRuntime();
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(1);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
+    expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${point.pointId}"]`)?.classList.contains('is-installed')).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('renders fault injection location markers and can locate a selected catalog fault on the canvas', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.buildFaultInjectionAnnotationModel).toBe('function');
+    expect(typeof window.renderCanvasDiagnosticAnnotations).toBe('function');
+    expect(typeof window.locateFaultCatalogInjectionTarget).toBe('function');
+
+    const annotations = window.buildFaultInjectionAnnotationModel();
+    expect(annotations.length).toBeGreaterThan(0);
+    expect(annotations.some((item) => item.targetEdgeId || item.targetNodeId)).toBe(true);
+    expect(annotations.every((item) => item.targetLabel)).toBe(true);
+    expect(annotations.some((item) => item.targetLabel.includes('IMU') || item.targetLabel.includes('测量'))).toBe(true);
+
+    window.renderCanvasDiagnosticAnnotations();
+    await flushRuntime();
+
+    expect(document.querySelectorAll('[data-canvas-fault-marker]').length).toBe(annotations.length);
+    expect(document.querySelector('[data-canvas-fault-marker] title')?.textContent).toMatch(/注入点|模块|连线/);
+
+    const firstFault = annotations.find((item) => item.models?.length)?.models[0];
+    const located = window.locateFaultCatalogInjectionTarget(firstFault.id);
+    await flushRuntime();
+
+    expect(located).toMatchObject({
+      faultId: firstFault.id,
+      targetId: expect.any(String),
+      targetKind: expect.stringMatching(/node|edge/)
+    });
+    if (located.targetKind === 'edge') {
+      expect(window.__GZ_STATE__.selEdge).toBe(located.targetId);
+    } else {
+      expect(window.__GZ_STATE__.selBlk).toBe(located.targetId);
+    }
+
+    wrapper.unmount();
+  });
+
+  it('renders an exportable D matrix view for fault detectability by test point', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.buildDetectionMatrixModel).toBe('function');
+    expect(typeof window.exportDetectionMatrixCsv).toBe('function');
+
+    const matrix = window.buildDetectionMatrixModel();
+    expect(matrix.points.length).toBeGreaterThanOrEqual(10);
+    expect(matrix.faults.length).toBeGreaterThanOrEqual(10);
+    expect(matrix.rows.some((row) => row.faultId === 'sensor_additive_bias')).toBe(true);
+    expect(matrix.rows.some((row) => row.faultId === 'fault_bias_overlay')).toBe(true);
+    expect(matrix.rows.some((row) => row.faultId === 'fault_noise_injection')).toBe(true);
+    expect(matrix.rows.find((row) => row.faultId === 'sensor_additive_bias')?.cells.some((cell) => cell.detectable)).toBe(true);
+
+    const dMatrixTab = document.querySelector('[data-canvas-view="dmatrix"]');
+    expect(dMatrixTab).not.toBeNull();
+    dMatrixTab.click();
+    await flushRuntime();
+
+    const panel = document.getElementById('d-matrix-panel');
+    expect(document.getElementById('cw')?.dataset.view).toBe('dmatrix');
+    expect(panel?.querySelector('[data-d-matrix-view]')).not.toBeNull();
+    expect(panel?.querySelector('[data-d-matrix-export]')).not.toBeNull();
+    expect(panel?.textContent).toContain('D矩阵');
+
+    const componentsCss = readComponentsCss();
+    const dMatrixPanelRule = findCssRule(componentsCss, '.d-matrix-panel');
+    const dMatrixRule = findCssRule(componentsCss, '.d-matrix');
+    const dMatrixHeaderRule = findCssRule(componentsCss, '.d-matrix-header');
+    const dMatrixTitleRule = findCssRule(componentsCss, '.d-matrix-header h2');
+    const dMatrixHeaderCopyRule = findCssRule(componentsCss, '.d-matrix-header p');
+    const canvasChromeRule = findCssRule(componentsCss, '.canvas-chrome');
+    const canvasTabsRule = findCssRule(componentsCss, '.canvas-tabs');
+    const tableWrapRule = findCssRule(componentsCss, '.d-matrix-table-wrap');
+    const exportRule = findCssRule(componentsCss, '.d-matrix-export');
+    expect(componentsCss).toContain('.canvas-wrap[data-view="dmatrix"] .canvas-floating');
+    expect(componentsCss).toContain('.canvas-wrap[data-view="dmatrix"] .canvas-tools');
+    expect(componentsCss).toContain('.canvas-wrap[data-view="dmatrix"] .canvas-sim-dock');
+    expect(dMatrixPanelRule).toMatch(/top\s*:\s*46px/);
+    expect(dMatrixPanelRule).toMatch(/z-index\s*:\s*11/);
+    expect(canvasChromeRule).toMatch(/z-index\s*:\s*20/);
+    expect(canvasTabsRule).toMatch(/background\s*:\s*#fff/);
+    expect(dMatrixPanelRule).toMatch(/overflow\s*:\s*hidden/);
+    expect(dMatrixPanelRule).toMatch(/border-radius\s*:\s*0/);
+    expect(dMatrixPanelRule).not.toMatch(/box-shadow/);
+    expect(dMatrixRule).toMatch(/font-family\s*:\s*"IBM Plex Sans"/);
+    expect(dMatrixHeaderRule).toMatch(/align-items\s*:\s*center/);
+    expect(dMatrixTitleRule).toMatch(/font-size\s*:\s*22px/);
+    expect(dMatrixHeaderCopyRule).toMatch(/display\s*:\s*none/);
+    expect(tableWrapRule).toMatch(/min-height\s*:\s*0/);
+    expect(exportRule).toMatch(/border-radius\s*:\s*0/);
+
+    const csv = window.exportDetectionMatrixCsv({ download: false });
+    expect(csv).toContain('故障类型');
+    expect(csv).toContain('M1');
+    expect(csv).toContain('sensor_additive_bias');
 
     wrapper.unmount();
   });
