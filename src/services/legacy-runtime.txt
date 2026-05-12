@@ -13746,7 +13746,87 @@ function getInjectedFaultCollections(){
 function faultEntryMatches(entry,faultId){
   if(!entry||!faultId) return false;
   if(typeof entry==='string') return entry===faultId;
-  return entry.id===faultId||entry.faultId===faultId||entry.instanceId===faultId||entry.key===faultId||entry.type===faultId;
+  return entry.id===faultId
+    || entry.faultId===faultId
+    || entry.modelId===faultId
+    || entry.faultModelId===faultId
+    || entry.faultTypeId===faultId
+    || entry.instanceId===faultId
+    || entry.key===faultId
+    || entry.type===faultId
+    || faultEntryMatches(entry.injectedFault,faultId)
+    || faultEntryMatches(entry.fault,faultId);
+}
+function uniqueFaultTargets(){
+  const seen=new Set();
+  const result=[];
+  Array.from(arguments).forEach(list=>{
+    if(!Array.isArray(list)) return;
+    list.forEach(item=>{
+      if(item&&typeof item==='object'&&!seen.has(item)){
+        seen.add(item);
+        result.push(item);
+      }
+    });
+  });
+  return result;
+}
+function getFaultTargetNodes(){
+  return uniqueFaultTargets(S.nodes,S.modelNodes);
+}
+function getFaultTargetEdges(){
+  return uniqueFaultTargets(S.edges,S.modelEdges);
+}
+function isActiveFaultReference(entry){
+  return Boolean(entry)&&(typeof entry!=='object'||entry.active!==false);
+}
+function targetHasActiveFaultReferences(target){
+  if(!target) return false;
+  if(isActiveFaultReference(target.fault)||isActiveFaultReference(target.injectedFault)) return true;
+  return ['faults','faultBindings','activeFaults','faultInstances','appliedFaults','selectedFaults'].some(key=>{
+    return Array.isArray(target[key])&&target[key].some(isActiveFaultReference);
+  });
+}
+function removeFaultReferencesFromTarget(target,faultId){
+  if(!target) return false;
+  let removed=false;
+  ['fault','injectedFault'].forEach(key=>{
+    if(faultEntryMatches(target[key],faultId)){
+      delete target[key];
+      removed=true;
+    }
+  });
+  ['faults','faultBindings','activeFaults','faultInstances','appliedFaults','selectedFaults'].forEach(key=>{
+    if(!Array.isArray(target[key])) return;
+    const before=target[key].length;
+    target[key]=target[key].filter(entry=>!faultEntryMatches(entry,faultId));
+    if(target[key].length!==before) removed=true;
+  });
+  if(target.status==='fault'&&!targetHasActiveFaultReferences(target)){
+    target.status='normal';
+  }
+  return removed;
+}
+function clearFaultReferencesFromTarget(target){
+  if(!target) return false;
+  let removed=false;
+  ['fault','injectedFault'].forEach(key=>{
+    if(target[key]){
+      delete target[key];
+      removed=true;
+    }
+  });
+  ['faults','faultBindings','activeFaults','faultInstances','appliedFaults','selectedFaults'].forEach(key=>{
+    if(Array.isArray(target[key])&&target[key].length){
+      target[key]=[];
+      removed=true;
+    }
+  });
+  if(target.status==='fault'){
+    target.status='normal';
+    removed=true;
+  }
+  return removed;
 }
 function removeInjectedFault(faultId){
   if(!faultId) return false;
@@ -13772,39 +13852,17 @@ function removeInjectedFault(faultId){
       }
     });
   }
-  if(Array.isArray(S.edges)){
-    S.edges.forEach(edge=>{
-      if(edge&&faultEntryMatches(edge.fault,faultId)){
-        delete edge.fault;
-        edge.status=edge.status==='fault'?'normal':edge.status;
-        removed=true;
-      }
-      if(edge&&Array.isArray(edge.faults)){
-        const before=edge.faults.length;
-        edge.faults=edge.faults.filter(entry=>!faultEntryMatches(entry,faultId));
-        if(edge.faults.length!==before) removed=true;
-      }
-      if(edge&&Array.isArray(edge.faults)&&edge.faults.length){
-        edge.status='fault';
-      }
-    });
-  }
-  if(Array.isArray(S.nodes)){
-    S.nodes.forEach(node=>{
-      if(node&&faultEntryMatches(node.fault,faultId)){
-        delete node.fault;
-        node.status=node.status==='fault'?'normal':node.status;
-        removed=true;
-      }
-      if(node&&Array.isArray(node.faults)){
-        const before=node.faults.length;
-        node.faults=node.faults.filter(entry=>!faultEntryMatches(entry,faultId));
-        if(node.faults.length!==before) removed=true;
-      }
-      if(node&&Array.isArray(node.faults)&&node.faults.length){
-        node.status='fault';
-      }
-    });
+  getFaultTargetEdges().forEach(edge=>{
+    if(removeFaultReferencesFromTarget(edge,faultId)) removed=true;
+  });
+  getFaultTargetNodes().forEach(node=>{
+    if(removeFaultReferencesFromTarget(node,faultId)) removed=true;
+  });
+  if(Array.isArray(S.faultedBlks)){
+    const activeFaultNodeIds=new Set(getFaultTargetNodes().filter(targetHasActiveFaultReferences).map(node=>node.id));
+    const before=S.faultedBlks.length;
+    S.faultedBlks=S.faultedBlks.filter(id=>activeFaultNodeIds.has(id));
+    if(S.faultedBlks.length!==before) removed=true;
   }
   if(S.lastDiagnosticTestPointResult&&Array.isArray(S.lastDiagnosticTestPointResult.candidates)){
     S.lastDiagnosticTestPointResult.candidates=S.lastDiagnosticTestPointResult.candidates.filter(candidate=>!faultEntryMatches(candidate,faultId));
@@ -13831,23 +13889,15 @@ window.clearInjectedFaults=function(){
       removed=true;
     }
   });
-  if(Array.isArray(S.edges)){
-    S.edges.forEach(edge=>{
-      if(edge){
-        if(edge.fault){delete edge.fault; removed=true;}
-        if(Array.isArray(edge.faults)&&edge.faults.length){edge.faults=[]; removed=true;}
-        if(edge.status==='fault'){edge.status='normal'; removed=true;}
-      }
-    });
-  }
-  if(Array.isArray(S.nodes)){
-    S.nodes.forEach(node=>{
-      if(node){
-        if(node.fault){delete node.fault; removed=true;}
-        if(Array.isArray(node.faults)&&node.faults.length){node.faults=[]; removed=true;}
-        if(node.status==='fault'){node.status='normal'; removed=true;}
-      }
-    });
+  getFaultTargetEdges().forEach(edge=>{
+    if(clearFaultReferencesFromTarget(edge)) removed=true;
+  });
+  getFaultTargetNodes().forEach(node=>{
+    if(clearFaultReferencesFromTarget(node)) removed=true;
+  });
+  if(Array.isArray(S.faultedBlks)&&S.faultedBlks.length){
+    S.faultedBlks=[];
+    removed=true;
   }
   S.lastDiagnosticTestPointResult=null;
   if(typeof renderAll==='function') renderAll();
@@ -13910,14 +13960,43 @@ function createUavFaultDiagnosticDemo(){
 function normalizeInjectedFaultEntry(entry){
   if(!entry) return null;
   if(typeof entry==='string') return {id:entry,name:entry};
-  return {id:entry.id||entry.faultId||entry.instanceId||entry.key||entry.type,name:entry.name||entry.label||entry.id||entry.faultId,type:entry.type,category:entry.category,targetEdgeId:entry.targetEdgeId,targetNodeId:entry.targetNodeId};
+  return {
+    id:entry.id||entry.faultId||entry.modelId||entry.faultModelId||entry.faultTypeId||entry.instanceId||entry.key||entry.type,
+    name:entry.name||entry.label||entry.id||entry.faultId||entry.modelId||entry.faultModelId,
+    type:entry.type,
+    category:entry.category,
+    targetEdgeId:entry.targetEdgeId,
+    targetNodeId:entry.targetNodeId
+  };
 }
 function getInjectedFaultEntries(){
   const map=new Map();
+  const addFault=(entry,target={})=>{
+    if(entry&&typeof entry==='object'&&entry.active===false) return;
+    const fault=normalizeInjectedFaultEntry(entry);
+    if(fault&&fault.id&&!map.has(fault.id)) map.set(fault.id,{...fault,...target});
+  };
   getInjectedFaultCollections().forEach(key=>{
     S[key].forEach(entry=>{
-      const fault=normalizeInjectedFaultEntry(entry);
-      if(fault&&fault.id&&!map.has(fault.id)) map.set(fault.id,fault);
+      addFault(entry);
+    });
+  });
+  getFaultTargetEdges().forEach(edge=>{
+    addFault(edge.fault,{targetEdgeId:edge.id});
+    addFault(edge.injectedFault,{targetEdgeId:edge.id});
+    ['faults','faultBindings'].forEach(key=>{
+      if(Array.isArray(edge[key])){
+        edge[key].forEach(entry=>addFault(entry,{targetEdgeId:edge.id}));
+      }
+    });
+  });
+  getFaultTargetNodes().forEach(node=>{
+    addFault(node.fault,{targetNodeId:node.id});
+    addFault(node.injectedFault,{targetNodeId:node.id});
+    ['faults','faultBindings'].forEach(key=>{
+      if(Array.isArray(node[key])){
+        node[key].forEach(entry=>addFault(entry,{targetNodeId:node.id}));
+      }
     });
   });
   if(S.faultStates&&typeof S.faultStates==='object'){
@@ -17229,20 +17308,24 @@ function decorateDataflowEdges(){
     const state=getState();
     if(!faultId){return false;}
     const matches=(item)=>{
+      if(typeof faultEntryMatches==='function') return faultEntryMatches(item,faultId);
       if(!item||typeof item!=='object'){return false;}
       return getFaultKey(item)===faultId
         || item.id===faultId
         || item.modelId===faultId
         || item.faultId===faultId
-        || item.faultModelId===faultId;
+        || item.faultModelId===faultId
+        || item.faultTypeId===faultId;
     };
-    if(arr(state.injectedFaults).some(matches)){return true;}
+    if(['injectedFaults','activeFaults','faultInstances','selectedFaults','faultInjectionResults','appliedFaults'].some(key=>arr(state[key]).some(matches))){return true;}
     if(state.injectedFaultMap&&typeof state.injectedFaultMap==='object'){
       if(state.injectedFaultMap[faultId]){return true;}
       if(Object.values(state.injectedFaultMap).some(matches)){return true;}
     }
-    if(arr(state.modelNodes).some(node=>matches(node?.injectedFault)||arr(node?.faultBindings).some(binding=>matches(binding)||matches(binding?.injectedFault)))){return true;}
-    if(arr(state.modelEdges).some(edge=>matches(edge?.injectedFault)||arr(edge?.faultBindings).some(binding=>matches(binding)||matches(binding?.injectedFault)))){return true;}
+    const nodes=[...arr(state.nodes),...arr(state.modelNodes)];
+    const edges=[...arr(state.edges),...arr(state.modelEdges)];
+    if(nodes.some(node=>matches(node?.fault)||matches(node?.injectedFault)||arr(node?.faults).some(matches)||arr(node?.faultBindings).some(matches))){return true;}
+    if(edges.some(edge=>matches(edge?.fault)||matches(edge?.injectedFault)||arr(edge?.faults).some(matches)||arr(edge?.faultBindings).some(matches))){return true;}
     return false;
   }
 

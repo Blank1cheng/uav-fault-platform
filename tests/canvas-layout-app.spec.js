@@ -53,6 +53,32 @@ function findCssRule(css, selector) {
   return css.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] ?? '';
 }
 
+function faultRefMatches(entry, faultId) {
+  if (!entry || !faultId) return false;
+  if (typeof entry === 'string') return entry === faultId;
+  return [
+    entry.id,
+    entry.faultId,
+    entry.modelId,
+    entry.faultModelId,
+    entry.faultTypeId,
+    entry.instanceId,
+    entry.key,
+    entry.type
+  ].includes(faultId) ||
+    faultRefMatches(entry.injectedFault, faultId) ||
+    faultRefMatches(entry.fault, faultId);
+}
+
+function targetHasFaultRef(target, faultId) {
+  if (!target) return false;
+  return faultRefMatches(target.fault, faultId) ||
+    faultRefMatches(target.injectedFault, faultId) ||
+    ['faults', 'faultBindings', 'activeFaults', 'faultInstances', 'appliedFaults'].some((key) =>
+      Array.isArray(target[key]) && target[key].some((entry) => faultRefMatches(entry, faultId))
+    );
+}
+
 describe('canvas layout cleanup', () => {
   afterEach(() => {
     window.localStorage.clear();
@@ -639,6 +665,57 @@ describe('canvas layout cleanup', () => {
 
     expect(window.__GZ_STATE__.confirmedDiagnosticFaults[imuPoint.pointId]).toContain('sensor_additive_bias');
     expect(window.__GZ_STATE__.testPointDiagnosis.confirmedFaultTypeIds).toContain('sensor_additive_bias');
+
+    wrapper.unmount();
+  });
+
+  it('removes catalog-injected faults from model targets and binding arrays', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.doImportFault).toBe('function');
+    expect(typeof window.selectFaultCatalogModel).toBe('function');
+    expect(typeof window.confirmImportFault).toBe('function');
+    expect(typeof window.removeInjectedFault).toBe('function');
+
+    const faultId = 'sensor_additive_bias';
+    const state = window.__GZ_STATE__;
+    const targetEdge = state.modelEdges.find((edge) => edge.id === 'edge-imu-error');
+    expect(targetEdge).toBeTruthy();
+    targetEdge.injectedFault = {
+      modelId: faultId,
+      name: 'sensor additive bias',
+      layer: 'electrical',
+      runtimeBehavior: 'sensor_bias'
+    };
+    targetEdge.faultBindings = [
+      {
+        bindingId: `${faultId}::edge-imu-error`,
+        faultModelId: faultId,
+        active: true,
+        injectedFault: {
+          modelId: faultId,
+          name: 'sensor additive bias'
+        }
+      }
+    ];
+    targetEdge.status = 'fault';
+
+    const allTargets = () => [...state.modelNodes, ...state.modelEdges, ...(state.nodes || []), ...(state.edges || [])];
+
+    expect(allTargets().some((target) => targetHasFaultRef(target, faultId))).toBe(true);
+
+    const removed = window.removeInjectedFault(faultId);
+    await flushRuntime();
+
+    expect(removed).toBe(true);
+    expect(allTargets().some((target) => targetHasFaultRef(target, faultId))).toBe(false);
+    expect(state.injectedFaultMap?.[faultId]).toBeUndefined();
 
     wrapper.unmount();
   });
