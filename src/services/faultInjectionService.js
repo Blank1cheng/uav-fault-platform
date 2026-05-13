@@ -725,7 +725,11 @@ function nodeMatchesFaultTargets(node, faultModel) {
   }
 
   const nodeKeys = getNodeModuleKeys(node);
-  return targets.some((target) => nodeKeys.some((key) => key.includes(target) || target.includes(key)));
+  return targets.some((target) => nodeKeys.some((key) => (
+    target.startsWith('node-')
+      ? key === target
+      : key.includes(target) || target.includes(key)
+  )));
 }
 
 function getCanEdgeModuleKeys(edge = {}) {

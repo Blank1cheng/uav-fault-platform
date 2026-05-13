@@ -2,109 +2,864 @@
   "schemaVersion": 1,
   "packageType": "flight-control-model",
   "systemFamily": "uav-flight-control",
-  "supportedFaultLibraries": ["uav-flight-control-faults"],
+  "supportedFaultLibraries": [
+    "uav-flight-control-faults"
+  ],
   "modelId": "evtol-closed-loop-fault-demo",
-  "modelName": "eVTOL Closed-Loop Fault Demo",
-  "description": "A stable closed-loop eVTOL flight-control demo for importing a full control chain, injecting relevant faults, and comparing nominal versus degraded behavior.",
+  "modelName": "四旋翼姿态闭环飞控故障诊断 Demo",
+  "description": "面向演示的完整飞控闭环模型：包含姿态指令、控制器、控制分配、四电机执行、动力学、IMU 反馈、残差与频谱诊断，可直接注入重点故障并查看固定测点响应。",
   "source": {
     "origin": "workbench-demo",
-    "notes": "Closed-loop pitch-control demo with small command amplitude, simple first-order blocks, CAN IMU feedback, and residual monitoring for normal/fault comparison."
+    "notes": "内部 ID 和仿真变量保持英文；界面展示、故障实例、测点和 D 矩阵使用中文。"
   },
   "pythonModules": [],
   "faultLibrary": [
     {
-      "id": "imu_rate_bias",
-      "name": "IMU Rate Bias Drift",
-      "layer": "sensor",
-      "desc": "Adds a small pitch-rate bias in the IMU feedback path.",
+      "id": "gyro_zero_bias_offset",
+      "name": "Gyro 陀螺仪零偏 - 固定偏差",
+      "catalogTypeId": "sensor_additive_bias",
+      "layer": "electrical",
+      "modelClass": "偏差故障",
+      "runtimeBehavior": "additive_bias",
+      "desc": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。",
+      "description": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。",
       "defaultValue": 0.04,
+      "defaultParameters": {
+        "bias": 0.04,
+        "start": 2,
+        "duration": ""
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
       "moduleTargets": [
         "node-imu",
-        "imu_gyro"
+        "imu_gyro",
+        "edge-imu-error"
       ],
       "parameter": "bias",
-      "tags": [
-        "demo",
-        "sensor",
-        "imu",
-        "bias"
-      ],
-      "createdAt": "2026-04-30",
-      "origin": "demo"
-    },
-    {
-      "id": "can_bus_delay",
-      "name": "CAN Feedback Delay",
-      "layer": "communication",
-      "desc": "Delays or attenuates the IMU feedback message on the flight-control CAN channel.",
-      "defaultValue": 0.12,
-      "moduleTargets": [
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
         "edge-imu-error",
-        "imu_can_link"
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
       ],
-      "parameter": "latency",
       "tags": [
         "demo",
-        "can",
-        "communication",
-        "feedback"
+        "gyro",
+        "bias",
+        "offset"
       ],
-      "createdAt": "2026-04-30",
-      "origin": "demo"
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
     },
     {
-      "id": "motor_efficiency_loss",
-      "name": "Motor Efficiency Loss",
+      "id": "gyro_zero_bias_drift",
+      "name": "Gyro 陀螺仪零偏 - 缓慢漂移",
+      "catalogTypeId": "physical_parameter_drift",
       "layer": "electrical",
-      "desc": "Reduces motor response so the controller must work harder to hold the pitch rate.",
-      "defaultValue": 0.78,
+      "modelClass": "渐变故障",
+      "runtimeBehavior": "parameter_drift",
+      "desc": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。",
+      "description": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。",
+      "defaultValue": 0.006,
+      "defaultParameters": {
+        "rate": 0.006,
+        "start": 3,
+        "duration": ""
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
       "moduleTargets": [
-        "node-motor",
-        "motor_model"
+        "node-imu",
+        "imu_gyro",
+        "edge-imu-error"
       ],
-      "parameter": "efficiency",
+      "parameter": "drift_rate",
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "gyro",
+        "drift"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "gyro_zero_bias_intermittent",
+      "name": "Gyro 陀螺仪零偏 - 间歇故障",
+      "catalogTypeId": "intermittent_anomaly",
+      "layer": "electrical",
+      "modelClass": "间歇故障",
+      "runtimeBehavior": "intermittent",
+      "desc": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。",
+      "description": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。",
+      "defaultValue": 0.06,
+      "defaultParameters": {
+        "bias": 0.06,
+        "period": 6,
+        "duty": 0.35,
+        "start": 2
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
+      "moduleTargets": [
+        "node-imu",
+        "imu_gyro",
+        "edge-imu-error"
+      ],
+      "parameter": "burst_bias",
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "gyro",
+        "intermittent"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "motor_1_stuck_position",
+      "name": "单电机卡死 - 1号电机卡位",
+      "catalogTypeId": "actuator_lock_or_failure",
+      "layer": "physical",
+      "modelClass": "卡位故障",
+      "runtimeBehavior": "lock",
+      "desc": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。",
+      "description": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。",
+      "defaultValue": 0.35,
+      "defaultParameters": {
+        "lock_value": 0.35,
+        "start": 4,
+        "duration": ""
+      },
+      "targetNodeId": "node-motor-1",
+      "targetEdgeId": "edge-motor1-dynamics",
+      "moduleTargets": [
+        "node-motor-1",
+        "motor_model",
+        "edge-motor1-dynamics"
+      ],
+      "parameter": "lock_value",
+      "recommendedModule": "node-motor-1",
+      "targetModuleName": "1号电机与旋翼",
+      "affectedEdges": [
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
       "tags": [
         "demo",
         "motor",
-        "electrical",
+        "stuck",
         "actuator"
       ],
-      "createdAt": "2026-04-30",
-      "origin": "demo"
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "control_command_tamper",
+      "name": "控制指令篡改 - 1号电机 CAN 指令",
+      "catalogTypeId": "data_tamper",
+      "layer": "protocol",
+      "modelClass": "篡改故障",
+      "runtimeBehavior": "tamper",
+      "desc": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。",
+      "description": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。",
+      "defaultValue": 1.25,
+      "defaultParameters": {
+        "scale": 1.25,
+        "bias": 0.08,
+        "invert": false,
+        "rewriteRate": 0.2,
+        "start": 3
+      },
+      "targetEdgeId": "edge-motor-motor1",
+      "moduleTargets": [
+        "edge-motor-motor1",
+        "motor.command.m1",
+        "CAN-FC-M1"
+      ],
+      "parameter": "scale",
+      "targetModuleName": "1号电机 CAN 指令",
+      "affectedEdges": [
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "can",
+        "tamper",
+        "command"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "sensor_additive_bias",
+      "name": "传感器加性偏置（IMU 通用）",
+      "catalogTypeId": "sensor_additive_bias",
+      "layer": "electrical",
+      "modelClass": "偏差故障",
+      "runtimeBehavior": "additive_bias",
+      "desc": "用于演示故障库中的通用传感器偏置类型。",
+      "description": "用于演示故障库中的通用传感器偏置类型。",
+      "defaultValue": 0.03,
+      "defaultParameters": {
+        "offset": 0.03,
+        "start": 0,
+        "duration": ""
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
+      "moduleTargets": [
+        "node-imu",
+        "imu_gyro",
+        "edge-imu-error"
+      ],
+      "parameter": "offset",
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "sensor",
+        "bias"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "fault_bias_overlay",
+      "name": "偏置叠加块 - IMU 反馈",
+      "catalogTypeId": "fault_bias_overlay",
+      "layer": "electrical",
+      "modelClass": "偏置叠加",
+      "runtimeBehavior": "additive_bias",
+      "desc": "对应平台中的偏置叠加故障注入组件。",
+      "description": "对应平台中的偏置叠加故障注入组件。",
+      "defaultValue": 0.05,
+      "defaultParameters": {
+        "delta_p": 0.05,
+        "start": 0,
+        "duration": ""
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
+      "moduleTargets": [
+        "node-imu",
+        "imu_gyro",
+        "edge-imu-error"
+      ],
+      "parameter": "delta_p",
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "bias-overlay"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "fault_noise_injection",
+      "name": "噪声注入块 - IMU 反馈",
+      "catalogTypeId": "fault_noise_injection",
+      "layer": "electrical",
+      "modelClass": "噪声注入",
+      "runtimeBehavior": "noise",
+      "desc": "对应平台中的噪声注入故障组件，用于高频抖动诊断。",
+      "description": "对应平台中的噪声注入故障组件，用于高频抖动诊断。",
+      "defaultValue": 0.08,
+      "defaultParameters": {
+        "std": 0.08,
+        "seed": 4,
+        "start": 0,
+        "duration": ""
+      },
+      "targetNodeId": "node-imu",
+      "targetEdgeId": "edge-imu-error",
+      "moduleTargets": [
+        "node-imu",
+        "imu_gyro",
+        "edge-imu-error"
+      ],
+      "parameter": "std",
+      "recommendedModule": "node-imu",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "noise"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "can_bus_delay",
+      "name": "CAN 反馈延迟",
+      "catalogTypeId": "fixed_delay",
+      "layer": "protocol",
+      "modelClass": "延迟传输",
+      "runtimeBehavior": "fixed_delay",
+      "desc": "IMU 反馈 CAN 报文固定延迟。",
+      "description": "IMU 反馈 CAN 报文固定延迟。",
+      "defaultValue": 0.12,
+      "defaultParameters": {
+        "delay": 0.12,
+        "start": 2,
+        "duration": ""
+      },
+      "targetEdgeId": "edge-imu-error",
+      "moduleTargets": [
+        "edge-imu-error",
+        "CAN-FC-IMU"
+      ],
+      "parameter": "latency",
+      "targetModuleName": "IMU 反馈链路",
+      "affectedEdges": [
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-controller-allocator",
+        "edge-allocator-motor",
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "can",
+        "delay"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
+    },
+    {
+      "id": "motor_efficiency_loss",
+      "name": "电机效率下降 - 混控输出",
+      "catalogTypeId": "physical_parameter_drift",
+      "layer": "physical",
+      "modelClass": "效率衰减",
+      "runtimeBehavior": "parameter_drift",
+      "desc": "电机混控整体效率下降，用于保留旧 demo 的执行器故障对照。",
+      "description": "电机混控整体效率下降，用于保留旧 demo 的执行器故障对照。",
+      "defaultValue": 0.78,
+      "defaultParameters": {
+        "efficiency": 0.78,
+        "start": 4,
+        "duration": ""
+      },
+      "targetNodeId": "node-motor",
+      "targetEdgeId": "edge-motor-motor1",
+      "moduleTargets": [
+        "node-motor",
+        "motor_model",
+        "edge-motor-motor1"
+      ],
+      "parameter": "efficiency",
+      "recommendedModule": "node-motor",
+      "targetModuleName": "电机混控器",
+      "affectedEdges": [
+        "edge-motor-motor1",
+        "edge-motor1-dynamics",
+        "edge-dynamics-imu-can",
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
+      "tags": [
+        "demo",
+        "motor",
+        "efficiency"
+      ],
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
     },
     {
       "id": "airframe_inertia_shift",
-      "name": "Airframe Inertia Shift",
+      "name": "机体惯量参数偏差",
+      "catalogTypeId": "physical_parameter_bias",
       "layer": "physical",
-      "desc": "Changes the pitch-axis inertia and slightly slows the vehicle response.",
+      "modelClass": "参数偏差",
+      "runtimeBehavior": "parameter_bias",
+      "desc": "飞行动力学参数偏差导致响应变慢。",
+      "description": "飞行动力学参数偏差导致响应变慢。",
       "defaultValue": 1.18,
+      "defaultParameters": {
+        "inertia": 1.18,
+        "start": 0,
+        "duration": ""
+      },
+      "targetNodeId": "node-dynamics",
+      "targetEdgeId": "edge-dynamics-imu-can",
       "moduleTargets": [
         "node-dynamics",
-        "vehicle_dynamics"
+        "vehicle_dynamics",
+        "edge-dynamics-imu-can"
       ],
       "parameter": "inertia",
+      "recommendedModule": "node-dynamics",
+      "targetModuleName": "飞行动力学",
+      "affectedEdges": [
+        "edge-dynamics-imu-can",
+        "edge-imu-error",
+        "edge-error-controller",
+        "edge-error-logger",
+        "edge-error-spectrum"
+      ],
       "tags": [
         "demo",
-        "physical",
-        "dynamics",
-        "airframe"
+        "airframe",
+        "inertia"
       ],
-      "createdAt": "2026-04-30",
-      "origin": "demo"
+      "createdAt": "2026-05-13",
+      "origin": "demo-diagnostic-model"
     }
   ],
+  "diagnosticModel": {
+    "modelId": "evtol-closed-loop-fault-demo",
+    "locale": "zh-CN",
+    "systemFamily": "uav-flight-control",
+    "title": "测点诊断台",
+    "description": "固定测点由当前飞控 demo 预设。先安装测点，注入故障后点击检测，系统按测点列出候选故障供人工确认。",
+    "faultCases": [
+      {
+        "id": "gyro_zero_bias_offset",
+        "name": "Gyro 陀螺仪零偏 - 固定偏差",
+        "catalogTypeId": "sensor_additive_bias",
+        "layer": "electrical",
+        "modelClass": "偏差故障",
+        "runtimeBehavior": "additive_bias",
+        "targetNodeId": "node-imu",
+        "targetEdgeId": "edge-imu-error",
+        "targetModuleName": "IMU 陀螺仪反馈",
+        "defaultParameters": {
+          "bias": 0.04,
+          "start": 2,
+          "duration": ""
+        },
+        "affectedEdges": [
+          "edge-imu-error",
+          "edge-error-controller",
+          "edge-controller-allocator",
+          "edge-allocator-motor",
+          "edge-motor-motor1",
+          "edge-motor1-dynamics",
+          "edge-dynamics-imu-can",
+          "edge-error-logger",
+          "edge-error-spectrum"
+        ],
+        "explanation": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。"
+      },
+      {
+        "id": "gyro_zero_bias_drift",
+        "name": "Gyro 陀螺仪零偏 - 缓慢漂移",
+        "catalogTypeId": "physical_parameter_drift",
+        "layer": "electrical",
+        "modelClass": "渐变故障",
+        "runtimeBehavior": "parameter_drift",
+        "targetNodeId": "node-imu",
+        "targetEdgeId": "edge-imu-error",
+        "targetModuleName": "IMU 陀螺仪反馈",
+        "defaultParameters": {
+          "rate": 0.006,
+          "start": 3,
+          "duration": ""
+        },
+        "affectedEdges": [
+          "edge-imu-error",
+          "edge-error-controller",
+          "edge-controller-allocator",
+          "edge-allocator-motor",
+          "edge-motor-motor1",
+          "edge-motor1-dynamics",
+          "edge-dynamics-imu-can",
+          "edge-error-logger",
+          "edge-error-spectrum"
+        ],
+        "explanation": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。"
+      },
+      {
+        "id": "gyro_zero_bias_intermittent",
+        "name": "Gyro 陀螺仪零偏 - 间歇故障",
+        "catalogTypeId": "intermittent_anomaly",
+        "layer": "electrical",
+        "modelClass": "间歇故障",
+        "runtimeBehavior": "intermittent",
+        "targetNodeId": "node-imu",
+        "targetEdgeId": "edge-imu-error",
+        "targetModuleName": "IMU 陀螺仪反馈",
+        "defaultParameters": {
+          "bias": 0.06,
+          "period": 6,
+          "duty": 0.35,
+          "start": 2
+        },
+        "affectedEdges": [
+          "edge-imu-error",
+          "edge-error-controller",
+          "edge-controller-allocator",
+          "edge-allocator-motor",
+          "edge-motor-motor1",
+          "edge-motor1-dynamics",
+          "edge-dynamics-imu-can",
+          "edge-error-logger",
+          "edge-error-spectrum"
+        ],
+        "explanation": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。"
+      },
+      {
+        "id": "motor_1_stuck_position",
+        "name": "单电机卡死 - 1号电机卡位",
+        "catalogTypeId": "actuator_lock_or_failure",
+        "layer": "physical",
+        "modelClass": "卡位故障",
+        "runtimeBehavior": "lock",
+        "targetNodeId": "node-motor-1",
+        "targetEdgeId": "edge-motor1-dynamics",
+        "targetModuleName": "1号电机与旋翼",
+        "defaultParameters": {
+          "lock_value": 0.35,
+          "start": 4,
+          "duration": ""
+        },
+        "affectedEdges": [
+          "edge-motor1-dynamics",
+          "edge-dynamics-imu-can",
+          "edge-imu-error",
+          "edge-error-controller",
+          "edge-error-logger",
+          "edge-error-spectrum"
+        ],
+        "explanation": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。"
+      },
+      {
+        "id": "control_command_tamper",
+        "name": "控制指令篡改 - 1号电机 CAN 指令",
+        "catalogTypeId": "data_tamper",
+        "layer": "protocol",
+        "modelClass": "篡改故障",
+        "runtimeBehavior": "tamper",
+        "targetEdgeId": "edge-motor-motor1",
+        "targetModuleName": "1号电机 CAN 指令",
+        "defaultParameters": {
+          "scale": 1.25,
+          "bias": 0.08,
+          "invert": false,
+          "rewriteRate": 0.2,
+          "start": 3
+        },
+        "affectedEdges": [
+          "edge-motor-motor1",
+          "edge-motor1-dynamics",
+          "edge-dynamics-imu-can",
+          "edge-imu-error",
+          "edge-error-controller",
+          "edge-error-logger",
+          "edge-error-spectrum"
+        ],
+        "explanation": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。"
+      }
+    ],
+    "testPoints": [
+      {
+        "pointId": "tp-command",
+        "shortName": "M1",
+        "name": "姿态指令测点",
+        "positionNameZh": "姿态指令输出",
+        "edgeId": "edge-command-shaper",
+        "role": "command",
+        "detects": [],
+        "id": "tp-command"
+      },
+      {
+        "pointId": "tp-shaped-command",
+        "shortName": "M2",
+        "name": "整形指令测点",
+        "positionNameZh": "指令整形输出",
+        "edgeId": "edge-shaper-error",
+        "role": "command",
+        "detects": [],
+        "id": "tp-shaped-command"
+      },
+      {
+        "pointId": "tp-error",
+        "shortName": "M3",
+        "name": "姿态误差测点",
+        "positionNameZh": "误差求和输出",
+        "edgeId": "edge-error-controller",
+        "role": "control",
+        "detects": [
+          "gyro_zero_bias_offset",
+          "gyro_zero_bias_drift",
+          "gyro_zero_bias_intermittent",
+          "sensor_additive_bias",
+          "fault_bias_overlay",
+          "fault_noise_injection",
+          "can_bus_delay"
+        ],
+        "id": "tp-error"
+      },
+      {
+        "pointId": "tp-controller-output",
+        "shortName": "M4",
+        "name": "控制器输出测点",
+        "positionNameZh": "姿态控制器输出",
+        "edgeId": "edge-controller-allocator",
+        "role": "control",
+        "detects": [
+          "gyro_zero_bias_offset",
+          "gyro_zero_bias_drift",
+          "gyro_zero_bias_intermittent",
+          "can_bus_delay"
+        ],
+        "id": "tp-controller-output"
+      },
+      {
+        "pointId": "tp-allocation",
+        "shortName": "M5",
+        "name": "控制分配测点",
+        "positionNameZh": "控制分配输出",
+        "edgeId": "edge-allocator-motor",
+        "role": "allocation",
+        "detects": [
+          "gyro_zero_bias_offset",
+          "gyro_zero_bias_drift",
+          "gyro_zero_bias_intermittent",
+          "can_bus_delay"
+        ],
+        "id": "tp-allocation"
+      },
+      {
+        "pointId": "tp-motor-command-m1",
+        "shortName": "M6",
+        "name": "1号电机指令测点",
+        "positionNameZh": "1号电机 CAN 指令",
+        "edgeId": "edge-motor-motor1",
+        "role": "actuation",
+        "detects": [
+          "control_command_tamper",
+          "motor_efficiency_loss"
+        ],
+        "id": "tp-motor-command-m1"
+      },
+      {
+        "pointId": "tp-motor-response-m1",
+        "shortName": "M7",
+        "name": "1号电机响应测点",
+        "positionNameZh": "1号电机执行响应",
+        "edgeId": "edge-motor1-dynamics",
+        "role": "actuation",
+        "detects": [
+          "motor_1_stuck_position",
+          "control_command_tamper",
+          "motor_efficiency_loss"
+        ],
+        "id": "tp-motor-response-m1"
+      },
+      {
+        "pointId": "tp-dynamics",
+        "shortName": "M8",
+        "name": "飞行动力学响应测点",
+        "positionNameZh": "机体俯仰响应",
+        "edgeId": "edge-dynamics-imu-can",
+        "role": "plant",
+        "detects": [
+          "motor_1_stuck_position",
+          "control_command_tamper",
+          "motor_efficiency_loss",
+          "airframe_inertia_shift"
+        ],
+        "id": "tp-dynamics"
+      },
+      {
+        "pointId": "tp-imu-feedback",
+        "shortName": "M9",
+        "name": "IMU 陀螺仪反馈测点",
+        "positionNameZh": "IMU 反馈链路",
+        "edgeId": "edge-imu-error",
+        "role": "measurement",
+        "detects": [
+          "gyro_zero_bias_offset",
+          "gyro_zero_bias_drift",
+          "gyro_zero_bias_intermittent",
+          "sensor_additive_bias",
+          "fault_bias_overlay",
+          "fault_noise_injection",
+          "can_bus_delay",
+          "motor_1_stuck_position",
+          "control_command_tamper"
+        ],
+        "id": "tp-imu-feedback"
+      },
+      {
+        "pointId": "tp-residual",
+        "shortName": "M10",
+        "name": "残差诊断测点",
+        "positionNameZh": "残差诊断输出",
+        "edgeId": "edge-error-logger",
+        "role": "residual",
+        "detects": [
+          "gyro_zero_bias_offset",
+          "gyro_zero_bias_drift",
+          "gyro_zero_bias_intermittent",
+          "motor_1_stuck_position",
+          "control_command_tamper",
+          "sensor_additive_bias",
+          "fault_bias_overlay",
+          "fault_noise_injection",
+          "can_bus_delay",
+          "motor_efficiency_loss",
+          "airframe_inertia_shift"
+        ],
+        "id": "tp-residual"
+      },
+      {
+        "pointId": "tp-spectrum",
+        "shortName": "M11",
+        "name": "频谱诊断测点",
+        "positionNameZh": "频谱分析输出",
+        "edgeId": "edge-error-spectrum",
+        "role": "residual",
+        "detects": [
+          "gyro_zero_bias_intermittent",
+          "fault_noise_injection",
+          "motor_1_stuck_position",
+          "control_command_tamper"
+        ],
+        "id": "tp-spectrum"
+      },
+      {
+        "pointId": "tp-can-monitor",
+        "shortName": "M12",
+        "name": "CAN 状态测点",
+        "positionNameZh": "电机 CAN 总线状态",
+        "edgeId": "edge-motor-motor2",
+        "role": "protocol",
+        "detects": [
+          "control_command_tamper"
+        ],
+        "id": "tp-can-monitor"
+      }
+    ],
+    "dMatrix": {
+      "pointIds": [
+        "tp-command",
+        "tp-shaped-command",
+        "tp-error",
+        "tp-controller-output",
+        "tp-allocation",
+        "tp-motor-command-m1",
+        "tp-motor-response-m1",
+        "tp-dynamics",
+        "tp-imu-feedback",
+        "tp-residual",
+        "tp-spectrum",
+        "tp-can-monitor"
+      ],
+      "faultCaseIds": [
+        "gyro_zero_bias_offset",
+        "gyro_zero_bias_drift",
+        "gyro_zero_bias_intermittent",
+        "motor_1_stuck_position",
+        "control_command_tamper"
+      ],
+      "note": "D(i,j)=1 ???? i ???? j ???????????? affectedEdges ???????????"
+    },
+    "contrastExamples": [
+      {
+        "title": "同一电机对象，不同故障在 M6 的表现不同",
+        "pointId": "tp-motor-command-m1",
+        "detectableFaultId": "control_command_tamper",
+        "nonDetectableFaultId": "motor_1_stuck_position",
+        "explanation": "控制指令篡改发生在 M6 所在 CAN 指令链路；单电机卡死发生在执行响应端，因此 M6 不直接检出卡死。"
+      }
+    ]
+  },
   "workbenchSnapshot": {
     "version": 1,
     "modelNodes": [
       {
         "id": "node-command",
         "type": "signal_source",
-        "x": 80,
-        "y": 170,
-        "w": 172,
-        "h": 84,
+        "x": 70,
+        "y": 215,
+        "w": 170,
+        "h": 86,
         "props": {
-          "name": "Pilot Pitch Command",
+          "name": "姿态指令",
           "waveType": "sine",
           "amplitude": "0.08",
           "frequency": "0.35",
@@ -115,32 +870,32 @@
       {
         "id": "node-command-shaper",
         "type": "simulation_block",
-        "x": 290,
-        "y": 160,
-        "w": 184,
+        "x": 285,
+        "y": 205,
+        "w": 185,
         "h": 100,
         "props": {
-          "name": "Command Shaper",
+          "name": "指令整形",
           "moduleType": "control-conditioning",
           "inputs": [
             {
-              "name": "Pitch Command",
+              "name": "俯仰指令",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Shaped Command",
+              "name": "整形指令",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "filtered_command",
+              "name": "滤波指令",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "Simple first-order command limiter used to keep the closed-loop demo bounded."
+          "ffunctionNote": "限制指令变化率，保证正常闭环不发散。"
         },
         "pythonBinding": null
       },
@@ -148,11 +903,11 @@
         "id": "node-error-sum",
         "type": "sum_block",
         "x": 520,
-        "y": 160,
-        "w": 154,
+        "y": 210,
+        "w": 155,
         "h": 88,
         "props": {
-          "name": "Pitch Error Sum",
+          "name": "姿态误差求和",
           "inputCount": 2,
           "signs": [
             "+",
@@ -166,208 +921,353 @@
         "id": "node-controller",
         "type": "simulation_block",
         "x": 720,
-        "y": 145,
-        "w": 192,
+        "y": 190,
+        "w": 190,
         "h": 108,
         "props": {
-          "name": "Attitude Controller",
+          "name": "姿态控制器",
           "moduleType": "control",
           "inputs": [
             {
-              "name": "Pitch Error",
-              "type": "scalar"
-            },
-            {
-              "name": "Rate Feedback",
+              "name": "姿态误差",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Torque Demand",
+              "name": "力矩需求",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "integrator_state",
+              "name": "积分状态",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "Small PID-like controller tuned for gentle closed-loop response."
+          "ffunctionNote": "温和 PID 控制器，用于演示故障前后的差异。"
         },
         "pythonBinding": null
       },
       {
         "id": "node-allocator",
         "type": "simulation_block",
-        "x": 965,
-        "y": 145,
-        "w": 188,
-        "h": 100,
+        "x": 955,
+        "y": 190,
+        "w": 185,
+        "h": 108,
         "props": {
-          "name": "Control Allocation",
-          "moduleType": "allocation",
+          "name": "控制分配",
+          "moduleType": "control_allocation",
           "inputs": [
             {
-              "name": "Torque Demand",
+              "name": "力矩需求",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Motor Command",
+              "name": "电机总指令",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "allocation_state",
+              "name": "分配状态",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "Maps a bounded attitude demand into a motor command envelope."
+          "ffunctionNote": "将姿态控制量分配到四个电机通道。"
         },
         "pythonBinding": null
       },
       {
         "id": "node-motor",
         "type": "simulation_block",
-        "x": 1210,
-        "y": 145,
-        "w": 180,
-        "h": 100,
+        "x": 1190,
+        "y": 190,
+        "w": 185,
+        "h": 108,
         "props": {
-          "name": "Motor Mixer",
-          "moduleType": "actuators",
+          "name": "电机混控器",
+          "moduleType": "motor_mixer",
           "inputs": [
             {
-              "name": "Motor Command",
+              "name": "电机总指令",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Thrust Response",
+              "name": "M1 指令",
+              "type": "scalar"
+            },
+            {
+              "name": "M2 指令",
+              "type": "scalar"
+            },
+            {
+              "name": "M3 指令",
+              "type": "scalar"
+            },
+            {
+              "name": "M4 指令",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "motor_state",
+              "name": "混控状态",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "First-order actuator response with small saturation margin for stable demo playback."
+          "ffunctionNote": "生成四路电机 CAN 指令。"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-motor-1",
+        "type": "simulation_block",
+        "x": 1440,
+        "y": 70,
+        "w": 185,
+        "h": 94,
+        "props": {
+          "name": "1号电机与旋翼",
+          "moduleType": "motor_model",
+          "inputs": [
+            {
+              "name": "M1 指令",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "M1 推力",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "1号电机状态",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "单电机卡位故障的展示对象。"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-motor-2",
+        "type": "simulation_block",
+        "x": 1440,
+        "y": 185,
+        "w": 185,
+        "h": 94,
+        "props": {
+          "name": "2号电机与旋翼",
+          "moduleType": "motor_model",
+          "inputs": [
+            {
+              "name": "M2 指令",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "M2 推力",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "2号电机状态",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "正常电机通道，用于 CAN 状态测点对照。"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-motor-3",
+        "type": "simulation_block",
+        "x": 1440,
+        "y": 300,
+        "w": 185,
+        "h": 94,
+        "props": {
+          "name": "3号电机与旋翼",
+          "moduleType": "motor_model",
+          "inputs": [
+            {
+              "name": "M3 指令",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "M3 推力",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "3号电机状态",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "正常电机通道。"
+        },
+        "pythonBinding": null
+      },
+      {
+        "id": "node-motor-4",
+        "type": "simulation_block",
+        "x": 1440,
+        "y": 415,
+        "w": 185,
+        "h": 94,
+        "props": {
+          "name": "4号电机与旋翼",
+          "moduleType": "motor_model",
+          "inputs": [
+            {
+              "name": "M4 指令",
+              "type": "scalar"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "M4 推力",
+              "type": "scalar"
+            }
+          ],
+          "middleVars": [
+            {
+              "name": "4号电机状态",
+              "type": "scalar"
+            }
+          ],
+          "ffunctionNote": "正常电机通道。"
         },
         "pythonBinding": null
       },
       {
         "id": "node-dynamics",
         "type": "simulation_block",
-        "x": 1450,
-        "y": 145,
-        "w": 188,
-        "h": 104,
+        "x": 1700,
+        "y": 230,
+        "w": 205,
+        "h": 116,
         "props": {
-          "name": "Vehicle Pitch Dynamics",
-          "moduleType": "vehicle",
+          "name": "飞行动力学",
+          "moduleType": "vehicle_dynamics",
           "inputs": [
             {
-              "name": "Thrust Response",
+              "name": "M1 推力",
+              "type": "scalar"
+            },
+            {
+              "name": "M2 推力",
+              "type": "scalar"
+            },
+            {
+              "name": "M3 推力",
+              "type": "scalar"
+            },
+            {
+              "name": "M4 推力",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Pitch Rate",
+              "name": "俯仰角速度",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "pitch_state",
+              "name": "俯仰状态",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "Lightly damped vehicle model so the loop remains bounded and easy to compare under faults."
+          "ffunctionNote": "四电机推力汇总后的俯仰动力学响应。"
         },
         "pythonBinding": null
       },
       {
         "id": "node-imu",
         "type": "simulation_block",
-        "x": 1450,
-        "y": 330,
-        "w": 188,
-        "h": 104,
+        "x": 735,
+        "y": 455,
+        "w": 190,
+        "h": 102,
         "props": {
-          "name": "IMU Gyro",
-          "moduleType": "sensors",
+          "name": "IMU 陀螺仪反馈",
+          "moduleType": "imu_gyro",
           "inputs": [
             {
-              "name": "Body Rate",
+              "name": "机体角速度",
               "type": "scalar"
             }
           ],
           "outputs": [
             {
-              "name": "Measured Pitch Rate",
+              "name": "测量角速度",
               "type": "scalar"
             }
           ],
           "middleVars": [
             {
-              "name": "measured_pitch_rate",
+              "name": "陀螺仪零偏状态",
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "Pitch-rate sensor path that can carry bias, delay, or scale faults."
+          "ffunctionNote": "陀螺仪零偏故障的主要注入对象。"
         },
         "pythonBinding": null
       },
       {
         "id": "node-scope",
         "type": "instrument_scope",
-        "x": 1710,
-        "y": 150,
-        "w": 176,
-        "h": 92,
+        "x": 505,
+        "y": 540,
+        "w": 190,
+        "h": 90,
         "props": {
-          "name": "Command vs Rate Scope",
+          "name": "指令与反馈示波器",
           "instrumentType": "scope",
-          "sampleRate": "50Hz",
-          "signal": "CH1 pitch command / CH2 measured pitch rate"
+          "sampleRate": "1000 Hz"
         },
         "pythonBinding": null
       },
       {
         "id": "node-residual-logger",
         "type": "instrument_logger",
-        "x": 1710,
-        "y": 320,
-        "w": 172,
-        "h": 84,
+        "x": 970,
+        "y": 455,
+        "w": 190,
+        "h": 90,
         "props": {
-          "name": "Pitch Error Logger",
+          "name": "残差诊断记录仪",
           "instrumentType": "logger",
-          "sampleRate": "50Hz",
-          "signal": "pitch error"
+          "sampleRate": "1000 Hz"
         },
         "pythonBinding": null
       },
       {
         "id": "node-residual-spectrum",
         "type": "instrument_spectrum",
-        "x": 1710,
-        "y": 450,
-        "w": 176,
-        "h": 84,
+        "x": 1210,
+        "y": 455,
+        "w": 190,
+        "h": 90,
         "props": {
-          "name": "Error Spectrum",
+          "name": "频谱分析仪",
           "instrumentType": "spectrum",
-          "sampleRate": "50Hz",
-          "signal": "pitch error spectrum"
+          "sampleRate": "1000 Hz"
         },
         "pythonBinding": null
       }
@@ -379,7 +1279,10 @@
         "targetNodeId": "node-command-shaper",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "姿态指令",
+        "signalId": "cmd.pitch",
+        "signalUnit": "rad"
       },
       {
         "id": "edge-shaper-error",
@@ -387,7 +1290,10 @@
         "targetNodeId": "node-error-sum",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "整形指令",
+        "signalId": "cmd.pitch.shaped",
+        "signalUnit": "rad"
       },
       {
         "id": "edge-imu-error",
@@ -396,6 +1302,7 @@
         "sourcePortIndex": 0,
         "targetPortIndex": 1,
         "lineType": "can",
+        "label": "IMU 反馈",
         "signalId": "imu.pitch_rate",
         "channelId": "CAN-FC-IMU",
         "messageId": "0x184",
@@ -419,7 +1326,10 @@
         "targetNodeId": "node-controller",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "姿态误差",
+        "signalId": "err.pitch",
+        "signalUnit": "rad/s"
       },
       {
         "id": "edge-controller-allocator",
@@ -427,7 +1337,10 @@
         "targetNodeId": "node-allocator",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "控制量",
+        "signalId": "ctrl.pitch",
+        "signalUnit": "N*m"
       },
       {
         "id": "edge-allocator-motor",
@@ -435,15 +1348,153 @@
         "targetNodeId": "node-motor",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "电机总指令",
+        "signalId": "motor.command.total"
       },
       {
-        "id": "edge-motor-dynamics",
+        "id": "edge-motor-motor1",
         "sourceNodeId": "node-motor",
+        "targetNodeId": "node-motor-1",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 0,
+        "lineType": "can",
+        "label": "1号电机 CAN 指令",
+        "signalId": "motor.command.m1",
+        "channelId": "CAN-FC-M1",
+        "messageId": "0x211",
+        "payloadKind": "float32",
+        "signalUnit": "norm",
+        "faultPropagationPolicy": "propagates",
+        "signalChannels": [
+          {
+            "signalId": "motor.command.m1",
+            "channelId": "CAN-FC-M1",
+            "messageId": "0x211",
+            "payloadKind": "float32",
+            "signalUnit": "norm",
+            "faultPropagationPolicy": "propagates"
+          }
+        ]
+      },
+      {
+        "id": "edge-motor-motor2",
+        "sourceNodeId": "node-motor",
+        "targetNodeId": "node-motor-2",
+        "sourcePortIndex": 1,
+        "targetPortIndex": 0,
+        "lineType": "can",
+        "label": "2号电机 CAN 指令",
+        "signalId": "motor.command.m2",
+        "channelId": "CAN-FC-M2",
+        "messageId": "0x212",
+        "payloadKind": "float32",
+        "signalUnit": "norm",
+        "faultPropagationPolicy": "propagates",
+        "signalChannels": [
+          {
+            "signalId": "motor.command.m2",
+            "channelId": "CAN-FC-M2",
+            "messageId": "0x212",
+            "payloadKind": "float32",
+            "signalUnit": "norm",
+            "faultPropagationPolicy": "propagates"
+          }
+        ]
+      },
+      {
+        "id": "edge-motor-motor3",
+        "sourceNodeId": "node-motor",
+        "targetNodeId": "node-motor-3",
+        "sourcePortIndex": 2,
+        "targetPortIndex": 0,
+        "lineType": "can",
+        "label": "3号电机 CAN 指令",
+        "signalId": "motor.command.m3",
+        "channelId": "CAN-FC-M3",
+        "messageId": "0x213",
+        "payloadKind": "float32",
+        "signalUnit": "norm",
+        "faultPropagationPolicy": "propagates",
+        "signalChannels": [
+          {
+            "signalId": "motor.command.m3",
+            "channelId": "CAN-FC-M3",
+            "messageId": "0x213",
+            "payloadKind": "float32",
+            "signalUnit": "norm",
+            "faultPropagationPolicy": "propagates"
+          }
+        ]
+      },
+      {
+        "id": "edge-motor-motor4",
+        "sourceNodeId": "node-motor",
+        "targetNodeId": "node-motor-4",
+        "sourcePortIndex": 3,
+        "targetPortIndex": 0,
+        "lineType": "can",
+        "label": "4号电机 CAN 指令",
+        "signalId": "motor.command.m4",
+        "channelId": "CAN-FC-M4",
+        "messageId": "0x214",
+        "payloadKind": "float32",
+        "signalUnit": "norm",
+        "faultPropagationPolicy": "propagates",
+        "signalChannels": [
+          {
+            "signalId": "motor.command.m4",
+            "channelId": "CAN-FC-M4",
+            "messageId": "0x214",
+            "payloadKind": "float32",
+            "signalUnit": "norm",
+            "faultPropagationPolicy": "propagates"
+          }
+        ]
+      },
+      {
+        "id": "edge-motor1-dynamics",
+        "sourceNodeId": "node-motor-1",
         "targetNodeId": "node-dynamics",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "M1 推力响应",
+        "signalId": "motor.thrust.m1",
+        "signalUnit": "N"
+      },
+      {
+        "id": "edge-motor2-dynamics",
+        "sourceNodeId": "node-motor-2",
+        "targetNodeId": "node-dynamics",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 1,
+        "lineType": "normal",
+        "label": "M2 推力响应",
+        "signalId": "motor.thrust.m2",
+        "signalUnit": "N"
+      },
+      {
+        "id": "edge-motor3-dynamics",
+        "sourceNodeId": "node-motor-3",
+        "targetNodeId": "node-dynamics",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 2,
+        "lineType": "normal",
+        "label": "M3 推力响应",
+        "signalId": "motor.thrust.m3",
+        "signalUnit": "N"
+      },
+      {
+        "id": "edge-motor4-dynamics",
+        "sourceNodeId": "node-motor-4",
+        "targetNodeId": "node-dynamics",
+        "sourcePortIndex": 0,
+        "targetPortIndex": 3,
+        "lineType": "normal",
+        "label": "M4 推力响应",
+        "signalId": "motor.thrust.m4",
+        "signalUnit": "N"
       },
       {
         "id": "edge-dynamics-imu-can",
@@ -451,7 +1502,10 @@
         "targetNodeId": "node-imu",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "机体俯仰角速度",
+        "signalId": "body.pitch_rate",
+        "signalUnit": "rad/s"
       },
       {
         "id": "edge-command-scope",
@@ -459,7 +1513,9 @@
         "targetNodeId": "node-scope",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "指令观测",
+        "signalId": "scope.command"
       },
       {
         "id": "edge-imu-scope",
@@ -467,7 +1523,9 @@
         "targetNodeId": "node-scope",
         "sourcePortIndex": 0,
         "targetPortIndex": 1,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "反馈观测",
+        "signalId": "scope.imu"
       },
       {
         "id": "edge-error-logger",
@@ -475,7 +1533,9 @@
         "targetNodeId": "node-residual-logger",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "残差诊断",
+        "signalId": "diag.residual"
       },
       {
         "id": "edge-error-spectrum",
@@ -483,94 +1543,15 @@
         "targetNodeId": "node-residual-spectrum",
         "sourcePortIndex": 0,
         "targetPortIndex": 0,
-        "lineType": "normal"
+        "lineType": "normal",
+        "label": "频谱诊断",
+        "signalId": "diag.spectrum"
       }
     ],
-    "nodeSeq": 11,
-    "edgeSeq": 12,
+    "nodeSeq": 15,
+    "edgeSeq": 19,
     "activeLineType": "normal",
     "faultedBlks": [],
-    "importedFaultModels": [
-      {
-        "id": "imu_rate_bias",
-        "name": "IMU Rate Bias Drift",
-        "layer": "sensor",
-        "desc": "Adds a small pitch-rate bias in the IMU feedback path.",
-        "defaultValue": 0.04,
-        "moduleTargets": [
-          "node-imu",
-          "imu_gyro"
-        ],
-        "parameter": "bias",
-        "tags": [
-          "demo",
-          "sensor",
-          "imu",
-          "bias"
-        ],
-        "createdAt": "2026-04-30",
-        "origin": "demo"
-      },
-      {
-        "id": "can_bus_delay",
-        "name": "CAN Feedback Delay",
-        "layer": "communication",
-        "desc": "Delays or attenuates the IMU feedback message on the flight-control CAN channel.",
-        "defaultValue": 0.12,
-        "moduleTargets": [
-          "edge-imu-error",
-          "imu_can_link"
-        ],
-        "parameter": "latency",
-        "tags": [
-          "demo",
-          "can",
-          "communication",
-          "feedback"
-        ],
-        "createdAt": "2026-04-30",
-        "origin": "demo"
-      },
-      {
-        "id": "motor_efficiency_loss",
-        "name": "Motor Efficiency Loss",
-        "layer": "electrical",
-        "desc": "Reduces motor response so the controller must work harder to hold the pitch rate.",
-        "defaultValue": 0.78,
-        "moduleTargets": [
-          "node-motor",
-          "motor_model"
-        ],
-        "parameter": "efficiency",
-        "tags": [
-          "demo",
-          "motor",
-          "electrical",
-          "actuator"
-        ],
-        "createdAt": "2026-04-30",
-        "origin": "demo"
-      },
-      {
-        "id": "airframe_inertia_shift",
-        "name": "Airframe Inertia Shift",
-        "layer": "physical",
-        "desc": "Changes the pitch-axis inertia and slightly slows the vehicle response.",
-        "defaultValue": 1.18,
-        "moduleTargets": [
-          "node-dynamics",
-          "vehicle_dynamics"
-        ],
-        "parameter": "inertia",
-        "tags": [
-          "demo",
-          "physical",
-          "dynamics",
-          "airframe"
-        ],
-        "createdAt": "2026-04-30",
-        "origin": "demo"
-      }
-    ]
+    "importedFaultModels": []
   }
 }

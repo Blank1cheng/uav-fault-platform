@@ -277,6 +277,8 @@ export function __resetLegacyRuntimeForTests() {
   delete window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__;
   delete window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__;
   delete window.__GZ_PUBLIC_DEMO_MODE__;
+  delete window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SOURCE__;
+  delete window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SYNC__;
   delete window.__GZ_DISABLE_DEFAULT_MODEL__;
   delete window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   delete window.__GZ_PYTHON_BINDING_EVENTS__;

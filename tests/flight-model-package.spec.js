@@ -939,6 +939,52 @@ describe('flightModelPackageService', () => {
     ]);
   });
 
+  it('defines the closed-loop demo diagnostic contract with Chinese labels and red-box faults', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const diagnosticModel = closedLoopPackage.diagnosticModel;
+    const nodes = closedLoopPackage.workbenchSnapshot.modelNodes;
+    const faults = closedLoopPackage.faultLibrary;
+    const points = diagnosticModel?.testPoints ?? [];
+    const cases = diagnosticModel?.faultCases ?? [];
+    const caseIds = cases.map((faultCase) => faultCase.id);
+
+    expect(closedLoopPackage.modelName).toContain('飞控');
+    expect(nodes.map((node) => node.props?.name)).toEqual(expect.arrayContaining([
+      '姿态指令',
+      '姿态控制器',
+      '控制分配',
+      '1号电机与旋翼',
+      'IMU 陀螺仪反馈'
+    ]));
+    expect(diagnosticModel).toMatchObject({
+      modelId: 'evtol-closed-loop-fault-demo',
+      locale: 'zh-CN'
+    });
+    expect(points).toHaveLength(12);
+    expect(points.map((point) => point.shortName)).toEqual([
+      'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'
+    ]);
+    expect(caseIds).toEqual(expect.arrayContaining([
+      'gyro_zero_bias_offset',
+      'gyro_zero_bias_drift',
+      'gyro_zero_bias_intermittent',
+      'motor_1_stuck_position',
+      'control_command_tamper'
+    ]));
+    cases.forEach((faultCase) => {
+      expect(faults.some((fault) => fault.id === faultCase.id)).toBe(true);
+      expect(points.some((point) => point.detects.includes(faultCase.id))).toBe(true);
+      expect(faultCase.name).toMatch(/[一-龥]/);
+      expect(faultCase.catalogTypeId).toBeTruthy();
+    });
+
+    const motorCommandPoint = points.find((point) => point.shortName === 'M6');
+    const motorResponsePoint = points.find((point) => point.shortName === 'M7');
+    expect(motorCommandPoint?.detects).toContain('control_command_tamper');
+    expect(motorCommandPoint?.detects).not.toContain('motor_1_stuck_position');
+    expect(motorResponsePoint?.detects).toContain('motor_1_stuck_position');
+  });
+
   it('maps every closed-loop demo fault-library entry to a compatible runtime target', () => {
     const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
     const nodes = closedLoopPackage.workbenchSnapshot.modelNodes;
@@ -951,7 +997,11 @@ describe('flightModelPackageService', () => {
     );
 
     expect(targetsByFaultId).toMatchObject({
-      imu_rate_bias: { kind: 'node', id: 'node-imu' },
+      gyro_zero_bias_offset: { kind: 'node', id: 'node-imu' },
+      gyro_zero_bias_drift: { kind: 'node', id: 'node-imu' },
+      gyro_zero_bias_intermittent: { kind: 'node', id: 'node-imu' },
+      motor_1_stuck_position: { kind: 'node', id: 'node-motor-1' },
+      control_command_tamper: { kind: 'edge', id: 'edge-motor-motor1' },
       motor_efficiency_loss: { kind: 'node', id: 'node-motor' },
       airframe_inertia_shift: { kind: 'node', id: 'node-dynamics' },
       can_bus_delay: { kind: 'edge', id: 'edge-imu-error' }

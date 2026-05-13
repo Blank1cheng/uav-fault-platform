@@ -171,6 +171,8 @@ describe('canvas layout cleanup', () => {
     expect(consoleCss).toContain('.canvas-sim-dock .simbar');
     expect(consoleCss).toContain('@media (max-width:1680px)');
     expect(consoleCss).toContain('grid-template-rows:104px minmax(0,1fr)');
+    expect(consoleCss).toContain('header .toolbar .tbtn{\n  flex:0 0 auto;');
+    expect(consoleCss).toContain('header .toolbar{\n    grid-column:2 / 4;');
     expect(consoleCss).toContain('@media (max-width:1120px)');
     expect(consoleCss).toContain('grid-template-rows:156px minmax(0,1fr)');
     expect(consoleCss).toContain('top:140px');
@@ -561,7 +563,8 @@ describe('canvas layout cleanup', () => {
     const initialModel = window.buildDiagnosticTestPointModel();
     const installablePosition = initialModel.positions.find((point) => !point.installed);
 
-    expect(initialModel.positions).toHaveLength(semantic.measurementPoints.length);
+    expect(semantic.measurementPoints.length).toBeGreaterThanOrEqual(initialModel.positions.length);
+    expect(initialModel.positions).toHaveLength(pkg.diagnosticModel.testPoints.length);
     expect(initialModel.installed.length).toBe(0);
     expect(installablePosition).toBeTruthy();
     expect(initialModel.positions.every((point) =>
@@ -731,8 +734,8 @@ describe('canvas layout cleanup', () => {
     expect(importResult).toMatchObject({ ok: true });
 
     const model = window.buildDiagnosticTestPointModel();
-    const imuPoint = model.positions.find((point) => point.edgeId === 'edge-imu-error');
-    const imuNode = window.__GZ_STATE__.modelNodes.find((node) => node.id === 'node-imu');
+    const imuPoint = model.positions.find((point) => point.shortName === 'M6');
+    const imuNode = window.__GZ_STATE__.modelNodes.find((node) => node.id === 'node-motor-1');
     expect(imuPoint).toBeTruthy();
     expect(imuNode).toBeTruthy();
 
@@ -745,8 +748,8 @@ describe('canvas layout cleanup', () => {
         category: '传感器故障'
       },
       {
-        id: 'imu_self_test_warning',
-        modelId: 'imu_self_test_warning',
+        id: 'motor_1_stuck_position',
+        modelId: 'motor_1_stuck_position',
         name: 'IMU 自检状态异常',
         category: '本地状态故障'
       }
@@ -755,12 +758,12 @@ describe('canvas layout cleanup', () => {
     const mixedDiagnosis = window.runDiagnosticTestPointDetection(imuPoint.pointId);
     expect(mixedDiagnosis.status).toBe('abnormal');
     expect(mixedDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'sensor_additive_bias')).toBe(true);
-    expect(mixedDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'imu_self_test_warning')).toBe(false);
+    expect(mixedDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'motor_1_stuck_position')).toBe(false);
 
     imuNode.faults = [
       {
-        id: 'imu_self_test_warning',
-        modelId: 'imu_self_test_warning',
+        id: 'motor_1_stuck_position',
+        modelId: 'motor_1_stuck_position',
         name: 'IMU 自检状态异常',
         category: '本地状态故障'
       }
@@ -768,7 +771,7 @@ describe('canvas layout cleanup', () => {
 
     const localOnlyDiagnosis = window.runDiagnosticTestPointDetection(imuPoint.pointId);
     expect(localOnlyDiagnosis.status).toBe('normal');
-    expect(localOnlyDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'imu_self_test_warning')).toBe(false);
+    expect(localOnlyDiagnosis.candidates.some((candidate) => candidate.faultTypeId === 'motor_1_stuck_position')).toBe(false);
 
     wrapper.unmount();
   });
@@ -1016,7 +1019,17 @@ describe('canvas layout cleanup', () => {
     expect(matrix.rows.some((row) => row.faultId === 'sensor_additive_bias')).toBe(true);
     expect(matrix.rows.some((row) => row.faultId === 'fault_bias_overlay')).toBe(true);
     expect(matrix.rows.some((row) => row.faultId === 'fault_noise_injection')).toBe(true);
+    expect(matrix.rows.some((row) => row.faultId === 'gyro_zero_bias_offset')).toBe(true);
+    expect(matrix.rows.some((row) => row.faultId === 'motor_1_stuck_position')).toBe(true);
+    expect(matrix.rows.some((row) => row.faultId === 'control_command_tamper')).toBe(true);
     expect(matrix.rows.find((row) => row.faultId === 'sensor_additive_bias')?.cells.some((cell) => cell.detectable)).toBe(true);
+    const motorCommandPoint = matrix.points.find((point) => point.shortName === 'M6');
+    const motorResponsePoint = matrix.points.find((point) => point.shortName === 'M7');
+    const motorStuckRow = matrix.rows.find((row) => row.faultId === 'motor_1_stuck_position');
+    const commandTamperRow = matrix.rows.find((row) => row.faultId === 'control_command_tamper');
+    expect(commandTamperRow?.cells.find((cell) => cell.pointId === motorCommandPoint?.pointId)?.detectable).toBe(true);
+    expect(motorStuckRow?.cells.find((cell) => cell.pointId === motorCommandPoint?.pointId)?.detectable).toBe(false);
+    expect(motorStuckRow?.cells.find((cell) => cell.pointId === motorResponsePoint?.pointId)?.detectable).toBe(true);
 
     const dMatrixTab = document.querySelector('[data-canvas-view="dmatrix"]');
     expect(dMatrixTab).not.toBeNull();

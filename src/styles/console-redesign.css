@@ -1042,8 +1042,8 @@ header .toolbar{
   overscroll-behavior-inline:contain;
 }
 header .toolbar .tbtn{
-  flex:0 1 auto;
-  min-width:0;
+  flex:0 0 auto;
+  min-width:88px;
   max-width:158px;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1066,7 +1066,7 @@ header .toolbar .tbtn-disabled{
     grid-row:1;
   }
   .header-project{
-    grid-column:1 / 3;
+    grid-column:1;
     grid-row:2;
     margin:6px 10px 6px 14px;
   }
@@ -1079,7 +1079,7 @@ header .toolbar .tbtn-disabled{
     justify-content:center;
   }
   header .toolbar{
-    grid-column:3;
+    grid-column:2 / 4;
     grid-row:2;
     height:100%;
     border-left:1px solid #d7e2ee;

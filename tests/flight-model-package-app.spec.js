@@ -332,7 +332,7 @@ describe('Flight model package app integration', () => {
       modelName: defaultPackage.modelName,
       systemFamily: 'uav-flight-control'
     });
-    expect(window.__GZ_STATE__.modelNodes).toHaveLength(11);
+    expect(window.__GZ_STATE__.modelNodes).toHaveLength(defaultPackage.workbenchSnapshot.modelNodes.length);
     expect(window.__GZ_STATE__.modelEdges.some((edge) => edge.id === 'edge-imu-error')).toBe(true);
     expect(window.__GZ_STATE__.availableFaultModels.some((model) => model.id === 'sensor_additive_bias')).toBe(true);
     expect(window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__).toMatchObject({
@@ -383,8 +383,8 @@ describe('Flight model package app integration', () => {
       modelName: defaultPackage.modelName,
       systemFamily: 'uav-flight-control'
     });
-    expect(state.modelNodes).toHaveLength(11);
-    expect(state.modelEdges).toHaveLength(12);
+    expect(state.modelNodes).toHaveLength(defaultPackage.workbenchSnapshot.modelNodes.length);
+    expect(state.modelEdges).toHaveLength(defaultPackage.workbenchSnapshot.modelEdges.length);
     expect(state.availableFaultModels.some((model) => model.id === 'sensor_additive_bias')).toBe(true);
     expect(document.getElementById('btn-imp-flt')?.disabled).toBe(false);
 
@@ -392,7 +392,12 @@ describe('Flight model package app integration', () => {
     await flushRuntime();
 
     expect(document.getElementById('ov-ifm')?.classList.contains('open')).toBe(true);
-    expect(document.querySelector('[data-fault-id="sensor_additive_bias"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="gyro_zero_bias_offset"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="gyro_zero_bias_drift"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="gyro_zero_bias_intermittent"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="motor_1_stuck_position"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="control_command_tamper"]')).toBeTruthy();
+    expect(document.querySelector('[data-fault-id="physical_parameter_bias"]')).toBeNull();
     expect(document.querySelector('#ov-ifm .btn-ok-r')?.disabled).toBe(false);
 
     wrapper.unmount();

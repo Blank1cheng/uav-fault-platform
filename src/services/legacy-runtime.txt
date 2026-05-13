@@ -16425,6 +16425,127 @@ function decorateDataflowEdges(){
   });
 })();
 
+;(function installDiagnosticModelPackageBridge(){
+  if(typeof window==='undefined') return;
+
+  function clone(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:null);
+  }
+
+  function hasDiagnosticFaultLibrary(state){
+    return Boolean(state?.diagnosticModel&&arr(state.faultLibrary).length);
+  }
+
+  function applyDiagnosticFaultCatalog(state=getState()){
+    if(!hasDiagnosticFaultLibrary(state)) return [];
+    const models=arr(state.faultLibrary).map(clone);
+    state.availableFaultModels=models;
+    if(!models.some(model=>model.id===state.selectedFaultCatalogId)){
+      state.selectedFaultCatalogId=models[0]?.id||'';
+    }
+    return models;
+  }
+
+  function normalizeFaultCase(faultCase){
+    if(!faultCase||typeof faultCase!=='object') return null;
+    const id=faultCase.id||faultCase.faultId||faultCase.modelId||faultCase.faultModelId;
+    if(!id) return null;
+    return {
+      ...faultCase,
+      id,
+      name:faultCase.name||faultCase.nameZh||faultCase.labelZh||id,
+      category:faultCase.category||faultCase.categoryZh||faultCase.modelClass||faultCase.layer||'故障',
+      detects:arr(faultCase.detects),
+      moduleTargets:arr(faultCase.moduleTargets)
+    };
+  }
+
+  function normalizeDiagnosticPoint(point,index){
+    const pointId=point?.pointId||point?.id||`tp-${index+1}`;
+    return {
+      ...point,
+      pointId,
+      id:pointId,
+      shortName:point?.shortName||point?.code||`M${index+1}`,
+      name:point?.name||point?.nameZh||point?.labelZh||point?.positionNameZh||`测点 ${index+1}`,
+      detects:arr(point?.detects)
+    };
+  }
+
+  function clearDiagnosticPackageCaches(state){
+    delete state.compactDiagnosticFixedPoints;
+    delete state.compactDiagnosticFixedPointSignature;
+    delete state.compactDiagnosticPointSignature;
+    state.diagnosticTestPointModelSignature='';
+    state.selectedDiagnosticTestPointId='';
+    state.diagnosticScanResults=[];
+    state.lastDiagnosticTestPointResult=null;
+    state.testPointDiagnosis=null;
+    state.confirmedDiagnosticFaults={};
+    state.confirmedDiagnosticFaultIds=[];
+    state.installedDiagnosticTestPointIds=[];
+  }
+
+  const previousGetFaultTypeCatalogModels=window.getFaultTypeCatalogModels;
+  if(typeof previousGetFaultTypeCatalogModels==='function'&&!window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SOURCE__){
+    window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SOURCE__=true;
+    window.getFaultTypeCatalogModels=function(){
+      const diagnosticModels=applyDiagnosticFaultCatalog();
+      if(diagnosticModels.length) return diagnosticModels.map(clone);
+      return previousGetFaultTypeCatalogModels.apply(this,arguments);
+    };
+  }
+
+  if(typeof syncFaultTypeCatalogIntoAvailable==='function'&&!window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SYNC__){
+    const previousSyncFaultTypeCatalogIntoAvailable=syncFaultTypeCatalogIntoAvailable;
+    window.__GZ_DIAGNOSTIC_FAULT_CATALOG_SYNC__=true;
+    syncFaultTypeCatalogIntoAvailable=function(){
+      if(applyDiagnosticFaultCatalog().length) return;
+      return previousSyncFaultTypeCatalogIntoAvailable.apply(this,arguments);
+    };
+  }
+
+  const previousApply=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
+  if(typeof previousApply==='function'){
+    window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
+      const result=previousApply(pkg,prepared);
+      if(result?.ok===false) return result;
+      const state=getState();
+      const diagnosticModel=pkg?.diagnosticModel||prepared?.diagnosticModel||null;
+      if(!state||!diagnosticModel) return result;
+      const points=arr(diagnosticModel.testPoints).map(normalizeDiagnosticPoint);
+      const cases=arr(diagnosticModel.faultCases).map(normalizeFaultCase).filter(Boolean);
+      const packageFaults=arr(pkg?.faultLibrary).map(normalizeFaultCase).filter(Boolean);
+      const merged=new Map();
+      [...packageFaults,...cases].forEach(fault=>{
+        if(fault?.id) merged.set(fault.id,{...(merged.get(fault.id)||{}),...fault});
+      });
+      state.diagnosticModel=clone(diagnosticModel);
+      state.diagnosticTestPoints=clone(points);
+      state.testPoints=clone(points);
+      state.faultLibrary=Array.from(merged.values()).map(clone);
+      state.faults=state.faultLibrary;
+      applyDiagnosticFaultCatalog(state);
+      if(state.activeModelPackage){
+        state.activeModelPackage.diagnosticModel=clone(diagnosticModel);
+      }
+      clearDiagnosticPackageCaches(state);
+      if(typeof renderFaultCatalogList==='function'){
+        try{renderFaultCatalogList();}catch(error){console.warn('[diagnostic-model] failed to render fault catalog',error);}
+      }
+      return result;
+    };
+  }
+})();
+
 ;(function installCompactFaultDiagnosisConsole(){
   if(typeof window==='undefined') return;
 
@@ -16509,9 +16630,9 @@ function decorateDataflowEdges(){
   function getRuntimeFaultLibrary(){
     const state=getState();
     const library=[
-      ...DEMO_FAULT_LIBRARY,
       ...(arr(state.faultLibrary).length?arr(state.faultLibrary):arr(state.availableFaultModels)),
-      ...arr(state.importedFaultModels)
+      ...arr(state.importedFaultModels),
+      ...((arr(state.faultLibrary).length||arr(state.availableFaultModels).length)?[]:DEMO_FAULT_LIBRARY)
     ];
     const merged=new Map();
     library.forEach(model=>{
@@ -16535,7 +16656,7 @@ function decorateDataflowEdges(){
     const nodes=getRuntimeNodes();
     const id=edge[key]||edge[`${key}Id`]||edge[key==='source'?'from':'to']||edge[key==='source'?'sourceNodeId':'targetNodeId'];
     const node=nodes.find(item=>item.id===id);
-    return NODE_NAME_ZH[id]||node?.name||node?.label||node?.props?.name||id||'未连接';
+    return node?.props?.name||node?.name||node?.label||NODE_NAME_ZH[id]||id||'未连接';
   }
 
   function pointForEdge(edge,index){
@@ -16760,7 +16881,11 @@ function decorateDataflowEdges(){
     if(!point||!fault) return false;
     const id=getFaultKey(fault);
     if(arr(point.detects).includes(id)) return true;
-    const model={...(getRuntimeFaultLibrary().find(item=>item.id===id)||{}),...fault};
+    const configuredModel=getRuntimeFaultLibrary().find(item=>item.id===id);
+    if(!configuredModel&&!arr(fault.affectedEdges).length&&!arr(fault.affectedTestPointEdges).length){
+      return false;
+    }
+    const model={...(configuredModel||{}),...fault};
     return getFaultAffectedEdges(model).has(point.edgeId);
   }
 
@@ -16932,22 +17057,25 @@ function decorateDataflowEdges(){
   };
 
   function getFaultTargetText(fault){
+    if(fault?.targetModuleName||fault?.targetName||fault?.moduleName){
+      return fault.targetModuleName||fault.targetName||fault.moduleName;
+    }
     const edgeId=fault?.targetEdgeId||fault?.injectionDesign?.targetEdgeId||fault?.injectionTarget?.edgeId;
     if(edgeId){
       const edge=getRuntimeEdges().find(item=>item.id===edgeId);
-      const name=EDGE_NAME_ZH[edgeId]||edge?.label||edge?.signalLabel||edge?.name||edgeId;
+      const name=edge?.label||edge?.signalLabel||edge?.name||EDGE_NAME_ZH[edgeId]||edgeId;
       return `连线：${name}`;
     }
     const nodeId=fault?.targetNodeId||fault?.recommendedModuleId||fault?.injectionDesign?.targetNodeId||fault?.injectionDesign?.targetId||fault?.injectionTarget?.nodeId;
     if(nodeId){
       const node=getRuntimeNodes().find(item=>item.id===nodeId);
-      const name=NODE_NAME_ZH[nodeId]||node?.name||node?.label||node?.props?.name||node?.type||nodeId;
+      const name=node?.props?.name||node?.name||node?.label||NODE_NAME_ZH[nodeId]||node?.type||nodeId;
       return `模块：${name}`;
     }
     const seeds=getFaultTargetEdges(fault);
     if(seeds[0]){
       const edge=getRuntimeEdges().find(item=>item.id===seeds[0]);
-      return `连线：${EDGE_NAME_ZH[seeds[0]]||edge?.label||edge?.signalLabel||seeds[0]}`;
+      return `连线：${edge?.label||edge?.signalLabel||EDGE_NAME_ZH[seeds[0]]||seeds[0]}`;
     }
     return '未绑定';
   }

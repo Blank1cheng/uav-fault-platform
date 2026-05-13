@@ -368,7 +368,21 @@ export function validateFlightModelPackage(pkg) {
   };
 
   registerFaultIds(pkg.faultLibrary);
+  registerFaultIds(pkg.diagnosticModel?.faultCases);
   registerFaultIds(pkg.workbenchSnapshot?.importedFaultModels);
+
+  if (pkg.diagnosticModel !== undefined) {
+    if (!isPlainObject(pkg.diagnosticModel)) {
+      errors.push('diagnosticModel must be an object.');
+    } else {
+      if (pkg.diagnosticModel.testPoints !== undefined) {
+        validatePlainObjectArray(errors, pkg.diagnosticModel.testPoints, 'diagnosticModel.testPoints');
+      }
+      if (pkg.diagnosticModel.faultCases !== undefined) {
+        validatePlainObjectArray(errors, pkg.diagnosticModel.faultCases, 'diagnosticModel.faultCases');
+      }
+    }
+  }
 
   collectSnapshotNodes(pkg.workbenchSnapshot).forEach((node, index) => {
     if (!isPlainObject(node) || !isPlainObject(node.injectedFault)) {
@@ -436,6 +450,7 @@ export function applyFlightModelPackage(pkg) {
     snapshot: hydratedSnapshot.snapshot,
     descriptor: createFlightModelPackageDescriptor(pkg),
     faultLibrary: clone(Array.isArray(pkg.faultLibrary) ? pkg.faultLibrary : []),
+    diagnosticModel: isPlainObject(pkg.diagnosticModel) ? clone(pkg.diagnosticModel) : null,
     pythonModules
   };
 }
