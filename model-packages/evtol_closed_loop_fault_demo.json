@@ -57,7 +57,32 @@
         "offset"
       ],
       "createdAt": "2026-05-13",
-      "origin": "demo-diagnostic-model"
+      "origin": "demo-diagnostic-model",
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_bias_overlay",
+        "variableRelation": "gyro_rate_fault = gyro_rate + bias",
+        "implementationNote": "使用现有偏置叠加块，在 IMU 反馈边上可视化固定零偏。"
+      },
+      "injectionDesign": {
+        "componentType": "fault_bias",
+        "targetKind": "edge",
+        "targetEdgeId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "mode": "fixed_bias"
+      },
+      "recommendedInjectionComponent": "fault_tag",
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
     },
     {
       "id": "gyro_zero_bias_drift",
@@ -101,7 +126,32 @@
         "drift"
       ],
       "createdAt": "2026-05-13",
-      "origin": "demo-diagnostic-model"
+      "origin": "demo-diagnostic-model",
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_drift_bias",
+        "variableRelation": "gyro_rate_fault = gyro_rate + rate * max(t - start, 0)",
+        "implementationNote": "使用现有偏置叠加块，将偏置值设为随时间漂移。"
+      },
+      "injectionDesign": {
+        "componentType": "fault_bias",
+        "targetKind": "edge",
+        "targetEdgeId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "mode": "drift_bias"
+      },
+      "recommendedInjectionComponent": "fault_tag",
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
     },
     {
       "id": "gyro_zero_bias_intermittent",
@@ -146,7 +196,32 @@
         "intermittent"
       ],
       "createdAt": "2026-05-13",
-      "origin": "demo-diagnostic-model"
+      "origin": "demo-diagnostic-model",
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_intermittent_bias",
+        "variableRelation": "gyro_rate_fault = gyro_rate + bias when phase(t, period) < duty else gyro_rate",
+        "implementationNote": "使用现有偏置叠加块，通过 period/duty 参数表示间歇启停。"
+      },
+      "injectionDesign": {
+        "componentType": "fault_bias",
+        "targetKind": "edge",
+        "targetEdgeId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "mode": "intermittent_bias"
+      },
+      "recommendedInjectionComponent": "fault_tag",
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
     },
     {
       "id": "motor_1_stuck_position",
@@ -188,7 +263,33 @@
         "actuator"
       ],
       "createdAt": "2026-05-13",
-      "origin": "demo-diagnostic-model"
+      "origin": "demo-diagnostic-model",
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_motor_stuck",
+        "variableRelation": "motor_1_output_fault = lock_value",
+        "implementationNote": "使用中间变量赋值块直观覆盖 1号电机输出为卡位值。"
+      },
+      "injectionDesign": {
+        "componentType": "middle_var_assign",
+        "targetKind": "node",
+        "targetId": "node-motor-1",
+        "targetNodeId": "node-motor-1",
+        "targetName": "1号电机与旋翼",
+        "mode": "lock"
+      },
+      "recommendedInjectionComponent": "fault_tag",
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "node",
+        "targetId": "node-motor-1",
+        "targetName": "1号电机与旋翼",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
     },
     {
       "id": "control_command_tamper",
@@ -231,7 +332,32 @@
         "command"
       ],
       "createdAt": "2026-05-13",
-      "origin": "demo-diagnostic-model"
+      "origin": "demo-diagnostic-model",
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_can_command_tamper",
+        "variableRelation": "motor_1_cmd_fault = motor_1_cmd * scale + bias",
+        "implementationNote": "使用增益块和求和块组合表示 CAN 指令缩放与偏置篡改。"
+      },
+      "injectionDesign": {
+        "componentType": "sum_block",
+        "targetKind": "edge",
+        "targetEdgeId": "edge-motor-motor1",
+        "targetName": "1号电机 CAN 指令",
+        "mode": "tamper"
+      },
+      "recommendedInjectionComponent": "fault_tag",
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-motor-motor1",
+        "targetName": "1号电机 CAN 指令",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
     },
     {
       "id": "sensor_additive_bias",
@@ -521,7 +647,32 @@
           "edge-error-logger",
           "edge-error-spectrum"
         ],
-        "explanation": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。"
+        "explanation": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。",
+        "platformImplementation": {
+          "existingModule": "fault_tag",
+          "recommendedModule": "fault_tag",
+          "moduleLabel": "故障组件",
+          "pythonFunction": "fault_bias_overlay",
+          "variableRelation": "gyro_rate_fault = gyro_rate + bias",
+          "implementationNote": "使用现有偏置叠加块，在 IMU 反馈边上可视化固定零偏。"
+        },
+        "injectionDesign": {
+          "componentType": "fault_bias",
+          "targetKind": "edge",
+          "targetEdgeId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "mode": "fixed_bias"
+        },
+        "recommendedInjectionComponent": "fault_tag",
+        "visualInjection": {
+          "strategy": "fault_tag",
+          "tagType": "fault_tag",
+          "targetKind": "edge",
+          "targetId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "relationStyle": "fault-tag-attachment",
+          "editableParameters": true
+        }
       },
       {
         "id": "gyro_zero_bias_drift",
@@ -549,7 +700,32 @@
           "edge-error-logger",
           "edge-error-spectrum"
         ],
-        "explanation": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。"
+        "explanation": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。",
+        "platformImplementation": {
+          "existingModule": "fault_tag",
+          "recommendedModule": "fault_tag",
+          "moduleLabel": "故障组件",
+          "pythonFunction": "fault_drift_bias",
+          "variableRelation": "gyro_rate_fault = gyro_rate + rate * max(t - start, 0)",
+          "implementationNote": "使用现有偏置叠加块，将偏置值设为随时间漂移。"
+        },
+        "injectionDesign": {
+          "componentType": "fault_bias",
+          "targetKind": "edge",
+          "targetEdgeId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "mode": "drift_bias"
+        },
+        "recommendedInjectionComponent": "fault_tag",
+        "visualInjection": {
+          "strategy": "fault_tag",
+          "tagType": "fault_tag",
+          "targetKind": "edge",
+          "targetId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "relationStyle": "fault-tag-attachment",
+          "editableParameters": true
+        }
       },
       {
         "id": "gyro_zero_bias_intermittent",
@@ -578,7 +754,32 @@
           "edge-error-logger",
           "edge-error-spectrum"
         ],
-        "explanation": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。"
+        "explanation": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。",
+        "platformImplementation": {
+          "existingModule": "fault_tag",
+          "recommendedModule": "fault_tag",
+          "moduleLabel": "故障组件",
+          "pythonFunction": "fault_intermittent_bias",
+          "variableRelation": "gyro_rate_fault = gyro_rate + bias when phase(t, period) < duty else gyro_rate",
+          "implementationNote": "使用现有偏置叠加块，通过 period/duty 参数表示间歇启停。"
+        },
+        "injectionDesign": {
+          "componentType": "fault_bias",
+          "targetKind": "edge",
+          "targetEdgeId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "mode": "intermittent_bias"
+        },
+        "recommendedInjectionComponent": "fault_tag",
+        "visualInjection": {
+          "strategy": "fault_tag",
+          "tagType": "fault_tag",
+          "targetKind": "edge",
+          "targetId": "edge-imu-error",
+          "targetName": "IMU 测量反馈",
+          "relationStyle": "fault-tag-attachment",
+          "editableParameters": true
+        }
       },
       {
         "id": "motor_1_stuck_position",
@@ -603,7 +804,33 @@
           "edge-error-logger",
           "edge-error-spectrum"
         ],
-        "explanation": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。"
+        "explanation": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。",
+        "platformImplementation": {
+          "existingModule": "fault_tag",
+          "recommendedModule": "fault_tag",
+          "moduleLabel": "故障组件",
+          "pythonFunction": "fault_motor_stuck",
+          "variableRelation": "motor_1_output_fault = lock_value",
+          "implementationNote": "使用中间变量赋值块直观覆盖 1号电机输出为卡位值。"
+        },
+        "injectionDesign": {
+          "componentType": "middle_var_assign",
+          "targetKind": "node",
+          "targetId": "node-motor-1",
+          "targetNodeId": "node-motor-1",
+          "targetName": "1号电机与旋翼",
+          "mode": "lock"
+        },
+        "recommendedInjectionComponent": "fault_tag",
+        "visualInjection": {
+          "strategy": "fault_tag",
+          "tagType": "fault_tag",
+          "targetKind": "node",
+          "targetId": "node-motor-1",
+          "targetName": "1号电机与旋翼",
+          "relationStyle": "fault-tag-attachment",
+          "editableParameters": true
+        }
       },
       {
         "id": "control_command_tamper",
@@ -630,7 +857,32 @@
           "edge-error-logger",
           "edge-error-spectrum"
         ],
-        "explanation": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。"
+        "explanation": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。",
+        "platformImplementation": {
+          "existingModule": "fault_tag",
+          "recommendedModule": "fault_tag",
+          "moduleLabel": "故障组件",
+          "pythonFunction": "fault_can_command_tamper",
+          "variableRelation": "motor_1_cmd_fault = motor_1_cmd * scale + bias",
+          "implementationNote": "使用增益块和求和块组合表示 CAN 指令缩放与偏置篡改。"
+        },
+        "injectionDesign": {
+          "componentType": "sum_block",
+          "targetKind": "edge",
+          "targetEdgeId": "edge-motor-motor1",
+          "targetName": "1号电机 CAN 指令",
+          "mode": "tamper"
+        },
+        "recommendedInjectionComponent": "fault_tag",
+        "visualInjection": {
+          "strategy": "fault_tag",
+          "tagType": "fault_tag",
+          "targetKind": "edge",
+          "targetId": "edge-motor-motor1",
+          "targetName": "1号电机 CAN 指令",
+          "relationStyle": "fault-tag-attachment",
+          "editableParameters": true
+        }
       }
     ],
     "testPoints": [
@@ -836,7 +1088,7 @@
         "motor_1_stuck_position",
         "control_command_tamper"
       ],
-      "note": "D(i,j)=1 ???? i ???? j ???????????? affectedEdges ???????????"
+      "note": "D(i,j)=1 \u8868\u793a\u6545\u969c i \u53ef\u88ab\u6d4b\u70b9 j \u68c0\u6d4b\uff1baffectedEdges \u4fdd\u7559\u4f20\u64ad\u8fb9\u3002"
     },
     "contrastExamples": [
       {
@@ -1232,14 +1484,25 @@
       {
         "id": "node-scope",
         "type": "instrument_scope",
-        "x": 505,
-        "y": 540,
-        "w": 190,
-        "h": 90,
+        "x": 705,
+        "y": 335,
+        "w": 210,
+        "h": 92,
         "props": {
-          "name": "指令与反馈示波器",
+          "name": "故障前后对比示波器",
           "instrumentType": "scope",
-          "sampleRate": "1000 Hz"
+          "sampleRate": "1000 Hz",
+          "displayRole": "fault-comparison",
+          "channels": [
+            {
+              "key": "CH1",
+              "label": "正常指令"
+            },
+            {
+              "key": "CH2",
+              "label": "故障反馈"
+            }
+          ]
         },
         "pythonBinding": null
       },

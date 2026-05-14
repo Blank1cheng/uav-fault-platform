@@ -94,13 +94,9 @@
       <span class="lgroup-arrow open" id="arr-g2">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g2">
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_bias">
-        <span class="citem-icon-badge citem-icon-badge--fault">B</span>
-        <span class="citem-label">偏置叠加块</span>
-      </div>
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_noise">
-        <span class="citem-icon-badge citem-icon-badge--noise">N</span>
-        <span class="citem-label">噪声注入块</span>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
+        <span class="citem-icon-badge citem-icon-badge--fault">F</span>
+        <span class="citem-label">故障组件</span>
       </div>
     </div>
 
@@ -203,7 +199,7 @@
     </div>
     <div class="canvas-tabs">
       <button type="button" class="canvas-tab is-active" data-canvas-view="canvas">画布</button>
-      <button type="button" class="canvas-tab" data-canvas-view="components">组件视图</button>
+      <button type="button" class="canvas-tab" data-canvas-view="components">&#25925;&#38556;&#35270;&#22270;</button>
       <button type="button" class="canvas-tab" data-canvas-view="dataflow">多信号流图</button>
       <button type="button" class="canvas-tab" data-canvas-view="dmatrix">D矩阵</button>
     </div>
@@ -614,7 +610,7 @@
   </div>
 </div>
 `,Mo=[`innerHTML`],No={__name:`ConfigDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`config-dialog`,innerHTML:I(jo)},null,8,Mo))}},Po=`<div class="scope-dialog-stub" id="ov-scope" hidden data-scope-dialog-stub="true"></div>
-`,Fo=[`innerHTML`],Io={__name:`ScopeDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:I(Po)},null,8,Fo))}},q=Pt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null}});function Lo(){function e(e={}){q.pythonBinding.open=!0,q.pythonBinding.targetNode=e.targetNode??null,q.pythonBinding.parsedInterface=e.parsedInterface??null,q.pythonBinding.boundSnapshot=e.boundSnapshot??null,q.pythonBinding.parseError=e.parseError??``}function t(){q.pythonBinding.open=!1,q.pythonBinding.targetNode=null,q.pythonBinding.parsedInterface=null,q.pythonBinding.boundSnapshot=null,q.pythonBinding.parseError=``}function n(e){q.pythonBinding.parsedInterface=e,q.pythonBinding.parseError=``}function r(e){q.pythonBinding.parseError=e}return{dialogsState:q,openPythonBindingDialog:e,closePythonBindingDialog:t,setPythonBindingPreview:n,setPythonBindingError:r}}var Ro=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],zo=[{type:`fault_bias`,label:`偏置叠加块`},{type:`fault_noise`,label:`噪声注入块`}],Bo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Vo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Ho(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Ro,faultInjection:zo,instruments:Bo,edges:Vo}}}var Uo=Pt(Ho()),Wo=Wt(!1),Go=Wt(null);function Ko(e){return e.displayName??e.comment??e.name}function qo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Jo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...qo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``}))}}}function Yo(){function e(){Wo.value=!0}function t(e){Go.value=e}return{shellState:Uo,runtimeReady:Wo,selectedNodeBinding:Go,markReady:e,setSelectedNodeBinding:t}}function Xo(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function Zo(e){return e.replace(/\r\n/g,`
+`,Fo=[`innerHTML`],Io={__name:`ScopeDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:I(Po)},null,8,Fo))}},q=Pt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null}});function Lo(){function e(e={}){q.pythonBinding.open=!0,q.pythonBinding.targetNode=e.targetNode??null,q.pythonBinding.parsedInterface=e.parsedInterface??null,q.pythonBinding.boundSnapshot=e.boundSnapshot??null,q.pythonBinding.parseError=e.parseError??``}function t(){q.pythonBinding.open=!1,q.pythonBinding.targetNode=null,q.pythonBinding.parsedInterface=null,q.pythonBinding.boundSnapshot=null,q.pythonBinding.parseError=``}function n(e){q.pythonBinding.parsedInterface=e,q.pythonBinding.parseError=``}function r(e){q.pythonBinding.parseError=e}return{dialogsState:q,openPythonBindingDialog:e,closePythonBindingDialog:t,setPythonBindingPreview:n,setPythonBindingError:r}}var Ro=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],zo=[{type:`fault_tag`,label:`故障组件`}],Bo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Vo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Ho(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Ro,faultInjection:zo,instruments:Bo,edges:Vo}}}var Uo=Pt(Ho()),Wo=Wt(!1),Go=Wt(null);function Ko(e){return e.displayName??e.comment??e.name}function qo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Jo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...qo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``}))}}}function Yo(){function e(){Wo.value=!0}function t(e){Go.value=e}return{shellState:Uo,runtimeReady:Wo,selectedNodeBinding:Go,markReady:e,setSelectedNodeBinding:t}}function Xo(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function Zo(e){return e.replace(/\r\n/g,`
 `)}function Qo(e,t){let n=e.match(/("""|''')([\s\S]*?)\1/)?.[2]??``;return{moduleName:n.match(/Module:\s*([A-Za-z0-9_]+)/)?.[1]??t.replace(/\.py$/i,``),description:n.match(/Description:\s*(.+)/)?.[1]?.trim()??``}}function $o(e){let t=/(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g,n=[],r;for(;r=t.exec(e);){if((r[4]??``).length!==0)continue;let t=r.index+r[1].length,i=e.slice(0,t).split(`
 `).length;n.push({startIndex:t,line:i,isEntry:!!r[3],name:r[5],paramsSource:r[6],returnAnnotation:r[7]?.trim()??``,headerComment:r[8]?.trim()??``})}return n.sort((e,t)=>e.startIndex-t.startIndex).map((t,n,r)=>({...t,endIndex:r[n+1]?.startIndex??e.length}))}function es(e){if(e.length===0)throw Xo(`未找到可识别的入口函数`);let t=e.find(e=>e.isEntry);if(t)return t;let n=e.find(e=>e.name===`process`);if(n)return n;if(e.length===1)return e[0];throw Xo(`找到多个顶层函数，但没有 @entry 或 process 入口`)}function ts(e){let t=[],n=``,r=0;for(let i of e){if((i===`(`||i===`[`||i===`{`)&&(r+=1),(i===`)`||i===`]`||i===`}`)&&(r=Math.max(0,r-1)),i===`,`&&r===0){n.trim()&&t.push(n.trim()),n=``;continue}n+=i}return n.trim()&&t.push(n.trim()),t}function ns(e){return String(e??``).trim().replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u,``).trim()}function rs({name:e,comment:t}){return ns(t)||e}function is(e){let t=ns(e);return t?ts(t):[]}function as(e){let t=e.indexOf(`#`);return t<0?{signature:e.trim().replace(/,$/,``),comment:``}:{signature:e.slice(0,t).trim().replace(/,$/,``),comment:e.slice(t+1).trim()}}function os(e,t,n=``){let r=is(n),i=[];return e.includes(`#`)?e.split(`
 `).map(e=>e.trim()).filter(Boolean).forEach(e=>{let{signature:t,comment:n}=as(e),r=ts(t.replace(/,$/,``)).filter(Boolean),a=is(n);r.forEach((e,t)=>{i.push({signature:e,comment:a[t]??(r.length===1?ns(n):``)})})}):ts(e).filter(Boolean).forEach((e,t)=>{i.push({signature:e,comment:r[t]??``})}),i.map((e,n)=>{let{signature:i,comment:a}=typeof e==`string`?as(e):e,o=i.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);if(!o)throw Xo(`无法解析参数定义: ${i}`,t+n);let s=ns(a||r[n]||``);return{name:o[1],displayName:rs({name:o[1],comment:s}),type:o[2]?.trim()??`any`,default:o[3]?.trim()??null,comment:s}})}function ss(e,t){let n=e.slice(t.startIndex,t.endIndex),r=n.indexOf(`
@@ -628,8 +624,11 @@ const S={\r
   faultLoaded:false,\r
   faultModels:0,\r
   availableFaultModels:[],\r
-  importedFaultModels:[],\r
-  selectedFaultCatalogId:'',\r
+  importedFaultModels:[],
+  faultTags:[],
+  faultInjectionLinks:[],
+  selFaultTag:null,
+  selectedFaultCatalogId:'',
   simDone:false,\r
   selBlk:null,\r
   selEdge:null,\r
@@ -729,24 +728,16 @@ const COMPONENT_LIBRARY={\r
     width:156,\r
     height:74,\r
     defaults:{name:'噪声注入块',faultType:'随机噪声',layer:'物理层',trigger:'持续'}\r
-  },\r
-  fault_stuck:{\r
-    label:'卡死注入块',\r
-    badge:'故障',\r
-    className:'b-fault',\r
-    width:156,\r
-    height:74,\r
-    defaults:{name:'卡死注入块',faultType:'卡死',layer:'电气层',trigger:'持续'}\r
-  },\r
-  fault_drift:{\r
-    label:'漂移注入块',\r
-    badge:'故障',\r
-    className:'b-fault',\r
-    width:156,\r
-    height:74,\r
-    defaults:{name:'漂移注入块',faultType:'漂移',layer:'协议层',trigger:'渐变'}\r
-  },\r
-  instrument_scope:{\r
+  },
+  fault_tag:{
+    label:'故障组件',
+    badge:'故障',
+    className:'b-fault',
+    width:196,
+    height:78,
+    defaults:{name:'故障组件',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
+  },
+  instrument_scope:{
     label:'示波器',\r
     badge:'仪器',\r
     className:'b-inst',\r
@@ -1176,11 +1167,13 @@ function createSystemModelSnapshot(){\r
     activeCanvasId:S.activeCanvasId,\r
     canvasTrail:S.canvasTrail,\r
     canvases:S.canvases,\r
-    activeLineType:S.activeLineType,\r
-    faultedBlks:S.faultedBlks,\r
-    importedFaultModels:S.importedFaultModels\r
-  });\r
-}\r
+    activeLineType:S.activeLineType,
+    faultedBlks:S.faultedBlks,
+    importedFaultModels:S.importedFaultModels,
+    faultTags:S.faultTags,
+    faultInjectionLinks:S.faultInjectionLinks
+  });
+}
 \r
 function restoreSystemModelSnapshot(snapshot){\r
   const api=getWorkbenchSnapshotApi();\r
@@ -1198,11 +1191,14 @@ function restoreSystemModelSnapshot(snapshot){\r
   S.edgeSeq=restored.edgeSeq||0;\r
   S.activeLineType=restored.activeLineType||'normal';\r
   S.workspaceSource=typeof restored.workspaceSource==='string'?restored.workspaceSource:(S.workspaceSource||'');\r
-  S.faultedBlks=restored.faultedBlks||[];\r
-  S.importedFaultModels=restored.importedFaultModels||[];\r
-  S.faultModels=S.importedFaultModels.length;\r
-  S.selBlk=null;\r
-  S.selEdge=null;\r
+  S.faultedBlks=restored.faultedBlks||[];
+  S.importedFaultModels=restored.importedFaultModels||[];
+  S.faultTags=Array.isArray(restored.faultTags)?restored.faultTags:[];
+  S.faultInjectionLinks=Array.isArray(restored.faultInjectionLinks)?restored.faultInjectionLinks:[];
+  S.faultModels=S.importedFaultModels.length;
+  S.selBlk=null;
+  S.selEdge=null;
+  S.selFaultTag=null;
   restoreActiveCanvasViewport(S.activeCanvasId);\r
   applyCanvasTransform();\r
   clearPendingConnection();\r
@@ -1596,9 +1592,9 @@ function getLayerLabel(layer){\r
   return LAYER_LABELS[layer]||layer||'未分类';\r
 }\r
 \r
-function isPhysicalFaultNodeType(type){\r
-  return type==='fault_bias'||type==='fault_noise';\r
-}\r
+function isPhysicalFaultNodeType(type){
+  return typeof type==='string'&&type.startsWith('fault_');
+}
 \r
 function isElectricalInjectableType(type){\r
   return type==='flow_block'||type==='simulation_block';\r
@@ -2015,9 +2011,9 @@ function getNodePorts(node){\r
       outputs:[{key:'output',label:node.props.outputName||'输出'}]\r
     };\r
   }\r
-  if(node.type==='simulation_block'){\r
-    const groups=getSimulationPortSets(node.props);\r
-    return {\r
+  if(node.type==='simulation_block'){
+    const groups=getSimulationPortSets(node.props);
+    return {
       inputs:groups.inputs.map((item,index)=>({\r
         key:\`input-\${index}\`,\r
         label:\`输入 \${index+1} · \${item.name} / \${item.type}\`,\r
@@ -2030,11 +2026,14 @@ function getNodePorts(node){\r
         kind:item.kind,\r
         side:item.side,\r
         portIndex:index\r
-      }))\r
-    };\r
-  }\r
-  if(node.type.startsWith('fault_')){\r
-    return {\r
+      }))
+    };
+  }
+  if(node.type==='fault_tag'){
+    return {inputs:[],outputs:[]};
+  }
+  if(node.type.startsWith('fault_')){
+    return {
       inputs:[{key:'input',label:'故障输入'}],\r
       outputs:[{key:'output',label:'故障输出'}]\r
     };\r
@@ -2257,10 +2256,9 @@ function buildNodeSubtitle(node){\r
       normalizeSimulationInterfaces(props);\r
       return \`\${props.inputs.length}输入 · \${props.outputs.length}输出 · \${props.middleVars.length}中间量 · \${props.moduleType}\${faultNote}\`;\r
     case 'fault_bias':\r
-    case 'fault_noise':\r
-    case 'fault_stuck':\r
-    case 'fault_drift':\r
-      return \`\${props.faultType} · \${props.layer}\`;\r
+    case 'fault_noise':
+    case 'fault_tag':
+      return \`\${props.faultType} · \${props.layer}\`;
     case 'instrument_scope':\r
       return \`\${props.instrumentType} · 双击查看波形\`;\r
     case 'instrument_spectrum':\r
@@ -2469,9 +2467,11 @@ function renderModelNodes(){\r
   if(!layer){return;}\r
   layer.innerHTML='';\r
   S.modelNodes.forEach(node=>{\r
-    applyNodeGeometry(node);\r
-    const meta=COMPONENT_LIBRARY[node.type];\r
-    const faulted=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault);\r
+    applyNodeGeometry(node);
+    const meta=COMPONENT_LIBRARY[node.type];
+    const nodeFaultTags=getFaultTagsForNode(node.id);
+    const expandedFaultTags=nodeFaultTags.filter(tag=>tag.expanded);
+    const faulted=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault)||nodeFaultTags.length>0;
     const pythonBound=isPythonBoundFlowBlock(node);\r
     const el=document.createElement('div');\r
     el.id=\`b-\${node.id}\`;\r
@@ -2489,15 +2489,31 @@ function renderModelNodes(){\r
     }else{\r
       el.style.paddingTop='';\r
       el.style.paddingBottom='';\r
-    }\r
-    const nodeTitle=pythonBound?(node.pythonBinding?.fileName||node.props.name):node.props.name;\r
-    const nodeSubtitle=pythonBound?\`流程块 · \${getPythonBindingSummary(node)}\`:buildNodeSubtitle(node);\r
-    el.innerHTML=\`\r
-      <div class="fbadge">F</div>\r
-      \${pythonBound?'<div class="node-card__python-chip">Py</div>':''}\r
-      <div class="blk-kicker">\${pythonBound?'已绑定 Python':(faulted&&!isFaultNodeType(node.type)?\`\${meta.badge} 故障\` : meta.badge)}</div>\r
-      <div class="blk-lbl">\${escapeHtml(nodeTitle)}</div>\r
-      <div class="blk-sub">\${escapeHtml(nodeSubtitle)}</div>\`;\r
+    }
+    const nodeTitle=pythonBound?(node.pythonBinding?.fileName||node.props.name):node.props.name;
+    const nodeSubtitle=pythonBound?\`流程块 · \${getPythonBindingSummary(node)}\`:buildNodeSubtitle(node);
+    const faultTagToggle=nodeFaultTags.length
+      ?\`<button type="button" class="fault-node-toggle\${expandedFaultTags.length?' is-open':''}" data-fault-tags-toggle="\${escapeHtml(node.id)}">
+          <span>\${expandedFaultTags.length?'收起故障':'展开故障'}</span>
+          <b>\${nodeFaultTags.length}</b>
+        </button>\`
+      :'';
+    el.innerHTML=\`
+      <div class="fbadge">F</div>
+      \${pythonBound?'<div class="node-card__python-chip">Py</div>':''}
+      <div class="blk-kicker">\${pythonBound?'已绑定 Python':(faulted&&!isFaultNodeType(node.type)?\`\${meta.badge} 故障\` : meta.badge)}</div>
+      <div class="blk-lbl">\${escapeHtml(nodeTitle)}</div>
+      <div class="blk-sub">\${escapeHtml(nodeSubtitle)}</div>
+      \${faultTagToggle}\`;
+    const faultToggle=el.querySelector('[data-fault-tags-toggle]');
+    if(faultToggle){
+      faultToggle.addEventListener('pointerdown',event=>event.stopPropagation());
+      faultToggle.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        toggleFaultTagsForNode(node.id);
+      });
+    }
     el.addEventListener('pointerdown',event=>beginNodeDrag(event,node.id));\r
     el.addEventListener('click',event=>{\r
       if(event.target.closest('.node-port')){return;}\r
@@ -2599,9 +2615,10 @@ function renderModelNodes(){\r
 function selectNode(id){\r
   const node=getNode(id);\r
   if(!node){return;}\r
-  S.selBlk=id;\r
-  S.selEdge=null;\r
-  S.propertyPanelTab='overview';\r
+  S.selBlk=id;
+  S.selEdge=null;
+  S.selFaultTag=null;
+  S.propertyPanelTab='overview';
   renderModelNodes();\r
   renderPropertyPanel(node);\r
   document.querySelectorAll('.props-tab').forEach(button=>{\r
@@ -2619,9 +2636,10 @@ function selectEdge(id){\r
   if(S.pendingConnection){\r
     S.pendingConnection=null;\r
   }\r
-  S.selEdge=id;\r
-  S.selBlk=null;\r
-  S.propertyPanelTab='overview';\r
+  S.selEdge=id;
+  S.selBlk=null;
+  S.selFaultTag=null;
+  S.propertyPanelTab='overview';
   renderModelNodes();\r
   renderPropertyPanel(edge);\r
   document.querySelectorAll('.props-tab').forEach(button=>{\r
@@ -2709,10 +2727,14 @@ function markFaultTarget(targetId){\r
   else if(S.selEdge&&getEdge(S.selEdge)){renderPropertyPanel(getEdge(S.selEdge));}\r
 }\r
 \r
-function createNode(type,rawX,rawY){\r
-  const meta=COMPONENT_LIBRARY[type];\r
-  if(!meta){return;}\r
-  const props=cloneDefaults(meta.defaults);\r
+function createNode(type,rawX,rawY){
+  const meta=COMPONENT_LIBRARY[type];
+  if(!meta){return;}
+  if(type==='fault_tag'&&window.createManualFaultTag){
+    window.createManualFaultTag({x:rawX,y:rawY});
+    return;
+  }
+  const props=cloneDefaults(meta.defaults);
   const count=getNodeTypeCount(type);\r
   if(type==='signal_source'){props.name=\`信号源 \${count}\`;}\r
   if(type==='flow_block'){props.name=\`流程块 \${count}\`;}\r
@@ -2782,12 +2804,19 @@ function initCanvasDrop(){\r
     event.preventDefault();\r
     diagram.classList.remove('dragover');\r
     if(!S.sysLoaded){toast('请先导入系统模型','w');return;}\r
-    const type=event.dataTransfer.getData('text/plain')||S.dragType;\r
-    if(!COMPONENT_LIBRARY[type]){return;}\r
-    const point=clientToStagePoint(event.clientX,event.clientY);\r
-    createNode(type,point.x,point.y);\r
-  });\r
-}\r
+    const type=event.dataTransfer.getData('text/plain')||S.dragType;
+    if(!COMPONENT_LIBRARY[type]){return;}
+    const point=clientToStagePoint(event.clientX,event.clientY);
+    if(type==='fault_tag'&&window.createManualFaultTag){
+      const targetEl=document.elementFromPoint(event.clientX,event.clientY)?.closest?.('.blk');
+      const targetId=targetEl?.id?.replace(/^b-/,'')||'';
+      const target=targetId?getNode(targetId):null;
+      window.createManualFaultTag({x:point.x,y:point.y,target});
+      return;
+    }
+    createNode(type,point.x,point.y);
+  });
+}
 \r
 function bindCanvasInteractions(){\r
   const viewport=getCanvasViewport();\r
@@ -4146,11 +4175,11 @@ function applyPhysicalFaultNode(node,inputValue,time,modeKey){\r
   if(node.type==='fault_bias'){\r
     return inputValue+0.5;\r
   }\r
-  if(node.type==='fault_noise'){\r
-    return inputValue+noiseAt(getNodeSeed(node.id),SIM.stepIndex,time)*0.22;\r
-  }\r
-  return inputValue;\r
-}\r
+  if(node.type==='fault_noise'){
+    return inputValue+noiseAt(getNodeSeed(node.id),SIM.stepIndex,time)*0.22;
+  }
+  return inputValue;
+}
 \r
 function flipBitValue(value){\r
   const scaled=Math.round(value*256);\r
@@ -4760,9 +4789,9 @@ if(!window.__GZ_PYTHON_BINDING_EVENTS__){\r
   window.addEventListener('gz:python-binding-unbind',runtimeListeners.pythonBindingUnbind);\r
 }\r
 \r
-function buildPythonBindingPortRows(items,kind){\r
-  if(!items.length){\r
-    return '<div class="props-help">?????????</div>';\r
+function buildPythonBindingPortRows(items,kind){
+  if(!items.length){
+    return '<div class="props-help">&#26242;&#26080;&#31471;&#21475;</div>';
   }\r
   return items.map(item=>{\r
     const status=kind==='inputs'\r
@@ -4794,7 +4823,7 @@ function buildFlowBlockFields(node){\r
         <div class="prow"><span class="pk">文件<</span><span class="pv">\${escapeHtml(binding.fileName||'-')}<</span></div>\r
         <div class="prow"><span class="pk">模块<</span><span class="pv">\${escapeHtml(binding.moduleName||'-')}<</span></div>\r
         <div class="prow"><span class="pk">鍏ュ彛鍑芥暟<</span><span class="pv">\${escapeHtml(binding.entryFunction||'process')}<</span></div>\r
-        <div class="prow"><span class="pk">????<</span><span class="pv">\${escapeHtml(getPythonBindingSummary(node))}<</span></div>\r
+        <div class="prow"><span class="pk">&#25509;&#21475;&#25688;&#35201;</span><span class="pv">\${escapeHtml(getPythonBindingSummary(node))}</span></div>
         \${binding.description?\`<div class="props-help">\${escapeHtml(binding.description)}</div>\`:''}\r
       </div>\r
       <div class="pgroup">\r
@@ -5757,10 +5786,9 @@ buildNodeSubtitle = function(node){\r
       normalizeSimulationInterfaces(props);\r
       return \`\${props.inputs.length}输入 · \${props.outputs.length}输出 · \${props.middleVars.length}中间变量 · \${props.moduleType||'一阶函数'}\${faultNote}\`;\r
     case 'fault_bias':\r
-    case 'fault_noise':\r
-    case 'fault_stuck':\r
-    case 'fault_drift':\r
-      return \`\${props.faultType||'故障'} · \${props.layer||'物理层'}\`;\r
+    case 'fault_noise':
+    case 'fault_tag':
+      return \`\${props.faultType||'故障'} · \${props.layer||'物理层'}\`;
     case 'instrument_scope':\r
       return \`\${props.instrumentType||'示波器'} · 双击查看波形\`;\r
     case 'instrument_spectrum':\r
@@ -9047,11 +9075,14 @@ buildNodeSubtitle = function(node){\r
   if(!node?.props){\r
     return __signalRoutingBuildNodeSubtitle(node);\r
   }\r
-  const props=node.props;\r
-  const faultNote=node.injectedFault?' / 已注入故障':'';\r
-  if(node.type==='flow_block'){\r
-    return \`\${props.inputName||'输入信号'} / \${props.inputFormat||'标量'} -> \${props.outputName||'输出信号'} / \${props.outputFormat||'标量'} / 类型适配\${faultNote}\`;\r
-  }\r
+  const props=node.props;
+  const faultNote=node.injectedFault?' / 已注入故障':'';
+  if(typeof node.type==='string'&&node.type.startsWith('fault_')){
+    return \`\${props.faultType||COMPONENT_LIBRARY[node.type]?.label||'故障'} / \${props.layer||'故障层'} / \${props.trigger||'触发'}\`;
+  }
+  if(node.type==='flow_block'){
+    return \`\${props.inputName||'输入信号'} / \${props.inputFormat||'标量'} -> \${props.outputName||'输出信号'} / \${props.outputFormat||'标量'} / 类型适配\${faultNote}\`;
+  }
   if(node.type==='gain_block'){\r
     normalizeSignalUtilityNode(node);\r
     return \`系数 \${props.gain||'1.0'} / \${props.inputFormat||'标量'} -> \${props.outputFormat||'标量'}\${faultNote}\`;\r
@@ -9558,7 +9589,7 @@ Object.assign(window,{\r
     if(!node){return 3;}\r
     if(node.type==='signal_source'||node.type==='subsystem_in_port'){return 0;}\r
     if(node.type.startsWith('instrument_')||node.type==='subsystem_out_port'){return 8;}\r
-    if(node.type==='fault_bias'||node.type==='fault_noise'||node.type==='middle_var_assign'){return 2;}\r
+    if((typeof node.type==='string'&&node.type.startsWith('fault_'))||node.type==='middle_var_assign'){return 2;}
     if(node.type==='flow_block'||node.type==='gain_block'||node.type==='sum_block'||node.type==='mux_block'){return 3;}\r
     if(node.type==='simulation_block'){return 4;}\r
     if(node.type==='subsystem_block'){return 5;}\r
@@ -15627,7 +15658,7 @@ function decorateDataflowEdges(){\r
       tab.classList.toggle('is-active',active);\r
       tab.setAttribute('aria-pressed',active?'true':'false');\r
     });\r
-    const labels={canvas:'画布视图',components:'组件视图',dataflow:'多信号流图',dmatrix:'D矩阵视图'};\r
+    const labels={canvas:'画布视图',components:'故障视图',dataflow:'多信号流图',dmatrix:'D矩阵视图'};
     if(nextView==='dataflow'){\r
       window.renderDataflowPanel?.();\r
       window.decorateDataflowEdges?.();\r
@@ -16156,7 +16187,7 @@ function decorateDataflowEdges(){\r
           \${model.recommendedModule?\`<span class="ifm-chip">\${escapeHtml(model.recommendedModule)}</span>\`:''}\r
         </div>\r
       </div>\r
-      \${imported?'<span class="ifm-state">已导入</span>':''}\`;\r
+      \${imported?\`<button type="button" class="ifm-state ifm-state--remove" data-clear-selected-fault-catalog="\${escapeHtml(model.id)}">撤销导入</button>\`:''}\`;
   }\r
 \r
   const __faultTypesInitializeFaultCatalog=initializeFaultCatalog;\r
@@ -16187,7 +16218,10 @@ function decorateDataflowEdges(){\r
         item.className=\`ifm-item\${S.selectedFaultCatalogId===model.id?' on':''}\${imported?' is-imported':''}\`;\r
         item.dataset.faultId=model.id;\r
         item.innerHTML=renderFaultCatalogItem(model,imported);\r
-        item.addEventListener('click',()=>selectFaultCatalogModel(model.id));\r
+        item.addEventListener('click',(event)=>{
+          if(event.target.closest?.('[data-clear-selected-fault-catalog]')){return;}
+          selectFaultCatalogModel(model.id);
+        });
         container.appendChild(item);\r
       });\r
       renderFaultTypeDetail(getFaultCatalogModel(S.selectedFaultCatalogId));\r
@@ -16517,19 +16551,795 @@ function decorateDataflowEdges(){\r
     return true;\r
   }\r
 \r
-  function injectFaultIntoEdge(target,model,parameterOverrides={}){\r
-    if(!target||!model){return false;}\r
-    const payload=getRuntimePayload({...model,layer:'protocol'},parameterOverrides);\r
-    target.injectedFault=payload;\r
-    appendRuntimeFaultBinding(target,{...model,layer:'protocol'},payload,'edge');\r
-    markTopologyDirty('fault');\r
-    return true;\r
-  }\r
-\r
-  function refreshAfterBridgeInjection(target){\r
-    renderFaultCatalogList();\r
-    renderModelNodes();\r
-    if(target?.sourceNodeId&&target?.targetNodeId){\r
+  function injectFaultIntoEdge(target,model,parameterOverrides={}){
+    if(!target||!model){return false;}
+    const payload=getRuntimePayload({...model,layer:'protocol'},parameterOverrides);
+    target.injectedFault=payload;
+    appendRuntimeFaultBinding(target,{...model,layer:'protocol'},payload,'edge');
+    markTopologyDirty('fault');
+    return true;
+  }
+
+  function cloneBridgeValue(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function ensureFaultInjectionLinks(){
+    if(!Array.isArray(S.faultInjectionLinks)){
+      S.faultInjectionLinks=[];
+    }
+    return S.faultInjectionLinks;
+  }
+
+  function removeVisualFaultInjectionArtifacts(faultId,options={}){
+    if(!faultId){return false;}
+    const removedNodeIds=new Set();
+    const beforeNodes=S.modelNodes.length;
+    S.modelNodes=S.modelNodes.filter(node=>{
+      const remove=Boolean(node?.autoFaultInjection&&node.faultModelId===faultId);
+      if(remove){removedNodeIds.add(node.id);}
+      return !remove;
+    });
+    const beforeLinks=ensureFaultInjectionLinks().length;
+    S.faultInjectionLinks=S.faultInjectionLinks.filter(link=>link.faultModelId!==faultId&&!removedNodeIds.has(link.sourceNodeId)&&!removedNodeIds.has(link.targetNodeId));
+    if(Array.isArray(S.faultedBlks)&&removedNodeIds.size){
+      S.faultedBlks=S.faultedBlks.filter(id=>!removedNodeIds.has(id));
+    }
+    const changed=beforeNodes!==S.modelNodes.length||beforeLinks!==S.faultInjectionLinks.length;
+    if(changed&&!options.skipRender){
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+    }
+    return changed;
+  }
+
+  function getTargetVisualPoint(target){
+    if(!target){return {x:CANVAS_STAGE.width/2,y:CANVAS_STAGE.height/2};}
+    if(target.sourceNodeId&&target.targetNodeId){
+      const source=getNode(target.sourceNodeId);
+      const targetNode=getNode(target.targetNodeId);
+      const sourcePort=getPortInfo(source,'output',target.sourcePortIndex||0);
+      const targetPort=getPortInfo(targetNode,'input',target.targetPortIndex||0);
+      if(sourcePort&&targetPort){
+        return {
+          x:Math.round((sourcePort.x+targetPort.x)/2),
+          y:Math.round((sourcePort.y+targetPort.y)/2)
+        };
+      }
+    }
+    return {
+      x:Math.round((target.x||0)+(target.w||160)/2),
+      y:Math.round((target.y||0)+(target.h||80)/2)
+    };
+  }
+
+  function getVisualInjectionBlocks(model){
+    const explicit=Array.isArray(model?.visualInjection?.blocks)?model.visualInjection.blocks:[];
+    if(explicit.length){return explicit;}
+    const behavior=model?.runtimeBehavior||'';
+    if(behavior==='lock'){
+      return [{type:'middle_var_assign',name:\`\${model.name||'故障'} 赋值覆盖\`,props:{assignMode:'constant',constantValue:model.defaultParameters?.lock_value??model.defaultValue??0}}];
+    }
+    if(behavior==='tamper'){
+      return [
+        {type:'gain_block',name:\`\${model.name||'故障'} 缩放\`,props:{gain:'scale'}},
+        {type:'sum_block',name:\`\${model.name||'故障'} 偏置\`,props:{inputCount:2,signs:['+','+']}}
+      ];
+    }
+    if(behavior==='noise'||behavior==='colored_noise'){
+      return [{type:'fault_noise',name:\`\${model.name||'故障'} 噪声注入\`,props:{faultType:model.modelClass||'噪声注入',layer:getLayerLabel(model.layer),trigger:'持续'}}];
+    }
+    return [{type:'fault_bias',name:\`\${model.name||'故障'} 偏置注入\`,props:{faultType:model.modelClass||'偏置叠加',layer:getLayerLabel(model.layer),trigger:behavior==='intermittent'?'周期启停':behavior==='parameter_drift'?'渐变':'持续',mode:behavior}}];
+  }
+
+  function createAutoFaultNode(block,index,total,targetPoint,model,payload){
+    const type=block?.type||'fault_bias';
+    const meta=COMPONENT_LIBRARY[type];
+    if(!meta){return null;}
+    const props=typeof cloneDefaults==='function'?cloneDefaults(meta.defaults):cloneBridgeValue(meta.defaults||{});
+    Object.assign(props,cloneBridgeValue(block.props||{}));
+    props.name=block.name||props.name||\`\${meta.label} \${getNodeTypeCount(type)+1}\`;
+    const size=type==='simulation_block'?getSimulationNodeSize(props):{width:meta.width,height:meta.height};
+    const verticalOffset=(index-(total-1)/2)*92;
+    const point={
+      x:clamp(Math.round(targetPoint.x-size.width-140),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-size.width-CANVAS_STAGE.nodePadding),
+      y:clamp(Math.round(targetPoint.y-size.height/2+verticalOffset),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-size.height-CANVAS_STAGE.nodePadding)
+    };
+    const node={
+      id:\`node-\${++S.nodeSeq}\`,
+      type,
+      x:point.x,
+      y:point.y,
+      w:size.width,
+      h:size.height,
+      props,
+      pythonBinding:type==='simulation_block'?createDefaultPythonBinding():null,
+      autoFaultInjection:true,
+      faultModelId:model.id,
+      faultModelName:model.name,
+      injectedFault:cloneBridgeValue(payload)
+    };
+    S.modelNodes.push(node);
+    if(!S.faultedBlks.includes(node.id)){
+      S.faultedBlks.push(node.id);
+    }
+    return node;
+  }
+
+  function addVisualFaultInjectionLinks(model,target,visualNodes){
+    const links=ensureFaultInjectionLinks();
+    const internalRelations=Array.isArray(model?.visualInjection?.relations)?model.visualInjection.relations:[];
+    internalRelations.forEach((relation,index)=>{
+      const source=visualNodes[relation.from];
+      const destination=visualNodes[relation.to];
+      if(source&&destination){
+        links.push({
+          id:\`fault-link-\${model.id}-\${links.length+1}-\${index}\`,
+          faultModelId:model.id,
+          sourceNodeId:source.id,
+          targetNodeId:destination.id,
+          role:'fault-injection-chain',
+          label:model.name||'故障注入'
+        });
+      }
+    });
+    const terminal=visualNodes[visualNodes.length-1];
+    if(terminal){
+      links.push({
+        id:\`fault-link-\${model.id}-\${links.length+1}-target\`,
+        faultModelId:model.id,
+        sourceNodeId:terminal.id,
+        targetNodeId:target?.sourceNodeId?null:target?.id,
+        targetEdgeId:target?.sourceNodeId?target.id:null,
+        role:'fault-injection-target',
+        label:model.name||'故障注入'
+      });
+    }
+    if(!internalRelations.length&&visualNodes.length>1){
+      visualNodes.slice(0,-1).forEach((node,index)=>{
+        links.push({
+          id:\`fault-link-\${model.id}-\${links.length+1}-parallel-\${index}\`,
+          faultModelId:model.id,
+          sourceNodeId:node.id,
+          targetNodeId:target?.sourceNodeId?null:target?.id,
+          targetEdgeId:target?.sourceNodeId?target.id:null,
+          role:'fault-injection-target',
+          label:model.name||'故障注入'
+        });
+      });
+    }
+  }
+
+  function createVisualFaultInjection(model,target,payload){
+    if(!model||!target){return [];}
+    removeVisualFaultInjectionArtifacts(model.id,{skipRender:true});
+    const targetPoint=getTargetVisualPoint(target);
+    const blocks=getVisualInjectionBlocks(model);
+    const visualNodes=blocks
+      .map((block,index)=>createAutoFaultNode(block,index,blocks.length,targetPoint,model,payload))
+      .filter(Boolean);
+    addVisualFaultInjectionLinks(model,target,visualNodes);
+    markTopologyDirty('fault');
+    return visualNodes;
+  }
+
+  function getVisualLinkPointForNode(node){
+    return node?{x:Math.round((node.x||0)+(node.w||160)/2),y:Math.round((node.y||0)+(node.h||80)/2)}:null;
+  }
+
+  function getVisualLinkTargetPoint(link){
+    if(link.targetNodeId){
+      return getVisualLinkPointForNode(getNode(link.targetNodeId));
+    }
+    if(link.targetEdgeId){
+      return getTargetVisualPoint(getEdge(link.targetEdgeId));
+    }
+    return null;
+  }
+
+  function renderVisualFaultInjectionLinks(){
+    const edgeGroup=document.getElementById('edge-group');
+    if(!edgeGroup){return;}
+    const existing=document.getElementById('fault-injection-link-group');
+    if(existing){existing.remove();}
+    const links=ensureFaultInjectionLinks();
+    if(!links.length){return;}
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.id='fault-injection-link-group';
+    links.forEach(link=>{
+      const source=getVisualLinkPointForNode(getNode(link.sourceNodeId));
+      const target=getVisualLinkTargetPoint(link);
+      if(!source||!target){return;}
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      const dx=Math.max(48,Math.abs(target.x-source.x)*0.38);
+      path.setAttribute('d',\`M \${source.x} \${source.y} C \${source.x+dx} \${source.y}, \${target.x-dx} \${target.y}, \${target.x} \${target.y}\`);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke','#dc2626');
+      path.setAttribute('stroke-width','2.4');
+      path.setAttribute('stroke-dasharray','7 5');
+      path.setAttribute('marker-end','url(#edge-arrow-fault)');
+      path.setAttribute('pointer-events','none');
+      path.dataset.faultModelId=link.faultModelId||'';
+      path.dataset.faultInjectionLink=link.id||'';
+      group.appendChild(path);
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x',String(Math.round((source.x+target.x)/2)));
+      label.setAttribute('y',String(Math.round((source.y+target.y)/2)-8));
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','#b91c1c');
+      label.setAttribute('font-size','12');
+      label.setAttribute('font-weight','800');
+      label.textContent='故障注入';
+      group.appendChild(label);
+    });
+    edgeGroup.appendChild(group);
+  }
+
+  function ensureFaultTags(){
+    if(!Array.isArray(S.faultTags)){
+      S.faultTags=[];
+    }
+    return S.faultTags;
+  }
+
+  function safeFaultTagId(value){
+    return String(value||'fault').replace(/[^A-Za-z0-9_-]/g,'-');
+  }
+
+  function getFaultTagBoxSize(tag={}){
+    return {w:204,h:76};
+  }
+
+  function applyFaultTagBoxSize(tag){
+    if(!tag){return null;}
+    if(typeof tag.expanded!=='boolean'){
+      tag.expanded=tag.collapsed===false;
+    }
+    const size=getFaultTagBoxSize(tag);
+    tag.w=size.w;
+    tag.h=size.h;
+    return size;
+  }
+
+  function setFaultTagExpanded(tag,expanded){
+    if(!tag){return;}
+    tag.expanded=Boolean(expanded);
+    tag.collapsed=!tag.expanded;
+    applyFaultTagBoxSize(tag);
+  }
+
+  function getFaultTagHostNodeIdFromTarget(target){
+    if(!target){return '';}
+    if(target.sourceNodeId&&target.targetNodeId){
+      return target.sourceNodeId||target.targetNodeId||'';
+    }
+    return target.id||'';
+  }
+
+  function getFaultTagHostNodeId(tag){
+    if(!tag){return '';}
+    if(tag.hostNodeId){return tag.hostNodeId;}
+    if(tag.targetKind==='edge'){
+      return getFaultTagHostNodeIdFromTarget(getEdge(tag.targetId));
+    }
+    return tag.targetId||'';
+  }
+
+  function getFaultTagsForNode(nodeId){
+    if(!nodeId){return [];}
+    return ensureFaultTags().filter(tag=>getFaultTagHostNodeId(tag)===nodeId);
+  }
+
+  function toggleFaultTagsForNode(nodeId){
+    const tags=getFaultTagsForNode(nodeId);
+    if(!tags.length){return 0;}
+    const nextExpanded=!tags.some(tag=>tag.expanded);
+    tags.forEach(tag=>setFaultTagExpanded(tag,nextExpanded));
+    renderModelNodes();
+    renderEdges();
+    return tags.length;
+  }
+
+  removeVisualFaultInjectionArtifacts=function(faultId,options={}){
+    if(!faultId){return false;}
+    const removedNodeIds=new Set();
+    const beforeNodes=S.modelNodes.length;
+    S.modelNodes=S.modelNodes.filter(node=>{
+      const remove=Boolean(node?.autoFaultInjection&&node.faultModelId===faultId);
+      if(remove){removedNodeIds.add(node.id);}
+      return !remove;
+    });
+    const tags=ensureFaultTags();
+    const removedTagIds=new Set(tags.filter(tag=>tag.faultModelId===faultId).map(tag=>tag.id));
+    const beforeTags=tags.length;
+    S.faultTags=tags.filter(tag=>tag.faultModelId!==faultId);
+    const beforeLinks=ensureFaultInjectionLinks().length;
+    S.faultInjectionLinks=S.faultInjectionLinks.filter(link=>
+      link.faultModelId!==faultId
+      &&!removedNodeIds.has(link.sourceNodeId)
+      &&!removedNodeIds.has(link.targetNodeId)
+      &&!removedTagIds.has(link.sourceTagId)
+    );
+    if(Array.isArray(S.faultedBlks)&&removedNodeIds.size){
+      S.faultedBlks=S.faultedBlks.filter(id=>!removedNodeIds.has(id));
+    }
+    if(removedTagIds.has(S.selFaultTag)){
+      S.selFaultTag=null;
+    }
+    const changed=beforeNodes!==S.modelNodes.length||beforeTags!==S.faultTags.length||beforeLinks!==S.faultInjectionLinks.length;
+    if(changed&&!options.skipRender){
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+    }
+    return changed;
+  };
+
+  function getFaultTagTargetName(model,target){
+    if(model?.visualInjection?.targetName){return model.visualInjection.targetName;}
+    if(target?.sourceNodeId&&target?.targetNodeId){
+      const source=getNode(target.sourceNodeId);
+      const destination=getNode(target.targetNodeId);
+      return \`\${source?.props?.name||target.sourceNodeId} -> \${destination?.props?.name||target.targetNodeId}\`;
+    }
+    return target?.props?.name||target?.id||'目标对象';
+  }
+
+  function getFaultTagPosition(model,target,offsetIndex=null){
+    const targetPoint=getTargetVisualPoint(target);
+    const {w:width,h:height}=getFaultTagBoxSize(model);
+    const targetId=target?.id||model?.visualInjection?.targetId||'';
+    const sameTargetCount=offsetIndex ?? ensureFaultTags().filter(tag=>tag.targetId===targetId).length;
+    const baseX=target?.sourceNodeId
+      ?targetPoint.x-width/2
+      :targetPoint.x+Math.round((target?.w||160)/2)+30;
+    const baseY=target?.sourceNodeId
+      ?targetPoint.y-height-72+(sameTargetCount%3)*88
+      :targetPoint.y-height/2+(sameTargetCount%3)*88;
+    return {
+      x:clamp(Math.round(baseX),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-width-CANVAS_STAGE.nodePadding),
+      y:clamp(Math.round(baseY),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-height-CANVAS_STAGE.nodePadding),
+      w:width,
+      h:height
+    };
+  }
+
+  function getFaultTagById(tagId){
+    return ensureFaultTags().find(tag=>tag.id===tagId)||null;
+  }
+
+  function getFaultTagTarget(tag){
+    if(!tag){return null;}
+    return tag.targetKind==='edge'?getEdge(tag.targetId):getNode(tag.targetId);
+  }
+
+  function syncFaultTagPositions(){
+    const offsets=new Map();
+    ensureFaultTags().forEach(tag=>{
+      tag.positionMode=tag.positionMode||'manual';
+      applyFaultTagBoxSize(tag);
+      if(tag.positionMode==='manual'){
+        return;
+      }
+      const target=getFaultTagTarget(tag);
+      if(!target){return;}
+      const key=tag.targetId||target.id;
+      const offset=offsets.get(key)||0;
+      offsets.set(key,offset+1);
+      const box=getFaultTagPosition(tag,target,offset);
+      tag.x=box.x;
+      tag.y=box.y;
+      tag.w=box.w;
+      tag.h=box.h;
+    });
+  }
+
+  createVisualFaultInjection=function(model,target,payload){
+    if(!model||!target){return null;}
+    removeVisualFaultInjectionArtifacts(model.id,{skipRender:true});
+    const targetKind=target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+    const targetId=target?.id||model?.visualInjection?.targetId||'';
+    const hostNodeId=getFaultTagHostNodeIdFromTarget(target);
+    const hostAlreadyExpanded=hostNodeId?getFaultTagsForNode(hostNodeId).some(tag=>tag.expanded):false;
+    const box=getFaultTagPosition(model,target);
+    const tag={
+      id:\`fault-tag-\${safeFaultTagId(model.id)}\`,
+      type:'fault_tag',
+      faultModelId:model.id,
+      faultModelName:model.name||'故障',
+      name:model.name||'故障',
+      layer:getLayerLabel(model.layer),
+      modelClass:model.modelClass||model.faultKind||'故障',
+      runtimeBehavior:model.runtimeBehavior||payload?.runtimeBehavior||'',
+      targetKind,
+      targetId,
+      hostNodeId,
+      targetName:getFaultTagTargetName(model,target),
+      active:true,
+      positionMode:'manual',
+      expanded:hostAlreadyExpanded,
+      collapsed:!hostAlreadyExpanded,
+      parameters:cloneBridgeValue(payload?.parameters||model.defaultParameters||{}),
+      injectedFault:cloneBridgeValue(payload),
+      x:box.x,
+      y:box.y,
+      w:box.w,
+      h:box.h
+    };
+    ensureFaultTags().push(tag);
+    if(hostNodeId&&!S.faultedBlks.includes(hostNodeId)){
+      S.faultedBlks.push(hostNodeId);
+    }
+    ensureFaultInjectionLinks().push({
+      id:\`fault-link-\${safeFaultTagId(model.id)}-target\`,
+      faultModelId:model.id,
+      sourceTagId:tag.id,
+      targetNodeId:target?.sourceNodeId?null:target?.id,
+      targetEdgeId:target?.sourceNodeId?target.id:null,
+      role:'fault-tag-attachment',
+      label:'故障注入'
+    });
+    markTopologyDirty('fault');
+    return tag;
+  };
+
+  function createManualFaultTag({x,y,target}={}){
+    const id=\`manual-fault-tag-\${Date.now()}-\${Math.round(Math.random()*10000)}\`;
+    const box=target
+      ?getFaultTagPosition({id,visualInjection:{}},target)
+      :{
+        x:clamp(Math.round((x||CANVAS_STAGE.width/2)-102),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-204-CANVAS_STAGE.nodePadding),
+        y:clamp(Math.round((y||CANVAS_STAGE.height/2)-38),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-76-CANVAS_STAGE.nodePadding),
+        w:204,
+        h:76
+      };
+    const tag={
+      id,
+      type:'fault_tag',
+      faultModelId:id,
+      faultModelName:'故障组件',
+      name:'故障组件',
+      layer:'飞控故障库',
+      modelClass:'故障标签',
+      runtimeBehavior:'manual',
+      targetKind:target?(target.sourceNodeId?'edge':'node'):'unbound',
+      targetId:target?.id||'',
+      hostNodeId:getFaultTagHostNodeIdFromTarget(target),
+      targetName:target?getFaultTagTargetName({visualInjection:{}},target):'未绑定目标',
+      active:false,
+      positionMode:'manual',
+      expanded:false,
+      collapsed:true,
+      parameters:{},
+      injectedFault:null,
+      x:box.x,
+      y:box.y,
+      w:box.w,
+      h:box.h
+    };
+    ensureFaultTags().push(tag);
+    if(target){
+      ensureFaultInjectionLinks().push({
+        id:\`fault-link-\${safeFaultTagId(id)}-target\`,
+        faultModelId:id,
+        sourceTagId:tag.id,
+        targetNodeId:target.sourceNodeId?null:target.id,
+        targetEdgeId:target.sourceNodeId?target.id:null,
+        role:'fault-tag-attachment',
+        label:'故障注入'
+      });
+    }
+    renderModelNodes();
+    renderEdges();
+    selectFaultTag(tag.id);
+    return tag;
+  }
+
+  function getVisualLinkPointForTag(tag){
+    return tag?.expanded?{x:Math.round((tag.x||0)+(tag.w||204)/2),y:Math.round((tag.y||0)+(tag.h||76))}:null;
+  }
+
+  function renderFaultTagPropertyPanel(tag){
+    const pe=document.getElementById('pe');
+    const pd=document.getElementById('pd');
+    if(!pd||!tag){return;}
+    if(pe){pe.style.display='none';}
+    pd.style.display='block';
+    const title=document.querySelector('.ph-title');
+    const sub=document.querySelector('.ph-sub');
+    if(title){title.textContent='属性面板';}
+    if(sub){sub.textContent='当前选择 · 故障标签';}
+    const params=Object.entries(tag.parameters||{});
+    const target=getFaultTagTarget(tag);
+    const targetName=tag.targetName||target?.props?.name||tag.targetId||'目标对象';
+    pd.innerHTML=\`
+      <div class="pgroup fault-tag-inspector" data-fault-tag-inspector="\${escapeHtml(tag.id)}">
+        <div class="pglbl">故障标签</div>
+        <div class="props-target-card is-faulted">
+          <div>
+            <div class="props-target-title">\${escapeHtml(tag.name||'故障')}</div>
+            <div class="props-target-meta">\${escapeHtml(tag.modelClass||'故障')} · \${escapeHtml(tag.layer||'飞控故障库')}</div>
+          </div>
+          <span class="props-state-pill is-faulted">已注入</span>
+        </div>
+        <div class="prow"><span class="pk">目标对象</span><span class="pv">\${escapeHtml(targetName)}</span></div>
+        <div class="prow"><span class="pk">目标类型</span><span class="pv">\${tag.targetKind==='edge'?'连线':'模块'}</span></div>
+        <div class="prow"><span class="pk">运行行为</span><span class="pv">\${escapeHtml(tag.runtimeBehavior||'按故障库定义')}</span></div>
+      </div>
+      <div class="pgroup fault-tag-param-panel">
+        <div class="pglbl">故障参数</div>
+        \${params.length?params.map(([key,value])=>\`
+          <label class="fault-tag-param-row">
+            <span>\${escapeHtml(key)}</span>
+            <input value="\${escapeHtml(value)}" data-fault-tag-param="\${escapeHtml(key)}">
+          </label>
+        \`).join(''):'<div class="props-empty-inline">该故障没有额外参数。</div>'}
+      </div>
+    \`;
+    pd.querySelectorAll('[data-fault-tag-param]').forEach(input=>{
+      input.addEventListener('change',()=>{
+        const key=input.getAttribute('data-fault-tag-param');
+        if(!key){return;}
+        tag.parameters=tag.parameters||{};
+        tag.parameters[key]=input.value;
+        const runtimeTarget=getFaultTagTarget(tag);
+        if(runtimeTarget?.injectedFault){
+          runtimeTarget.injectedFault.parameters={...(runtimeTarget.injectedFault.parameters||{}),[key]:input.value};
+        }
+      });
+    });
+    if(typeof syncPropertyTabs==='function'){syncPropertyTabs();}
+  }
+
+  function selectFaultTag(tagId){
+    const tag=getFaultTagById(tagId);
+    if(!tag){return;}
+    S.selFaultTag=tag.id;
+    S.selBlk=null;
+    S.selEdge=null;
+    S.propertyPanelTab='overview';
+    renderModelNodes();
+    renderEdges();
+    renderFaultTagPropertyPanel(tag);
+    updateUI();
+  }
+
+  const FAULT_TAG_DRAG={
+    active:false,
+    engaged:false,
+    pointerId:null,
+    tagId:'',
+    startX:0,
+    startY:0,
+    originX:0,
+    originY:0,
+    suppressClick:false
+  };
+
+  function updateFaultTagElementPosition(el,tag){
+    if(!el||!tag){return;}
+    applyFaultTagBoxSize(tag);
+    el.style.left=\`\${tag.x||0}px\`;
+    el.style.top=\`\${tag.y||0}px\`;
+    el.style.width=\`\${tag.w||204}px\`;
+    el.style.height=\`\${tag.h||76}px\`;
+  }
+
+  function beginFaultTagDrag(event,tag,el){
+    event.stopPropagation();
+    if(event.button!==0){return;}
+    FAULT_TAG_DRAG.active=true;
+    FAULT_TAG_DRAG.engaged=false;
+    FAULT_TAG_DRAG.suppressClick=false;
+    FAULT_TAG_DRAG.pointerId=event.pointerId;
+    FAULT_TAG_DRAG.tagId=tag.id;
+    FAULT_TAG_DRAG.startX=event.clientX;
+    FAULT_TAG_DRAG.startY=event.clientY;
+    FAULT_TAG_DRAG.originX=tag.x||0;
+    FAULT_TAG_DRAG.originY=tag.y||0;
+    if(el.setPointerCapture){
+      el.setPointerCapture(event.pointerId);
+    }
+  }
+
+  function moveFaultTagDrag(event,tag,el){
+    if(!FAULT_TAG_DRAG.active||FAULT_TAG_DRAG.pointerId!==event.pointerId||FAULT_TAG_DRAG.tagId!==tag.id){return;}
+    const dx=event.clientX-FAULT_TAG_DRAG.startX;
+    const dy=event.clientY-FAULT_TAG_DRAG.startY;
+    if(!FAULT_TAG_DRAG.engaged&&!movedBeyondPointerThreshold(FAULT_TAG_DRAG.startX,FAULT_TAG_DRAG.startY,event.clientX,event.clientY)){return;}
+    event.preventDefault();
+    event.stopPropagation();
+    FAULT_TAG_DRAG.engaged=true;
+    tag.positionMode='manual';
+    tag.x=clamp(Math.round(FAULT_TAG_DRAG.originX+dx/(S.canvasScale||1)),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-(tag.w||204)-CANVAS_STAGE.nodePadding);
+    tag.y=clamp(Math.round(FAULT_TAG_DRAG.originY+dy/(S.canvasScale||1)),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-(tag.h||76)-CANVAS_STAGE.nodePadding);
+    updateFaultTagElementPosition(el,tag);
+    renderVisualFaultInjectionLinks();
+  }
+
+  function endFaultTagDrag(event,tag,el){
+    if(!FAULT_TAG_DRAG.active||FAULT_TAG_DRAG.pointerId!==event.pointerId||FAULT_TAG_DRAG.tagId!==tag.id){return;}
+    event.stopPropagation();
+    if(el.releasePointerCapture){
+      try{el.releasePointerCapture(event.pointerId);}catch(error){}
+    }
+    const wasDragged=FAULT_TAG_DRAG.engaged;
+    const shouldSelect=!wasDragged;
+    FAULT_TAG_DRAG.active=false;
+    FAULT_TAG_DRAG.engaged=false;
+    FAULT_TAG_DRAG.pointerId=null;
+    FAULT_TAG_DRAG.tagId='';
+    FAULT_TAG_DRAG.suppressClick=wasDragged;
+    if(shouldSelect){
+      selectFaultTag(tag.id);
+    }
+  }
+
+  function renderFaultTags(){
+    const layer=document.getElementById('node-layer');
+    if(!layer){return;}
+    syncFaultTagPositions();
+    layer.querySelectorAll('.fault-tag-card').forEach(el=>el.remove());
+    ensureFaultTags().forEach(tag=>{
+      applyFaultTagBoxSize(tag);
+      if(!tag.expanded){return;}
+      const el=document.createElement('div');
+      el.className=\`fault-tag-card\${S.selFaultTag===tag.id?' is-selected':''}\`;
+      el.id=\`visual-\${tag.id}\`;
+      el.dataset.faultTagId=tag.id;
+      el.dataset.faultModelId=tag.faultModelId||'';
+      el.style.left=\`\${tag.x||0}px\`;
+      el.style.top=\`\${tag.y||0}px\`;
+      el.style.width=\`\${tag.w||204}px\`;
+      el.style.height=\`\${tag.h||76}px\`;
+      el.innerHTML=\`
+        <div class="fault-tag-card__badge">F</div>
+        <div class="fault-tag-card__kicker">故障</div>
+        <div class="fault-tag-card__title">\${escapeHtml(tag.name||'故障')}</div>
+        <div class="fault-tag-card__meta">\${escapeHtml(tag.modelClass||'故障')} / \${escapeHtml(tag.layer||'飞控故障库')}</div>
+      \`;
+      el.addEventListener('pointerdown',event=>beginFaultTagDrag(event,tag,el));
+      el.addEventListener('pointermove',event=>moveFaultTagDrag(event,tag,el));
+      el.addEventListener('pointerup',event=>endFaultTagDrag(event,tag,el));
+      el.addEventListener('pointercancel',event=>endFaultTagDrag(event,tag,el));
+      el.addEventListener('click',event=>{
+        if(FAULT_TAG_DRAG.suppressClick){
+          FAULT_TAG_DRAG.suppressClick=false;
+          event.stopPropagation();
+          return;
+        }
+        event.stopPropagation();
+        selectFaultTag(tag.id);
+      });
+      el.addEventListener('dblclick',event=>{
+        event.stopPropagation();
+        selectFaultTag(tag.id);
+        renderFaultTagPropertyPanel(tag);
+      });
+      layer.appendChild(el);
+    });
+  }
+
+  function setAllFaultTagsCollapsed(collapsed){
+    const tags=ensureFaultTags();
+    tags.forEach(tag=>setFaultTagExpanded(tag,!collapsed));
+    renderModelNodes();
+    renderEdges();
+    if(S.selFaultTag){
+      const selected=getFaultTagById(S.selFaultTag);
+      if(selected){
+        renderFaultTagPropertyPanel(selected);
+      }
+    }
+    return tags.length;
+  }
+
+  function renderFaultNodeToggles(){
+    document.querySelectorAll('[data-fault-tags-toggle]').forEach(button=>button.remove());
+    S.modelNodes.forEach(node=>{
+      const tags=getFaultTagsForNode(node.id);
+      if(!tags.length){return;}
+      const el=document.getElementById(\`b-\${node.id}\`);
+      if(!el){return;}
+      const expandedCount=tags.filter(tag=>tag.expanded).length;
+      el.classList.add('faulted');
+      const button=document.createElement('button');
+      button.type='button';
+      button.className=\`fault-node-toggle\${expandedCount?' is-open':''}\`;
+      button.dataset.faultTagsToggle=node.id;
+      button.innerHTML=\`<span>\${expandedCount?'收起故障':'展开故障'}</span><b>\${tags.length}</b>\`;
+      button.addEventListener('pointerdown',event=>event.stopPropagation());
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        toggleFaultTagsForNode(node.id);
+      });
+      el.appendChild(button);
+    });
+  }
+
+  renderVisualFaultInjectionLinks=function(){
+    const edgeGroup=document.getElementById('edge-group');
+    if(!edgeGroup){return;}
+    syncFaultTagPositions();
+    const existing=document.getElementById('fault-injection-link-group');
+    if(existing){existing.remove();}
+    const links=ensureFaultInjectionLinks();
+    if(!links.length){return;}
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.id='fault-injection-link-group';
+    links.forEach(link=>{
+      const source=getVisualLinkPointForTag(getFaultTagById(link.sourceTagId));
+      const target=getVisualLinkTargetPoint(link);
+      if(!source||!target){return;}
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      const dx=Math.max(48,Math.abs(target.x-source.x)*0.38);
+      path.setAttribute('d',\`M \${source.x} \${source.y} C \${source.x+dx} \${source.y}, \${target.x-dx} \${target.y}, \${target.x} \${target.y}\`);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke','#dc2626');
+      path.setAttribute('stroke-width','2.4');
+      path.setAttribute('stroke-dasharray','7 5');
+      path.setAttribute('marker-end','url(#edge-arrow-fault)');
+      path.setAttribute('pointer-events','none');
+      path.dataset.faultModelId=link.faultModelId||'';
+      path.dataset.faultInjectionLink=link.id||'';
+      group.appendChild(path);
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x',String(Math.round((source.x+target.x)/2)));
+      label.setAttribute('y',String(Math.round((source.y+target.y)/2)-8));
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','#b91c1c');
+      label.setAttribute('font-size','12');
+      label.setAttribute('font-weight','800');
+      label.textContent='故障注入';
+      group.appendChild(label);
+    });
+    edgeGroup.appendChild(group);
+  };
+
+  const __visualInjectionRenderModelNodes=renderModelNodes;
+  renderModelNodes=function(){
+    const result=__visualInjectionRenderModelNodes();
+    renderFaultNodeToggles();
+    renderFaultTags();
+    return result;
+  };
+  window.renderModelNodes=renderModelNodes;
+  window.renderFaultTags=renderFaultTags;
+  window.selectFaultTag=selectFaultTag;
+  window.createManualFaultTag=createManualFaultTag;
+  window.collapseAllFaultTags=()=>setAllFaultTagsCollapsed(true);
+  window.expandAllFaultTags=()=>setAllFaultTagsCollapsed(false);
+
+  const __visualInjectionRenderEdges=renderEdges;
+  renderEdges=function(){
+    const result=__visualInjectionRenderEdges();
+    renderVisualFaultInjectionLinks();
+    return result;
+  };
+  window.renderEdges=renderEdges;
+
+  const __visualInjectionRemoveInjectedFault=window.removeInjectedFault||(typeof removeInjectedFault!=='undefined'?removeInjectedFault:null);
+  if(__visualInjectionRemoveInjectedFault&&!window.__visualInjectionRemoveWrapped){
+    window.__visualInjectionRemoveWrapped=true;
+    window.removeInjectedFault=function(faultId){
+      const removed=__visualInjectionRemoveInjectedFault.apply(this,arguments);
+      const visualRemoved=removeVisualFaultInjectionArtifacts(faultId,{skipRender:true});
+      if(visualRemoved){
+        renderModelNodes();
+        renderEdges();
+        updateUI();
+      }
+      return Boolean(removed||visualRemoved);
+    };
+    if(typeof removeInjectedFault!=='undefined') removeInjectedFault=window.removeInjectedFault;
+  }
+
+  function refreshAfterBridgeInjection(target){
+    renderFaultCatalogList();
+    renderModelNodes();
+    if(target?.sourceNodeId&&target?.targetNodeId){
       renderEdges();\r
       if(S.selEdge===target.id){renderPropertyPanel(target);}\r
     }else if(target?.id&&S.selBlk===target.id){\r
@@ -16606,17 +17416,19 @@ function decorateDataflowEdges(){\r
     });\r
     const parameterOverrides=readFaultParameterValues('fault-type-detail');\r
     let injectedTarget=null;\r
-    if(target?.kind==='edge'){\r
-      const edge=findEdgeEverywhere(target.id);\r
-      if(edge&&injectFaultIntoEdge(edge,imported,parameterOverrides)){\r
-        injectedTarget=edge;\r
-      }\r
-    }else if(target?.kind==='node'){\r
-      const node=findNodeEverywhere(target.id);\r
-      if(node&&injectFaultIntoNode(node,imported,parameterOverrides)){\r
-        injectedTarget=node;\r
-      }\r
-    }\r
+    if(target?.kind==='edge'){
+      const edge=findEdgeEverywhere(target.id);
+      if(edge&&injectFaultIntoEdge(edge,imported,parameterOverrides)){
+        injectedTarget=edge;
+        createVisualFaultInjection(imported,edge,edge.injectedFault);
+      }
+    }else if(target?.kind==='node'){
+      const node=findNodeEverywhere(target.id);
+      if(node&&injectFaultIntoNode(node,imported,parameterOverrides)){
+        injectedTarget=node;
+        createVisualFaultInjection(imported,node,node.injectedFault);
+      }
+    }
 \r
     renderFaultCatalogList();\r
     if(injectedTarget){\r
@@ -18081,31 +18893,32 @@ function decorateDataflowEdges(){\r
 \r
   function normalizeFaultSelectionButton(){\r
     if(typeof document==='undefined') return;\r
-    const selected=getState().selectedFaultCatalogId;\r
-    const existing=document.querySelectorAll('[data-clear-selected-fault-catalog]');\r
-    existing.forEach(node=>node.remove());\r
-    if(!selected) return;\r
-    const injected=isFaultCurrentlyInjected(selected);\r
-    if(!injected) return;\r
-    const footer=document.querySelector('.modal-footer,.dlg-actions,.dialog-actions,.ifm-actions,.modal .actions')||document.querySelector('#faultLibModal,.modal.show,.modal');\r
-    const button=document.createElement('button');\r
-    button.type='button';\r
-    button.className='compact-clear-fault-selection';\r
-    button.dataset.clearSelectedFaultCatalog='1';\r
-    button.textContent='移除已注入故障';\r
+    const selected=getState().selectedFaultCatalogId;
+    const existing=document.querySelectorAll('.compact-clear-fault-selection,.compact-clear-fault-selection-inline');
+    existing.forEach(node=>node.remove());
+    if(!selected) return;
+    const imported=arr(getState().importedFaultModels).some(model=>getFaultKey(model)===selected||model?.id===selected||model?.modelId===selected);
+    const injected=isFaultCurrentlyInjected(selected);
+    if(!injected&&!imported) return;
+    const footer=document.querySelector('.modal-footer,.dlg-actions,.dialog-actions,.ifm-actions,.modal .actions')||document.querySelector('#faultLibModal,.modal.show,.modal');
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='compact-clear-fault-selection';
+    button.dataset.clearSelectedFaultCatalog=selected;
+    button.textContent=injected?'移除已注入故障':'撤销故障导入';
     if(footer) footer.insertBefore(button,footer.firstChild||null);\r
     const selectedCard=document.querySelector('.ifm-item.on,.fault-card.on,.fault-item.on');\r
     if(selectedCard){\r
       const inline=document.createElement('button');\r
-      inline.type='button';\r
-      inline.className='compact-clear-fault-selection-inline';\r
-      inline.dataset.clearSelectedFaultCatalog='1';\r
-      inline.textContent='移除故障';\r
-      selectedCard.appendChild(inline);\r
-    }\r
-  }\r
+      inline.type='button';
+      inline.className='compact-clear-fault-selection-inline';
+      inline.dataset.clearSelectedFaultCatalog=selected;
+      inline.textContent=injected?'移除故障':'撤销导入';
+      selectedCard.appendChild(inline);
+    }
+  }
 \r
-  function removeImportedFaultModelById(id){\r
+  function removeImportedFaultModelById(id,options={}){
     const state=getState();\r
     if(!id||!Array.isArray(state.importedFaultModels)) return false;\r
     const before=state.importedFaultModels.length;\r
@@ -18134,7 +18947,7 @@ function decorateDataflowEdges(){\r
       }\r
       if(typeof updateUI==='function') updateUI();\r
       if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();\r
-      if(typeof toast==='function') toast('已撤销该故障导入','s');\r
+      if(!options?.silent&&typeof toast==='function') toast('已撤销该故障导入','s');
     }\r
     return removed;\r
   }\r
@@ -18644,20 +19457,29 @@ function decorateDataflowEdges(){\r
         }\r
         return;\r
       }\r
-      if(event.target.closest?.('[data-clear-selected-fault-catalog]')){\r
-        event.preventDefault();\r
-        const state=getState();\r
-        const selected=state.selectedFaultCatalogId;\r
-        if(isFaultCurrentlyInjected(selected)&&typeof window.removeInjectedFault==='function'){\r
-          window.removeInjectedFault(selected);\r
-          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();\r
-          if(typeof updateUI==='function') updateUI();\r
-          if(typeof toast==='function') toast('已移除该故障','s');\r
-        }else if(!removeImportedFaultModelById(selected)){\r
-          state.selectedFaultCatalogId='';\r
-          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();\r
-        }\r
-      }\r
+      const clearSelectedTrigger=event.target.closest?.('[data-clear-selected-fault-catalog]');
+      if(clearSelectedTrigger){
+        event.preventDefault();
+        event.stopPropagation();
+        const state=getState();
+        const selected=clearSelectedTrigger.getAttribute('data-clear-selected-fault-catalog')||state.selectedFaultCatalogId;
+        let removed=false;
+        if(isFaultCurrentlyInjected(selected)&&typeof window.removeInjectedFault==='function'){
+          removed=window.removeInjectedFault(selected)||removed;
+        }
+        removed=removeImportedFaultModelById(selected,{silent:true})||removed;
+        if(removed){
+          state.selectedFaultCatalogId='';
+          state.faultCatalogSelectionCleared=true;
+          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+          if(typeof updateUI==='function') updateUI();
+          if(typeof toast==='function') toast('已移除该故障','s');
+        }else{
+          state.selectedFaultCatalogId='';
+          state.faultCatalogSelectionCleared=true;
+          if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
+        }
+      }
     });\r
   }\r
 \r
@@ -18748,6 +19570,6 @@ function decorateDataflowEdges(){\r
   window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;\r
   setTimeout(decorateCanvasNodes,0);\r
 })();\r
-`,Ks=`canvas-root`,qs=`顶层`;function J(e){return JSON.parse(JSON.stringify(e))}function Js(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Ys(e){return Array.isArray(e)?e:[]}function Xs(e){let t=J(e??{});return{inputs:Array.isArray(t.inputs)?J(t.inputs):[],outputs:Array.isArray(t.outputs)?J(t.outputs):[],middleVars:Array.isArray(t.middleVars)?J(t.middleVars):[]}}function Zs(e){let t=J(e??{});return{...qo().executionConfig,...t}}function Qs(e){if(!e||typeof e!=`object`)return qo();let t={...qo(),...J(e)};return t.executionConfig=Zs(e.executionConfig),t.portMapping={...qo().portMapping,...Xs(e.portMapping)},t}function $s(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function ec(e,t){return Object.values(Js(e)?e:{}).flatMap(e=>Js(e)?Ys(e[t]):[])}function tc(e,t,n){return $s(ec(e,t),n)}function nc(e){let t=Js(e)?J(e):{};return{...t,pythonBinding:t.type===`simulation_block`?Qs(t.pythonBinding):t.pythonBinding??null}}function rc(e){return Js(e)?J(e):{}}function ic(e=Ks,t=qs){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function ac(e,t=Ks){let n=Js(e)?J(e):{};return{id:n.id??t,name:n.name??(t===Ks?qs:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:Ys(n.nodes).map(nc),edges:Ys(n.edges).map(rc)}}function oc(e){let t=Js(e)?e:{},n=Js(t.canvases)?t.canvases:null;if(!n){let e=ic();return e.nodes=Ys(t.modelNodes).map(nc),e.edges=Ys(t.modelEdges).map(rc),{rootCanvasId:Ks,activeCanvasId:Ks,canvasTrail:[Ks],canvases:{[Ks]:e}}}let r=t.rootCanvasId??Ks,i={};Object.entries(n).forEach(([e,t])=>{i[e]=ac(t,e)}),i[r]||(i[r]=ic(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=Ys(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function sc(e){let t=Js(e)?J(e):{},n=oc(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??ic(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),a=i.nodes,o=i.edges;return J({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??tc(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??tc(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Ys(t.faultedBlks),importedFaultModels:Ys(t.importedFaultModels)})}function cc(e){let t=Js(e)?J(e):{},n=oc(t),r=n.canvases[n.activeCanvasId]??ic(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),i=r.nodes,a=r.edges;return J({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??tc(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??tc(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Ys(t.faultedBlks),importedFaultModels:Ys(t.importedFaultModels)})}var lc=`flight-control-model`;function Y(e){return JSON.parse(JSON.stringify(e))}function uc(e){let t=Y(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function dc(e){let t=new Map;return e.forEach(e=>{let n=uc(e);X(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),X(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function fc(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Z(e)){t.push(e);return}let r=X(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Z(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function pc(e,t){let n=Y(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Z(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Z(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function mc(e){return!!(e?.bound&&X(e.entryFunction)&&X(e.rawSource??e.source)&&Z(e.parsedInterface))}function hc(e,t){if(!e?.bound||!t||!Z(t.parsedInterface)||mc(e))return e;let n=Jo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...Y(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??Y(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Z(e.executionConfig)?e.executionConfig:n.executionConfig}}function gc(e,t){let n=dc(t),r=[];return{snapshot:pc(e,e=>{if(!Z(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!mc(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=hc(t,i);if(!mc(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function _c(e){if(!Z(e))return e;if(e?.type!==`simulation_block`)return Y(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...Y(e),pythonBinding:t?Y(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=X(n)&&X(r)&&X(i)&&X(a);return{...Y(e),pythonBinding:o?Y(t):null}}function vc(e){return fc(e).reduce((e,t)=>{if(!Z(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!X(r)||!X(i)||!X(a)||!X(o)||e.has(r)||e.set(r,uc({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function X(e){return typeof e==`string`&&e.trim().length>0}function Z(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function yc(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Z(t)||e.push(`${n}[${r}] must be an object.`)})}function bc(e){let t=[],n=new Set,r=new Set;if(!Z(e))return{ok:!1,errors:[`Package must be an object.`]};if(e.schemaVersion!==1&&t.push(`schemaVersion must be 1.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${lc}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Z(e)){t.push(`pythonModules[${i}] must be an object.`);return}X(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),X(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),X(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),X(e.source)||t.push(`pythonModules[${i}].source is required.`),X(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),X(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Z(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Z(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?yc(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?yc(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Z(e)&&X(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Z(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&yc(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&yc(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),fc(e.workbenchSnapshot).forEach((e,n)=>{if(!Z(e)||!Z(e.injectedFault))return;let r=X(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!X(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function xc(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?Y(e.supportedFaultLibraries):[],capabilities:Z(e.capabilities)?Y(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function Sc(e){let t=bc(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=Y(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=gc(cc(e.workbenchSnapshot),n);return r.errors.length>0?{ok:!1,errors:r.errors}:{ok:!0,snapshot:r.snapshot,descriptor:xc(e),faultLibrary:Y(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Z(e.diagnosticModel)?Y(e.diagnosticModel):null,pythonModules:n}}function Cc({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=sc(t),i=pc(r,_c),a=vc(r);return{schemaVersion:1,packageType:lc,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?Y(e.supportedFaultLibraries):[],capabilities:Z(e.capabilities)?Y(e.capabilities):{},source:Y(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:Y(n??[]),workbenchSnapshot:i}}function wc({meta:e={},state:t={},faultLibrary:n=[]}={}){return Cc({meta:e,snapshot:t,faultLibrary:n})}var Tc={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},Ec=!1,Dc=`model-packages/evtol_closed_loop_fault_demo.json`,Oc=`gz-workbench-system-model`;function kc(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function Ac(){let e=kc(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function jc(){return new URL(Dc,Ac()).toString()}function Mc(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Nc(){return Mc()?{force:!0,resetStoredWorkbench:!0,publicDemo:!0}:{}}function Pc(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(Oc)}catch{}}function Fc({force:e=!1}={}){if(e)return!1;if(window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Ic(e={}){if(Fc(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,Pc(e);try{let n=e.packageObject??await Lc(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??jc(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??jc(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Lc(e=jc()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function Rc(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function zc(e={}){return sc(e)}function Bc(){Ec||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:sc,restoreWorkbenchSnapshot:cc},window.__GZ_FAULT_TYPE_CATALOG__=Tc,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return bc(e)},importObject(e){let t=Sc(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return wc({meta:Rc(e),state:zc(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Ic,window.eval(`${Gs}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Nc();Ic(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:jc(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,Ec=!0)}var Vc=[`all`,`info`,`ok`,`warn`,`error`],Hc={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},Uc={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},Wc={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},Gc=null,Kc=null,qc=null,Jc=!1;function Q(){return document.querySelector(`.sbar`)}function Yc(e=Q()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function Xc(e=Q()){return e?.querySelector(`.sbar-log-table`)||null}function Zc(e=Q()){return e?.querySelector(`[data-status-empty]`)||null}function Qc(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function $c(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function el(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(Qc(t)),e.append(n)}function tl(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function nl(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function rl(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`组件`),nl(e),el(e,n),tl(e,`连线`))}function il(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`故障`))}function al(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function ol(){let e=$c(document.getElementById(`sblk`)?.textContent||``),t=$c(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function sl(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function cl(e={}){let t=Q();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=ol(),r={components:Qc(e.components,n.components),links:Qc(e.links,n.links),faults:Qc(e.faults,n.faults),state:e.state,time:e.time};rl(document.getElementById(`sblk`),r.components,r.links),il(document.getElementById(`sflt`),r.faults),al(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function ll(){Jc||(Jc=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{Jc=!1,sl()&&cl(ol())}))}function ul(e){if(qc?.disconnect(),qc=null,cl(ol()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){qc=new MutationObserver(ll);for(let e of t)qc.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function dl(e,t,n){let r=Zc(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function fl(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=Hc[t]||Hc.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function pl(e=Q()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of Yc(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:Wc[t]||Wc.log;return dl(e,i===0,a),fl(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function ml(e=`all`){let t=Q();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=Vc.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...pl(t)}}function hl(){let e=Q();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return ml(Vc[(Vc.indexOf(t)+1)%Vc.length]||`all`)}function gl(e=`log`){let t=Q();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...pl(t)}}function _l(){let e=Q();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...pl(e)}}function vl(e={}){let t=Q();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of Yc(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
-`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function yl(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function bl(e={}){let t=Q(),n=Xc(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=Hc[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||yl();let s=document.createElement(`span`);s.className=`sbar-badge ${Uc[r]||Uc.info}`,s.textContent=Hc[r]||Hc.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=Zc(t);n.insertBefore(a,u||null);let d=Yc(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,pl(t),{ok:!0,row:a}}function xl(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Sl(e={}){let t=xl(e.duration,2),n=xl(e.elapsedSeconds??e.time??0,2),r=xl(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:Qc(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:Qc(e.stepIndex,0),stepSize:r}}function Cl(e={}){let t=Sl(e),n=bl({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=bl({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function wl(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){gl(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?_l():n.dataset.statusAction===`level`?hl():n.dataset.statusAction===`export`&&vl())}function Tl(){let e=Q();!e||e===Gc||(El(),Gc=e,Kc=wl,Gc.addEventListener(`click`,Kc),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,ul(e),pl(e),window.__GZ_STATUS_BAR__={applyLevelFilter:ml,bind:Tl,clear:_l,cycleLevelFilter:hl,exportLog:vl,formatMetrics:cl,pushEntry:bl,publishSimulationSummary:Cl,refresh:pl,selectView:gl,unbind:El})}function El(){Gc&&Kc&&Gc.removeEventListener(`click`,Kc),qc?.disconnect(),qc=null,Gc=null,Kc=null}function Dl(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function Ol({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Dl(t)}async function kl({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Dl(n)}function Al(e){return String(e??`any`).trim().toLowerCase()}function jl(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Ml(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function Nl(e){let t=Al(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Ml(n)}function Pl({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=Ol,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?Nl(e):Ml(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Ml(jl(h.outputs,e,t))),_=f.map((e,t)=>Ml(jl(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Ml(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Fl=Pl;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var Il=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Ll=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Rl=new Set(Object.values(Ll)),zl=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),Bl=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),Vl=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function Hl(e){return JSON.parse(JSON.stringify(e??null))}function Ul(e){return typeof e==`string`&&e.trim().length>0}function Wl(e){return String(e??``).trim().toLowerCase()}function $(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function Gl(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function Kl(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function ql(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function Jl(e=1,t=0,n=0){return ql(e,t,n)*2-1}function Yl(e){return Array.isArray(e)?e:[]}function Xl(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function Zl(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function Ql(e={}){if(Ul(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return e.runtimeBehavior;if(Ul(e.id)&&Il[e.id])return Il[e.id];if(Ul(e.faultTypeId)&&Il[e.faultTypeId])return Il[e.faultTypeId];if(Ul(e.faultCode)&&Bl[e.faultCode])return Bl[e.faultCode];let t=[e.name,e.modelClass,e.faultKind,...Yl(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function $l(e){return Rl.has(e)?e:``}function eu(e={},t={}){let n=$l(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=Ql(e)||Ql(t);if(yu(r)||i===`protocol_edge_fault`)return Ll.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Ll.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Ll.signalTransform:Ll.localOnly}function tu(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function nu(e={},t=0){let n=$(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+$(r,1/0)}function ru(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??tu(n,r),a=t.behavior||Ql(n)||Ql(r),o=t.state??{},s=$(t.time,0),c=Math.max($(t.dt,.1),1e-4),l=$(t.seed,1),u=$(t.stepIndex,0),d=$(e,0);if(!a||!nu(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+$(Zl(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*$(i.scale,1);if(a===`parameter_drift`){let e=$(i.rate,0),t=i.max_delta===void 0?null:Math.abs($(i.max_delta,0)),n=Math.max(s-$(i.start,0),0)*e;return t!==null&&(n=Kl(n,-t,t)),d+n}if(a===`parameter_step`)return d+$(i.step_value,$(i.jump,0));if(a===`lock`)return $(i.lock_value,0);if(a===`saturation`)return Kl(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:$(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:$(i.upper,1/0));if(a===`noise`){let e=Wl(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&ql(l,u,s)>1-$(i.probability,.03))return d+Math.sign(Jl(l+17,u,s)||1)*$(i.amplitude,.2);let t=e.includes(`white`)?$(i.amplitude,.2):$(i.std,.08);return d+Jl(l,u,s)*t}if(a===`colored_noise`){let e=Kl($(i.alpha,.92),0,.999),t=$(i.std,.03);return o.previousNoise=e*$(o.previousNoise,0)+Jl(l,u,s)*t,d+o.previousNoise}if(a===`freeze`)return o.hasHoldValue||=(o.holdValue=d,!0),$(o.holdValue,d);if(a===`jump_or_invert`)return(Gl(i.invert,!0)?-d:d)+$(i.jump,0);if(a===`intermittent`){let e=Math.max($(i.period,4),c),n=Kl($(i.duty,.25),0,1);if((s-$(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return ru(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round($(Zl(i,`delay_steps`,$(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return $(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,$(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round($(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs($(i.jitter_steps,1))),0),r=Math.round(ql(l,u,s)*n);return ru(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=Kl($(Zl(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return ql(l,u,s)<=e?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round($(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:$(o.previousValue,0);let e=Kl($(i.start_probability,.02),0,1);return ql(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round($(i.burst_length,5))-1,0),i.strategy===`zero`?0:$(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*$(i.scale,1)+$(i.bias,0);return Gl(i.invert,!1)?-e:e}if(a===`interrupt`)return Gl(i.enable,!0)?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round($(i.replay_depth,6)),1),t=Math.max(Math.round($(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,$(n,d)}return d}function iu(e={},t={}){let n=tu(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:Hl(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:Ql(e),parameters:n}}function au(e){return Xl(e)&&(Ul(e.modelId)||Ul(e.faultModelId)||Ul(e.runtimeBehavior)||Xl(e.parameters))}function ou(e={},t={}){return au(t)?{...iu(e,t.parameters??{}),...t,parameters:tu(e,t)}:iu(e,t)}function su(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function cu(e={},t={},n={}){let r=ou(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(yu(r.layer)?`edge`:`node`),o=$l(n.propagationMode)||eu(e,r);return{bindingId:n.bindingId||su(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||Ql(e),parameters:Hl(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Ll.localOnly,active:n.active??!0,injectedFault:r}}function lu(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function uu(e={},t={}){let n=lu(e),r=lu(t);return n&&r&&n===r?!0:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function du(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:Hl(e.parameters??{})},i=$l(e.propagationMode)||eu(e,r),a={...e,bindingId:e.bindingId||su(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:Hl(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Ll.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,parameters:Hl(a.parameters)},a}function fu(e={},t={}){if(!e||!Xl(e))return[];let n=du(t,e),r=Yl(e.faultBindings).map(t=>du(t,e)),i=r.findIndex(e=>uu(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function pu(e={},t={}){let n=Yl(e.faultBindings).map(t=>du(t,e));return n.length===0&&e.injectedFault&&n.push(du({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function mu(e={}){return pu(e,{activeOnly:!0}).length>0}function hu(e,t={}){let n=pu(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=Xl(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||Ql(o)||Ql(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=Xl(r.bindingStates[c])?r.bindingStates[c]:{},ru(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:$(t.seed,1)+a})},e)}function gu(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(Ul).map(Wl)}function _u(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function vu(e={}){let t=e.id??e.faultTypeId,n=Yl(e.moduleTargets),r=t?zl[t]??[]:[];return[...new Set([...n,...r].map(Wl).filter(Boolean))]}function yu(e){return e===`protocol`||e===`communication`}function bu(e,t){if(!_u(e))return!1;let n=vu(t);if(n.length===0)return!0;let r=gu(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function xu(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...Yl(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(Ul).map(Wl)}function Su(e,t){if(e?.lineType!==`can`)return!1;let n=vu(t);if(n.length===0)return!1;let r=xu(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Cu(e={},t={}){let n=Yl(t.nodes),r=Yl(t.edges);if(yu(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=r.find(t=>Su(t,e));if(i)return{kind:`edge`,id:i.id,reason:`module-target-can-edge`};let a=r.find(e=>e.lineType===`can`);return a?{kind:`edge`,id:a.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&bu(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let a=n.find(t=>bu(t,e));return a?{kind:`node`,id:a.id,reason:`module-target`}:null}function wu(e={}){let t=Ql(e)||`additive_bias`,n=Vl[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=tu(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
-`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var Tu=`uav-flight-control`,Eu=`uav-flight-control-faults`,Du=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Ou(e){return typeof e==`string`&&e.trim().length>0}function ku(e){return Ou(e)?e.trim():``}function Au(e){return Array.isArray(e)?Array.from(new Set(e.map(ku).filter(Boolean))):[]}function ju(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Ou).join(` `).toLowerCase()}function Mu(e={}){let t=ju(e);return Du.some(e=>t.includes(e.toLowerCase()))}function Nu(e={}){let t=ku(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Eu:``}function Pu(e={}){let t=ku(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Tu:``}function Fu(e={}){return ku(e.systemFamily??e.modelFamily)||(Mu(e)?Tu:``)}function Iu(e={}){return Array.isArray(e.supportedFaultLibraries)?Au(e.supportedFaultLibraries):Fu(e)===`uav-flight-control`?[Eu]:[]}function Lu(e={},t=null){return ku(e.libraryId)||Nu(t??e)}function Ru(e={},t=null){return ku(e.systemFamily??e.modelFamily)||Pu(t??e)}function zu(e,t={}){let n=typeof e==`string`?ku(e):Lu(e),r=typeof e==`string`?``:Ru(e),i=Iu(t),a=Fu(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function Bu(e,t={},n=null){let r=Lu(e,n),i=Ru(e,n),a=Iu(t),o=Fu(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function Vu(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>Bu(e,t,r)):[]}function Hu(e={},t=null){let n=Iu(e),r=Fu(e),i=t?Vu(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:kl,executePythonBindingSync:Ol,executeFlowBlockPythonBindingSync:Pl,executeSimulationBlockPythonBindingSync:Fl,getPythonBindingDefaultValue:Nl},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:ru,applyScalarFaultBindings:hu,appendFaultBinding:fu,buildFaultPythonModuleSpec:wu,createFaultBinding:cu,createInjectedFaultPayload:iu,findCompatibleFaultTarget:Cu,getFaultBindings:pu,getFaultRuntimeBehavior:Ql,hasActiveFaultBinding:mu,inferFaultPropagationMode:eu,isFaultActive:nu,resolveFaultParameters:tu,compatibility:{describeModelFaultCompatibility:Hu,filterCompatibleFaultTypes:Vu,getModelFaultLibraryIds:Iu,getModelSystemFamily:Fu,isFaultCompatibleWithModel:Bu,isFaultLibraryCompatibleWithModel:zu}});var Uu=[`data-runtime-ready`],Wu={class:`workbench-main`},Gu=`gz.layoutSizes`;eo({__name:`App`,setup(e){let t=Yo(),n=Wt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(Gu)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(Gu,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return er(async()=>{u(s(),{persist:!1}),await mn(),Bc(),Tl(),t.markReady()}),rr(()=>{f(),El()}),(e,r)=>(H(),U(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":I(t).runtimeReady?`true`:`false`},[G(ao),W(`main`,Wu,[G(co),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),G(fo),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),G(ho),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),G(vo)]),G(xo),G(wo),G(Do),G(Ao),G(No),G(Io),G(Vs),G(Ws)],8,Uu))}}).mount(`#app`);
+`,Ks=`canvas-root`,qs=`顶层`;function J(e){return JSON.parse(JSON.stringify(e))}function Js(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Y(e){return Array.isArray(e)?e:[]}function Ys(e){let t=J(e??{});return{inputs:Array.isArray(t.inputs)?J(t.inputs):[],outputs:Array.isArray(t.outputs)?J(t.outputs):[],middleVars:Array.isArray(t.middleVars)?J(t.middleVars):[]}}function Xs(e){let t=J(e??{});return{...qo().executionConfig,...t}}function Zs(e){if(!e||typeof e!=`object`)return qo();let t={...qo(),...J(e)};return t.executionConfig=Xs(e.executionConfig),t.portMapping={...qo().portMapping,...Ys(e.portMapping)},t}function Qs(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function $s(e,t){return Object.values(Js(e)?e:{}).flatMap(e=>Js(e)?Y(e[t]):[])}function ec(e,t,n){return Qs($s(e,t),n)}function tc(e){let t=Js(e)?J(e):{};return{...t,pythonBinding:t.type===`simulation_block`?Zs(t.pythonBinding):t.pythonBinding??null}}function nc(e){return Js(e)?J(e):{}}function rc(e=Ks,t=qs){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function ic(e,t=Ks){let n=Js(e)?J(e):{};return{id:n.id??t,name:n.name??(t===Ks?qs:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:Y(n.nodes).map(tc),edges:Y(n.edges).map(nc)}}function ac(e){let t=Js(e)?e:{},n=Js(t.canvases)?t.canvases:null;if(!n){let e=rc();return e.nodes=Y(t.modelNodes).map(tc),e.edges=Y(t.modelEdges).map(nc),{rootCanvasId:Ks,activeCanvasId:Ks,canvasTrail:[Ks],canvases:{[Ks]:e}}}let r=t.rootCanvasId??Ks,i={};Object.entries(n).forEach(([e,t])=>{i[e]=ic(t,e)}),i[r]||(i[r]=rc(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=Y(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function oc(e){let t=Js(e)?J(e):{},n=ac(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??rc(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),a=i.nodes,o=i.edges;return J({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??ec(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??ec(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}function sc(e){let t=Js(e)?J(e):{},n=ac(t),r=n.canvases[n.activeCanvasId]??rc(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),i=r.nodes,a=r.edges;return J({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??ec(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??ec(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}var cc=`flight-control-model`;function X(e){return JSON.parse(JSON.stringify(e))}function lc(e){let t=X(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function uc(e){let t=new Map;return e.forEach(e=>{let n=lc(e);Z(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),Z(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function dc(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Q(e)){t.push(e);return}let r=Z(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Q(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function fc(e,t){let n=X(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Q(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Q(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function pc(e){return!!(e?.bound&&Z(e.entryFunction)&&Z(e.rawSource??e.source)&&Q(e.parsedInterface))}function mc(e,t){if(!e?.bound||!t||!Q(t.parsedInterface)||pc(e))return e;let n=Jo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...X(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??X(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Q(e.executionConfig)?e.executionConfig:n.executionConfig}}function hc(e,t){let n=uc(t),r=[];return{snapshot:fc(e,e=>{if(!Q(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!pc(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=mc(t,i);if(!pc(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function gc(e){if(!Q(e))return e;if(e?.type!==`simulation_block`)return X(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...X(e),pythonBinding:t?X(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=Z(n)&&Z(r)&&Z(i)&&Z(a);return{...X(e),pythonBinding:o?X(t):null}}function _c(e){return dc(e).reduce((e,t)=>{if(!Q(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!Z(r)||!Z(i)||!Z(a)||!Z(o)||e.has(r)||e.set(r,lc({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function Z(e){return typeof e==`string`&&e.trim().length>0}function Q(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function vc(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Q(t)||e.push(`${n}[${r}] must be an object.`)})}function yc(e){let t=[],n=new Set,r=new Set;if(!Q(e))return{ok:!1,errors:[`Package must be an object.`]};if(e.schemaVersion!==1&&t.push(`schemaVersion must be 1.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${cc}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Q(e)){t.push(`pythonModules[${i}] must be an object.`);return}Z(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),Z(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),Z(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),Z(e.source)||t.push(`pythonModules[${i}].source is required.`),Z(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),Z(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Q(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Q(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?vc(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?vc(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Q(e)&&Z(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Q(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&vc(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&vc(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),dc(e.workbenchSnapshot).forEach((e,n)=>{if(!Q(e)||!Q(e.injectedFault))return;let r=Z(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!Z(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function bc(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function xc(e){let t=yc(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=X(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=hc(sc(e.workbenchSnapshot),n);return r.errors.length>0?{ok:!1,errors:r.errors}:{ok:!0,snapshot:r.snapshot,descriptor:bc(e),faultLibrary:X(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Q(e.diagnosticModel)?X(e.diagnosticModel):null,pythonModules:n}}function Sc({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=oc(t),i=fc(r,gc),a=_c(r);return{schemaVersion:1,packageType:cc,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},source:X(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:X(n??[]),workbenchSnapshot:i}}function Cc({meta:e={},state:t={},faultLibrary:n=[]}={}){return Sc({meta:e,snapshot:t,faultLibrary:n})}var wc={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},Tc=!1,Ec=`model-packages/evtol_closed_loop_fault_demo.json`,Dc=`gz-workbench-system-model`;function Oc(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function kc(){let e=Oc(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function Ac(){return new URL(Ec,kc()).toString()}function jc(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Mc(){return jc()?{force:!0,resetStoredWorkbench:!0,publicDemo:!0}:{}}function Nc(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(Dc)}catch{}}function Pc({force:e=!1}={}){if(e)return!1;if(window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Fc(e={}){if(Pc(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,Nc(e);try{let n=e.packageObject??await Ic(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??Ac(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??Ac(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Ic(e=Ac()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function Lc(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function Rc(e={}){return oc(e)}function zc(){Tc||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:oc,restoreWorkbenchSnapshot:sc},window.__GZ_FAULT_TYPE_CATALOG__=wc,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return yc(e)},importObject(e){let t=xc(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return Cc({meta:Lc(e),state:Rc(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Fc,window.eval(`${Gs}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Mc();Fc(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:Ac(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,Tc=!0)}var Bc=[`all`,`info`,`ok`,`warn`,`error`],Vc={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},Hc={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},Uc={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},Wc=null,Gc=null,Kc=null,qc=!1;function Jc(){return document.querySelector(`.sbar`)}function Yc(e=Jc()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function Xc(e=Jc()){return e?.querySelector(`.sbar-log-table`)||null}function Zc(e=Jc()){return e?.querySelector(`[data-status-empty]`)||null}function Qc(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function $c(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function el(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(Qc(t)),e.append(n)}function tl(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function nl(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function rl(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`组件`),nl(e),el(e,n),tl(e,`连线`))}function il(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`故障`))}function al(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function ol(){let e=$c(document.getElementById(`sblk`)?.textContent||``),t=$c(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function sl(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function cl(e={}){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=ol(),r={components:Qc(e.components,n.components),links:Qc(e.links,n.links),faults:Qc(e.faults,n.faults),state:e.state,time:e.time};rl(document.getElementById(`sblk`),r.components,r.links),il(document.getElementById(`sflt`),r.faults),al(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function ll(){qc||(qc=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{qc=!1,sl()&&cl(ol())}))}function ul(e){if(Kc?.disconnect(),Kc=null,cl(ol()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){Kc=new MutationObserver(ll);for(let e of t)Kc.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function dl(e,t,n){let r=Zc(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function fl(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=Vc[t]||Vc.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function pl(e=Jc()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of Yc(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:Uc[t]||Uc.log;return dl(e,i===0,a),fl(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function ml(e=`all`){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=Bc.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...pl(t)}}function hl(){let e=Jc();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return ml(Bc[(Bc.indexOf(t)+1)%Bc.length]||`all`)}function gl(e=`log`){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...pl(t)}}function _l(){let e=Jc();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...pl(e)}}function vl(e={}){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of Yc(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
+`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function yl(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function bl(e={}){let t=Jc(),n=Xc(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=Vc[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||yl();let s=document.createElement(`span`);s.className=`sbar-badge ${Hc[r]||Hc.info}`,s.textContent=Vc[r]||Vc.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=Zc(t);n.insertBefore(a,u||null);let d=Yc(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,pl(t),{ok:!0,row:a}}function xl(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Sl(e={}){let t=xl(e.duration,2),n=xl(e.elapsedSeconds??e.time??0,2),r=xl(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:Qc(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:Qc(e.stepIndex,0),stepSize:r}}function Cl(e={}){let t=Sl(e),n=bl({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=bl({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function wl(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){gl(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?_l():n.dataset.statusAction===`level`?hl():n.dataset.statusAction===`export`&&vl())}function Tl(){let e=Jc();!e||e===Wc||(El(),Wc=e,Gc=wl,Wc.addEventListener(`click`,Gc),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,ul(e),pl(e),window.__GZ_STATUS_BAR__={applyLevelFilter:ml,bind:Tl,clear:_l,cycleLevelFilter:hl,exportLog:vl,formatMetrics:cl,pushEntry:bl,publishSimulationSummary:Cl,refresh:pl,selectView:gl,unbind:El})}function El(){Wc&&Gc&&Wc.removeEventListener(`click`,Gc),Kc?.disconnect(),Kc=null,Wc=null,Gc=null}function Dl(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function Ol({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Dl(t)}async function kl({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Dl(n)}function Al(e){return String(e??`any`).trim().toLowerCase()}function jl(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Ml(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function Nl(e){let t=Al(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Ml(n)}function Pl({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=Ol,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?Nl(e):Ml(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Ml(jl(h.outputs,e,t))),_=f.map((e,t)=>Ml(jl(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Ml(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Fl=Pl;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var Il=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Ll=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Rl=new Set(Object.values(Ll)),zl=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),Bl=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),Vl=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function Hl(e){return JSON.parse(JSON.stringify(e??null))}function Ul(e){return typeof e==`string`&&e.trim().length>0}function Wl(e){return String(e??``).trim().toLowerCase()}function $(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function Gl(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function Kl(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function ql(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function Jl(e=1,t=0,n=0){return ql(e,t,n)*2-1}function Yl(e){return Array.isArray(e)?e:[]}function Xl(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function Zl(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function Ql(e={}){if(Ul(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return e.runtimeBehavior;if(Ul(e.id)&&Il[e.id])return Il[e.id];if(Ul(e.faultTypeId)&&Il[e.faultTypeId])return Il[e.faultTypeId];if(Ul(e.faultCode)&&Bl[e.faultCode])return Bl[e.faultCode];let t=[e.name,e.modelClass,e.faultKind,...Yl(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function $l(e){return Rl.has(e)?e:``}function eu(e={},t={}){let n=$l(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=Ql(e)||Ql(t);if(yu(r)||i===`protocol_edge_fault`)return Ll.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Ll.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Ll.signalTransform:Ll.localOnly}function tu(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function nu(e={},t=0){let n=$(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+$(r,1/0)}function ru(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??tu(n,r),a=t.behavior||Ql(n)||Ql(r),o=t.state??{},s=$(t.time,0),c=Math.max($(t.dt,.1),1e-4),l=$(t.seed,1),u=$(t.stepIndex,0),d=$(e,0);if(!a||!nu(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+$(Zl(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*$(i.scale,1);if(a===`parameter_drift`){let e=$(i.rate,0),t=i.max_delta===void 0?null:Math.abs($(i.max_delta,0)),n=Math.max(s-$(i.start,0),0)*e;return t!==null&&(n=Kl(n,-t,t)),d+n}if(a===`parameter_step`)return d+$(i.step_value,$(i.jump,0));if(a===`lock`)return $(i.lock_value,0);if(a===`saturation`)return Kl(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:$(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:$(i.upper,1/0));if(a===`noise`){let e=Wl(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&ql(l,u,s)>1-$(i.probability,.03))return d+Math.sign(Jl(l+17,u,s)||1)*$(i.amplitude,.2);let t=e.includes(`white`)?$(i.amplitude,.2):$(i.std,.08);return d+Jl(l,u,s)*t}if(a===`colored_noise`){let e=Kl($(i.alpha,.92),0,.999),t=$(i.std,.03);return o.previousNoise=e*$(o.previousNoise,0)+Jl(l,u,s)*t,d+o.previousNoise}if(a===`freeze`)return o.hasHoldValue||=(o.holdValue=d,!0),$(o.holdValue,d);if(a===`jump_or_invert`)return(Gl(i.invert,!0)?-d:d)+$(i.jump,0);if(a===`intermittent`){let e=Math.max($(i.period,4),c),n=Kl($(i.duty,.25),0,1);if((s-$(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return ru(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round($(Zl(i,`delay_steps`,$(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return $(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,$(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round($(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs($(i.jitter_steps,1))),0),r=Math.round(ql(l,u,s)*n);return ru(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=Kl($(Zl(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return ql(l,u,s)<=e?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round($(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:$(o.previousValue,0);let e=Kl($(i.start_probability,.02),0,1);return ql(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round($(i.burst_length,5))-1,0),i.strategy===`zero`?0:$(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*$(i.scale,1)+$(i.bias,0);return Gl(i.invert,!1)?-e:e}if(a===`interrupt`)return Gl(i.enable,!0)?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round($(i.replay_depth,6)),1),t=Math.max(Math.round($(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,$(n,d)}return d}function iu(e={},t={}){let n=tu(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:Hl(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:Ql(e),parameters:n}}function au(e){return Xl(e)&&(Ul(e.modelId)||Ul(e.faultModelId)||Ul(e.runtimeBehavior)||Xl(e.parameters))}function ou(e={},t={}){return au(t)?{...iu(e,t.parameters??{}),...t,parameters:tu(e,t)}:iu(e,t)}function su(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function cu(e={},t={},n={}){let r=ou(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(yu(r.layer)?`edge`:`node`),o=$l(n.propagationMode)||eu(e,r);return{bindingId:n.bindingId||su(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||Ql(e),parameters:Hl(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Ll.localOnly,active:n.active??!0,injectedFault:r}}function lu(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function uu(e={},t={}){let n=lu(e),r=lu(t);return n&&r&&n===r?!0:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function du(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:Hl(e.parameters??{})},i=$l(e.propagationMode)||eu(e,r),a={...e,bindingId:e.bindingId||su(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:Hl(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Ll.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,parameters:Hl(a.parameters)},a}function fu(e={},t={}){if(!e||!Xl(e))return[];let n=du(t,e),r=Yl(e.faultBindings).map(t=>du(t,e)),i=r.findIndex(e=>uu(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function pu(e={},t={}){let n=Yl(e.faultBindings).map(t=>du(t,e));return n.length===0&&e.injectedFault&&n.push(du({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function mu(e={}){return pu(e,{activeOnly:!0}).length>0}function hu(e,t={}){let n=pu(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=Xl(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||Ql(o)||Ql(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=Xl(r.bindingStates[c])?r.bindingStates[c]:{},ru(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:$(t.seed,1)+a})},e)}function gu(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(Ul).map(Wl)}function _u(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function vu(e={}){let t=e.id??e.faultTypeId,n=Yl(e.moduleTargets),r=t?zl[t]??[]:[];return[...new Set([...n,...r].map(Wl).filter(Boolean))]}function yu(e){return e===`protocol`||e===`communication`}function bu(e,t){if(!_u(e))return!1;let n=vu(t);if(n.length===0)return!0;let r=gu(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function xu(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...Yl(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(Ul).map(Wl)}function Su(e,t){if(e?.lineType!==`can`)return!1;let n=vu(t);if(n.length===0)return!1;let r=xu(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Cu(e={},t={}){let n=Yl(t.nodes),r=Yl(t.edges);if(yu(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=r.find(t=>Su(t,e));if(i)return{kind:`edge`,id:i.id,reason:`module-target-can-edge`};let a=r.find(e=>e.lineType===`can`);return a?{kind:`edge`,id:a.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&bu(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let a=n.find(t=>bu(t,e));return a?{kind:`node`,id:a.id,reason:`module-target`}:null}function wu(e={}){let t=Ql(e)||`additive_bias`,n=Vl[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=tu(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
+`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var Tu=`uav-flight-control`,Eu=`uav-flight-control-faults`,Du=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Ou(e){return typeof e==`string`&&e.trim().length>0}function ku(e){return Ou(e)?e.trim():``}function Au(e){return Array.isArray(e)?Array.from(new Set(e.map(ku).filter(Boolean))):[]}function ju(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Ou).join(` `).toLowerCase()}function Mu(e={}){let t=ju(e);return Du.some(e=>t.includes(e.toLowerCase()))}function Nu(e={}){let t=ku(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Eu:``}function Pu(e={}){let t=ku(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Tu:``}function Fu(e={}){return ku(e.systemFamily??e.modelFamily)||(Mu(e)?Tu:``)}function Iu(e={}){return Array.isArray(e.supportedFaultLibraries)?Au(e.supportedFaultLibraries):Fu(e)===`uav-flight-control`?[Eu]:[]}function Lu(e={},t=null){return ku(e.libraryId)||Nu(t??e)}function Ru(e={},t=null){return ku(e.systemFamily??e.modelFamily)||Pu(t??e)}function zu(e,t={}){let n=typeof e==`string`?ku(e):Lu(e),r=typeof e==`string`?``:Ru(e),i=Iu(t),a=Fu(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function Bu(e,t={},n=null){let r=Lu(e,n),i=Ru(e,n),a=Iu(t),o=Fu(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function Vu(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>Bu(e,t,r)):[]}function Hu(e={},t=null){let n=Iu(e),r=Fu(e),i=t?Vu(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:kl,executePythonBindingSync:Ol,executeFlowBlockPythonBindingSync:Pl,executeSimulationBlockPythonBindingSync:Fl,getPythonBindingDefaultValue:Nl},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:ru,applyScalarFaultBindings:hu,appendFaultBinding:fu,buildFaultPythonModuleSpec:wu,createFaultBinding:cu,createInjectedFaultPayload:iu,findCompatibleFaultTarget:Cu,getFaultBindings:pu,getFaultRuntimeBehavior:Ql,hasActiveFaultBinding:mu,inferFaultPropagationMode:eu,isFaultActive:nu,resolveFaultParameters:tu,compatibility:{describeModelFaultCompatibility:Hu,filterCompatibleFaultTypes:Vu,getModelFaultLibraryIds:Iu,getModelSystemFamily:Fu,isFaultCompatibleWithModel:Bu,isFaultLibraryCompatibleWithModel:zu}});var Uu=[`data-runtime-ready`],Wu={class:`workbench-main`},Gu=`gz.layoutSizes`;eo({__name:`App`,setup(e){let t=Yo(),n=Wt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(Gu)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(Gu,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return er(async()=>{u(s(),{persist:!1}),await mn(),zc(),Tl(),t.markReady()}),rr(()=>{f(),El()}),(e,r)=>(H(),U(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":I(t).runtimeReady?`true`:`false`},[G(ao),W(`main`,Wu,[G(co),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),G(fo),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),G(ho),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),G(vo)]),G(xo),G(wo),G(Do),G(Ao),G(No),G(Io),G(Vs),G(Ws)],8,Uu))}}).mount(`#app`);
