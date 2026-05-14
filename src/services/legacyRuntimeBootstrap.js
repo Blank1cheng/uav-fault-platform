@@ -284,4 +284,6 @@ export function __resetLegacyRuntimeForTests() {
   delete window.__GZ_PYTHON_BINDING_EVENTS__;
   delete window.__GZ_SCOPE_WINDOW_DRAG_BOUND__;
   delete window.__GZ_RUNTIME_LISTENERS__;
+  delete window.__visualInjectionRemoveWrapped;
+  delete window.__visualInjectionRenderModelNodesWrapped;
 }

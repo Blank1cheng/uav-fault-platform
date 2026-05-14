@@ -197,7 +197,9 @@ export function createWorkbenchSnapshot(state) {
     activeLineType: safeState.activeLineType ?? 'normal',
     workspaceSource: typeof safeState.workspaceSource === 'string' ? safeState.workspaceSource : '',
     faultedBlks: toSafeArray(safeState.faultedBlks),
-    importedFaultModels: toSafeArray(safeState.importedFaultModels)
+    importedFaultModels: toSafeArray(safeState.importedFaultModels),
+    faultTags: toSafeArray(safeState.faultTags),
+    faultInjectionLinks: toSafeArray(safeState.faultInjectionLinks)
   });
 }
 
@@ -224,6 +226,8 @@ export function restoreWorkbenchSnapshot(snapshot) {
     activeLineType: safeSnapshot.activeLineType ?? 'normal',
     workspaceSource: typeof safeSnapshot.workspaceSource === 'string' ? safeSnapshot.workspaceSource : '',
     faultedBlks: toSafeArray(safeSnapshot.faultedBlks),
-    importedFaultModels: toSafeArray(safeSnapshot.importedFaultModels)
+    importedFaultModels: toSafeArray(safeSnapshot.importedFaultModels),
+    faultTags: toSafeArray(safeSnapshot.faultTags),
+    faultInjectionLinks: toSafeArray(safeSnapshot.faultInjectionLinks)
   });
 }

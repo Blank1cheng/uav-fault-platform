@@ -954,7 +954,26 @@ describe('flightModelPackageService', () => {
       '姿态控制器',
       '控制分配',
       '1号电机与旋翼',
-      'IMU 陀螺仪反馈'
+      'IMU 陀螺仪反馈',
+      '故障前后对比示波器'
+    ]));
+    const compareScope = nodes.find((node) => node.id === 'node-scope');
+    expect(compareScope).toMatchObject({
+      type: 'instrument_scope',
+      x: expect.any(Number),
+      y: expect.any(Number),
+      props: expect.objectContaining({
+        name: '故障前后对比示波器',
+        displayRole: 'fault-comparison'
+      })
+    });
+    expect(compareScope.x).toBeGreaterThanOrEqual(650);
+    expect(compareScope.x).toBeLessThanOrEqual(920);
+    expect(compareScope.y).toBeGreaterThanOrEqual(300);
+    expect(compareScope.y).toBeLessThanOrEqual(420);
+    expect(closedLoopPackage.workbenchSnapshot.modelEdges).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'edge-command-scope', targetNodeId: 'node-scope', targetPortIndex: 0 }),
+      expect.objectContaining({ id: 'edge-imu-scope', targetNodeId: 'node-scope', targetPortIndex: 1 })
     ]));
     expect(diagnosticModel).toMatchObject({
       modelId: 'evtol-closed-loop-fault-demo',
@@ -971,6 +990,30 @@ describe('flightModelPackageService', () => {
       'motor_1_stuck_position',
       'control_command_tamper'
     ]));
+    const visualImplementations = Object.fromEntries(faults.map((fault) => [
+      fault.id,
+      {
+        recommendedModule: fault.platformImplementation?.recommendedModule,
+        strategy: fault.visualInjection?.strategy,
+        tagType: fault.visualInjection?.tagType
+      }
+    ]));
+    expect(visualImplementations).toMatchObject({
+      gyro_zero_bias_offset: { recommendedModule: 'fault_tag', strategy: 'fault_tag', tagType: 'fault_tag' },
+      gyro_zero_bias_drift: { recommendedModule: 'fault_tag', strategy: 'fault_tag', tagType: 'fault_tag' },
+      gyro_zero_bias_intermittent: { recommendedModule: 'fault_tag', strategy: 'fault_tag', tagType: 'fault_tag' },
+      motor_1_stuck_position: { recommendedModule: 'fault_tag', strategy: 'fault_tag', tagType: 'fault_tag' },
+      control_command_tamper: { recommendedModule: 'fault_tag', strategy: 'fault_tag', tagType: 'fault_tag' }
+    });
+    caseIds.forEach((faultId) => {
+      const fault = faults.find((item) => item.id === faultId);
+      expect(fault.platformImplementation.moduleLabel).toBe('故障组件');
+      expect(fault.platformImplementation.moduleLabel).not.toContain('?');
+    });
+    const redBoxVisualImplementations = Object.fromEntries(
+      Object.entries(visualImplementations).filter(([faultId]) => caseIds.includes(faultId))
+    );
+    expect(JSON.stringify(redBoxVisualImplementations)).not.toMatch(/fault_bias|fault_noise|middle_var_assign|gain_block|sum_block|fault_intermittent|fault_tamper|fault_stuck/);
     cases.forEach((faultCase) => {
       expect(faults.some((fault) => fault.id === faultCase.id)).toBe(true);
       expect(points.some((point) => point.detects.includes(faultCase.id))).toBe(true);

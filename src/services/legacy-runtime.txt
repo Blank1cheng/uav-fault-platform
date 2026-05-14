@@ -7,6 +7,9 @@ const S={
   faultModels:0,
   availableFaultModels:[],
   importedFaultModels:[],
+  faultTags:[],
+  faultInjectionLinks:[],
+  selFaultTag:null,
   selectedFaultCatalogId:'',
   simDone:false,
   selBlk:null,
@@ -108,21 +111,13 @@ const COMPONENT_LIBRARY={
     height:74,
     defaults:{name:'噪声注入块',faultType:'随机噪声',layer:'物理层',trigger:'持续'}
   },
-  fault_stuck:{
-    label:'卡死注入块',
+  fault_tag:{
+    label:'故障组件',
     badge:'故障',
     className:'b-fault',
-    width:156,
-    height:74,
-    defaults:{name:'卡死注入块',faultType:'卡死',layer:'电气层',trigger:'持续'}
-  },
-  fault_drift:{
-    label:'漂移注入块',
-    badge:'故障',
-    className:'b-fault',
-    width:156,
-    height:74,
-    defaults:{name:'漂移注入块',faultType:'漂移',layer:'协议层',trigger:'渐变'}
+    width:196,
+    height:78,
+    defaults:{name:'故障组件',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
   },
   instrument_scope:{
     label:'示波器',
@@ -556,7 +551,9 @@ function createSystemModelSnapshot(){
     canvases:S.canvases,
     activeLineType:S.activeLineType,
     faultedBlks:S.faultedBlks,
-    importedFaultModels:S.importedFaultModels
+    importedFaultModels:S.importedFaultModels,
+    faultTags:S.faultTags,
+    faultInjectionLinks:S.faultInjectionLinks
   });
 }
 
@@ -578,9 +575,12 @@ function restoreSystemModelSnapshot(snapshot){
   S.workspaceSource=typeof restored.workspaceSource==='string'?restored.workspaceSource:(S.workspaceSource||'');
   S.faultedBlks=restored.faultedBlks||[];
   S.importedFaultModels=restored.importedFaultModels||[];
+  S.faultTags=Array.isArray(restored.faultTags)?restored.faultTags:[];
+  S.faultInjectionLinks=Array.isArray(restored.faultInjectionLinks)?restored.faultInjectionLinks:[];
   S.faultModels=S.importedFaultModels.length;
   S.selBlk=null;
   S.selEdge=null;
+  S.selFaultTag=null;
   restoreActiveCanvasViewport(S.activeCanvasId);
   applyCanvasTransform();
   clearPendingConnection();
@@ -975,7 +975,7 @@ function getLayerLabel(layer){
 }
 
 function isPhysicalFaultNodeType(type){
-  return type==='fault_bias'||type==='fault_noise';
+  return typeof type==='string'&&type.startsWith('fault_');
 }
 
 function isElectricalInjectableType(type){
@@ -1411,6 +1411,9 @@ function getNodePorts(node){
       }))
     };
   }
+  if(node.type==='fault_tag'){
+    return {inputs:[],outputs:[]};
+  }
   if(node.type.startsWith('fault_')){
     return {
       inputs:[{key:'input',label:'故障输入'}],
@@ -1636,8 +1639,7 @@ function buildNodeSubtitle(node){
       return `${props.inputs.length}输入 · ${props.outputs.length}输出 · ${props.middleVars.length}中间量 · ${props.moduleType}${faultNote}`;
     case 'fault_bias':
     case 'fault_noise':
-    case 'fault_stuck':
-    case 'fault_drift':
+    case 'fault_tag':
       return `${props.faultType} · ${props.layer}`;
     case 'instrument_scope':
       return `${props.instrumentType} · 双击查看波形`;
@@ -1849,7 +1851,9 @@ function renderModelNodes(){
   S.modelNodes.forEach(node=>{
     applyNodeGeometry(node);
     const meta=COMPONENT_LIBRARY[node.type];
-    const faulted=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault);
+    const nodeFaultTags=getFaultTagsForNode(node.id);
+    const expandedFaultTags=nodeFaultTags.filter(tag=>tag.expanded);
+    const faulted=S.faultedBlks.includes(node.id)||Boolean(node.injectedFault)||nodeFaultTags.length>0;
     const pythonBound=isPythonBoundFlowBlock(node);
     const el=document.createElement('div');
     el.id=`b-${node.id}`;
@@ -1870,12 +1874,28 @@ function renderModelNodes(){
     }
     const nodeTitle=pythonBound?(node.pythonBinding?.fileName||node.props.name):node.props.name;
     const nodeSubtitle=pythonBound?`流程块 · ${getPythonBindingSummary(node)}`:buildNodeSubtitle(node);
+    const faultTagToggle=nodeFaultTags.length
+      ?`<button type="button" class="fault-node-toggle${expandedFaultTags.length?' is-open':''}" data-fault-tags-toggle="${escapeHtml(node.id)}">
+          <span>${expandedFaultTags.length?'收起故障':'展开故障'}</span>
+          <b>${nodeFaultTags.length}</b>
+        </button>`
+      :'';
     el.innerHTML=`
       <div class="fbadge">F</div>
       ${pythonBound?'<div class="node-card__python-chip">Py</div>':''}
       <div class="blk-kicker">${pythonBound?'已绑定 Python':(faulted&&!isFaultNodeType(node.type)?`${meta.badge} 故障` : meta.badge)}</div>
       <div class="blk-lbl">${escapeHtml(nodeTitle)}</div>
-      <div class="blk-sub">${escapeHtml(nodeSubtitle)}</div>`;
+      <div class="blk-sub">${escapeHtml(nodeSubtitle)}</div>
+      ${faultTagToggle}`;
+    const faultToggle=el.querySelector('[data-fault-tags-toggle]');
+    if(faultToggle){
+      faultToggle.addEventListener('pointerdown',event=>event.stopPropagation());
+      faultToggle.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        toggleFaultTagsForNode(node.id);
+      });
+    }
     el.addEventListener('pointerdown',event=>beginNodeDrag(event,node.id));
     el.addEventListener('click',event=>{
       if(event.target.closest('.node-port')){return;}
@@ -1979,6 +1999,7 @@ function selectNode(id){
   if(!node){return;}
   S.selBlk=id;
   S.selEdge=null;
+  S.selFaultTag=null;
   S.propertyPanelTab='overview';
   renderModelNodes();
   renderPropertyPanel(node);
@@ -1999,6 +2020,7 @@ function selectEdge(id){
   }
   S.selEdge=id;
   S.selBlk=null;
+  S.selFaultTag=null;
   S.propertyPanelTab='overview';
   renderModelNodes();
   renderPropertyPanel(edge);
@@ -2090,6 +2112,10 @@ function markFaultTarget(targetId){
 function createNode(type,rawX,rawY){
   const meta=COMPONENT_LIBRARY[type];
   if(!meta){return;}
+  if(type==='fault_tag'&&window.createManualFaultTag){
+    window.createManualFaultTag({x:rawX,y:rawY});
+    return;
+  }
   const props=cloneDefaults(meta.defaults);
   const count=getNodeTypeCount(type);
   if(type==='signal_source'){props.name=`信号源 ${count}`;}
@@ -2163,6 +2189,13 @@ function initCanvasDrop(){
     const type=event.dataTransfer.getData('text/plain')||S.dragType;
     if(!COMPONENT_LIBRARY[type]){return;}
     const point=clientToStagePoint(event.clientX,event.clientY);
+    if(type==='fault_tag'&&window.createManualFaultTag){
+      const targetEl=document.elementFromPoint(event.clientX,event.clientY)?.closest?.('.blk');
+      const targetId=targetEl?.id?.replace(/^b-/,'')||'';
+      const target=targetId?getNode(targetId):null;
+      window.createManualFaultTag({x:point.x,y:point.y,target});
+      return;
+    }
     createNode(type,point.x,point.y);
   });
 }
@@ -4140,7 +4173,7 @@ if(!window.__GZ_PYTHON_BINDING_EVENTS__){
 
 function buildPythonBindingPortRows(items,kind){
   if(!items.length){
-    return '<div class="props-help">?????????</div>';
+    return '<div class="props-help">&#26242;&#26080;&#31471;&#21475;</div>';
   }
   return items.map(item=>{
     const status=kind==='inputs'
@@ -4172,7 +4205,7 @@ function buildFlowBlockFields(node){
         <div class="prow"><span class="pk">文件<</span><span class="pv">${escapeHtml(binding.fileName||'-')}<</span></div>
         <div class="prow"><span class="pk">模块<</span><span class="pv">${escapeHtml(binding.moduleName||'-')}<</span></div>
         <div class="prow"><span class="pk">鍏ュ彛鍑芥暟<</span><span class="pv">${escapeHtml(binding.entryFunction||'process')}<</span></div>
-        <div class="prow"><span class="pk">????<</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}<</span></div>
+        <div class="prow"><span class="pk">&#25509;&#21475;&#25688;&#35201;</span><span class="pv">${escapeHtml(getPythonBindingSummary(node))}</span></div>
         ${binding.description?`<div class="props-help">${escapeHtml(binding.description)}</div>`:''}
       </div>
       <div class="pgroup">
@@ -5136,8 +5169,7 @@ buildNodeSubtitle = function(node){
       return `${props.inputs.length}输入 · ${props.outputs.length}输出 · ${props.middleVars.length}中间变量 · ${props.moduleType||'一阶函数'}${faultNote}`;
     case 'fault_bias':
     case 'fault_noise':
-    case 'fault_stuck':
-    case 'fault_drift':
+    case 'fault_tag':
       return `${props.faultType||'故障'} · ${props.layer||'物理层'}`;
     case 'instrument_scope':
       return `${props.instrumentType||'示波器'} · 双击查看波形`;
@@ -8427,6 +8459,9 @@ buildNodeSubtitle = function(node){
   }
   const props=node.props;
   const faultNote=node.injectedFault?' / 已注入故障':'';
+  if(typeof node.type==='string'&&node.type.startsWith('fault_')){
+    return `${props.faultType||COMPONENT_LIBRARY[node.type]?.label||'故障'} / ${props.layer||'故障层'} / ${props.trigger||'触发'}`;
+  }
   if(node.type==='flow_block'){
     return `${props.inputName||'输入信号'} / ${props.inputFormat||'标量'} -> ${props.outputName||'输出信号'} / ${props.outputFormat||'标量'} / 类型适配${faultNote}`;
   }
@@ -8936,7 +8971,7 @@ Object.assign(window,{
     if(!node){return 3;}
     if(node.type==='signal_source'||node.type==='subsystem_in_port'){return 0;}
     if(node.type.startsWith('instrument_')||node.type==='subsystem_out_port'){return 8;}
-    if(node.type==='fault_bias'||node.type==='fault_noise'||node.type==='middle_var_assign'){return 2;}
+    if((typeof node.type==='string'&&node.type.startsWith('fault_'))||node.type==='middle_var_assign'){return 2;}
     if(node.type==='flow_block'||node.type==='gain_block'||node.type==='sum_block'||node.type==='mux_block'){return 3;}
     if(node.type==='simulation_block'){return 4;}
     if(node.type==='subsystem_block'){return 5;}
@@ -15005,7 +15040,7 @@ function decorateDataflowEdges(){
       tab.classList.toggle('is-active',active);
       tab.setAttribute('aria-pressed',active?'true':'false');
     });
-    const labels={canvas:'画布视图',components:'组件视图',dataflow:'多信号流图',dmatrix:'D矩阵视图'};
+    const labels={canvas:'画布视图',components:'故障视图',dataflow:'多信号流图',dmatrix:'D矩阵视图'};
     if(nextView==='dataflow'){
       window.renderDataflowPanel?.();
       window.decorateDataflowEdges?.();
@@ -15534,7 +15569,7 @@ function decorateDataflowEdges(){
           ${model.recommendedModule?`<span class="ifm-chip">${escapeHtml(model.recommendedModule)}</span>`:''}
         </div>
       </div>
-      ${imported?'<span class="ifm-state">已导入</span>':''}`;
+      ${imported?`<button type="button" class="ifm-state ifm-state--remove" data-clear-selected-fault-catalog="${escapeHtml(model.id)}">撤销导入</button>`:''}`;
   }
 
   const __faultTypesInitializeFaultCatalog=initializeFaultCatalog;
@@ -15565,7 +15600,10 @@ function decorateDataflowEdges(){
         item.className=`ifm-item${S.selectedFaultCatalogId===model.id?' on':''}${imported?' is-imported':''}`;
         item.dataset.faultId=model.id;
         item.innerHTML=renderFaultCatalogItem(model,imported);
-        item.addEventListener('click',()=>selectFaultCatalogModel(model.id));
+        item.addEventListener('click',(event)=>{
+          if(event.target.closest?.('[data-clear-selected-fault-catalog]')){return;}
+          selectFaultCatalogModel(model.id);
+        });
         container.appendChild(item);
       });
       renderFaultTypeDetail(getFaultCatalogModel(S.selectedFaultCatalogId));
@@ -15904,6 +15942,782 @@ function decorateDataflowEdges(){
     return true;
   }
 
+  function cloneBridgeValue(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function ensureFaultInjectionLinks(){
+    if(!Array.isArray(S.faultInjectionLinks)){
+      S.faultInjectionLinks=[];
+    }
+    return S.faultInjectionLinks;
+  }
+
+  function removeVisualFaultInjectionArtifacts(faultId,options={}){
+    if(!faultId){return false;}
+    const removedNodeIds=new Set();
+    const beforeNodes=S.modelNodes.length;
+    S.modelNodes=S.modelNodes.filter(node=>{
+      const remove=Boolean(node?.autoFaultInjection&&node.faultModelId===faultId);
+      if(remove){removedNodeIds.add(node.id);}
+      return !remove;
+    });
+    const beforeLinks=ensureFaultInjectionLinks().length;
+    S.faultInjectionLinks=S.faultInjectionLinks.filter(link=>link.faultModelId!==faultId&&!removedNodeIds.has(link.sourceNodeId)&&!removedNodeIds.has(link.targetNodeId));
+    if(Array.isArray(S.faultedBlks)&&removedNodeIds.size){
+      S.faultedBlks=S.faultedBlks.filter(id=>!removedNodeIds.has(id));
+    }
+    const changed=beforeNodes!==S.modelNodes.length||beforeLinks!==S.faultInjectionLinks.length;
+    if(changed&&!options.skipRender){
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+    }
+    return changed;
+  }
+
+  function getTargetVisualPoint(target){
+    if(!target){return {x:CANVAS_STAGE.width/2,y:CANVAS_STAGE.height/2};}
+    if(target.sourceNodeId&&target.targetNodeId){
+      const source=getNode(target.sourceNodeId);
+      const targetNode=getNode(target.targetNodeId);
+      const sourcePort=getPortInfo(source,'output',target.sourcePortIndex||0);
+      const targetPort=getPortInfo(targetNode,'input',target.targetPortIndex||0);
+      if(sourcePort&&targetPort){
+        return {
+          x:Math.round((sourcePort.x+targetPort.x)/2),
+          y:Math.round((sourcePort.y+targetPort.y)/2)
+        };
+      }
+    }
+    return {
+      x:Math.round((target.x||0)+(target.w||160)/2),
+      y:Math.round((target.y||0)+(target.h||80)/2)
+    };
+  }
+
+  function getVisualInjectionBlocks(model){
+    const explicit=Array.isArray(model?.visualInjection?.blocks)?model.visualInjection.blocks:[];
+    if(explicit.length){return explicit;}
+    const behavior=model?.runtimeBehavior||'';
+    if(behavior==='lock'){
+      return [{type:'middle_var_assign',name:`${model.name||'故障'} 赋值覆盖`,props:{assignMode:'constant',constantValue:model.defaultParameters?.lock_value??model.defaultValue??0}}];
+    }
+    if(behavior==='tamper'){
+      return [
+        {type:'gain_block',name:`${model.name||'故障'} 缩放`,props:{gain:'scale'}},
+        {type:'sum_block',name:`${model.name||'故障'} 偏置`,props:{inputCount:2,signs:['+','+']}}
+      ];
+    }
+    if(behavior==='noise'||behavior==='colored_noise'){
+      return [{type:'fault_noise',name:`${model.name||'故障'} 噪声注入`,props:{faultType:model.modelClass||'噪声注入',layer:getLayerLabel(model.layer),trigger:'持续'}}];
+    }
+    return [{type:'fault_bias',name:`${model.name||'故障'} 偏置注入`,props:{faultType:model.modelClass||'偏置叠加',layer:getLayerLabel(model.layer),trigger:behavior==='intermittent'?'周期启停':behavior==='parameter_drift'?'渐变':'持续',mode:behavior}}];
+  }
+
+  function createAutoFaultNode(block,index,total,targetPoint,model,payload){
+    const type=block?.type||'fault_bias';
+    const meta=COMPONENT_LIBRARY[type];
+    if(!meta){return null;}
+    const props=typeof cloneDefaults==='function'?cloneDefaults(meta.defaults):cloneBridgeValue(meta.defaults||{});
+    Object.assign(props,cloneBridgeValue(block.props||{}));
+    props.name=block.name||props.name||`${meta.label} ${getNodeTypeCount(type)+1}`;
+    const size=type==='simulation_block'?getSimulationNodeSize(props):{width:meta.width,height:meta.height};
+    const verticalOffset=(index-(total-1)/2)*92;
+    const point={
+      x:clamp(Math.round(targetPoint.x-size.width-140),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-size.width-CANVAS_STAGE.nodePadding),
+      y:clamp(Math.round(targetPoint.y-size.height/2+verticalOffset),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-size.height-CANVAS_STAGE.nodePadding)
+    };
+    const node={
+      id:`node-${++S.nodeSeq}`,
+      type,
+      x:point.x,
+      y:point.y,
+      w:size.width,
+      h:size.height,
+      props,
+      pythonBinding:type==='simulation_block'?createDefaultPythonBinding():null,
+      autoFaultInjection:true,
+      faultModelId:model.id,
+      faultModelName:model.name,
+      injectedFault:cloneBridgeValue(payload)
+    };
+    S.modelNodes.push(node);
+    if(!S.faultedBlks.includes(node.id)){
+      S.faultedBlks.push(node.id);
+    }
+    return node;
+  }
+
+  function addVisualFaultInjectionLinks(model,target,visualNodes){
+    const links=ensureFaultInjectionLinks();
+    const internalRelations=Array.isArray(model?.visualInjection?.relations)?model.visualInjection.relations:[];
+    internalRelations.forEach((relation,index)=>{
+      const source=visualNodes[relation.from];
+      const destination=visualNodes[relation.to];
+      if(source&&destination){
+        links.push({
+          id:`fault-link-${model.id}-${links.length+1}-${index}`,
+          faultModelId:model.id,
+          sourceNodeId:source.id,
+          targetNodeId:destination.id,
+          role:'fault-injection-chain',
+          label:model.name||'故障注入'
+        });
+      }
+    });
+    const terminal=visualNodes[visualNodes.length-1];
+    if(terminal){
+      links.push({
+        id:`fault-link-${model.id}-${links.length+1}-target`,
+        faultModelId:model.id,
+        sourceNodeId:terminal.id,
+        targetNodeId:target?.sourceNodeId?null:target?.id,
+        targetEdgeId:target?.sourceNodeId?target.id:null,
+        role:'fault-injection-target',
+        label:model.name||'故障注入'
+      });
+    }
+    if(!internalRelations.length&&visualNodes.length>1){
+      visualNodes.slice(0,-1).forEach((node,index)=>{
+        links.push({
+          id:`fault-link-${model.id}-${links.length+1}-parallel-${index}`,
+          faultModelId:model.id,
+          sourceNodeId:node.id,
+          targetNodeId:target?.sourceNodeId?null:target?.id,
+          targetEdgeId:target?.sourceNodeId?target.id:null,
+          role:'fault-injection-target',
+          label:model.name||'故障注入'
+        });
+      });
+    }
+  }
+
+  function createVisualFaultInjection(model,target,payload){
+    if(!model||!target){return [];}
+    removeVisualFaultInjectionArtifacts(model.id,{skipRender:true});
+    const targetPoint=getTargetVisualPoint(target);
+    const blocks=getVisualInjectionBlocks(model);
+    const visualNodes=blocks
+      .map((block,index)=>createAutoFaultNode(block,index,blocks.length,targetPoint,model,payload))
+      .filter(Boolean);
+    addVisualFaultInjectionLinks(model,target,visualNodes);
+    markTopologyDirty('fault');
+    return visualNodes;
+  }
+
+  function getVisualLinkPointForNode(node){
+    return node?{x:Math.round((node.x||0)+(node.w||160)/2),y:Math.round((node.y||0)+(node.h||80)/2)}:null;
+  }
+
+  function getVisualLinkTargetPoint(link){
+    if(link.targetNodeId){
+      return getVisualLinkPointForNode(getNode(link.targetNodeId));
+    }
+    if(link.targetEdgeId){
+      return getTargetVisualPoint(getEdge(link.targetEdgeId));
+    }
+    return null;
+  }
+
+  function renderVisualFaultInjectionLinks(){
+    const edgeGroup=document.getElementById('edge-group');
+    if(!edgeGroup){return;}
+    const existing=document.getElementById('fault-injection-link-group');
+    if(existing){existing.remove();}
+    const links=ensureFaultInjectionLinks();
+    if(!links.length){return;}
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.id='fault-injection-link-group';
+    links.forEach(link=>{
+      const source=getVisualLinkPointForNode(getNode(link.sourceNodeId));
+      const target=getVisualLinkTargetPoint(link);
+      if(!source||!target){return;}
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      const dx=Math.max(48,Math.abs(target.x-source.x)*0.38);
+      path.setAttribute('d',`M ${source.x} ${source.y} C ${source.x+dx} ${source.y}, ${target.x-dx} ${target.y}, ${target.x} ${target.y}`);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke','#dc2626');
+      path.setAttribute('stroke-width','2.4');
+      path.setAttribute('stroke-dasharray','7 5');
+      path.setAttribute('marker-end','url(#edge-arrow-fault)');
+      path.setAttribute('pointer-events','none');
+      path.dataset.faultModelId=link.faultModelId||'';
+      path.dataset.faultInjectionLink=link.id||'';
+      group.appendChild(path);
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x',String(Math.round((source.x+target.x)/2)));
+      label.setAttribute('y',String(Math.round((source.y+target.y)/2)-8));
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','#b91c1c');
+      label.setAttribute('font-size','12');
+      label.setAttribute('font-weight','800');
+      label.textContent='故障注入';
+      group.appendChild(label);
+    });
+    edgeGroup.appendChild(group);
+  }
+
+  function ensureFaultTags(){
+    if(!Array.isArray(S.faultTags)){
+      S.faultTags=[];
+    }
+    return S.faultTags;
+  }
+
+  function safeFaultTagId(value){
+    return String(value||'fault').replace(/[^A-Za-z0-9_-]/g,'-');
+  }
+
+  function getFaultTagBoxSize(tag={}){
+    return {w:204,h:76};
+  }
+
+  function applyFaultTagBoxSize(tag){
+    if(!tag){return null;}
+    if(typeof tag.expanded!=='boolean'){
+      tag.expanded=tag.collapsed===false;
+    }
+    const size=getFaultTagBoxSize(tag);
+    tag.w=size.w;
+    tag.h=size.h;
+    return size;
+  }
+
+  function setFaultTagExpanded(tag,expanded){
+    if(!tag){return;}
+    tag.expanded=Boolean(expanded);
+    tag.collapsed=!tag.expanded;
+    applyFaultTagBoxSize(tag);
+  }
+
+  function getFaultTagHostNodeIdFromTarget(target){
+    if(!target){return '';}
+    if(target.sourceNodeId&&target.targetNodeId){
+      return target.sourceNodeId||target.targetNodeId||'';
+    }
+    return target.id||'';
+  }
+
+  function getFaultTagHostNodeId(tag){
+    if(!tag){return '';}
+    if(tag.hostNodeId){return tag.hostNodeId;}
+    if(tag.targetKind==='edge'){
+      return getFaultTagHostNodeIdFromTarget(getEdge(tag.targetId));
+    }
+    return tag.targetId||'';
+  }
+
+  function getFaultTagsForNode(nodeId){
+    if(!nodeId){return [];}
+    return ensureFaultTags().filter(tag=>getFaultTagHostNodeId(tag)===nodeId);
+  }
+
+  function toggleFaultTagsForNode(nodeId){
+    const tags=getFaultTagsForNode(nodeId);
+    if(!tags.length){return 0;}
+    const nextExpanded=!tags.some(tag=>tag.expanded);
+    tags.forEach(tag=>setFaultTagExpanded(tag,nextExpanded));
+    renderModelNodes();
+    renderEdges();
+    return tags.length;
+  }
+
+  removeVisualFaultInjectionArtifacts=function(faultId,options={}){
+    if(!faultId){return false;}
+    const removedNodeIds=new Set();
+    const beforeNodes=S.modelNodes.length;
+    S.modelNodes=S.modelNodes.filter(node=>{
+      const remove=Boolean(node?.autoFaultInjection&&node.faultModelId===faultId);
+      if(remove){removedNodeIds.add(node.id);}
+      return !remove;
+    });
+    const tags=ensureFaultTags();
+    const removedTagIds=new Set(tags.filter(tag=>tag.faultModelId===faultId).map(tag=>tag.id));
+    const beforeTags=tags.length;
+    S.faultTags=tags.filter(tag=>tag.faultModelId!==faultId);
+    const beforeLinks=ensureFaultInjectionLinks().length;
+    S.faultInjectionLinks=S.faultInjectionLinks.filter(link=>
+      link.faultModelId!==faultId
+      &&!removedNodeIds.has(link.sourceNodeId)
+      &&!removedNodeIds.has(link.targetNodeId)
+      &&!removedTagIds.has(link.sourceTagId)
+    );
+    if(Array.isArray(S.faultedBlks)&&removedNodeIds.size){
+      S.faultedBlks=S.faultedBlks.filter(id=>!removedNodeIds.has(id));
+    }
+    if(removedTagIds.has(S.selFaultTag)){
+      S.selFaultTag=null;
+    }
+    const changed=beforeNodes!==S.modelNodes.length||beforeTags!==S.faultTags.length||beforeLinks!==S.faultInjectionLinks.length;
+    if(changed&&!options.skipRender){
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+    }
+    return changed;
+  };
+
+  function getFaultTagTargetName(model,target){
+    if(model?.visualInjection?.targetName){return model.visualInjection.targetName;}
+    if(target?.sourceNodeId&&target?.targetNodeId){
+      const source=getNode(target.sourceNodeId);
+      const destination=getNode(target.targetNodeId);
+      return `${source?.props?.name||target.sourceNodeId} -> ${destination?.props?.name||target.targetNodeId}`;
+    }
+    return target?.props?.name||target?.id||'目标对象';
+  }
+
+  function getFaultTagPosition(model,target,offsetIndex=null){
+    const targetPoint=getTargetVisualPoint(target);
+    const {w:width,h:height}=getFaultTagBoxSize(model);
+    const targetId=target?.id||model?.visualInjection?.targetId||'';
+    const sameTargetCount=offsetIndex ?? ensureFaultTags().filter(tag=>tag.targetId===targetId).length;
+    const baseX=target?.sourceNodeId
+      ?targetPoint.x-width/2
+      :targetPoint.x+Math.round((target?.w||160)/2)+30;
+    const baseY=target?.sourceNodeId
+      ?targetPoint.y-height-72+(sameTargetCount%3)*88
+      :targetPoint.y-height/2+(sameTargetCount%3)*88;
+    return {
+      x:clamp(Math.round(baseX),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-width-CANVAS_STAGE.nodePadding),
+      y:clamp(Math.round(baseY),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-height-CANVAS_STAGE.nodePadding),
+      w:width,
+      h:height
+    };
+  }
+
+  function getFaultTagById(tagId){
+    return ensureFaultTags().find(tag=>tag.id===tagId)||null;
+  }
+
+  function getFaultTagTarget(tag){
+    if(!tag){return null;}
+    return tag.targetKind==='edge'?getEdge(tag.targetId):getNode(tag.targetId);
+  }
+
+  function syncFaultTagPositions(){
+    const offsets=new Map();
+    ensureFaultTags().forEach(tag=>{
+      tag.positionMode=tag.positionMode||'manual';
+      applyFaultTagBoxSize(tag);
+      if(tag.positionMode==='manual'){
+        return;
+      }
+      const target=getFaultTagTarget(tag);
+      if(!target){return;}
+      const key=tag.targetId||target.id;
+      const offset=offsets.get(key)||0;
+      offsets.set(key,offset+1);
+      const box=getFaultTagPosition(tag,target,offset);
+      tag.x=box.x;
+      tag.y=box.y;
+      tag.w=box.w;
+      tag.h=box.h;
+    });
+  }
+
+  createVisualFaultInjection=function(model,target,payload){
+    if(!model||!target){return null;}
+    removeVisualFaultInjectionArtifacts(model.id,{skipRender:true});
+    const targetKind=target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+    const targetId=target?.id||model?.visualInjection?.targetId||'';
+    const hostNodeId=getFaultTagHostNodeIdFromTarget(target);
+    const hostAlreadyExpanded=hostNodeId?getFaultTagsForNode(hostNodeId).some(tag=>tag.expanded):false;
+    const box=getFaultTagPosition(model,target);
+    const tag={
+      id:`fault-tag-${safeFaultTagId(model.id)}`,
+      type:'fault_tag',
+      faultModelId:model.id,
+      faultModelName:model.name||'故障',
+      name:model.name||'故障',
+      layer:getLayerLabel(model.layer),
+      modelClass:model.modelClass||model.faultKind||'故障',
+      runtimeBehavior:model.runtimeBehavior||payload?.runtimeBehavior||'',
+      targetKind,
+      targetId,
+      hostNodeId,
+      targetName:getFaultTagTargetName(model,target),
+      active:true,
+      positionMode:'manual',
+      expanded:hostAlreadyExpanded,
+      collapsed:!hostAlreadyExpanded,
+      parameters:cloneBridgeValue(payload?.parameters||model.defaultParameters||{}),
+      injectedFault:cloneBridgeValue(payload),
+      x:box.x,
+      y:box.y,
+      w:box.w,
+      h:box.h
+    };
+    ensureFaultTags().push(tag);
+    if(hostNodeId&&!S.faultedBlks.includes(hostNodeId)){
+      S.faultedBlks.push(hostNodeId);
+    }
+    ensureFaultInjectionLinks().push({
+      id:`fault-link-${safeFaultTagId(model.id)}-target`,
+      faultModelId:model.id,
+      sourceTagId:tag.id,
+      targetNodeId:target?.sourceNodeId?null:target?.id,
+      targetEdgeId:target?.sourceNodeId?target.id:null,
+      role:'fault-tag-attachment',
+      label:'故障注入'
+    });
+    markTopologyDirty('fault');
+    return tag;
+  };
+
+  function createManualFaultTag({x,y,target}={}){
+    const id=`manual-fault-tag-${Date.now()}-${Math.round(Math.random()*10000)}`;
+    const box=target
+      ?getFaultTagPosition({id,visualInjection:{}},target)
+      :{
+        x:clamp(Math.round((x||CANVAS_STAGE.width/2)-102),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-204-CANVAS_STAGE.nodePadding),
+        y:clamp(Math.round((y||CANVAS_STAGE.height/2)-38),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-76-CANVAS_STAGE.nodePadding),
+        w:204,
+        h:76
+      };
+    const tag={
+      id,
+      type:'fault_tag',
+      faultModelId:id,
+      faultModelName:'故障组件',
+      name:'故障组件',
+      layer:'飞控故障库',
+      modelClass:'故障标签',
+      runtimeBehavior:'manual',
+      targetKind:target?(target.sourceNodeId?'edge':'node'):'unbound',
+      targetId:target?.id||'',
+      hostNodeId:getFaultTagHostNodeIdFromTarget(target),
+      targetName:target?getFaultTagTargetName({visualInjection:{}},target):'未绑定目标',
+      active:false,
+      positionMode:'manual',
+      expanded:false,
+      collapsed:true,
+      parameters:{},
+      injectedFault:null,
+      x:box.x,
+      y:box.y,
+      w:box.w,
+      h:box.h
+    };
+    ensureFaultTags().push(tag);
+    if(target){
+      ensureFaultInjectionLinks().push({
+        id:`fault-link-${safeFaultTagId(id)}-target`,
+        faultModelId:id,
+        sourceTagId:tag.id,
+        targetNodeId:target.sourceNodeId?null:target.id,
+        targetEdgeId:target.sourceNodeId?target.id:null,
+        role:'fault-tag-attachment',
+        label:'故障注入'
+      });
+    }
+    renderModelNodes();
+    renderEdges();
+    selectFaultTag(tag.id);
+    return tag;
+  }
+
+  function getVisualLinkPointForTag(tag){
+    return tag?.expanded?{x:Math.round((tag.x||0)+(tag.w||204)/2),y:Math.round((tag.y||0)+(tag.h||76))}:null;
+  }
+
+  function renderFaultTagPropertyPanel(tag){
+    const pe=document.getElementById('pe');
+    const pd=document.getElementById('pd');
+    if(!pd||!tag){return;}
+    if(pe){pe.style.display='none';}
+    pd.style.display='block';
+    const title=document.querySelector('.ph-title');
+    const sub=document.querySelector('.ph-sub');
+    if(title){title.textContent='属性面板';}
+    if(sub){sub.textContent='当前选择 · 故障标签';}
+    const params=Object.entries(tag.parameters||{});
+    const target=getFaultTagTarget(tag);
+    const targetName=tag.targetName||target?.props?.name||tag.targetId||'目标对象';
+    pd.innerHTML=`
+      <div class="pgroup fault-tag-inspector" data-fault-tag-inspector="${escapeHtml(tag.id)}">
+        <div class="pglbl">故障标签</div>
+        <div class="props-target-card is-faulted">
+          <div>
+            <div class="props-target-title">${escapeHtml(tag.name||'故障')}</div>
+            <div class="props-target-meta">${escapeHtml(tag.modelClass||'故障')} · ${escapeHtml(tag.layer||'飞控故障库')}</div>
+          </div>
+          <span class="props-state-pill is-faulted">已注入</span>
+        </div>
+        <div class="prow"><span class="pk">目标对象</span><span class="pv">${escapeHtml(targetName)}</span></div>
+        <div class="prow"><span class="pk">目标类型</span><span class="pv">${tag.targetKind==='edge'?'连线':'模块'}</span></div>
+        <div class="prow"><span class="pk">运行行为</span><span class="pv">${escapeHtml(tag.runtimeBehavior||'按故障库定义')}</span></div>
+      </div>
+      <div class="pgroup fault-tag-param-panel">
+        <div class="pglbl">故障参数</div>
+        ${params.length?params.map(([key,value])=>`
+          <label class="fault-tag-param-row">
+            <span>${escapeHtml(key)}</span>
+            <input value="${escapeHtml(value)}" data-fault-tag-param="${escapeHtml(key)}">
+          </label>
+        `).join(''):'<div class="props-empty-inline">该故障没有额外参数。</div>'}
+      </div>
+    `;
+    pd.querySelectorAll('[data-fault-tag-param]').forEach(input=>{
+      input.addEventListener('change',()=>{
+        const key=input.getAttribute('data-fault-tag-param');
+        if(!key){return;}
+        tag.parameters=tag.parameters||{};
+        tag.parameters[key]=input.value;
+        const runtimeTarget=getFaultTagTarget(tag);
+        if(runtimeTarget?.injectedFault){
+          runtimeTarget.injectedFault.parameters={...(runtimeTarget.injectedFault.parameters||{}),[key]:input.value};
+        }
+      });
+    });
+    if(typeof syncPropertyTabs==='function'){syncPropertyTabs();}
+  }
+
+  function selectFaultTag(tagId){
+    const tag=getFaultTagById(tagId);
+    if(!tag){return;}
+    S.selFaultTag=tag.id;
+    S.selBlk=null;
+    S.selEdge=null;
+    S.propertyPanelTab='overview';
+    renderModelNodes();
+    renderEdges();
+    renderFaultTagPropertyPanel(tag);
+    updateUI();
+  }
+
+  const FAULT_TAG_DRAG={
+    active:false,
+    engaged:false,
+    pointerId:null,
+    tagId:'',
+    startX:0,
+    startY:0,
+    originX:0,
+    originY:0,
+    suppressClick:false
+  };
+
+  function updateFaultTagElementPosition(el,tag){
+    if(!el||!tag){return;}
+    applyFaultTagBoxSize(tag);
+    el.style.left=`${tag.x||0}px`;
+    el.style.top=`${tag.y||0}px`;
+    el.style.width=`${tag.w||204}px`;
+    el.style.height=`${tag.h||76}px`;
+  }
+
+  function beginFaultTagDrag(event,tag,el){
+    event.stopPropagation();
+    if(event.button!==0){return;}
+    FAULT_TAG_DRAG.active=true;
+    FAULT_TAG_DRAG.engaged=false;
+    FAULT_TAG_DRAG.suppressClick=false;
+    FAULT_TAG_DRAG.pointerId=event.pointerId;
+    FAULT_TAG_DRAG.tagId=tag.id;
+    FAULT_TAG_DRAG.startX=event.clientX;
+    FAULT_TAG_DRAG.startY=event.clientY;
+    FAULT_TAG_DRAG.originX=tag.x||0;
+    FAULT_TAG_DRAG.originY=tag.y||0;
+    if(el.setPointerCapture){
+      el.setPointerCapture(event.pointerId);
+    }
+  }
+
+  function moveFaultTagDrag(event,tag,el){
+    if(!FAULT_TAG_DRAG.active||FAULT_TAG_DRAG.pointerId!==event.pointerId||FAULT_TAG_DRAG.tagId!==tag.id){return;}
+    const dx=event.clientX-FAULT_TAG_DRAG.startX;
+    const dy=event.clientY-FAULT_TAG_DRAG.startY;
+    if(!FAULT_TAG_DRAG.engaged&&!movedBeyondPointerThreshold(FAULT_TAG_DRAG.startX,FAULT_TAG_DRAG.startY,event.clientX,event.clientY)){return;}
+    event.preventDefault();
+    event.stopPropagation();
+    FAULT_TAG_DRAG.engaged=true;
+    tag.positionMode='manual';
+    tag.x=clamp(Math.round(FAULT_TAG_DRAG.originX+dx/(S.canvasScale||1)),CANVAS_STAGE.nodePadding,CANVAS_STAGE.width-(tag.w||204)-CANVAS_STAGE.nodePadding);
+    tag.y=clamp(Math.round(FAULT_TAG_DRAG.originY+dy/(S.canvasScale||1)),CANVAS_STAGE.nodeMinY,CANVAS_STAGE.height-(tag.h||76)-CANVAS_STAGE.nodePadding);
+    updateFaultTagElementPosition(el,tag);
+    renderVisualFaultInjectionLinks();
+  }
+
+  function endFaultTagDrag(event,tag,el){
+    if(!FAULT_TAG_DRAG.active||FAULT_TAG_DRAG.pointerId!==event.pointerId||FAULT_TAG_DRAG.tagId!==tag.id){return;}
+    event.stopPropagation();
+    if(el.releasePointerCapture){
+      try{el.releasePointerCapture(event.pointerId);}catch(error){}
+    }
+    const wasDragged=FAULT_TAG_DRAG.engaged;
+    const shouldSelect=!wasDragged;
+    FAULT_TAG_DRAG.active=false;
+    FAULT_TAG_DRAG.engaged=false;
+    FAULT_TAG_DRAG.pointerId=null;
+    FAULT_TAG_DRAG.tagId='';
+    FAULT_TAG_DRAG.suppressClick=wasDragged;
+    if(shouldSelect){
+      selectFaultTag(tag.id);
+    }
+  }
+
+  function renderFaultTags(){
+    const layer=document.getElementById('node-layer');
+    if(!layer){return;}
+    syncFaultTagPositions();
+    layer.querySelectorAll('.fault-tag-card').forEach(el=>el.remove());
+    ensureFaultTags().forEach(tag=>{
+      applyFaultTagBoxSize(tag);
+      if(!tag.expanded){return;}
+      const el=document.createElement('div');
+      el.className=`fault-tag-card${S.selFaultTag===tag.id?' is-selected':''}`;
+      el.id=`visual-${tag.id}`;
+      el.dataset.faultTagId=tag.id;
+      el.dataset.faultModelId=tag.faultModelId||'';
+      el.style.left=`${tag.x||0}px`;
+      el.style.top=`${tag.y||0}px`;
+      el.style.width=`${tag.w||204}px`;
+      el.style.height=`${tag.h||76}px`;
+      el.innerHTML=`
+        <div class="fault-tag-card__badge">F</div>
+        <div class="fault-tag-card__kicker">故障</div>
+        <div class="fault-tag-card__title">${escapeHtml(tag.name||'故障')}</div>
+        <div class="fault-tag-card__meta">${escapeHtml(tag.modelClass||'故障')} / ${escapeHtml(tag.layer||'飞控故障库')}</div>
+      `;
+      el.addEventListener('pointerdown',event=>beginFaultTagDrag(event,tag,el));
+      el.addEventListener('pointermove',event=>moveFaultTagDrag(event,tag,el));
+      el.addEventListener('pointerup',event=>endFaultTagDrag(event,tag,el));
+      el.addEventListener('pointercancel',event=>endFaultTagDrag(event,tag,el));
+      el.addEventListener('click',event=>{
+        if(FAULT_TAG_DRAG.suppressClick){
+          FAULT_TAG_DRAG.suppressClick=false;
+          event.stopPropagation();
+          return;
+        }
+        event.stopPropagation();
+        selectFaultTag(tag.id);
+      });
+      el.addEventListener('dblclick',event=>{
+        event.stopPropagation();
+        selectFaultTag(tag.id);
+        renderFaultTagPropertyPanel(tag);
+      });
+      layer.appendChild(el);
+    });
+  }
+
+  function setAllFaultTagsCollapsed(collapsed){
+    const tags=ensureFaultTags();
+    tags.forEach(tag=>setFaultTagExpanded(tag,!collapsed));
+    renderModelNodes();
+    renderEdges();
+    if(S.selFaultTag){
+      const selected=getFaultTagById(S.selFaultTag);
+      if(selected){
+        renderFaultTagPropertyPanel(selected);
+      }
+    }
+    return tags.length;
+  }
+
+  function renderFaultNodeToggles(){
+    document.querySelectorAll('[data-fault-tags-toggle]').forEach(button=>button.remove());
+    S.modelNodes.forEach(node=>{
+      const tags=getFaultTagsForNode(node.id);
+      if(!tags.length){return;}
+      const el=document.getElementById(`b-${node.id}`);
+      if(!el){return;}
+      const expandedCount=tags.filter(tag=>tag.expanded).length;
+      el.classList.add('faulted');
+      const button=document.createElement('button');
+      button.type='button';
+      button.className=`fault-node-toggle${expandedCount?' is-open':''}`;
+      button.dataset.faultTagsToggle=node.id;
+      button.innerHTML=`<span>${expandedCount?'收起故障':'展开故障'}</span><b>${tags.length}</b>`;
+      button.addEventListener('pointerdown',event=>event.stopPropagation());
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        toggleFaultTagsForNode(node.id);
+      });
+      el.appendChild(button);
+    });
+  }
+
+  renderVisualFaultInjectionLinks=function(){
+    const edgeGroup=document.getElementById('edge-group');
+    if(!edgeGroup){return;}
+    syncFaultTagPositions();
+    const existing=document.getElementById('fault-injection-link-group');
+    if(existing){existing.remove();}
+    const links=ensureFaultInjectionLinks();
+    if(!links.length){return;}
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.id='fault-injection-link-group';
+    links.forEach(link=>{
+      const source=getVisualLinkPointForTag(getFaultTagById(link.sourceTagId));
+      const target=getVisualLinkTargetPoint(link);
+      if(!source||!target){return;}
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      const dx=Math.max(48,Math.abs(target.x-source.x)*0.38);
+      path.setAttribute('d',`M ${source.x} ${source.y} C ${source.x+dx} ${source.y}, ${target.x-dx} ${target.y}, ${target.x} ${target.y}`);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke','#dc2626');
+      path.setAttribute('stroke-width','2.4');
+      path.setAttribute('stroke-dasharray','7 5');
+      path.setAttribute('marker-end','url(#edge-arrow-fault)');
+      path.setAttribute('pointer-events','none');
+      path.dataset.faultModelId=link.faultModelId||'';
+      path.dataset.faultInjectionLink=link.id||'';
+      group.appendChild(path);
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x',String(Math.round((source.x+target.x)/2)));
+      label.setAttribute('y',String(Math.round((source.y+target.y)/2)-8));
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','#b91c1c');
+      label.setAttribute('font-size','12');
+      label.setAttribute('font-weight','800');
+      label.textContent='故障注入';
+      group.appendChild(label);
+    });
+    edgeGroup.appendChild(group);
+  };
+
+  const __visualInjectionRenderModelNodes=renderModelNodes;
+  renderModelNodes=function(){
+    const result=__visualInjectionRenderModelNodes();
+    renderFaultNodeToggles();
+    renderFaultTags();
+    return result;
+  };
+  window.renderModelNodes=renderModelNodes;
+  window.renderFaultTags=renderFaultTags;
+  window.selectFaultTag=selectFaultTag;
+  window.createManualFaultTag=createManualFaultTag;
+  window.collapseAllFaultTags=()=>setAllFaultTagsCollapsed(true);
+  window.expandAllFaultTags=()=>setAllFaultTagsCollapsed(false);
+
+  const __visualInjectionRenderEdges=renderEdges;
+  renderEdges=function(){
+    const result=__visualInjectionRenderEdges();
+    renderVisualFaultInjectionLinks();
+    return result;
+  };
+  window.renderEdges=renderEdges;
+
+  const __visualInjectionRemoveInjectedFault=window.removeInjectedFault||(typeof removeInjectedFault!=='undefined'?removeInjectedFault:null);
+  if(__visualInjectionRemoveInjectedFault&&!window.__visualInjectionRemoveWrapped){
+    window.__visualInjectionRemoveWrapped=true;
+    window.removeInjectedFault=function(faultId){
+      const removed=__visualInjectionRemoveInjectedFault.apply(this,arguments);
+      const visualRemoved=removeVisualFaultInjectionArtifacts(faultId,{skipRender:true});
+      if(visualRemoved){
+        renderModelNodes();
+        renderEdges();
+        updateUI();
+      }
+      return Boolean(removed||visualRemoved);
+    };
+    if(typeof removeInjectedFault!=='undefined') removeInjectedFault=window.removeInjectedFault;
+  }
+
   function refreshAfterBridgeInjection(target){
     renderFaultCatalogList();
     renderModelNodes();
@@ -15988,11 +16802,13 @@ function decorateDataflowEdges(){
       const edge=findEdgeEverywhere(target.id);
       if(edge&&injectFaultIntoEdge(edge,imported,parameterOverrides)){
         injectedTarget=edge;
+        createVisualFaultInjection(imported,edge,edge.injectedFault);
       }
     }else if(target?.kind==='node'){
       const node=findNodeEverywhere(target.id);
       if(node&&injectFaultIntoNode(node,imported,parameterOverrides)){
         injectedTarget=node;
+        createVisualFaultInjection(imported,node,node.injectedFault);
       }
     }
 
@@ -17460,30 +18276,31 @@ function decorateDataflowEdges(){
   function normalizeFaultSelectionButton(){
     if(typeof document==='undefined') return;
     const selected=getState().selectedFaultCatalogId;
-    const existing=document.querySelectorAll('[data-clear-selected-fault-catalog]');
+    const existing=document.querySelectorAll('.compact-clear-fault-selection,.compact-clear-fault-selection-inline');
     existing.forEach(node=>node.remove());
     if(!selected) return;
+    const imported=arr(getState().importedFaultModels).some(model=>getFaultKey(model)===selected||model?.id===selected||model?.modelId===selected);
     const injected=isFaultCurrentlyInjected(selected);
-    if(!injected) return;
+    if(!injected&&!imported) return;
     const footer=document.querySelector('.modal-footer,.dlg-actions,.dialog-actions,.ifm-actions,.modal .actions')||document.querySelector('#faultLibModal,.modal.show,.modal');
     const button=document.createElement('button');
     button.type='button';
     button.className='compact-clear-fault-selection';
-    button.dataset.clearSelectedFaultCatalog='1';
-    button.textContent='移除已注入故障';
+    button.dataset.clearSelectedFaultCatalog=selected;
+    button.textContent=injected?'移除已注入故障':'撤销故障导入';
     if(footer) footer.insertBefore(button,footer.firstChild||null);
     const selectedCard=document.querySelector('.ifm-item.on,.fault-card.on,.fault-item.on');
     if(selectedCard){
       const inline=document.createElement('button');
       inline.type='button';
       inline.className='compact-clear-fault-selection-inline';
-      inline.dataset.clearSelectedFaultCatalog='1';
-      inline.textContent='移除故障';
+      inline.dataset.clearSelectedFaultCatalog=selected;
+      inline.textContent=injected?'移除故障':'撤销导入';
       selectedCard.appendChild(inline);
     }
   }
 
-  function removeImportedFaultModelById(id){
+  function removeImportedFaultModelById(id,options={}){
     const state=getState();
     if(!id||!Array.isArray(state.importedFaultModels)) return false;
     const before=state.importedFaultModels.length;
@@ -17512,7 +18329,7 @@ function decorateDataflowEdges(){
       }
       if(typeof updateUI==='function') updateUI();
       if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
-      if(typeof toast==='function') toast('已撤销该故障导入','s');
+      if(!options?.silent&&typeof toast==='function') toast('已撤销该故障导入','s');
     }
     return removed;
   }
@@ -18022,17 +18839,26 @@ function decorateDataflowEdges(){
         }
         return;
       }
-      if(event.target.closest?.('[data-clear-selected-fault-catalog]')){
+      const clearSelectedTrigger=event.target.closest?.('[data-clear-selected-fault-catalog]');
+      if(clearSelectedTrigger){
         event.preventDefault();
+        event.stopPropagation();
         const state=getState();
-        const selected=state.selectedFaultCatalogId;
+        const selected=clearSelectedTrigger.getAttribute('data-clear-selected-fault-catalog')||state.selectedFaultCatalogId;
+        let removed=false;
         if(isFaultCurrentlyInjected(selected)&&typeof window.removeInjectedFault==='function'){
-          window.removeInjectedFault(selected);
+          removed=window.removeInjectedFault(selected)||removed;
+        }
+        removed=removeImportedFaultModelById(selected,{silent:true})||removed;
+        if(removed){
+          state.selectedFaultCatalogId='';
+          state.faultCatalogSelectionCleared=true;
           if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
           if(typeof updateUI==='function') updateUI();
           if(typeof toast==='function') toast('已移除该故障','s');
-        }else if(!removeImportedFaultModelById(selected)){
+        }else{
           state.selectedFaultCatalogId='';
+          state.faultCatalogSelectionCleared=true;
           if(typeof window.renderFaultCatalogList==='function') window.renderFaultCatalogList();
         }
       }

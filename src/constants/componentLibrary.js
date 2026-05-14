@@ -9,8 +9,7 @@ export const systemModelingComponents = [
 ];
 
 export const faultInjectionComponents = [
-  { type: 'fault_bias', label: '偏置叠加块' },
-  { type: 'fault_noise', label: '噪声注入块' }
+  { type: 'fault_tag', label: '故障组件' }
 ];
 
 export const instrumentComponents = [

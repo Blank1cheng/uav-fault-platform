@@ -248,6 +248,26 @@ function getScopePeak(samples = []) {
   }, 0);
 }
 
+function targetHasFaultRef(target, faultId) {
+  if (!target) {
+    return false;
+  }
+  const matches = (entry) => {
+    if (!entry || typeof entry !== 'object') {
+      return false;
+    }
+    return entry.id === faultId
+      || entry.modelId === faultId
+      || entry.faultId === faultId
+      || entry.faultModelId === faultId
+      || entry.faultTypeId === faultId;
+  };
+  return matches(target.fault)
+    || matches(target.injectedFault)
+    || ['faults', 'faultBindings', 'activeFaults', 'faultInstances', 'appliedFaults', 'selectedFaults']
+      .some((key) => Array.isArray(target[key]) && target[key].some(matches));
+}
+
 async function measurePackageDynamicsScopePeak(fileName) {
   const wrapper = mount(App, { attachTo: document.body });
   await flushRuntime();
@@ -399,6 +419,198 @@ describe('Flight model package app integration', () => {
     expect(document.querySelector('[data-fault-id="control_command_tamper"]')).toBeTruthy();
     expect(document.querySelector('[data-fault-id="physical_parameter_bias"]')).toBeNull();
     expect(document.querySelector('#ov-ifm .btn-ok-r')?.disabled).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('removes a demo injected fault from the catalog imported state and canvas target', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const faultId = 'gyro_zero_bias_offset';
+    window.doImportFault();
+    await flushRuntime();
+    window.selectFaultCatalogModel(faultId);
+    await flushRuntime();
+    window.confirmImportFault();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const allTargets = () => [
+      ...state.modelNodes,
+      ...state.modelEdges,
+      ...(state.nodes || []),
+      ...(state.edges || [])
+    ];
+
+    expect(state.importedFaultModels.some((model) => model.id === faultId)).toBe(true);
+    expect(allTargets().some((target) => targetHasFaultRef(target, faultId))).toBe(true);
+    expect(state.modelNodes.some((node) => node.autoFaultInjection && node.faultModelId === faultId)).toBe(false);
+    expect((state.faultTags || []).some((tag) => tag.faultModelId === faultId)).toBe(true);
+    const hiddenTag = state.faultTags.find((tag) => tag.faultModelId === faultId);
+    expect((state.faultInjectionLinks || []).some((link) => (
+      link.faultModelId === faultId && link.role === 'fault-tag-attachment'
+    ))).toBe(true);
+    expect(document.querySelector(`[data-fault-tag-id][data-fault-model-id="${faultId}"]`)).toBeNull();
+    expect(document.querySelector(`[data-fault-tags-toggle="${hiddenTag.hostNodeId || hiddenTag.targetId}"]`)).not.toBeNull();
+    expect(document.querySelector(`[data-fault-id="${faultId}"].is-imported`)).not.toBeNull();
+
+    const clearButton = document.querySelector(`[data-clear-selected-fault-catalog="${faultId}"]`);
+    expect(clearButton).not.toBeNull();
+    clearButton.click();
+    await flushRuntime();
+
+    expect(state.importedFaultModels.some((model) => model.id === faultId)).toBe(false);
+    expect(allTargets().some((target) => targetHasFaultRef(target, faultId))).toBe(false);
+    expect(state.modelNodes.some((node) => node.autoFaultInjection && node.faultModelId === faultId)).toBe(false);
+    expect((state.faultInjectionLinks || []).some((link) => link.faultModelId === faultId)).toBe(false);
+    expect((state.faultTags || []).some((tag) => tag.faultModelId === faultId)).toBe(false);
+    expect(document.querySelector(`[data-fault-tag-id][data-fault-model-id="${faultId}"]`)).toBeNull();
+    expect(document.querySelector(`[data-fault-tags-toggle="${hiddenTag.hostNodeId || hiddenTag.targetId}"]`)).toBeNull();
+    expect(document.querySelector(`[data-fault-id="${faultId}"].is-imported`)).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('visualizes demo fault injection as attached fault tags instead of inserted canvas blocks', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const cases = [
+      'gyro_zero_bias_drift',
+      'gyro_zero_bias_intermittent',
+      'motor_1_stuck_position',
+      'control_command_tamper'
+    ];
+
+    for (const faultId of cases) {
+      window.doImportFault();
+      await flushRuntime();
+      window.selectFaultCatalogModel(faultId);
+      await flushRuntime();
+      window.confirmImportFault();
+      await flushRuntime();
+
+      const state = window.__GZ_STATE__;
+      const visualNodes = state.modelNodes
+        .filter((node) => node.autoFaultInjection && node.faultModelId === faultId)
+        .map((node) => node.type);
+      expect(visualNodes).toEqual([]);
+      expect((state.faultTags || []).filter((tag) => tag.faultModelId === faultId)).toHaveLength(1);
+      const tag = (state.faultTags || []).find((item) => item.faultModelId === faultId);
+      expect(tag).toMatchObject({
+        type: 'fault_tag',
+        active: true
+      });
+      expect(typeof tag.expanded).toBe('boolean');
+      expect((state.faultInjectionLinks || []).filter((link) => (
+        link.faultModelId === faultId && link.role === 'fault-tag-attachment'
+      )).length).toBe(1);
+      if (!tag.expanded) {
+        expect(document.querySelector(`[data-fault-tag-id][data-fault-model-id="${faultId}"]`)).toBeNull();
+        document.querySelector(`[data-fault-tags-toggle="${tag.hostNodeId || tag.targetId}"]`)
+          .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        await flushRuntime();
+      }
+      expect(document.querySelector(`[data-fault-tag-id][data-fault-model-id="${faultId}"]`)).not.toBeNull();
+    }
+
+    wrapper.unmount();
+  });
+
+  it('keeps the fault view label readable and leaves injected fault tags independently positioned', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(document.querySelector('[data-canvas-view="components"]')?.textContent?.trim()).toBe('故障视图');
+
+    const faultId = 'motor_1_stuck_position';
+    window.doImportFault();
+    await flushRuntime();
+    window.selectFaultCatalogModel(faultId);
+    await flushRuntime();
+    window.confirmImportFault();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const tag = state.faultTags.find((item) => item.faultModelId === faultId);
+    expect(tag).toMatchObject({ positionMode: 'manual' });
+    const initialPosition = { x: tag.x, y: tag.y };
+    const target = state.modelNodes.find((node) => node.id === tag.targetId);
+    expect(target).toBeTruthy();
+    target.x += 120;
+    target.y += 80;
+
+    window.renderModelNodes();
+    window.renderEdges();
+    await flushRuntime();
+
+    expect(tag.x).toBe(initialPosition.x);
+    expect(tag.y).toBe(initialPosition.y);
+
+    wrapper.unmount();
+  });
+
+  it('keeps injected fault tags hidden until the faulted module expands them', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const faultId = 'gyro_zero_bias_drift';
+    window.doImportFault();
+    await flushRuntime();
+    window.selectFaultCatalogModel(faultId);
+    await flushRuntime();
+    window.confirmImportFault();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const tag = state.faultTags.find((item) => item.faultModelId === faultId);
+    expect(tag).toMatchObject({ expanded: false });
+
+    expect(document.querySelector(`.fault-tag-card[data-fault-model-id="${faultId}"]`)).toBeNull();
+    const targetModule = document.querySelector(`[data-fault-tags-toggle="${tag.hostNodeId || tag.targetId}"]`);
+    expect(targetModule).not.toBeNull();
+    expect(document.getElementById(`b-${tag.hostNodeId || tag.targetId}`)?.classList.contains('faulted')).toBe(true);
+
+    targetModule.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await flushRuntime();
+
+    expect(tag.expanded).toBe(true);
+    let tagEl = document.querySelector(`.fault-tag-card[data-fault-model-id="${faultId}"]`);
+    expect(tagEl).not.toBeNull();
+    expect(tagEl.classList.contains('is-collapsed')).toBe(false);
+    expect(tagEl.querySelector('.fault-tag-card__compact')).toBeNull();
+    expect(tagEl.textContent).toContain('Gyro');
+
+    document.querySelector(`[data-fault-tags-toggle="${tag.hostNodeId || tag.targetId}"]`)
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await flushRuntime();
+
+    expect(tag.expanded).toBe(false);
+    expect(document.querySelector(`.fault-tag-card[data-fault-model-id="${faultId}"]`)).toBeNull();
 
     wrapper.unmount();
   });

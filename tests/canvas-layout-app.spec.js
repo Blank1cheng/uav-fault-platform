@@ -158,9 +158,10 @@ describe('canvas layout cleanup', () => {
     expect(document.querySelectorAll('.sbar-card')).toHaveLength(4);
 
     const testDir = path.dirname(fileURLToPath(import.meta.url));
-    const baseCss = readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'base.css'), 'utf8');
-    const componentsCss = readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'components.css'), 'utf8');
-    const consoleCss = readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'console-redesign.css'), 'utf8');
+    const normalizeLineEndings = (value) => value.replace(/\r\n/g, '\n');
+    const baseCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'base.css'), 'utf8'));
+    const componentsCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'components.css'), 'utf8'));
+    const consoleCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'console-redesign.css'), 'utf8'));
 
     expect(baseCss).toContain('grid-template-rows:minmax(0,1fr) var(--layout-resizer-size) var(--workbench-status-h)');
     expect(baseCss).toContain('--workbench-status-h:100px');
