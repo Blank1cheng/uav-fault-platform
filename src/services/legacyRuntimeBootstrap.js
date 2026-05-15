@@ -57,8 +57,6 @@ function getDefaultFlightModelLoadOptions() {
   }
 
   return {
-    force: true,
-    resetStoredWorkbench: true,
     publicDemo: true
   };
 }
@@ -80,7 +78,7 @@ function shouldSkipDefaultFlightModelLoad({ force = false } = {}) {
     return false;
   }
 
-  if (import.meta.env.MODE === 'test' || window.__GZ_DISABLE_DEFAULT_MODEL__) {
+  if (!window.__GZ_AUTO_LOAD_DEFAULT_MODEL__ || import.meta.env.MODE === 'test' || window.__GZ_DISABLE_DEFAULT_MODEL__) {
     return true;
   }
 

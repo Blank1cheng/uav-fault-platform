@@ -365,6 +365,47 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('keeps the startup canvas blank and imports the bundled UAV demo from the import action', async () => {
+    const originalFetch = window.fetch;
+    const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    window.fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => defaultPackage
+    }));
+    vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(function click() {
+      this.onchange?.(new Event('change'));
+    });
+
+    const wrapper = mount(App, { attachTo: document.body });
+    try {
+      await flushRuntime();
+
+      expect(window.__GZ_STATE__.sysLoaded).not.toBe(true);
+      expect(window.__GZ_STATE__.modelNodes).toHaveLength(0);
+      expect(document.getElementById('empty')?.style.display).not.toBe('none');
+
+      const importResult = await window.doImportSys();
+      await flushRuntime();
+
+      expect(importResult).toMatchObject({ ok: true });
+      expect(window.fetch).toHaveBeenCalledWith(
+        'http://localhost:3000/model-packages/evtol_closed_loop_fault_demo.json'
+      );
+      expect(window.__GZ_STATE__.sysLoaded).toBe(true);
+      expect(window.__GZ_STATE__.modelNodes).toHaveLength(defaultPackage.workbenchSnapshot.modelNodes.length);
+      expect(window.__GZ_STATE__.activeModelPackage).toMatchObject({
+        modelId: defaultPackage.modelId,
+        modelName: defaultPackage.modelName
+      });
+      expect(window.__GZ_STATE__.availableFaultModels.some((model) => model.id === 'gyro_zero_bias_offset')).toBe(true);
+      expect(document.getElementById('empty')?.style.display).toBe('none');
+      expect(document.getElementById('diagram')?.classList.contains('on')).toBe(true);
+    } finally {
+      window.fetch = originalFetch;
+      wrapper.unmount();
+    }
+  });
+
   it('force-loads the public demo over stale blank workspace state and opens fault injection directly', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
@@ -730,7 +771,14 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
-  it('falls back to the legacy localStorage snapshot when no JSON package is selected', async () => {
+  it('ignores stale localStorage snapshots when the import action loads the bundled UAV demo', async () => {
+    const originalFetch = window.fetch;
+    const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    window.fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => defaultPackage
+    }));
+
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -767,11 +815,15 @@ describe('Flight model package app integration', () => {
     await window.doImportSys();
     await flushRuntime();
 
+    expect(window.localStorage.getItem('gz-workbench-system-model')).toBeNull();
     expect(window.__GZ_STATE__.sysLoaded).toBe(true);
-    expect(window.__GZ_STATE__.modelNodes).toHaveLength(1);
-    expect(window.__GZ_STATE__.modelNodes[0].props.name).toBe('Legacy PID');
-    expect(document.getElementById('tm')?.textContent).toContain('已恢复已保存的系统模型');
-
+    expect(window.__GZ_STATE__.modelNodes).toHaveLength(defaultPackage.workbenchSnapshot.modelNodes.length);
+    expect(window.__GZ_STATE__.modelNodes.some((node) => node.props?.name === 'Legacy PID')).toBe(false);
+    expect(window.__GZ_STATE__.activeModelPackage).toMatchObject({
+      modelId: defaultPackage.modelId,
+      modelName: defaultPackage.modelName
+    });
+    window.fetch = originalFetch;
     wrapper.unmount();
   });
 

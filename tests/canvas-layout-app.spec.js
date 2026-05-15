@@ -959,6 +959,69 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
+  it('clears diagnostic points and injected faults when the canvas is reset', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+    expect(importResult).toMatchObject({ ok: true });
+
+    const point = window.buildDiagnosticTestPointModel().positions[0];
+    expect(point?.pointId).toBeTruthy();
+    const stateBeforeReset = window.__GZ_STATE__;
+    stateBeforeReset.installedDiagnosticTestPointIds = [point.pointId];
+    stateBeforeReset.selectedDiagnosticTestPointId = point.pointId;
+    stateBeforeReset.diagnosticScanResults = [{ pointId: point.pointId, status: 'abnormal', candidates: [{ faultTypeId: 'gyro_zero_bias_offset' }] }];
+    stateBeforeReset.lastDiagnosticTestPointResult = stateBeforeReset.diagnosticScanResults[0];
+    stateBeforeReset.testPointDiagnosis = stateBeforeReset.diagnosticScanResults[0];
+    stateBeforeReset.confirmedDiagnosticFaults = { [point.pointId]: ['gyro_zero_bias_offset'] };
+    stateBeforeReset.importedFaultModels = [{ id: 'gyro_zero_bias_offset', name: 'Gyro 零偏' }];
+    stateBeforeReset.faultedBlks = ['node-command-shaper'];
+    stateBeforeReset.faultTags = [{
+      id: 'fault-tag-reset-test',
+      faultModelId: 'gyro_zero_bias_offset',
+      hostNodeId: 'node-command-shaper',
+      targetId: 'node-command-shaper',
+      expanded: true
+    }];
+    stateBeforeReset.faultInjectionLinks = [{
+      id: 'fault-link-reset-test',
+      faultModelId: 'gyro_zero_bias_offset',
+      sourceNodeId: 'fault-tag-reset-test',
+      targetNodeId: 'node-command-shaper'
+    }];
+    window.renderCanvasDiagnosticTestPointMarkers();
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.installedDiagnosticTestPointIds.length).toBeGreaterThan(0);
+    expect(window.__GZ_STATE__.faultTags.length).toBeGreaterThan(0);
+    expect(window.__GZ_STATE__.faultInjectionLinks.length).toBeGreaterThan(0);
+    expect(window.__GZ_STATE__.diagnosticScanResults.length).toBeGreaterThan(0);
+
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    window.doResetWorkspace();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    expect(state.modelNodes).toHaveLength(0);
+    expect(state.modelEdges).toHaveLength(0);
+    expect(state.activeModelPackage).toBeNull();
+    expect(state.installedDiagnosticTestPointIds).toEqual([]);
+    expect(state.diagnosticTestPoints || []).toEqual([]);
+    expect(state.diagnosticScanResults || []).toEqual([]);
+    expect(state.confirmedDiagnosticFaults || {}).toEqual({});
+    expect(state.faultTags || []).toEqual([]);
+    expect(state.faultInjectionLinks || []).toEqual([]);
+    expect(state.faultedBlks || []).toEqual([]);
+    expect(state.importedFaultModels || []).toEqual([]);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(0);
+    expect(document.querySelectorAll('.fault-tag-card')).toHaveLength(0);
+
+    wrapper.unmount();
+  });
+
   it('renders fault injection location markers and can locate a selected catalog fault on the canvas', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();

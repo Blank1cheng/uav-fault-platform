@@ -5121,6 +5121,23 @@ async function pickJsonFileText(){
   });
 }
 
+async function importBundledDefaultFlightModel(){
+  const loader=window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__;
+  if(typeof loader!=='function'){
+    toast('飞控 Demo 模型加载入口未就绪','w');
+    return {ok:false,errors:['Default flight model loader is not ready.']};
+  }
+  const result=await loader({
+    force:true,
+    resetStoredWorkbench:true,
+    publicDemo:true
+  });
+  if(!result?.ok){
+    toast((result?.errors||['飞控 Demo 模型导入失败']).join('；'),'w');
+  }
+  return result;
+}
+
 function downloadFlightModelPackage(pkg){
   const blob=new Blob([JSON.stringify(pkg,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -8259,10 +8276,51 @@ function resetSimulationRuntimeForBlankWorkspace(){
   SIM.scopeWindowZ=10;
 }
 
+function clearModelTransientStateForBlankWorkspace(){
+  S.importedFaultModels=[];
+  S.faultTags=[];
+  S.faultInjectionLinks=[];
+  S.selFaultTag=null;
+  S.selectedFaultCatalogId='';
+  S.injectedFaults=[];
+  S.activeFaults=[];
+  S.faultInstances=[];
+  S.selectedFaults=[];
+  S.appliedFaults=[];
+  S.faultStates={};
+  S.injectedFaultMap={};
+  S.nodes=[];
+  S.edges=[];
+  S.faultLibrary=[];
+  S.faults=[];
+  S.diagnosticModel=null;
+  S.diagnosticTestPoints=[];
+  S.testPoints=[];
+  S.installedDiagnosticTestPointIds=[];
+  S.selectedDiagnosticTestPointId='';
+  S.diagnosticTestPointModelSignature='';
+  S.diagnosticTestPointManualCleared=false;
+  S.diagnosticScanResults=[];
+  S.lastDiagnosticTestPointResult=null;
+  S.testPointDiagnosis=null;
+  S.diagnosticLastScanAt=0;
+  S.confirmedDiagnosticFaults={};
+  S.confirmedDiagnosticFaultIds=[];
+  delete S.compactDiagnosticFixedPoints;
+  delete S.compactDiagnosticFixedPointSignature;
+  delete S.compactDiagnosticPointSignature;
+  try{
+    window.localStorage?.removeItem(WORKBENCH_STORAGE_KEY);
+  }catch(error){
+    console.warn('Failed to clear saved workbench snapshot',error);
+  }
+}
+
 function applyBlankWorkspaceState(toastMessage=''){
   if(typeof clearTask5NodeSelectionState==='function'){
     clearTask5NodeSelectionState();
   }
+  clearModelTransientStateForBlankWorkspace();
   S.rootCanvasId='canvas-root';
   S.activeCanvasId='canvas-root';
   S.canvasTrail=['canvas-root'];
@@ -8302,6 +8360,9 @@ function applyBlankWorkspaceState(toastMessage=''){
   syncConfigTargets('');
   renderFaultCatalogList();
   renderScopeWindows();
+  if(typeof window.renderCanvasDiagnosticAnnotations==='function'){
+    window.renderCanvasDiagnosticAnnotations();
+  }
   updateModelPackageStatus();
   updateUI();
   if(toastMessage){
@@ -8343,6 +8404,29 @@ window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__ = function(pkg,prepared){
   }
   return result;
 };
+
+doImportSys = async function(){
+  const btn=document.getElementById('btn-imp-sys');
+  const resetButton=()=>{
+    if(!btn){return;}
+    btn.textContent='导入系统模型';
+    btn.disabled=false;
+  };
+  if(btn){
+    btn.textContent='导入中...';
+    btn.disabled=true;
+  }
+  try{
+    return await importBundledDefaultFlightModel();
+  }catch(error){
+    console.warn('Failed to import bundled flight model package',error);
+    toast('飞控 Demo 模型导入失败，请稍后重试','w');
+    return {ok:false,errors:[error instanceof Error?error.message:'Failed to import bundled flight model package.']};
+  }finally{
+    resetButton();
+  }
+};
+window.doImportSys=doImportSys;
 
 const __blankWorkspaceDoSaveSys = doSaveSys;
 doSaveSys = function(){
