@@ -16506,6 +16506,57 @@ function decorateDataflowEdges(){
     return tag?.expanded?{x:Math.round((tag.x||0)+(tag.w||204)/2),y:Math.round((tag.y||0)+(tag.h||76))}:null;
   }
 
+  function faultTagRefMatches(value,faultId){
+    if(!value||!faultId){return false;}
+    return value.id===faultId
+      || value.modelId===faultId
+      || value.faultModelId===faultId
+      || value.faultTypeId===faultId
+      || value.injectedFault?.modelId===faultId
+      || value.injectedFault?.faultModelId===faultId;
+  }
+
+  function syncFaultTagParametersToRuntimeTarget(tag,nextParameters){
+    if(!tag){return;}
+    const parameters=cloneBridgeValue(nextParameters||{});
+    tag.parameters=cloneBridgeValue(parameters);
+    if(tag.injectedFault){
+      tag.injectedFault={...tag.injectedFault,parameters:cloneBridgeValue(parameters)};
+    }
+    const runtimeTarget=getFaultTagTarget(tag);
+    if(runtimeTarget?.injectedFault&&faultTagRefMatches(runtimeTarget.injectedFault,tag.faultModelId)){
+      runtimeTarget.injectedFault.parameters=cloneBridgeValue(parameters);
+    }
+    if(Array.isArray(runtimeTarget?.faultBindings)){
+      runtimeTarget.faultBindings=runtimeTarget.faultBindings.map(binding=>{
+        if(!faultTagRefMatches(binding,tag.faultModelId)){return binding;}
+        const nextBinding={...binding,parameters:cloneBridgeValue(parameters)};
+        if(binding.injectedFault){
+          nextBinding.injectedFault={...binding.injectedFault,parameters:cloneBridgeValue(parameters)};
+        }
+        return nextBinding;
+      });
+    }
+    ['injectedFaults','activeFaults','faultInstances','selectedFaults','appliedFaults'].forEach(key=>{
+      if(!Array.isArray(S[key])){return;}
+      S[key]=S[key].map(item=>{
+        if(!faultTagRefMatches(item,tag.faultModelId)){return item;}
+        const nextItem={...item,parameters:cloneBridgeValue(parameters)};
+        if(item.injectedFault){
+          nextItem.injectedFault={...item.injectedFault,parameters:cloneBridgeValue(parameters)};
+        }
+        return nextItem;
+      });
+    });
+    if(S.injectedFaultMap&&typeof S.injectedFaultMap==='object'&&S.injectedFaultMap[tag.faultModelId]){
+      S.injectedFaultMap[tag.faultModelId]={
+        ...S.injectedFaultMap[tag.faultModelId],
+        parameters:cloneBridgeValue(parameters)
+      };
+    }
+    markTopologyDirty('fault');
+  }
+
   function renderFaultTagPropertyPanel(tag){
     const pe=document.getElementById('pe');
     const pd=document.getElementById('pd');
@@ -16533,7 +16584,7 @@ function decorateDataflowEdges(){
         <div class="prow"><span class="pk">目标类型</span><span class="pv">${tag.targetKind==='edge'?'连线':'模块'}</span></div>
         <div class="prow"><span class="pk">运行行为</span><span class="pv">${escapeHtml(tag.runtimeBehavior||'按故障库定义')}</span></div>
       </div>
-      <div class="pgroup fault-tag-param-panel">
+      <div class="pgroup fault-tag-param-panel" data-fault-tag-param-panel="${escapeHtml(tag.id)}">
         <div class="pglbl">故障参数</div>
         ${params.length?params.map(([key,value])=>`
           <label class="fault-tag-param-row">
@@ -16541,20 +16592,62 @@ function decorateDataflowEdges(){
             <input value="${escapeHtml(value)}" data-fault-tag-param="${escapeHtml(key)}">
           </label>
         `).join(''):'<div class="props-empty-inline">该故障没有额外参数。</div>'}
+        ${params.length?`
+          <div class="fault-tag-param-actions">
+            <span data-fault-tag-param-status>参数未修改</span>
+            <div>
+              <button type="button" class="props-secondary fault-tag-param-reset" data-fault-tag-reset disabled>取消修改</button>
+              <button type="button" class="props-save fault-tag-param-apply" data-fault-tag-apply disabled>应用修改</button>
+            </div>
+          </div>
+        `:''}
       </div>
     `;
-    pd.querySelectorAll('[data-fault-tag-param]').forEach(input=>{
-      input.addEventListener('change',()=>{
+    const inputs=Array.from(pd.querySelectorAll('[data-fault-tag-param]'));
+    const applyButton=pd.querySelector('[data-fault-tag-apply]');
+    const resetButton=pd.querySelector('[data-fault-tag-reset]');
+    const statusText=pd.querySelector('[data-fault-tag-param-status]');
+    let committed=cloneBridgeValue(tag.parameters||{});
+    const readDraft=()=>{
+      const draft={};
+      inputs.forEach(input=>{
         const key=input.getAttribute('data-fault-tag-param');
-        if(!key){return;}
-        tag.parameters=tag.parameters||{};
-        tag.parameters[key]=input.value;
-        const runtimeTarget=getFaultTagTarget(tag);
-        if(runtimeTarget?.injectedFault){
-          runtimeTarget.injectedFault.parameters={...(runtimeTarget.injectedFault.parameters||{}),[key]:input.value};
-        }
+        if(key){draft[key]=input.value;}
       });
+      return draft;
+    };
+    const isDirty=()=>inputs.some(input=>{
+      const key=input.getAttribute('data-fault-tag-param');
+      return key&&String(committed?.[key]??'')!==input.value;
     });
+    const setDirtyState=()=>{
+      const dirty=isDirty();
+      if(applyButton){applyButton.disabled=!dirty;}
+      if(resetButton){resetButton.disabled=!dirty;}
+      if(statusText){statusText.textContent=dirty?'有未应用修改':'参数未修改';}
+    };
+    inputs.forEach(input=>{
+      input.addEventListener('input',setDirtyState);
+    });
+    applyButton?.addEventListener('click',()=>{
+      if(applyButton.disabled){return;}
+      const draft=readDraft();
+      syncFaultTagParametersToRuntimeTarget(tag,draft);
+      committed=cloneBridgeValue(draft);
+      setDirtyState();
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+      toast('故障参数修改已应用','s');
+    });
+    resetButton?.addEventListener('click',()=>{
+      inputs.forEach(input=>{
+        const key=input.getAttribute('data-fault-tag-param');
+        if(key){input.value=String(committed?.[key]??'');}
+      });
+      setDirtyState();
+    });
+    setDirtyState();
     if(typeof syncPropertyTabs==='function'){syncPropertyTabs();}
   }
 
@@ -17444,6 +17537,105 @@ function decorateDataflowEdges(){
       return result;
     };
   }
+})();
+
+;(function installComponentFaultCapabilityModel(){
+  if(typeof window==='undefined') return;
+
+  function cloneCapabilityValue(value){
+    try{
+      return JSON.parse(JSON.stringify(value==null?null:value));
+    }catch(error){
+      return value;
+    }
+  }
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function getActiveFaultCapabilityMap(){
+    const state=getState();
+    const pkg=state.activeModelPackage||{};
+    return arr(pkg.faultCapabilityMap);
+  }
+
+  function inferFaultTargetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function getFaultCapabilityForTarget(target){
+    if(!target?.id) return null;
+    const kind=inferFaultTargetKind(target);
+    return getActiveFaultCapabilityMap().find(entry=>(
+      entry?.targetId===target.id&&(entry.targetKind||kind)===kind
+    ))||null;
+  }
+
+  function getActiveFaultTypeCatalog(){
+    const state=getState();
+    const pkg=state.activeModelPackage||{};
+    if(arr(pkg.faultTypeCatalog).length) return arr(pkg.faultTypeCatalog);
+    return arr(state.availableFaultModels);
+  }
+
+  function defaultsFromParameterSchema(parameters){
+    return Object.fromEntries(Object.entries(parameters||{}).map(([key,value])=>[
+      key,
+      value&&typeof value==='object'&&Object.prototype.hasOwnProperty.call(value,'default')?value.default:value
+    ]));
+  }
+
+  function normalizeCapabilityFaultModel(model){
+    if(!model) return null;
+    const defaultParameters=Object.keys(model.defaultParameters||{}).length
+      ?model.defaultParameters
+      :defaultsFromParameterSchema(model.parameters);
+    return {
+      ...model,
+      name:model.name||model.displayName||model.id,
+      displayName:model.displayName||model.name||model.id,
+      defaultParameters:cloneCapabilityValue(defaultParameters||{})
+    };
+  }
+
+  function getCompatibleFaultModelsForTarget(target){
+    const capability=getFaultCapabilityForTarget(target);
+    if(!capability) return [];
+    const allowedIds=new Set(arr(capability.faultSlots).flatMap(slot=>arr(slot.allowedFaultIds)));
+    return getActiveFaultTypeCatalog()
+      .filter(model=>allowedIds.has(model?.id))
+      .map(normalizeCapabilityFaultModel)
+      .filter(Boolean);
+  }
+
+  const previousApply=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
+  if(typeof previousApply==='function'&&!window.__GZ_COMPONENT_FAULT_CAPABILITY_APPLY__){
+    window.__GZ_COMPONENT_FAULT_CAPABILITY_APPLY__=true;
+    window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
+      const result=previousApply(pkg,prepared);
+      if(result?.ok===false) return result;
+      const state=getState();
+      if(state.activeModelPackage){
+        state.activeModelPackage={
+          ...state.activeModelPackage,
+          faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
+          faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
+          faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances))
+        };
+      }
+      return result;
+    };
+  }
+
+  Object.assign(window,{
+    getFaultCapabilityForTarget,
+    getCompatibleFaultModelsForTarget
+  });
 })();
 
 ;(function installCompactFaultDiagnosisConsole(){

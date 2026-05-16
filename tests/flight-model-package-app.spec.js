@@ -237,6 +237,25 @@ async function flushRuntime() {
   await Promise.resolve();
 }
 
+async function importDefaultClosedLoopPackage() {
+  const wrapper = mount(App, { attachTo: document.body });
+  await flushRuntime();
+
+  const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+  const importResult = await window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__({
+    force: true,
+    packageObject: defaultPackage
+  });
+  await flushRuntime();
+
+  expect(importResult).toMatchObject({ ok: true });
+  return {
+    wrapper,
+    defaultPackage,
+    state: window.__GZ_STATE__
+  };
+}
+
 function getScopePeak(samples = []) {
   if (!samples.length) {
     return 0;
@@ -361,6 +380,35 @@ describe('Flight model package app integration', () => {
       modelName: defaultPackage.modelName,
       source: 'provided-object'
     });
+
+    wrapper.unmount();
+  });
+
+  it('resolves compatible fault choices from target fault capability slots', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const motor = state.modelNodes.find((node) => node.id === 'node-motor-1');
+    const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+
+    expect(window.getFaultCapabilityForTarget(imu)).toMatchObject({
+      targetId: 'node-imu',
+      targetKind: 'node'
+    });
+    expect(window.getCompatibleFaultModelsForTarget(imu).map((fault) => fault.id)).toEqual([
+      'gyro_zero_bias_offset',
+      'gyro_zero_bias_drift',
+      'gyro_zero_bias_intermittent'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(motor).map((fault) => fault.id)).toEqual([
+      'motor_1_stuck_position'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(canEdge).map((fault) => fault.id)).toEqual([
+      'control_command_tamper'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(controller)).toEqual([]);
 
     wrapper.unmount();
   });
@@ -652,6 +700,88 @@ describe('Flight model package app integration', () => {
 
     expect(tag.expanded).toBe(false);
     expect(document.querySelector(`.fault-tag-card[data-fault-model-id="${faultId}"]`)).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('requires explicit apply before fault tag parameter edits affect the runtime target', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+    expect(importResult).toMatchObject({ ok: true });
+
+    const faultId = 'gyro_zero_bias_offset';
+    window.doImportFault();
+    await flushRuntime();
+    window.selectFaultCatalogModel(faultId);
+    await flushRuntime();
+    window.confirmImportFault();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const tag = state.faultTags.find((item) => item.faultModelId === faultId);
+    expect(tag).toBeTruthy();
+    window.selectFaultTag(tag.id);
+    await flushRuntime();
+
+    const allTargets = [
+      ...state.modelNodes,
+      ...state.modelEdges,
+      ...(state.nodes || []),
+      ...(state.edges || [])
+    ];
+    const target = allTargets.find((item) => targetHasFaultRef(item, faultId));
+    const getTargetBinding = () => target?.faultBindings?.find((binding) => targetHasFaultRef(binding, faultId));
+    const getTargetFault = () => (
+      target?.injectedFault?.modelId === faultId
+        ? target.injectedFault
+        : getTargetBinding()?.injectedFault
+    );
+    expect(target).toBeTruthy();
+    expect(getTargetFault()?.parameters?.bias).toBe(0.04);
+    expect(getTargetBinding()?.parameters?.bias).toBe(0.04);
+
+    const input = document.querySelector('[data-fault-tag-param="bias"]');
+    const applyButton = document.querySelector('[data-fault-tag-apply]');
+    const resetButton = document.querySelector('[data-fault-tag-reset]');
+    expect(input).not.toBeNull();
+    expect(applyButton).not.toBeNull();
+    expect(resetButton).not.toBeNull();
+    expect(applyButton.disabled).toBe(true);
+
+    input.value = '0.12';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await flushRuntime();
+
+    expect(applyButton.disabled).toBe(false);
+    expect(resetButton.disabled).toBe(false);
+    expect(tag.parameters.bias).toBe(0.04);
+    expect(getTargetFault().parameters.bias).toBe(0.04);
+    expect(getTargetBinding().parameters.bias).toBe(0.04);
+
+    applyButton.click();
+    await flushRuntime();
+
+    expect(applyButton.disabled).toBe(true);
+    expect(tag.parameters.bias).toBe('0.12');
+    expect(tag.injectedFault.parameters.bias).toBe('0.12');
+    expect(getTargetFault().parameters.bias).toBe('0.12');
+    expect(getTargetBinding().parameters.bias).toBe('0.12');
+    expect(getTargetBinding().injectedFault.parameters.bias).toBe('0.12');
+
+    input.value = '0.20';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(applyButton.disabled).toBe(false);
+    resetButton.click();
+    await flushRuntime();
+
+    expect(input.value).toBe('0.12');
+    expect(applyButton.disabled).toBe(true);
+    expect(tag.parameters.bias).toBe('0.12');
+    expect(getTargetFault().parameters.bias).toBe('0.12');
 
     wrapper.unmount();
   });

@@ -162,6 +162,7 @@ describe('canvas layout cleanup', () => {
     const baseCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'base.css'), 'utf8'));
     const componentsCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'components.css'), 'utf8'));
     const consoleCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'console-redesign.css'), 'utf8'));
+    const ibmCss = normalizeLineEndings(readFileSync(path.resolve(testDir, '..', 'src', 'styles', 'ibm-workbench.css'), 'utf8'));
 
     expect(baseCss).toContain('grid-template-rows:minmax(0,1fr) var(--layout-resizer-size) var(--workbench-status-h)');
     expect(baseCss).toContain('--workbench-status-h:100px');
@@ -177,6 +178,11 @@ describe('canvas layout cleanup', () => {
     expect(consoleCss).toContain('@media (max-width:1120px)');
     expect(consoleCss).toContain('grid-template-rows:156px minmax(0,1fr)');
     expect(consoleCss).toContain('top:140px');
+    expect(ibmCss).toContain('@media (min-width:1121px) and (max-width:1900px)');
+    expect(ibmCss).toContain('grid-template-rows:104px minmax(0,1fr)');
+    expect(ibmCss).toContain('grid-column:1 / 4;');
+    expect(ibmCss).toContain('.tbtn-imp-flt');
+    expect(ibmCss).toContain('.fault-tag-param-actions');
     expect(componentsCss).toContain('.sbar{\n  height:100%;');
     expect(componentsCss).toContain('.sbar-log-head');
     expect(componentsCss).toContain('flex:0 0 30px');
