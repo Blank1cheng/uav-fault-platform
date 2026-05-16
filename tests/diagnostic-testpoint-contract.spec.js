@@ -71,4 +71,28 @@ describe('diagnostic testpoint workbench contract', () => {
     expect(css).toContain('.tp-console');
     expect(css).toContain('.compact-clear-fault-selection');
   });
+
+  it('distinguishes multiple Gyro fault forms at the diagnostic matrix level', () => {
+    const demo = JSON.parse(readWorkspaceFile('public/model-packages/evtol_closed_loop_fault_demo.json'));
+    const rows = demo.diagnosticModel.dMatrix.rows;
+    const byFault = new Map(rows.map((row) => [row.faultId, row]));
+
+    const fixed = byFault.get('gyro_zero_bias_offset');
+    const drift = byFault.get('gyro_zero_bias_drift');
+    const intermittent = byFault.get('gyro_zero_bias_intermittent');
+
+    expect(fixed.targetId).toBe('node-imu');
+    expect(drift.targetId).toBe('node-imu');
+    expect(intermittent.targetId).toBe('node-imu');
+
+    expect(fixed.points.M3.detectable).toBe(true);
+    expect(drift.points.M3.detectable).toBe(true);
+    expect(intermittent.points.M3.detectable).toBe(true);
+    expect(fixed.points.M10.detectable).toBe(false);
+    expect(drift.points.M10.detectable).toBe(true);
+    expect(intermittent.points.M10.detectable).toBe(true);
+    expect(fixed.points.M11.detectable).toBe(false);
+    expect(intermittent.points.M11.detectable).toBe(true);
+    expect(intermittent.points.M11.signature).toContain('间歇');
+  });
 });

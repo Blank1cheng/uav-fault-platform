@@ -476,6 +476,26 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('uses explicit diagnostic matrix signatures for multiple fault forms on the same target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    const matrix = window.buildDetectionMatrixModel();
+    const residual = matrix.points.find((point) => point.shortName === 'M10');
+    const spectrum = matrix.points.find((point) => point.shortName === 'M11');
+    const byFault = new Map(matrix.rows.map((row) => [row.faultId, row]));
+
+    const fixed = byFault.get('gyro_zero_bias_offset');
+    const drift = byFault.get('gyro_zero_bias_drift');
+    const intermittent = byFault.get('gyro_zero_bias_intermittent');
+
+    expect(fixed.cells.find((cell) => cell.pointId === residual.pointId).detectable).toBe(false);
+    expect(drift.cells.find((cell) => cell.pointId === residual.pointId).detectable).toBe(true);
+    expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).detectable).toBe(true);
+    expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).reason).toContain('间歇');
+
+    wrapper.unmount();
+  });
+
   it('keeps the startup canvas blank and imports the bundled UAV demo from the import action', async () => {
     const originalFetch = window.fetch;
     const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');

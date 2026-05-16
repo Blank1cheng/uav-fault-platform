@@ -18271,6 +18271,8 @@ function decorateDataflowEdges(){
 
   function pointDetectsFault(point,fault){
     if(!point||!fault) return false;
+    const explicitCell=getExplicitDetectionMatrixCell(point,fault);
+    if(explicitCell) return explicitCell.detectable;
     const id=getFaultKey(fault);
     if(arr(point.detects).includes(id)) return true;
     const configuredModel=getRuntimeFaultLibrary().find(item=>item.id===id);
@@ -18472,7 +18474,74 @@ function decorateDataflowEdges(){
     return '未绑定';
   }
 
-  function getDetectionCellReason(point,fault,affectedEdges){
+  function getActiveDiagnosticMatrixRows(){
+    const state=getState();
+    const matrix=state?.diagnosticModel?.dMatrix||state?.activeModelPackage?.diagnosticModel?.dMatrix||null;
+    return arr(matrix?.rows);
+  }
+
+  function normalizeDetectionMatrixCell(value){
+    if(value==null) return null;
+    if(typeof value==='boolean'||typeof value==='number'){
+      const detectable=Boolean(value);
+      return {
+        detectable,
+        value:detectable?1:0,
+        reason:detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测'
+      };
+    }
+    if(typeof value==='string'){
+      const token=value.trim().toLowerCase();
+      const detectable=token==='1'||token==='true'||token==='yes'||token==='detectable'||token==='可检测';
+      return {
+        detectable,
+        value:detectable?1:0,
+        reason:detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测'
+      };
+    }
+    const raw=value.detectable??value.detect??value.d??value.value;
+    const detectable=typeof raw==='string'
+      ?['1','true','yes','detectable','可检测'].includes(raw.trim().toLowerCase())
+      :Boolean(raw);
+    return {
+      detectable,
+      value:detectable?1:0,
+      reason:value.signature||value.reason||value.note||(detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测')
+    };
+  }
+
+  function getExplicitDetectionMatrixCell(point,fault){
+    const faultId=getFaultKey(fault);
+    if(!faultId||!point) return null;
+    const row=getActiveDiagnosticMatrixRows().find(item=>[
+      item?.faultId,
+      item?.faultTypeId,
+      item?.caseId,
+      item?.id
+    ].filter(Boolean).includes(faultId));
+    if(!row) return null;
+    const values=row.points||row.cells||row.pointValues||{};
+    if(Array.isArray(values)){
+      const match=values.find(cell=>[
+        cell?.pointId,
+        cell?.pointCode,
+        cell?.shortName,
+        cell?.id,
+        cell?.edgeId
+      ].filter(Boolean).some(key=>key===point.pointId||key===point.shortName||key===point.edgeId));
+      return normalizeDetectionMatrixCell(match);
+    }
+    const keys=[point.pointId,point.id,point.shortName,point.code,point.edgeId].filter(Boolean);
+    for(const key of keys){
+      if(Object.prototype.hasOwnProperty.call(values,key)){
+        return normalizeDetectionMatrixCell(values[key]);
+      }
+    }
+    return null;
+  }
+
+  function getDetectionCellReason(point,fault,affectedEdges,explicitCell=null){
+    if(explicitCell) return explicitCell.reason;
     const id=getFaultKey(fault);
     if(arr(point.detects).includes(id)) return '测点直接配置为可观测';
     if(affectedEdges.has(point.edgeId)) return '故障传播路径覆盖该测点';
@@ -18494,7 +18563,8 @@ function decorateDataflowEdges(){
     const rows=faults.map(fault=>{
       const affectedEdges=getFaultAffectedEdges(fault);
       const cells=points.map(point=>{
-        const detectable=arr(point.detects).includes(getFaultKey(fault))||affectedEdges.has(point.edgeId);
+        const explicitCell=getExplicitDetectionMatrixCell(point,fault);
+        const detectable=explicitCell?explicitCell.detectable:(arr(point.detects).includes(getFaultKey(fault))||affectedEdges.has(point.edgeId));
         return {
           pointId:point.pointId,
           pointCode:point.shortName,
@@ -18502,7 +18572,7 @@ function decorateDataflowEdges(){
           edgeId:point.edgeId,
           detectable,
           value:detectable?1:0,
-          reason:getDetectionCellReason(point,fault,affectedEdges)
+          reason:getDetectionCellReason(point,fault,affectedEdges,explicitCell)
         };
       });
       return {

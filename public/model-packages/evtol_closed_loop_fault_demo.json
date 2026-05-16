@@ -1088,7 +1088,289 @@
         "motor_1_stuck_position",
         "control_command_tamper"
       ],
-      "note": "D(i,j)=1 表示故障 i 可被测点 j 检测；affectedEdges 保留传播边。"
+      "note": "D(i,j)=1 表示故障 i 可被测点 j 检测；affectedEdges 保留传播边。",
+      "rows": [
+        {
+          "faultId": "gyro_zero_bias_offset",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差出现固定偏差"
+            },
+            "M4": {
+              "detectable": true,
+              "signature": "控制器输出含持续补偿量"
+            },
+            "M5": {
+              "detectable": true,
+              "signature": "分配量存在持续偏置"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "机体响应产生稳态偏差"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈含固定零偏"
+            },
+            "M10": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M11": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "gyro_zero_bias_drift",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差缓慢漂移"
+            },
+            "M4": {
+              "detectable": true,
+              "signature": "控制器补偿量随时间爬升"
+            },
+            "M5": {
+              "detectable": true,
+              "signature": "分配量随时间缓慢变化"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "机体响应出现低频漂移"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈零偏随时间漂移"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差趋势项持续上升"
+            },
+            "M11": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "gyro_zero_bias_intermittent",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差间歇跳变"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈间歇异常"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差出现间歇脉冲"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱可见间歇激励特征"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "motor_1_stuck_position",
+          "targetId": "node-motor-1",
+          "targetLabel": "1号电机与旋翼",
+          "layer": "物理层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": true,
+              "signature": "1号电机响应被锁定"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "飞行动力学响应异常"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈显示姿态偏差"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差指向执行端异常"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱含执行器卡滞特征"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "control_command_tamper",
+          "targetId": "edge-motor-motor1",
+          "targetLabel": "1号电机 CAN 指令",
+          "layer": "协议层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": true,
+              "signature": "1号电机指令被篡改"
+            },
+            "M7": {
+              "detectable": true,
+              "signature": "电机响应随篡改指令变化"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "飞行动力学响应异常"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈显示姿态偏差"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差指向指令链路异常"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱含指令篡改特征"
+            },
+            "M12": {
+              "detectable": true,
+              "signature": "CAN 监控可见报文篡改"
+            }
+          }
+        }
+      ]
     },
     "contrastExamples": [
       {
