@@ -456,6 +456,26 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('opens compatible fault choices for a selected target instead of importing arbitrary catalog faults', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    window.selectNode(imu.id);
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-target-fault-dialog]');
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 固定偏差');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 间歇故障');
+    expect(dialog.textContent).not.toContain('单电机卡死');
+
+    wrapper.unmount();
+  });
+
   it('keeps the startup canvas blank and imports the bundled UAV demo from the import action', async () => {
     const originalFetch = window.fetch;
     const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');

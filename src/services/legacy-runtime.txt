@@ -17858,6 +17858,60 @@ function decorateDataflowEdges(){
     return created;
   }
 
+  function capabilityHtml(value){
+    const raw=value==null?'':String(value);
+    if(typeof escapeHtml==='function') return escapeHtml(raw);
+    return raw.replace(/[&<>"']/g,match=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[match]));
+  }
+
+  function getSelectedFaultActivationTarget(){
+    const state=getState();
+    if(state.selBlk&&typeof getNode==='function') return getNode(state.selBlk);
+    if(state.selEdge&&typeof getEdge==='function') return getEdge(state.selEdge);
+    return null;
+  }
+
+  function renderTargetFaultActivationDialog(target){
+    document.querySelector('[data-target-fault-dialog]')?.remove();
+    const models=getCompatibleFaultModelsForTarget(target);
+    const box=document.createElement('div');
+    box.className='target-fault-dialog';
+    box.dataset.targetFaultDialog='true';
+    box.innerHTML=`
+      <div class="target-fault-dialog__head">
+        <strong>${capabilityHtml(getCapabilityTargetName(target))}</strong>
+        <button type="button" data-close-target-fault-dialog>关闭</button>
+      </div>
+      <div class="target-fault-dialog__body">
+        ${models.length?models.map(model=>`
+          <button type="button" class="target-fault-choice" data-activate-compatible-fault="${capabilityHtml(model.id)}">
+            <span>${capabilityHtml(model.displayName||model.name)}</span>
+            <small>${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · ${capabilityHtml(model.faultClass||model.modelClass||model.runtimeBehavior||'故障')}</small>
+          </button>
+        `).join(''):'<div class="target-fault-empty">该对象没有可添加的故障</div>'}
+      </div>`;
+    document.body.appendChild(box);
+    box.querySelector('[data-close-target-fault-dialog]')?.addEventListener('click',()=>box.remove());
+    box.querySelectorAll('[data-activate-compatible-fault]').forEach(button=>{
+      button.addEventListener('click',()=>{
+        const faultId=button.dataset.activateCompatibleFault||'';
+        const result=activateFaultForTarget(target,faultId,{});
+        if(result?.ok) box.remove();
+      });
+    });
+    return box;
+  }
+
+  function openTargetFaultActivationDialog(){
+    const target=getSelectedFaultActivationTarget();
+    if(!target){
+      toast('请先选择可添加故障的组件或连线','w');
+      return false;
+    }
+    renderTargetFaultActivationDialog(target);
+    return true;
+  }
+
   const previousApply=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   if(typeof previousApply==='function'){
     window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
@@ -17879,7 +17933,8 @@ function decorateDataflowEdges(){
   Object.assign(window,{
     getFaultCapabilityForTarget,
     getCompatibleFaultModelsForTarget,
-    activateFaultForTarget
+    activateFaultForTarget,
+    openTargetFaultActivationDialog
   });
 })();
 
