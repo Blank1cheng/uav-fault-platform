@@ -17643,6 +17643,19 @@ function decorateDataflowEdges(){
       .find(model=>model?.id===faultTypeId)||null;
   }
 
+  function findExistingFaultInstanceForTarget(target,faultTypeId,slot=null){
+    if(!target?.id||!faultTypeId) return null;
+    const targetKind=inferFaultTargetKind(target);
+    const slotId=slot?.slotId||getFirstCompatibleSlotForFault(target,faultTypeId)?.slotId||'';
+    return ensureFaultInstances().find(instance=>(
+      instance?.active!==false
+      && instance.targetKind===targetKind
+      && instance.targetId===target.id
+      && instance.faultTypeId===faultTypeId
+      && (!slotId||instance.slotId===slotId)
+    ))||null;
+  }
+
   function createFaultInstanceForTarget(target,faultTypeId,parameterOverrides={}){
     const model=getCapabilityFaultModel(faultTypeId);
     const slot=getFirstCompatibleSlotForFault(target,faultTypeId);
@@ -17650,6 +17663,10 @@ function decorateDataflowEdges(){
       return {ok:false,error:'incompatible-target'};
     }
     const targetKind=inferFaultTargetKind(target);
+    const duplicate=findExistingFaultInstanceForTarget(target,model.id,slot);
+    if(duplicate){
+      return {ok:false,error:'duplicate-fault-instance',instance:duplicate,model,slot};
+    }
     const parameters={
       ...(model.defaultParameters||{}),
       ...(parameterOverrides||{})
@@ -17896,12 +17913,15 @@ function decorateDataflowEdges(){
         <button type="button" data-close-target-fault-dialog>关闭</button>
       </div>
       <div class="target-fault-dialog__body">
-        ${models.length?models.map(model=>`
-          <button type="button" class="target-fault-choice" data-activate-compatible-fault="${capabilityHtml(model.id)}">
+        ${models.length?models.map(model=>{
+          const injected=Boolean(findExistingFaultInstanceForTarget(target,model.id));
+          return `
+          <button type="button" class="target-fault-choice${injected?' is-injected':''}" data-activate-compatible-fault="${capabilityHtml(model.id)}" ${injected?'disabled aria-disabled="true"':''}>
             <span>${capabilityHtml(model.displayName||model.name)}</span>
             <small>${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · ${capabilityHtml(model.faultClass||model.modelClass||model.runtimeBehavior||'故障')}</small>
+            ${injected?'<em>已注入</em>':''}
           </button>
-        `).join(''):'<div class="target-fault-empty">该对象没有可添加的故障</div>'}
+        `;}).join(''):'<div class="target-fault-empty">该对象没有可添加的故障</div>'}
       </div>`;
     document.body.appendChild(box);
     box.querySelector('[data-close-target-fault-dialog]')?.addEventListener('click',()=>box.remove());

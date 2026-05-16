@@ -2183,7 +2183,9 @@ header{
 .fault-tag-param-actions div{
   display:flex;
   align-items:center;
+  flex-wrap:nowrap;
   gap:8px;
+  white-space:nowrap;
 }
 
 .fault-tag-param-actions button{
@@ -2193,6 +2195,8 @@ header{
   border-radius:0;
   font-size:12px;
   font-weight:600;
+  white-space:nowrap;
+  word-break:keep-all;
 }
 
 .fault-tag-param-actions button:disabled{
@@ -2287,6 +2291,14 @@ header{
   background:#f2f7ff;
 }
 
+.target-fault-choice.is-injected,
+.target-fault-choice:disabled{
+  border-color:#f1c7c7;
+  background:#fff7f7;
+  color:#7f1d1d;
+  cursor:not-allowed;
+}
+
 .target-fault-choice span{
   display:block;
   color:var(--text);
@@ -2299,6 +2311,18 @@ header{
   color:var(--muted);
   font-size:12px;
   font-weight:600;
+}
+
+.target-fault-choice em{
+  justify-self:start;
+  width:max-content;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#ffe5e5;
+  color:#b91c1c;
+  font-size:11px;
+  font-style:normal;
+  font-weight:800;
 }
 
 .target-fault-empty{

@@ -476,6 +476,37 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('prevents choosing the same concrete fault twice on the same target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    const first = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift');
+    const second = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift');
+    await flushRuntime();
+
+    expect(first.ok).toBe(true);
+    expect(second).toMatchObject({ ok: false, error: 'duplicate-fault-instance' });
+    expect(state.faultInstances.filter((instance) => (
+      instance.targetId === 'node-imu' && instance.faultTypeId === 'gyro_zero_bias_drift'
+    ))).toHaveLength(1);
+
+    window.selectNode(imu.id);
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const injectedChoice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_drift"]');
+    const otherChoice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_offset"]');
+    expect(injectedChoice).not.toBeNull();
+    expect(injectedChoice.disabled).toBe(true);
+    expect(injectedChoice.classList.contains('is-injected')).toBe(true);
+    expect(injectedChoice.textContent).toContain('已注入');
+    expect(otherChoice).not.toBeNull();
+    expect(otherChoice.disabled).toBe(false);
+
+    wrapper.unmount();
+  });
+
   it('uses explicit diagnostic matrix signatures for multiple fault forms on the same target', async () => {
     const { wrapper } = await importDefaultClosedLoopPackage();
 
@@ -492,6 +523,44 @@ describe('Flight model package app integration', () => {
     expect(drift.cells.find((cell) => cell.pointId === residual.pointId).detectable).toBe(true);
     expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).detectable).toBe(true);
     expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).reason).toContain('间歇');
+
+    wrapper.unmount();
+  });
+
+  it('injects a compatible fault into a model edge from the fault component drop flow', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
+
+    const result = window.handleFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
+    await flushRuntime();
+
+    expect(result).toMatchObject({
+      ok: true,
+      mode: 'target-fault-dialog',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1'
+    });
+
+    const choice = document.querySelector('[data-activate-compatible-fault="control_command_tamper"]');
+    expect(choice).not.toBeNull();
+    choice.click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'control_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1',
+      slotId: 'motor1-can-command'
+    }));
+    expect(canEdge.injectedFault).toMatchObject({ modelId: 'control_command_tamper' });
+    expect(canEdge.faultBindings.some((binding) => binding.faultModelId === 'control_command_tamper')).toBe(true);
+    expect(state.faultTags).toContainEqual(expect.objectContaining({
+      faultModelId: 'control_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1'
+    }));
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-faulted')).toBe(true);
 
     wrapper.unmount();
   });

@@ -183,6 +183,10 @@ describe('canvas layout cleanup', () => {
     expect(ibmCss).toContain('grid-column:1 / 4;');
     expect(ibmCss).toContain('.tbtn-imp-flt');
     expect(ibmCss).toContain('.fault-tag-param-actions');
+    expect(findCssRule(ibmCss, '.fault-tag-param-actions div')).toMatch(/flex-wrap\s*:\s*nowrap/);
+    expect(findCssRule(ibmCss, '.fault-tag-param-actions div')).toMatch(/white-space\s*:\s*nowrap/);
+    expect(findCssRule(ibmCss, '.fault-tag-param-actions button')).toMatch(/white-space\s*:\s*nowrap/);
+    expect(findCssRule(ibmCss, '.fault-tag-param-actions button')).toMatch(/word-break\s*:\s*keep-all/);
     expect(componentsCss).toContain('.sbar{\n  height:100%;');
     expect(componentsCss).toContain('.sbar-log-head');
     expect(componentsCss).toContain('flex:0 0 30px');
