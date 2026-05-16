@@ -496,6 +496,59 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('highlights only compatible targets while dragging the fault component template', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.showCompatibleFaultDropTargets).toBe('function');
+    expect(typeof window.clearCompatibleFaultDropTargets).toBe('function');
+
+    window.showCompatibleFaultDropTargets();
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.getElementById('b-node-motor-1')?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.getElementById('b-node-controller')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-shaper-error"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    window.clearCompatibleFaultDropTargets();
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(false);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('opens target-specific choices when the fault component is dropped on a compatible target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+    const initialTagCount = (state.faultTags || []).length;
+
+    expect(typeof window.handleFaultComponentDrop).toBe('function');
+    const compatibleResult = window.handleFaultComponentDrop({ target: imu, x: imu.x + 20, y: imu.y + 20 });
+    await flushRuntime();
+
+    expect(compatibleResult).toMatchObject({ ok: true, mode: 'target-fault-dialog' });
+    const dialog = document.querySelector('[data-target-fault-dialog]');
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 固定偏差');
+    expect((state.faultTags || []).length).toBe(initialTagCount);
+
+    const incompatibleResult = window.handleFaultComponentDrop({ target: controller, x: controller.x + 20, y: controller.y + 20 });
+    await flushRuntime();
+
+    expect(incompatibleResult).toMatchObject({ ok: false, reason: 'incompatible-target' });
+    expect((state.faultTags || []).length).toBe(initialTagCount);
+
+    wrapper.unmount();
+  });
+
   it('keeps the startup canvas blank and imports the bundled UAV demo from the import action', async () => {
     const originalFetch = window.fetch;
     const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');

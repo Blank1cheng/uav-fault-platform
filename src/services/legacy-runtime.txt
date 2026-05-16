@@ -2112,8 +2112,12 @@ function markFaultTarget(targetId){
 function createNode(type,rawX,rawY){
   const meta=COMPONENT_LIBRARY[type];
   if(!meta){return;}
-  if(type==='fault_tag'&&window.createManualFaultTag){
-    window.createManualFaultTag({x:rawX,y:rawY});
+  if(type==='fault_tag'){
+    if(window.handleFaultComponentDrop){
+      window.handleFaultComponentDrop({x:rawX,y:rawY});
+    }else{
+      toast('请将故障组件拖到可注入故障的目标对象上','w');
+    }
     return;
   }
   const props=cloneDefaults(meta.defaults);
@@ -2158,6 +2162,9 @@ function initPaletteDrag(){
       const type=item.dataset.component||'';
       S.dragType=type;
       item.classList.add('citem-dragging');
+      if(type==='fault_tag'&&window.showCompatibleFaultDropTargets){
+        window.showCompatibleFaultDropTargets();
+      }
       event.dataTransfer.effectAllowed='copy';
       event.dataTransfer.setData('text/plain',type);
     });
@@ -2165,6 +2172,9 @@ function initPaletteDrag(){
       S.dragType=null;
       item.classList.remove('citem-dragging');
       document.getElementById('diagram').classList.remove('dragover');
+      if(window.clearCompatibleFaultDropTargets){
+        window.clearCompatibleFaultDropTargets();
+      }
     });
   });
 }
@@ -2177,6 +2187,9 @@ function initCanvasDrop(){
     if(!S.sysLoaded){return;}
     event.preventDefault();
     diagram.classList.add('dragover');
+    if((S.dragType||event.dataTransfer?.getData?.('text/plain'))==='fault_tag'&&window.showCompatibleFaultDropTargets){
+      window.showCompatibleFaultDropTargets();
+    }
     event.dataTransfer.dropEffect='copy';
   });
   viewport.addEventListener('dragleave',event=>{
@@ -2189,11 +2202,11 @@ function initCanvasDrop(){
     const type=event.dataTransfer.getData('text/plain')||S.dragType;
     if(!COMPONENT_LIBRARY[type]){return;}
     const point=clientToStagePoint(event.clientX,event.clientY);
-    if(type==='fault_tag'&&window.createManualFaultTag){
-      const targetEl=document.elementFromPoint(event.clientX,event.clientY)?.closest?.('.blk');
-      const targetId=targetEl?.id?.replace(/^b-/,'')||'';
-      const target=targetId?getNode(targetId):null;
-      window.createManualFaultTag({x:point.x,y:point.y,target});
+    if(type==='fault_tag'&&window.handleFaultComponentDrop){
+      const target=window.getFaultComponentDropTargetFromClientPoint
+        ?window.getFaultComponentDropTargetFromClientPoint(event.clientX,event.clientY)
+        :null;
+      window.handleFaultComponentDrop({x:point.x,y:point.y,target,clientX:event.clientX,clientY:event.clientY});
       return;
     }
     createNode(type,point.x,point.y);
@@ -17935,6 +17948,140 @@ function decorateDataflowEdges(){
     getCompatibleFaultModelsForTarget,
     activateFaultForTarget,
     openTargetFaultActivationDialog
+  });
+})();
+
+;(function installFaultComponentDropTargets(){
+  if(typeof window==='undefined') return;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function getRuntimeNodes(){
+    const state=getState();
+    return arr(state.modelNodes).length?arr(state.modelNodes):arr(state.nodes);
+  }
+
+  function getRuntimeEdges(){
+    const state=getState();
+    return arr(state.modelEdges).length?arr(state.modelEdges):arr(state.edges);
+  }
+
+  function targetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function targetAcceptsFaultComponent(target){
+    if(!target?.id||typeof window.getCompatibleFaultModelsForTarget!=='function') return false;
+    return window.getCompatibleFaultModelsForTarget(target).length>0;
+  }
+
+  function clearCompatibleFaultDropTargets(){
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.remove('fault-drop-preview');
+    document.querySelectorAll('.fault-drop-compatible,.fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('fault-drop-compatible','fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+    document.querySelectorAll('.is-fault-drop-compatible,.is-fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('is-fault-drop-compatible','is-fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+  }
+
+  function showCompatibleFaultDropTargets(){
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.add('fault-drop-preview');
+    getRuntimeNodes().forEach(node=>{
+      const el=document.getElementById(`b-${node.id}`);
+      if(!el) return;
+      const compatible=targetAcceptsFaultComponent(node);
+      el.classList.toggle('fault-drop-compatible',compatible);
+      el.classList.toggle('fault-drop-incompatible',!compatible);
+      el.dataset.faultDropState=compatible?'compatible':'incompatible';
+    });
+    getRuntimeEdges().forEach(edge=>{
+      const compatible=targetAcceptsFaultComponent(edge);
+      document.querySelectorAll(`[data-edge-id="${edge.id}"]`).forEach(el=>{
+        el.classList.toggle('is-fault-drop-compatible',compatible);
+        el.classList.toggle('is-fault-drop-incompatible',!compatible);
+        el.dataset.faultDropState=compatible?'compatible':'incompatible';
+      });
+    });
+  }
+
+  function getFaultComponentDropTargetFromElement(element){
+    const nodeEl=element?.closest?.('.blk');
+    if(nodeEl?.id){
+      const nodeId=nodeEl.id.replace(/^b-/,'');
+      const node=(typeof getNode==='function'?getNode(nodeId):null)||getRuntimeNodes().find(item=>item.id===nodeId);
+      if(node) return node;
+    }
+    const edgeEl=element?.closest?.('.edge-hit,.edge-path,.edge-label,[data-edge-id]');
+    const edgeId=edgeEl?.dataset?.edgeId||edgeEl?.getAttribute?.('data-edge-id')||'';
+    if(edgeId){
+      const edge=(typeof getEdge==='function'?getEdge(edgeId):null)||getRuntimeEdges().find(item=>item.id===edgeId);
+      if(edge) return edge;
+    }
+    return null;
+  }
+
+  function getFaultComponentDropTargetFromClientPoint(clientX,clientY){
+    const element=document.elementFromPoint?.(clientX,clientY);
+    const target=getFaultComponentDropTargetFromElement(element);
+    if(target) return target;
+    const edgeId=typeof findNearestEdgeIdByClientPoint==='function'
+      ?findNearestEdgeIdByClientPoint(clientX,clientY)
+      :'';
+    return edgeId?((typeof getEdge==='function'?getEdge(edgeId):null)||getRuntimeEdges().find(item=>item.id===edgeId)||null):null;
+  }
+
+  function selectFaultDropTarget(target){
+    if(!target?.id) return;
+    if(targetKind(target)==='edge'){
+      if(typeof selectEdge==='function') selectEdge(target.id);
+      return;
+    }
+    if(typeof selectNode==='function') selectNode(target.id);
+  }
+
+  function handleFaultComponentDrop(options={}){
+    const target=options.target||(
+      Number.isFinite(options.clientX)&&Number.isFinite(options.clientY)
+        ?getFaultComponentDropTargetFromClientPoint(options.clientX,options.clientY)
+        :null
+    );
+    clearCompatibleFaultDropTargets();
+    if(!target){
+      toast('请将故障组件拖到高亮的可注入目标上','w');
+      return {ok:false,reason:'missing-target'};
+    }
+    if(!targetAcceptsFaultComponent(target)){
+      toast('该对象没有匹配的故障形式','w');
+      return {ok:false,reason:'incompatible-target',targetId:target.id};
+    }
+    selectFaultDropTarget(target);
+    const opened=typeof window.openTargetFaultActivationDialog==='function'
+      ?window.openTargetFaultActivationDialog()
+      :false;
+    return {
+      ok:opened!==false,
+      mode:'target-fault-dialog',
+      targetId:target.id,
+      targetKind:targetKind(target)
+    };
+  }
+
+  Object.assign(window,{
+    showCompatibleFaultDropTargets,
+    clearCompatibleFaultDropTargets,
+    getFaultComponentDropTargetFromClientPoint,
+    handleFaultComponentDrop
   });
 })();
 
