@@ -939,6 +939,49 @@ describe('flightModelPackageService', () => {
     ]);
   });
 
+  it('defines component-owned fault capabilities for the closed-loop demo', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const nodes = new Set(closedLoopPackage.workbenchSnapshot.modelNodes.map((node) => node.id));
+    const edges = new Set(closedLoopPackage.workbenchSnapshot.modelEdges.map((edge) => edge.id));
+    const faultIds = new Set(closedLoopPackage.faultTypeCatalog.map((fault) => fault.id));
+
+    expect(closedLoopPackage.schemaVersion).toBe('2.0');
+    expect(closedLoopPackage.faultInstances).toEqual([]);
+    expect(closedLoopPackage.faultTypeCatalog).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'gyro_zero_bias_offset', displayName: 'Gyro 陀螺仪零偏 - 固定偏差' }),
+      expect.objectContaining({ id: 'gyro_zero_bias_drift', displayName: 'Gyro 陀螺仪零偏 - 缓慢漂移' }),
+      expect.objectContaining({ id: 'gyro_zero_bias_intermittent', displayName: 'Gyro 陀螺仪零偏 - 间歇故障' }),
+      expect.objectContaining({ id: 'motor_1_stuck_position', displayName: '单电机卡死 - 1号电机卡位' }),
+      expect.objectContaining({ id: 'control_command_tamper', displayName: '控制指令篡改 - 1号电机 CAN 指令' })
+    ]));
+
+    closedLoopPackage.faultCapabilityMap.forEach((entry) => {
+      expect(['node', 'edge']).toContain(entry.targetKind);
+      expect(entry.targetKind === 'node' ? nodes.has(entry.targetId) : edges.has(entry.targetId)).toBe(true);
+      expect(entry.targetName).toBeTruthy();
+      expect(entry.faultSlots.length).toBeGreaterThan(0);
+      entry.faultSlots.forEach((slot) => {
+        expect(slot.slotId).toBeTruthy();
+        expect(slot.slotName).toBeTruthy();
+        expect(slot.allowedFaultIds.length).toBeGreaterThan(0);
+        slot.allowedFaultIds.forEach((faultId) => expect(faultIds.has(faultId)).toBe(true));
+      });
+    });
+
+    const imu = closedLoopPackage.faultCapabilityMap.find((entry) => entry.targetId === 'node-imu');
+    expect(imu.faultSlots[0].allowedFaultIds).toEqual([
+      'gyro_zero_bias_offset',
+      'gyro_zero_bias_drift',
+      'gyro_zero_bias_intermittent'
+    ]);
+
+    const motor = closedLoopPackage.faultCapabilityMap.find((entry) => entry.targetId === 'node-motor-1');
+    expect(motor.faultSlots[0].allowedFaultIds).toEqual(['motor_1_stuck_position']);
+
+    const can = closedLoopPackage.faultCapabilityMap.find((entry) => entry.targetId === 'edge-motor-motor1');
+    expect(can.faultSlots[0].allowedFaultIds).toEqual(['control_command_tamper']);
+  });
+
   it('defines the closed-loop demo diagnostic contract with Chinese labels and red-box faults', () => {
     const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
     const diagnosticModel = closedLoopPackage.diagnosticModel;

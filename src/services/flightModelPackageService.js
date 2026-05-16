@@ -1,4 +1,5 @@
 export const FLIGHT_MODEL_SCHEMA_VERSION = 1;
+const SUPPORTED_FLIGHT_MODEL_SCHEMA_VERSIONS = new Set([FLIGHT_MODEL_SCHEMA_VERSION, '2.0']);
 export const FLIGHT_MODEL_PACKAGE_TYPE = 'flight-control-model';
 
 import { createSimulationBlockPythonBinding } from '../composables/useWorkbenchState.js';
@@ -285,8 +286,8 @@ export function validateFlightModelPackage(pkg) {
     return { ok: false, errors: ['Package must be an object.'] };
   }
 
-  if (pkg.schemaVersion !== FLIGHT_MODEL_SCHEMA_VERSION) {
-    errors.push(`schemaVersion must be ${FLIGHT_MODEL_SCHEMA_VERSION}.`);
+  if (!SUPPORTED_FLIGHT_MODEL_SCHEMA_VERSIONS.has(pkg.schemaVersion)) {
+    errors.push(`schemaVersion must be ${FLIGHT_MODEL_SCHEMA_VERSION} or 2.0.`);
   }
 
   if (pkg.packageType !== FLIGHT_MODEL_PACKAGE_TYPE) {
