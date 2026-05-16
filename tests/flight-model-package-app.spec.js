@@ -413,6 +413,49 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('activates a compatible fault as a target-owned fault instance', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    const result = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift', {
+      rate: '0.01',
+      start: '5'
+    });
+    await flushRuntime();
+
+    expect(result.ok).toBe(true);
+    expect(state.faultInstances).toHaveLength(1);
+    expect(state.faultInstances[0]).toMatchObject({
+      faultTypeId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu',
+      slotId: 'imu-gyro-feedback',
+      active: true
+    });
+    expect(state.faultInstances[0].parameters).toMatchObject({ rate: '0.01', start: '5' });
+    expect(imu.injectedFault).toMatchObject({ modelId: 'gyro_zero_bias_drift' });
+    expect(imu.faultBindings.some((binding) => binding.faultModelId === 'gyro_zero_bias_drift')).toBe(true);
+    expect(state.faultTags.some((tag) => tag.faultModelId === 'gyro_zero_bias_drift' && tag.targetId === 'node-imu')).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('rejects fault activation on targets without compatible capability slots', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+
+    const result = window.activateFaultForTarget(controller, 'gyro_zero_bias_drift');
+    await flushRuntime();
+
+    expect(result).toMatchObject({ ok: false, error: 'incompatible-target' });
+    expect(state.faultInstances || []).toHaveLength(0);
+    expect(controller.injectedFault).toBeUndefined();
+
+    wrapper.unmount();
+  });
+
   it('keeps the startup canvas blank and imports the bundled UAV demo from the import action', async () => {
     const originalFetch = window.fetch;
     const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
