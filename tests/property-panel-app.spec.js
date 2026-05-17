@@ -488,4 +488,61 @@ describe('property panel interaction', () => {
 
     wrapper.unmount();
   });
+
+  it('opens component authoring dialog from a custom event and displays parsed interfaces', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.dispatchEvent(new CustomEvent('gz:open-component-authoring', {
+      detail: {
+        parsedInterface: {
+          fileName: 'attitude_controller.py',
+          moduleName: 'attitude_controller',
+          description: '姿态控制器',
+          entryFunction: 'process',
+          inputs: [
+            { name: 'attitude_error', displayName: '姿态误差', type: 'float' }
+          ],
+          outputs: [
+            { name: 'output_0', displayName: '力矩指令', type: 'float' }
+          ],
+          middleVars: [],
+          rawSource: 'def process(attitude_error): return attitude_error'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-testid="component-authoring-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('姿态控制器');
+    expect(dialog?.textContent).toContain('姿态误差');
+    expect(dialog?.textContent).toContain('力矩指令');
+
+    wrapper.unmount();
+  });
+
+  it('opens fault authoring dialog for a selected target slot', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.dispatchEvent(new CustomEvent('gz:open-fault-authoring', {
+      detail: {
+        target: {
+          targetKind: 'node',
+          targetId: 'node-imu',
+          targetName: 'IMU 陀螺仪反馈',
+          slotId: 'gyro-feedback',
+          slotName: '陀螺仪反馈信号'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-testid="fault-authoring-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog?.textContent).toContain('陀螺仪反馈信号');
+    expect(dialog?.textContent).toContain('故障名称');
+
+    wrapper.unmount();
+  });
 });
