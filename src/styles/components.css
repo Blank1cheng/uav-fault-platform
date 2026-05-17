@@ -67,6 +67,24 @@ main{flex:1;display:flex;overflow:hidden;}
 .citem-draggable{cursor:grab;}
 .citem-draggable:active{cursor:grabbing;}
 .citem-dragging{opacity:0.58;transform:translateX(2px);}
+.citem-authoring-action{
+  width: 100%;
+  appearance: none;
+  background: #f8fbff;
+  border-color: var(--border);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.citem-authoring-action:hover{
+  background: var(--blue-bg);
+  border-color: var(--blue-lt);
+}
+.citem-authoring-action--fault{
+  color: var(--red)!important;
+  background: #fffafa;
+  border-color: var(--red-border)!important;
+}
 .citem-copy{display:flex;flex-direction:column;gap:1px;min-width:0;}
 .citem-sub{font-size:9px;color:var(--textm);line-height:1.35;white-space:normal;}
 .citem-label{font-size:11px;font-weight:600;color:inherit;line-height:1.45;}

@@ -38,6 +38,15 @@
         <span class="citem-icon-badge citem-icon-badge--middle">中</span>
         <span class="citem-label">中间变量赋值块</span>
       </div>
+      <button
+        type="button"
+        class="citem citem-authoring-action"
+        data-open-component-authoring
+        onclick="window.dispatchEvent(new CustomEvent('gz:open-component-authoring',{detail:{}}))"
+      >
+        <span class="citem-icon-badge citem-icon-badge--simulation">新</span>
+        <span class="citem-label">新增组件</span>
+      </button>
     </div>
 
     <div class="lgroup-head lgroup-head--fault" onclick="toggleGroup('g2')">
@@ -50,6 +59,15 @@
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
         <span class="citem-label">故障组件</span>
       </div>
+      <button
+        type="button"
+        class="citem citem-authoring-action citem-authoring-action--fault"
+        data-open-fault-authoring-for-selected
+        onclick="window.__GZ_AUTHORING_RUNTIME__?.openFaultAuthoringForSelectedTarget?.()"
+      >
+        <span class="citem-icon-badge citem-icon-badge--fault">+</span>
+        <span class="citem-label">新增故障</span>
+      </button>
     </div>
 
     <div class="lgroup-head lgroup-head--instrument" onclick="toggleGroup('g3')">
