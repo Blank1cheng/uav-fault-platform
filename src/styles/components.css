@@ -4773,6 +4773,12 @@ button:focus-visible,
   padding: 14px;
   background: var(--bg-panel);
 }
+.authoring-modal .authoring-modal__body{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 .authoring-card{
   flex-shrink: 0;
   border: 1px solid var(--border);
