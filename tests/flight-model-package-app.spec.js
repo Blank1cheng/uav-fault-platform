@@ -413,6 +413,201 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('uses authored fault slots to offer only target-compatible faults', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = {
+      schemaVersion: '3.0',
+      modelInfo: {
+        modelId: 'authoring-runtime',
+        modelName: '人工扩展运行模型'
+      },
+      systemModel: {
+        nodes: [
+          {
+            id: 'node-imu',
+            type: 'simulation_block',
+            x: 240,
+            y: 180,
+            props: {
+              name: 'IMU 陀螺仪反馈',
+              inputs: [],
+              outputs: [{ name: '角速度反馈', type: 'scalar' }],
+              middleVars: []
+            },
+            faultSlots: [
+              {
+                slotId: 'gyro-feedback',
+                signalName: '角速度反馈',
+                allowedFaultTypeIds: ['gyro_zero_bias_drift']
+              }
+            ]
+          },
+          {
+            id: 'node-controller',
+            type: 'simulation_block',
+            x: 520,
+            y: 180,
+            props: {
+              name: '姿态控制器',
+              inputs: [],
+              outputs: [],
+              middleVars: []
+            },
+            faultSlots: []
+          }
+        ],
+        edges: []
+      },
+      faultTypeCatalog: [
+        {
+          id: 'gyro_zero_bias_drift',
+          displayName: 'Gyro 零偏 - 缓慢漂移',
+          layer: 'sensor',
+          runtimeBehavior: 'drift',
+          defaultParameters: {}
+        },
+        {
+          id: 'motor1_stuck',
+          displayName: '1号电机卡死',
+          layer: 'actuator',
+          runtimeBehavior: 'stuck',
+          defaultParameters: {}
+        }
+      ],
+      faultCapabilityMap: [
+        {
+          targetKind: 'node',
+          targetId: 'node-imu',
+          slotId: 'gyro-feedback',
+          allowedFaultTypeIds: ['gyro_zero_bias_drift']
+        }
+      ],
+      faultInstances: [],
+      diagnosticModel: {
+        testPoints: [],
+        detectabilityMatrix: []
+      },
+      componentTemplates: [],
+      pythonModules: []
+    };
+
+    const result = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(pkg);
+    await flushRuntime();
+
+    expect(result?.ok).not.toBe(false);
+    window.selectNode('node-imu');
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const choices = [...document.querySelectorAll('[data-activate-compatible-fault]')];
+    expect(choices).toHaveLength(1);
+    expect(choices[0].textContent).toContain('Gyro 零偏 - 缓慢漂移');
+    expect(choices[0].textContent).not.toContain('1号电机卡死');
+
+    wrapper.unmount();
+  });
+
+  it('creates edge-targeted authored fault instances from compatible edge slots', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = {
+      schemaVersion: '3.0',
+      modelInfo: {
+        modelId: 'authoring-edge-runtime',
+        modelName: '边故障运行模型'
+      },
+      systemModel: {
+        nodes: [
+          {
+            id: 'node-motor',
+            type: 'simulation_block',
+            x: 240,
+            y: 180,
+            props: {
+              name: '电机控制器',
+              inputs: [],
+              outputs: [{ name: '电机指令', type: 'scalar' }],
+              middleVars: []
+            }
+          },
+          {
+            id: 'node-motor-1',
+            type: 'simulation_block',
+            x: 560,
+            y: 180,
+            props: {
+              name: '1号电机',
+              inputs: [{ name: '电机指令', type: 'scalar' }],
+              outputs: [],
+              middleVars: []
+            }
+          }
+        ],
+        edges: [
+          {
+            id: 'edge-motor-motor1',
+            sourceNodeId: 'node-motor',
+            targetNodeId: 'node-motor-1',
+            sourcePortIndex: 0,
+            targetPortIndex: 0,
+            lineType: 'can',
+            signalId: 'motor1.command'
+          }
+        ]
+      },
+      faultTypeCatalog: [
+        {
+          id: 'motor1_can_command_tamper',
+          displayName: '1号电机 CAN 指令篡改',
+          layer: 'protocol',
+          runtimeBehavior: 'tamper',
+          defaultParameters: { scale: 0.5 }
+        }
+      ],
+      faultCapabilityMap: [
+        {
+          targetKind: 'edge',
+          targetId: 'edge-motor-motor1',
+          slotId: 'motor1-can-command',
+          allowedFaultTypeIds: ['motor1_can_command_tamper']
+        }
+      ],
+      faultInstances: [],
+      diagnosticModel: {
+        testPoints: [],
+        detectabilityMatrix: []
+      },
+      componentTemplates: [],
+      pythonModules: []
+    };
+
+    const applyResult = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(pkg);
+    await flushRuntime();
+
+    expect(applyResult?.ok).not.toBe(false);
+    const edge = window.__GZ_STATE__.modelEdges.find((item) => item.id === 'edge-motor-motor1');
+    expect(edge).toBeTruthy();
+
+    const dropResult = window.handleFaultComponentDrop({ target: edge });
+    await flushRuntime();
+
+    expect(dropResult).toMatchObject({ ok: true });
+    document.querySelector('[data-activate-compatible-fault="motor1_can_command_tamper"]').click();
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'motor1_can_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1',
+      slotId: 'motor1-can-command'
+    }));
+
+    wrapper.unmount();
+  });
+
   it('activates a compatible fault as a target-owned fault instance', async () => {
     const { wrapper } = await importDefaultClosedLoopPackage();
     const state = window.__GZ_STATE__;

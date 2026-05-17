@@ -17589,6 +17589,21 @@ function decorateDataflowEdges(){
     ))||null;
   }
 
+  function getCapabilitySlots(entry){
+    if(!entry) return [];
+    if(arr(entry.faultSlots).length) return arr(entry.faultSlots);
+    if(entry.slotId||arr(entry.allowedFaultIds).length||arr(entry.allowedFaultTypeIds).length){
+      return [entry];
+    }
+    return [];
+  }
+
+  function getAllowedFaultIds(slot){
+    return arr(slot?.allowedFaultIds).length
+      ?arr(slot.allowedFaultIds)
+      :arr(slot?.allowedFaultTypeIds);
+  }
+
   function getActiveFaultTypeCatalog(){
     const state=getState();
     const pkg=state.activeModelPackage||{};
@@ -17605,13 +17620,15 @@ function decorateDataflowEdges(){
 
   function normalizeCapabilityFaultModel(model){
     if(!model) return null;
+    const id=model.id||model.faultTypeId||'';
     const defaultParameters=Object.keys(model.defaultParameters||{}).length
       ?model.defaultParameters
       :defaultsFromParameterSchema(model.parameters);
     return {
       ...model,
-      name:model.name||model.displayName||model.id,
-      displayName:model.displayName||model.name||model.id,
+      id,
+      name:model.name||model.displayName||id,
+      displayName:model.displayName||model.name||id,
       defaultParameters:cloneCapabilityValue(defaultParameters||{})
     };
   }
@@ -17619,9 +17636,9 @@ function decorateDataflowEdges(){
   function getCompatibleFaultModelsForTarget(target){
     const capability=getFaultCapabilityForTarget(target);
     if(!capability) return [];
-    const allowedIds=new Set(arr(capability.faultSlots).flatMap(slot=>arr(slot.allowedFaultIds)));
+    const allowedIds=new Set(getCapabilitySlots(capability).flatMap(getAllowedFaultIds));
     return getActiveFaultTypeCatalog()
-      .filter(model=>allowedIds.has(model?.id))
+      .filter(model=>allowedIds.has(model?.id||model?.faultTypeId))
       .map(normalizeCapabilityFaultModel)
       .filter(Boolean);
   }
@@ -17634,7 +17651,7 @@ function decorateDataflowEdges(){
 
   function getFirstCompatibleSlotForFault(target,faultTypeId){
     const capability=getFaultCapabilityForTarget(target);
-    return arr(capability?.faultSlots).find(slot=>arr(slot.allowedFaultIds).includes(faultTypeId))||null;
+    return getCapabilitySlots(capability).find(slot=>getAllowedFaultIds(slot).includes(faultTypeId))||null;
   }
 
   function getCapabilityFaultModel(faultTypeId){
@@ -17945,19 +17962,114 @@ function decorateDataflowEdges(){
     return true;
   }
 
+  function hasAuthoredSystemModel(pkg){
+    return arr(pkg?.systemModel?.nodes).length>0||arr(pkg?.systemModel?.edges).length>0;
+  }
+
+  function getAuthoredModelId(pkg,prepared){
+    return pkg?.modelInfo?.modelId??pkg?.modelId??prepared?.descriptor?.modelId??null;
+  }
+
+  function getAuthoredModelName(pkg,prepared){
+    return pkg?.modelInfo?.modelName??pkg?.modelName??prepared?.descriptor?.modelName??null;
+  }
+
+  function normalizeAuthoredNode(node){
+    const props={...(node?.props||{})};
+    props.name=props.name||node?.name||node?.label||node?.id||'组件';
+    props.inputs=arr(props.inputs).length?props.inputs:arr(node?.inputs);
+    props.outputs=arr(props.outputs).length?props.outputs:arr(node?.outputs);
+    props.middleVars=arr(props.middleVars).length?props.middleVars:arr(node?.middleVars);
+    return {
+      ...cloneCapabilityValue(node),
+      type:node?.type||node?.nodeType||'simulation_block',
+      x:Number.isFinite(node?.x)?node.x:0,
+      y:Number.isFinite(node?.y)?node.y:0,
+      props
+    };
+  }
+
+  function normalizeAuthoredEdge(edge){
+    return {
+      ...cloneCapabilityValue(edge),
+      sourceNodeId:edge?.sourceNodeId||edge?.source||edge?.from||'',
+      targetNodeId:edge?.targetNodeId||edge?.target||edge?.to||'',
+      sourcePortIndex:Number.isFinite(edge?.sourcePortIndex)?edge.sourcePortIndex:0,
+      targetPortIndex:Number.isFinite(edge?.targetPortIndex)?edge.targetPortIndex:0,
+      lineType:edge?.lineType||edge?.type||'normal'
+    };
+  }
+
+  function applyAuthoredSystemModelToRuntime(pkg){
+    if(!hasAuthoredSystemModel(pkg)) return false;
+    const state=getState();
+    const nodes=arr(pkg.systemModel.nodes).map(normalizeAuthoredNode);
+    const edges=arr(pkg.systemModel.edges).map(normalizeAuthoredEdge);
+    state.modelNodes=cloneCapabilityValue(nodes);
+    state.modelEdges=cloneCapabilityValue(edges);
+    state.nodes=state.modelNodes;
+    state.edges=state.modelEdges;
+    state.nodeSeq=Math.max(Number(state.nodeSeq)||0,nodes.length);
+    state.edgeSeq=Math.max(Number(state.edgeSeq)||0,edges.length);
+    state.selBlk=null;
+    state.selEdge=null;
+    state.sysLoaded=true;
+    state.systemSaved=true;
+    state.step=nodes.length?2:1;
+    state.faultedBlks=[];
+    state.faultTags=[];
+    state.faultInjectionLinks=[];
+    state.injectedFaults=[];
+    state.activeFaults=[];
+    state.appliedFaults=[];
+    state.injectedFaultMap={};
+    if(typeof renderModelNodes==='function') renderModelNodes();
+    if(typeof renderEdges==='function') renderEdges();
+    if(typeof updateUI==='function') updateUI();
+    return true;
+  }
+
+  function buildAuthoredActiveModelPackage(pkg,prepared,current={}){
+    const modelInfo=cloneCapabilityValue(pkg?.modelInfo||{
+      modelId:getAuthoredModelId(pkg,prepared),
+      modelName:getAuthoredModelName(pkg,prepared)
+    });
+    return {
+      ...current,
+      schemaVersion:pkg?.schemaVersion,
+      modelInfo,
+      modelId:modelInfo?.modelId??getAuthoredModelId(pkg,prepared),
+      modelName:modelInfo?.modelName??getAuthoredModelName(pkg,prepared),
+      componentTemplates:cloneCapabilityValue(arr(pkg?.componentTemplates)),
+      systemModel:cloneCapabilityValue(pkg?.systemModel||{nodes:[],edges:[]}),
+      faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
+      faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
+      faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances)),
+      diagnosticModel:cloneCapabilityValue(pkg?.diagnosticModel||null),
+      pythonModules:cloneCapabilityValue(arr(pkg?.pythonModules))
+    };
+  }
+
   const previousApply=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
   if(typeof previousApply==='function'){
     window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
       const result=previousApply(pkg,prepared);
       if(result?.ok===false) return result;
       const state=getState();
+      const authoredSystemApplied=applyAuthoredSystemModelToRuntime(pkg);
+      const hasAuthoredPackage=authoredSystemApplied||String(pkg?.schemaVersion||'')==='3.0';
+      if(hasAuthoredPackage){
+        state.faultInstances=cloneCapabilityValue(arr(pkg?.faultInstances));
+      }
       if(state.activeModelPackage){
-        state.activeModelPackage={
-          ...state.activeModelPackage,
-          faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
-          faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
-          faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances))
-        };
+        state.activeModelPackage=hasAuthoredPackage
+          ?buildAuthoredActiveModelPackage(pkg,prepared,state.activeModelPackage)
+          :{
+            ...state.activeModelPackage,
+            faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
+            faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
+            faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances))
+          };
       }
       return result;
     };
