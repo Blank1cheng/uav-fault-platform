@@ -1,15 +1,27 @@
 <aside class="lpanel">
   <div class="lscroll">
-    <div class="lgroup-head lgroup-head--system" onclick="toggleGroup('g1')">
-      <span class="lgroup-icon">系</span>
-      <span>系统建模组件</span>
-      <span class="lgroup-arrow open" id="arr-g1">&#9654;</span>
+    <div class="lgroup-head lgroup-head--system" data-palette-group="signals" onclick="toggleGroup('g-signals')">
+      <span class="lgroup-icon">信</span>
+      <span class="lgroup-label">系统信号</span>
+      <span class="lgroup-arrow open" id="arr-g-signals">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g1">
+    <div class="lgroup-body" id="g-signals" data-palette-body="signals">
       <div class="citem citem-draggable" draggable="true" data-component="signal_source">
         <span class="citem-icon-badge citem-icon-badge--source">S</span>
         <span class="citem-label">信号源</span>
       </div>
+      <div class="citem citem-draggable" draggable="true" data-component="middle_var_assign">
+        <span class="citem-icon-badge citem-icon-badge--middle">中</span>
+        <span class="citem-label">中间变量赋值块</span>
+      </div>
+    </div>
+
+    <div class="lgroup-head lgroup-head--system" data-palette-group="signal-ops" onclick="toggleGroup('g-signal-ops')">
+      <span class="lgroup-icon">算</span>
+      <span class="lgroup-label">信号运算</span>
+      <span class="lgroup-arrow open" id="arr-g-signal-ops">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-signal-ops" data-palette-body="signal-ops">
       <div class="citem citem-draggable" draggable="true" data-component="flow_block" title="统一输入输出的数据类型和格式">
         <span class="citem-icon-badge citem-icon-badge--flow">F</span>
         <span class="citem-label">信号适配块</span>
@@ -26,17 +38,17 @@
         <span class="citem-icon-badge citem-icon-badge--mux">M</span>
         <span class="citem-label">Mux 块</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="simulation_block">
+    </div>
+
+    <div class="lgroup-head lgroup-head--system" data-palette-group="simulation" onclick="toggleGroup('g-simulation')">
+      <span class="lgroup-icon">仿</span>
+      <span class="lgroup-label">仿真组件</span>
+      <span class="lgroup-arrow open" id="arr-g-simulation">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-simulation" data-palette-body="simulation">
+      <div class="citem citem-draggable" draggable="true" data-component="simulation_block" title="快速放置一个可绑定 Python 接口的仿真模块">
         <span class="citem-icon-badge citem-icon-badge--simulation">P</span>
-        <span class="citem-label">仿真块</span>
-      </div>
-      <div class="citem citem-draggable" draggable="true" data-component="subsystem_block" title="双击进入子系统画布">
-        <span class="citem-icon-badge citem-icon-badge--subsystem">子</span>
-        <span class="citem-label">子系统块</span>
-      </div>
-      <div class="citem citem-draggable" draggable="true" data-component="middle_var_assign">
-        <span class="citem-icon-badge citem-icon-badge--middle">中</span>
-        <span class="citem-label">中间变量赋值块</span>
+        <span class="citem-label">通用仿真块</span>
       </div>
       <button
         type="button"
@@ -49,12 +61,24 @@
       </button>
     </div>
 
-    <div class="lgroup-head lgroup-head--fault" onclick="toggleGroup('g2')">
-      <span class="lgroup-icon">故</span>
-      <span>故障注入组件</span>
-      <span class="lgroup-arrow open" id="arr-g2">&#9654;</span>
+    <div class="lgroup-head lgroup-head--system" data-palette-group="subsystem" onclick="toggleGroup('g-subsystem')">
+      <span class="lgroup-icon">子</span>
+      <span class="lgroup-label">子系统</span>
+      <span class="lgroup-arrow open" id="arr-g-subsystem">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g2">
+    <div class="lgroup-body" id="g-subsystem" data-palette-body="subsystem">
+      <div class="citem citem-draggable" draggable="true" data-component="subsystem_block" title="双击进入子系统画布">
+        <span class="citem-icon-badge citem-icon-badge--subsystem">子</span>
+        <span class="citem-label">子系统块</span>
+      </div>
+    </div>
+
+    <div class="lgroup-head lgroup-head--fault" data-palette-group="faults" onclick="toggleGroup('g-faults')">
+      <span class="lgroup-icon">故</span>
+      <span class="lgroup-label">故障注入</span>
+      <span class="lgroup-arrow open" id="arr-g-faults">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-faults" data-palette-body="faults">
       <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
         <span class="citem-label">故障组件</span>
@@ -70,12 +94,12 @@
       </button>
     </div>
 
-    <div class="lgroup-head lgroup-head--instrument" onclick="toggleGroup('g3')">
+    <div class="lgroup-head lgroup-head--instrument" data-palette-group="instruments" onclick="toggleGroup('g-instruments')">
       <span class="lgroup-icon">测</span>
-      <span>测量仪器组件</span>
-      <span class="lgroup-arrow open" id="arr-g3">&#9654;</span>
+      <span class="lgroup-label">测量仪器</span>
+      <span class="lgroup-arrow open" id="arr-g-instruments">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g3">
+    <div class="lgroup-body" id="g-instruments" data-palette-body="instruments">
       <div class="citem citem-scope citem-draggable" draggable="true" data-component="instrument_scope" title="接入信号后可双击查看波形">
         <span class="citem-icon-badge citem-icon-badge--scope">波</span>
         <span class="citem-label">示波器</span>
@@ -88,18 +112,14 @@
         <span class="citem-icon-badge citem-icon-badge--logger">记</span>
         <span class="citem-label">数据记录仪</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="instrument_signal_flow" style="color:#174ea6;border:1px solid #bfdbfe;background:#f8fbff;">
-        <span class="citem-icon-badge citem-icon-badge--logger">流</span>
-        <span class="citem-label">多信号流图</span>
-      </div>
     </div>
 
-    <div class="lgroup-head lgroup-head--link" onclick="toggleGroup('g4')">
+    <div class="lgroup-head lgroup-head--link" data-palette-group="can-lines" onclick="toggleGroup('g-can-lines')">
       <span class="lgroup-icon">线</span>
-      <span>连接线组件</span>
-      <span class="lgroup-arrow open" id="arr-g4">&#9654;</span>
+      <span class="lgroup-label">CAN连接线</span>
+      <span class="lgroup-arrow open" id="arr-g-can-lines">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g4">
+    <div class="lgroup-body" id="g-can-lines" data-palette-body="can-lines">
       <div class="citem citem-line-tool active" data-line-type="normal" onclick="setConnectionTool('normal')" style="color:var(--text2);">
         <div style="width:18px;height:2px;background:var(--border-dark);border-radius:1px;flex-shrink:0;"></div>
         普通连接线
