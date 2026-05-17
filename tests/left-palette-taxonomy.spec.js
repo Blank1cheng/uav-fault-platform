@@ -25,7 +25,7 @@ describe('left palette taxonomy', () => {
       ['subsystem', '子系统'],
       ['faults', '故障注入'],
       ['instruments', '测量仪器'],
-      ['can-lines', 'CAN连接线']
+      ['can-lines', '连接线']
     ]);
     expect(markup).not.toContain('诊断分析');
     expect(markup).not.toContain('data-component="instrument_signal_flow"');
