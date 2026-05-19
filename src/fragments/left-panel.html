@@ -75,13 +75,17 @@
 
     <div class="lgroup-head lgroup-head--fault" data-palette-group="faults" onclick="toggleGroup('g-faults')">
       <span class="lgroup-icon">故</span>
-      <span class="lgroup-label">故障注入</span>
+      <span class="lgroup-label">故障组件</span>
       <span class="lgroup-arrow open" id="arr-g-faults">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g-faults" data-palette-body="faults">
       <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
-        <span class="citem-label">故障组件</span>
+        <span class="citem-label">故障注入</span>
+      </div>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="edge_fault_tag">
+        <span class="citem-icon-badge citem-icon-badge--fault">线</span>
+        <span class="citem-label">连线故障注入</span>
       </div>
       <button
         type="button"

@@ -2268,6 +2268,50 @@
       }
     },
     {
+      "id": "can_bus_delay",
+      "displayName": "CAN 反馈延迟 - IMU 反馈链路",
+      "name": "CAN 反馈延迟 - IMU 反馈链路",
+      "catalogTypeId": "fixed_delay",
+      "layer": "protocol",
+      "faultClass": "延迟传输",
+      "modelClass": "延迟传输",
+      "runtimeBehavior": "fixed_delay",
+      "formula": "imu_pitch_rate_fault[k] = imu_pitch_rate[k - delay_steps]",
+      "description": "在 IMU 反馈 CAN 连线上加入固定传输延迟，用于演示连线本身可被注入协议层故障。",
+      "defaultParameters": {
+        "delay_seconds": 0.12,
+        "delay_steps": 2,
+        "jitter": 0.02,
+        "start": 2,
+        "duration": ""
+      },
+      "parameter": "delay_seconds",
+      "targetModuleName": "IMU 反馈链路",
+      "tags": [
+        "demo",
+        "can",
+        "delay",
+        "feedback"
+      ],
+      "platformImplementation": {
+        "existingModule": "edge_fault_tag",
+        "recommendedModule": "edge_fault_tag",
+        "moduleLabel": "连线故障注入",
+        "pythonFunction": "fault_can_feedback_delay",
+        "variableRelation": "imu_pitch_rate_fault[k] = imu_pitch_rate[k - delay_steps]",
+        "implementationNote": "拖动连线故障注入组件到 IMU 反馈连线后选择该故障，并编辑延迟时间与抖动参数。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "edge_fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 反馈链路",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
       "id": "control_command_tamper",
       "displayName": "控制指令篡改 - 1号电机 CAN 指令",
       "name": "控制指令篡改 - 1号电机 CAN 指令",
@@ -2341,6 +2385,21 @@
           "signalId": "motor.thrust.m1",
           "allowedFaultIds": [
             "motor_1_stuck_position"
+          ]
+        }
+      ]
+    },
+    {
+      "targetId": "edge-imu-error",
+      "targetKind": "edge",
+      "targetName": "IMU 反馈链路",
+      "faultSlots": [
+        {
+          "slotId": "imu-feedback-can",
+          "slotName": "IMU 反馈 CAN 报文",
+          "signalId": "imu.pitch_rate",
+          "allowedFaultIds": [
+            "can_bus_delay"
           ]
         }
       ]

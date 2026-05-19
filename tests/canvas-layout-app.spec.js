@@ -614,6 +614,47 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
+  it('toggles fixed diagnostic point markers from the fault view', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    window.clearDiagnosticTestPoints();
+    const point = window.buildDiagnosticTestPointModel().positions[0];
+    expect(point?.pointId).toBeTruthy();
+
+    window.setCanvasView('components');
+    await flushRuntime();
+    window.renderCanvasDiagnosticTestPointMarkers();
+    await flushRuntime();
+
+    const toggle = document.querySelector('[data-toggle-fault-view-testpoints]');
+    const positionCount = window.buildDiagnosticTestPointModel().positions.length;
+
+    expect(toggle).not.toBeNull();
+    expect(toggle?.textContent).toContain('显示测点');
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(0);
+
+    toggle?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flushRuntime();
+
+    expect(toggle?.textContent).toContain('隐藏测点');
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(positionCount);
+    expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${point.pointId}"]`)).not.toBeNull();
+
+    toggle?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flushRuntime();
+
+    expect(toggle?.textContent).toContain('显示测点');
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(0);
+
+    wrapper.unmount();
+  });
+
   it('detects possible fault types from an installed measurement point and records manual confirmations', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
@@ -932,7 +973,7 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
-  it('shows all fixed diagnostic point positions and keeps installed markers after edge rerendering', async () => {
+  it('only renders installed diagnostic points on the canvas and keeps them after edge rerendering', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -953,18 +994,58 @@ describe('canvas layout cleanup', () => {
 
     window.renderCanvasDiagnosticTestPointMarkers();
     await flushRuntime();
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker].is-uninstalled').length).toBe(positions.length);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(0);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker].is-uninstalled')).toHaveLength(0);
 
     window.addDiagnosticTestPoint(point.pointId);
     await flushRuntime();
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(1);
     expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${point.pointId}"]`)?.classList.contains('is-installed')).toBe(true);
 
     window.renderEdges();
     await flushRuntime();
-    expect(document.querySelectorAll('[data-canvas-testpoint-marker]').length).toBe(positions.length);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(1);
     expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${point.pointId}"]`)?.classList.contains('is-installed')).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('does not leak parent diagnostic points into an empty subsystem canvas', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    const rootPoint = window.buildDiagnosticTestPointModel().positions[0];
+    expect(rootPoint?.pointId).toBeTruthy();
+    expect(window.addDiagnosticTestPoint(rootPoint.pointId)).toBe(true);
+    await flushRuntime();
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(1);
+
+    window.createNode('subsystem_block', 1180, 260);
+    await flushRuntime();
+    const subsystem = window.__GZ_STATE__.modelNodes.find((node) => node.type === 'subsystem_block');
+    expect(subsystem?.targetCanvasId).toBeTruthy();
+
+    window.openSubsystemCanvas(subsystem.id);
+    await flushRuntime();
+    window.renderCanvasDiagnosticTestPointMarkers();
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.activeCanvasId).toBe(subsystem.targetCanvasId);
+    expect(window.buildDiagnosticTestPointModel().positions).toHaveLength(0);
+    expect(document.querySelectorAll('[data-canvas-testpoint-marker]')).toHaveLength(0);
+    expect(window.__GZ_STATE__.installedDiagnosticTestPointIds).toContain(rootPoint.pointId);
+
+    document.querySelector('[data-breadcrumb-root]')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true })
+    );
+    await flushRuntime();
+    expect(window.buildDiagnosticTestPointModel().positions.length).toBeGreaterThan(0);
+    expect(document.querySelector(`[data-canvas-testpoint-marker][data-testpoint-id="${rootPoint.pointId}"]`)).not.toBeNull();
 
     wrapper.unmount();
   });
@@ -1032,7 +1113,7 @@ describe('canvas layout cleanup', () => {
     wrapper.unmount();
   });
 
-  it('renders fault injection location markers and can locate a selected catalog fault on the canvas', async () => {
+  it('keeps fault injection target lookup available without rendering redundant F markers', async () => {
     const wrapper = mount(App, { attachTo: document.body });
     await flushRuntime();
 
@@ -1054,8 +1135,7 @@ describe('canvas layout cleanup', () => {
     window.renderCanvasDiagnosticAnnotations();
     await flushRuntime();
 
-    expect(document.querySelectorAll('[data-canvas-fault-marker]').length).toBe(annotations.length);
-    expect(document.querySelector('[data-canvas-fault-marker] title')?.textContent).toMatch(/注入点|模块|连线/);
+    expect(document.querySelectorAll('[data-canvas-fault-marker]').length).toBe(0);
 
     const firstFault = annotations.find((item) => item.models?.length)?.models[0];
     const located = window.locateFaultCatalogInjectionTarget(firstFault.id);

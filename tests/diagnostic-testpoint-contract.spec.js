@@ -11,16 +11,20 @@ function readWorkspaceFile(relativePath) {
 }
 
 describe('diagnostic testpoint workbench contract', () => {
-  it('keeps a manually cleared testpoint model empty until the model changes', () => {
+  it('keeps diagnostic installs globally while returning only the active scoped points', () => {
     const runtime = readWorkspaceFile('src/services/legacy-runtime.txt');
     const functionStart = runtime.indexOf('function ensureDiagnosticTestPointState(points=null)');
     const guardIndex = runtime.indexOf('diagnosticTestPointModelSignature', functionStart);
+    const preserveIndex = runtime.indexOf('S.installedDiagnosticTestPointIds=Array.from(new Set(S.installedDiagnosticTestPointIds.filter(Boolean)))', functionStart);
+    const scopedIndex = runtime.indexOf('scopedInstalledDiagnosticPointIds=S.installedDiagnosticTestPointIds.filter', functionStart);
     const defaultIndex = runtime.indexOf('getDiagnosticPointDefaults(semanticPointsForState)', functionStart);
-    const returnIndex = runtime.indexOf('return S.installedDiagnosticTestPointIds;', functionStart);
+    const returnIndex = runtime.indexOf('return scopedInstalledDiagnosticPointIds;', functionStart);
 
     expect(functionStart).toBeGreaterThanOrEqual(0);
     expect(guardIndex).toBeGreaterThan(functionStart);
-    expect(defaultIndex).toBeGreaterThan(guardIndex);
+    expect(preserveIndex).toBeGreaterThan(guardIndex);
+    expect(scopedIndex).toBeGreaterThan(preserveIndex);
+    expect(defaultIndex).toBeGreaterThan(scopedIndex);
     expect(returnIndex).toBeGreaterThan(defaultIndex);
   });
 

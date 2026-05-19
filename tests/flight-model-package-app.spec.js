@@ -391,6 +391,7 @@ describe('Flight model package app integration', () => {
     const imu = state.modelNodes.find((node) => node.id === 'node-imu');
     const motor = state.modelNodes.find((node) => node.id === 'node-motor-1');
     const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
+    const imuFeedbackEdge = state.modelEdges.find((edge) => edge.id === 'edge-imu-error');
     const controller = state.modelNodes.find((node) => node.id === 'node-controller');
 
     expect(window.getFaultCapabilityForTarget(imu)).toMatchObject({
@@ -407,6 +408,9 @@ describe('Flight model package app integration', () => {
     ]);
     expect(window.getCompatibleFaultModelsForTarget(canEdge).map((fault) => fault.id)).toEqual([
       'control_command_tamper'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(imuFeedbackEdge).map((fault) => fault.id)).toEqual([
+      'can_bus_delay'
     ]);
     expect(window.getCompatibleFaultModelsForTarget(controller)).toEqual([]);
 
@@ -591,11 +595,14 @@ describe('Flight model package app integration', () => {
     const edge = window.__GZ_STATE__.modelEdges.find((item) => item.id === 'edge-motor-motor1');
     expect(edge).toBeTruthy();
 
-    const dropResult = window.handleFaultComponentDrop({ target: edge });
+    expect(typeof window.handleLineFaultComponentDrop).toBe('function');
+    const dropResult = window.handleLineFaultComponentDrop({ target: edge });
     await flushRuntime();
 
     expect(dropResult).toMatchObject({ ok: true });
     document.querySelector('[data-activate-compatible-fault="motor1_can_command_tamper"]').click();
+    await flushRuntime();
+    document.querySelector('[data-confirm-target-fault]').click();
     await flushRuntime();
 
     expect(window.__GZ_STATE__.faultInstances).toContainEqual(expect.objectContaining({
@@ -632,6 +639,7 @@ describe('Flight model package app integration', () => {
     expect(imu.injectedFault).toMatchObject({ modelId: 'gyro_zero_bias_drift' });
     expect(imu.faultBindings.some((binding) => binding.faultModelId === 'gyro_zero_bias_drift')).toBe(true);
     expect(state.faultTags.some((tag) => tag.faultModelId === 'gyro_zero_bias_drift' && tag.targetId === 'node-imu')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-imu-error"]')?.classList.contains('is-faulted')).toBe(false);
 
     wrapper.unmount();
   });
@@ -702,6 +710,49 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('requires parameter confirmation before activating a compatible fault choice', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const initialTagCount = (state.faultTags || []).length;
+
+    window.handleFaultComponentDrop({ target: imu, x: imu.x + 20, y: imu.y + 20 });
+    await flushRuntime();
+
+    const choice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_drift"]');
+    expect(choice).not.toBeNull();
+    choice.click();
+    await flushRuntime();
+
+    expect(state.faultInstances || []).toHaveLength(0);
+    expect((state.faultTags || []).length).toBe(initialTagCount);
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    expect(panel.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(panel.querySelector('[data-target-fault-param="rate"]')).not.toBeNull();
+
+    const rate = panel.querySelector('[data-target-fault-param="rate"]');
+    rate.value = '0.009';
+    rate.dispatchEvent(new Event('input', { bubbles: true }));
+    panel.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu',
+      parameters: expect.objectContaining({ rate: '0.009' })
+    }));
+    expect(state.faultTags).toContainEqual(expect.objectContaining({
+      faultModelId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu'
+    }));
+
+    wrapper.unmount();
+  });
+
   it('uses explicit diagnostic matrix signatures for multiple fault forms on the same target', async () => {
     const { wrapper } = await importDefaultClosedLoopPackage();
 
@@ -722,12 +773,65 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
+  it('builds an ordered troubleshooting path for a concrete fault from the D matrix', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.buildTroubleshootingPathForFault).toBe('function');
+    const path = window.buildTroubleshootingPathForFault('gyro_zero_bias_drift');
+
+    expect(path).toMatchObject({
+      faultId: 'gyro_zero_bias_drift',
+      faultName: 'Gyro 陀螺仪零偏 - 缓慢漂移'
+    });
+    expect(path.steps.length).toBeGreaterThanOrEqual(2);
+    expect(path.steps[0]).toMatchObject({
+      pointCode: 'M10',
+      pointName: '残差诊断',
+      expected: expect.stringContaining('残差趋势项持续上升')
+    });
+    expect(path.steps[0].remainingFaultIds).toContain('gyro_zero_bias_drift');
+    expect(path.steps[0].remainingFaultIds).not.toContain('gyro_zero_bias_offset');
+    expect(path.steps.some((step) => step.pointCode === 'M3')).toBe(true);
+    expect(path.summary).toContain('优先检查');
+
+    wrapper.unmount();
+  });
+
+  it('opens the troubleshooting path panel from a D matrix fault row', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    window.renderDetectionMatrixPanel();
+    await flushRuntime();
+
+    const action = document.querySelector('[data-build-troubleshooting-path="gyro_zero_bias_drift"]');
+    expect(action).not.toBeNull();
+    action.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-troubleshooting-path-panel]');
+    expect(panel).not.toBeNull();
+    expect(panel.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(panel.textContent).toContain('M10');
+    expect(panel.textContent).toContain('残差趋势项持续上升');
+
+    wrapper.unmount();
+  });
+
   it('injects a compatible fault into a model edge from the fault component drop flow', async () => {
     const { wrapper } = await importDefaultClosedLoopPackage();
     const state = window.__GZ_STATE__;
     const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
 
-    const result = window.handleFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
+    expect(typeof window.handleLineFaultComponentDrop).toBe('function');
+
+    const moduleFaultResult = window.handleFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
+    expect(moduleFaultResult).toMatchObject({
+      ok: false,
+      reason: 'incompatible-target-kind',
+      targetKind: 'edge'
+    });
+
+    const result = window.handleLineFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
     await flushRuntime();
 
     expect(result).toMatchObject({
@@ -740,6 +844,11 @@ describe('Flight model package app integration', () => {
     const choice = document.querySelector('[data-activate-compatible-fault="control_command_tamper"]');
     expect(choice).not.toBeNull();
     choice.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    panel.querySelector('[data-confirm-target-fault]').click();
     await flushRuntime();
 
     expect(state.faultInstances).toContainEqual(expect.objectContaining({
@@ -760,20 +869,61 @@ describe('Flight model package app integration', () => {
     wrapper.unmount();
   });
 
-  it('highlights only compatible targets while dragging the fault component template', async () => {
+  it('offers a concrete selectable fault on the IMU feedback line', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imuFeedbackEdge = state.modelEdges.find((edge) => edge.id === 'edge-imu-error');
+
+    const result = window.handleLineFaultComponentDrop({ target: imuFeedbackEdge, x: 0, y: 0 });
+    await flushRuntime();
+
+    expect(result).toMatchObject({
+      ok: true,
+      mode: 'target-fault-dialog',
+      targetKind: 'edge',
+      targetId: 'edge-imu-error'
+    });
+
+    const choice = document.querySelector('[data-activate-compatible-fault="can_bus_delay"]');
+    expect(choice).not.toBeNull();
+    expect(choice.textContent).toContain('CAN 反馈延迟');
+    choice.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    expect(panel.querySelector('[data-target-fault-param="delay_seconds"]')).not.toBeNull();
+    panel.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'can_bus_delay',
+      targetKind: 'edge',
+      targetId: 'edge-imu-error',
+      slotId: 'imu-feedback-can'
+    }));
+    expect(imuFeedbackEdge.injectedFault).toMatchObject({ modelId: 'can_bus_delay' });
+    expect(document.querySelector('.edge-path[data-edge-id="edge-imu-error"]')?.classList.contains('is-faulted')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('faulted')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('highlights only compatible modules while dragging the module fault component template', async () => {
     const { wrapper } = await importDefaultClosedLoopPackage();
 
     expect(typeof window.showCompatibleFaultDropTargets).toBe('function');
     expect(typeof window.clearCompatibleFaultDropTargets).toBe('function');
 
-    window.showCompatibleFaultDropTargets();
+    window.showCompatibleFaultDropTargets({ targetKind: 'node' });
     await flushRuntime();
 
     expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--node')).toBe(true);
     expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(true);
     expect(document.getElementById('b-node-motor-1')?.classList.contains('fault-drop-compatible')).toBe(true);
     expect(document.getElementById('b-node-controller')?.classList.contains('fault-drop-compatible')).toBe(false);
-    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
     expect(document.querySelector('.edge-path[data-edge-id="edge-shaper-error"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
 
     window.clearCompatibleFaultDropTargets();
@@ -781,6 +931,30 @@ describe('Flight model package app integration', () => {
 
     expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(false);
     expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('highlights only compatible lines while dragging the line fault component template', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.showCompatibleFaultDropTargets).toBe('function');
+
+    window.showCompatibleFaultDropTargets({ targetKind: 'edge' });
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--edge')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.getElementById('b-node-motor-1')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-shaper-error"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    window.clearCompatibleFaultDropTargets();
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--edge')).toBe(false);
     expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
 
     wrapper.unmount();
