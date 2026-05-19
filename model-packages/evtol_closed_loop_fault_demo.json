@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": "2.0",
   "packageType": "flight-control-model",
   "systemFamily": "uav-flight-control",
   "supportedFaultLibraries": [
@@ -1088,7 +1088,289 @@
         "motor_1_stuck_position",
         "control_command_tamper"
       ],
-      "note": "D(i,j)=1 \u8868\u793a\u6545\u969c i \u53ef\u88ab\u6d4b\u70b9 j \u68c0\u6d4b\uff1baffectedEdges \u4fdd\u7559\u4f20\u64ad\u8fb9\u3002"
+      "note": "D(i,j)=1 表示故障 i 可被测点 j 检测；affectedEdges 保留传播边。",
+      "rows": [
+        {
+          "faultId": "gyro_zero_bias_offset",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差出现固定偏差"
+            },
+            "M4": {
+              "detectable": true,
+              "signature": "控制器输出含持续补偿量"
+            },
+            "M5": {
+              "detectable": true,
+              "signature": "分配量存在持续偏置"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "机体响应产生稳态偏差"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈含固定零偏"
+            },
+            "M10": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M11": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "gyro_zero_bias_drift",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差缓慢漂移"
+            },
+            "M4": {
+              "detectable": true,
+              "signature": "控制器补偿量随时间爬升"
+            },
+            "M5": {
+              "detectable": true,
+              "signature": "分配量随时间缓慢变化"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "机体响应出现低频漂移"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈零偏随时间漂移"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差趋势项持续上升"
+            },
+            "M11": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "gyro_zero_bias_intermittent",
+          "targetId": "node-imu",
+          "targetLabel": "IMU 陀螺仪反馈",
+          "layer": "电气层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": true,
+              "signature": "姿态误差间歇跳变"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M8": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈间歇异常"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差出现间歇脉冲"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱可见间歇激励特征"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "motor_1_stuck_position",
+          "targetId": "node-motor-1",
+          "targetLabel": "1号电机与旋翼",
+          "layer": "物理层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M7": {
+              "detectable": true,
+              "signature": "1号电机响应被锁定"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "飞行动力学响应异常"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈显示姿态偏差"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差指向执行端异常"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱含执行器卡滞特征"
+            },
+            "M12": {
+              "detectable": false,
+              "signature": "不可检测"
+            }
+          }
+        },
+        {
+          "faultId": "control_command_tamper",
+          "targetId": "edge-motor-motor1",
+          "targetLabel": "1号电机 CAN 指令",
+          "layer": "协议层",
+          "points": {
+            "M1": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M2": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M3": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M4": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M5": {
+              "detectable": false,
+              "signature": "不可检测"
+            },
+            "M6": {
+              "detectable": true,
+              "signature": "1号电机指令被篡改"
+            },
+            "M7": {
+              "detectable": true,
+              "signature": "电机响应随篡改指令变化"
+            },
+            "M8": {
+              "detectable": true,
+              "signature": "飞行动力学响应异常"
+            },
+            "M9": {
+              "detectable": true,
+              "signature": "IMU 反馈显示姿态偏差"
+            },
+            "M10": {
+              "detectable": true,
+              "signature": "残差指向指令链路异常"
+            },
+            "M11": {
+              "detectable": true,
+              "signature": "频谱含指令篡改特征"
+            },
+            "M12": {
+              "detectable": true,
+              "signature": "CAN 监控可见报文篡改"
+            }
+          }
+        }
+      ]
     },
     "contrastExamples": [
       {
@@ -1816,5 +2098,327 @@
     "activeLineType": "normal",
     "faultedBlks": [],
     "importedFaultModels": []
-  }
+  },
+  "faultTypeCatalog": [
+    {
+      "id": "gyro_zero_bias_offset",
+      "displayName": "Gyro 陀螺仪零偏 - 固定偏差",
+      "name": "Gyro 陀螺仪零偏 - 固定偏差",
+      "catalogTypeId": "sensor_additive_bias",
+      "layer": "electrical",
+      "faultClass": "偏差故障",
+      "modelClass": "偏差故障",
+      "runtimeBehavior": "additive_bias",
+      "formula": "gyro_rate_fault = gyro_rate + bias",
+      "description": "在 IMU 俯仰角速度反馈上叠加固定零偏，导致姿态误差长期偏置。",
+      "defaultParameters": {
+        "bias": 0.04,
+        "start": 2,
+        "duration": ""
+      },
+      "parameter": "bias",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "tags": [
+        "demo",
+        "gyro",
+        "bias",
+        "offset"
+      ],
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_bias_overlay",
+        "variableRelation": "gyro_rate_fault = gyro_rate + bias",
+        "implementationNote": "使用现有偏置叠加块，在 IMU 反馈边上可视化固定零偏。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
+      "id": "gyro_zero_bias_drift",
+      "displayName": "Gyro 陀螺仪零偏 - 缓慢漂移",
+      "name": "Gyro 陀螺仪零偏 - 缓慢漂移",
+      "catalogTypeId": "physical_parameter_drift",
+      "layer": "electrical",
+      "faultClass": "渐变故障",
+      "modelClass": "渐变故障",
+      "runtimeBehavior": "parameter_drift",
+      "formula": "gyro_rate_fault = gyro_rate + rate * max(t - start, 0)",
+      "description": "陀螺仪零偏随时间缓慢增加，适合展示姿态缓慢漂移。",
+      "defaultParameters": {
+        "rate": 0.006,
+        "start": 3,
+        "duration": ""
+      },
+      "parameter": "drift_rate",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "tags": [
+        "demo",
+        "gyro",
+        "drift"
+      ],
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_drift_bias",
+        "variableRelation": "gyro_rate_fault = gyro_rate + rate * max(t - start, 0)",
+        "implementationNote": "使用现有偏置叠加块，将偏置值设为随时间漂移。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
+      "id": "gyro_zero_bias_intermittent",
+      "displayName": "Gyro 陀螺仪零偏 - 间歇故障",
+      "name": "Gyro 陀螺仪零偏 - 间歇故障",
+      "catalogTypeId": "intermittent_anomaly",
+      "layer": "electrical",
+      "faultClass": "间歇故障",
+      "modelClass": "间歇故障",
+      "runtimeBehavior": "intermittent",
+      "formula": "gyro_rate_fault = gyro_rate + bias when phase(t, period) < duty else gyro_rate",
+      "description": "陀螺仪反馈链路周期性出现零偏，模拟难复现的间歇异常。",
+      "defaultParameters": {
+        "bias": 0.06,
+        "period": 6,
+        "duty": 0.35,
+        "start": 2
+      },
+      "parameter": "burst_bias",
+      "targetModuleName": "IMU 陀螺仪反馈",
+      "tags": [
+        "demo",
+        "gyro",
+        "intermittent"
+      ],
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_intermittent_bias",
+        "variableRelation": "gyro_rate_fault = gyro_rate + bias when phase(t, period) < duty else gyro_rate",
+        "implementationNote": "使用现有偏置叠加块，通过 period/duty 参数表示间歇启停。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 测量反馈",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
+      "id": "motor_1_stuck_position",
+      "displayName": "单电机卡死 - 1号电机卡位",
+      "name": "单电机卡死 - 1号电机卡位",
+      "catalogTypeId": "actuator_lock_or_failure",
+      "layer": "physical",
+      "faultClass": "卡位故障",
+      "modelClass": "卡位故障",
+      "runtimeBehavior": "lock",
+      "formula": "motor_1_output_fault = lock_value",
+      "description": "1号电机执行端保持在固定输出位置，上游控制指令仍可能正常。",
+      "defaultParameters": {
+        "lock_value": 0.35,
+        "start": 4,
+        "duration": ""
+      },
+      "parameter": "lock_value",
+      "targetModuleName": "1号电机与旋翼",
+      "tags": [
+        "demo",
+        "motor",
+        "stuck",
+        "actuator"
+      ],
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_motor_stuck",
+        "variableRelation": "motor_1_output_fault = lock_value",
+        "implementationNote": "使用中间变量赋值块直观覆盖 1号电机输出为卡位值。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "node",
+        "targetId": "node-motor-1",
+        "targetName": "1号电机与旋翼",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
+      "id": "can_bus_delay",
+      "displayName": "CAN 反馈延迟 - IMU 反馈链路",
+      "name": "CAN 反馈延迟 - IMU 反馈链路",
+      "catalogTypeId": "fixed_delay",
+      "layer": "protocol",
+      "faultClass": "延迟传输",
+      "modelClass": "延迟传输",
+      "runtimeBehavior": "fixed_delay",
+      "formula": "imu_pitch_rate_fault[k] = imu_pitch_rate[k - delay_steps]",
+      "description": "在 IMU 反馈 CAN 连线上加入固定传输延迟，用于演示连线本身可被注入协议层故障。",
+      "defaultParameters": {
+        "delay_seconds": 0.12,
+        "delay_steps": 2,
+        "jitter": 0.02,
+        "start": 2,
+        "duration": ""
+      },
+      "parameter": "delay_seconds",
+      "targetModuleName": "IMU 反馈链路",
+      "tags": [
+        "demo",
+        "can",
+        "delay",
+        "feedback"
+      ],
+      "platformImplementation": {
+        "existingModule": "edge_fault_tag",
+        "recommendedModule": "edge_fault_tag",
+        "moduleLabel": "连线故障注入",
+        "pythonFunction": "fault_can_feedback_delay",
+        "variableRelation": "imu_pitch_rate_fault[k] = imu_pitch_rate[k - delay_steps]",
+        "implementationNote": "拖动连线故障注入组件到 IMU 反馈连线后选择该故障，并编辑延迟时间与抖动参数。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "edge_fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-imu-error",
+        "targetName": "IMU 反馈链路",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    },
+    {
+      "id": "control_command_tamper",
+      "displayName": "控制指令篡改 - 1号电机 CAN 指令",
+      "name": "控制指令篡改 - 1号电机 CAN 指令",
+      "catalogTypeId": "data_tamper",
+      "layer": "protocol",
+      "faultClass": "篡改故障",
+      "modelClass": "篡改故障",
+      "runtimeBehavior": "tamper",
+      "formula": "motor_1_cmd_fault = motor_1_cmd * scale + bias",
+      "description": "篡改发往 1号电机的 CAN 控制指令，可与电机卡死形成测点差异。",
+      "defaultParameters": {
+        "scale": 1.25,
+        "bias": 0.08,
+        "invert": false,
+        "rewriteRate": 0.2,
+        "start": 3
+      },
+      "parameter": "scale",
+      "targetModuleName": "1号电机 CAN 指令",
+      "tags": [
+        "demo",
+        "can",
+        "tamper",
+        "command"
+      ],
+      "platformImplementation": {
+        "existingModule": "fault_tag",
+        "recommendedModule": "fault_tag",
+        "moduleLabel": "故障组件",
+        "pythonFunction": "fault_can_command_tamper",
+        "variableRelation": "motor_1_cmd_fault = motor_1_cmd * scale + bias",
+        "implementationNote": "使用增益块和求和块组合表示 CAN 指令缩放与偏置篡改。"
+      },
+      "visualInjection": {
+        "strategy": "fault_tag",
+        "tagType": "fault_tag",
+        "targetKind": "edge",
+        "targetId": "edge-motor-motor1",
+        "targetName": "1号电机 CAN 指令",
+        "relationStyle": "fault-tag-attachment",
+        "editableParameters": true
+      }
+    }
+  ],
+  "faultCapabilityMap": [
+    {
+      "targetId": "node-imu",
+      "targetKind": "node",
+      "targetName": "IMU 陀螺仪反馈",
+      "faultSlots": [
+        {
+          "slotId": "imu-gyro-feedback",
+          "slotName": "陀螺仪反馈信号",
+          "signalId": "imu.pitch_rate",
+          "allowedFaultIds": [
+            "gyro_zero_bias_offset",
+            "gyro_zero_bias_drift",
+            "gyro_zero_bias_intermittent"
+          ]
+        }
+      ]
+    },
+    {
+      "targetId": "node-motor-1",
+      "targetKind": "node",
+      "targetName": "1号电机与旋翼",
+      "faultSlots": [
+        {
+          "slotId": "motor1-output",
+          "slotName": "1号电机执行输出",
+          "signalId": "motor.thrust.m1",
+          "allowedFaultIds": [
+            "motor_1_stuck_position"
+          ]
+        }
+      ]
+    },
+    {
+      "targetId": "edge-imu-error",
+      "targetKind": "edge",
+      "targetName": "IMU 反馈链路",
+      "faultSlots": [
+        {
+          "slotId": "imu-feedback-can",
+          "slotName": "IMU 反馈 CAN 报文",
+          "signalId": "imu.pitch_rate",
+          "allowedFaultIds": [
+            "can_bus_delay"
+          ]
+        }
+      ]
+    },
+    {
+      "targetId": "edge-motor-motor1",
+      "targetKind": "edge",
+      "targetName": "1号电机 CAN 指令",
+      "faultSlots": [
+        {
+          "slotId": "motor1-can-command",
+          "slotName": "1号电机控制指令",
+          "signalId": "motor.command.m1",
+          "allowedFaultIds": [
+            "control_command_tamper"
+          ]
+        }
+      ]
+    }
+  ],
+  "faultInstances": []
 }

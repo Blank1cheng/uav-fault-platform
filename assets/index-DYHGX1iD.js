@@ -1,4 +1,4 @@
-(function(){let e=document.createElement(`link`).relList;if(e&&e.supports&&e.supports(`modulepreload`))return;for(let e of document.querySelectorAll(`link[rel="modulepreload"]`))n(e);new MutationObserver(e=>{for(let t of e)if(t.type===`childList`)for(let e of t.addedNodes)e.tagName===`LINK`&&e.rel===`modulepreload`&&n(e)}).observe(document,{childList:!0,subtree:!0});function t(e){let t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),e.crossOrigin===`use-credentials`?t.credentials=`include`:e.crossOrigin===`anonymous`?t.credentials=`omit`:t.credentials=`same-origin`,t}function n(e){if(e.ep)return;e.ep=!0;let n=t(e);fetch(e.href,n)}})();function e(e){let t=Object.create(null);for(let n of e.split(`,`))t[n]=1;return e=>e in t}var t={},n=[],r=()=>{},i=()=>!1,a=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),o=e=>e.startsWith(`onUpdate:`),s=Object.assign,c=(e,t)=>{let n=e.indexOf(t);n>-1&&e.splice(n,1)},l=Object.prototype.hasOwnProperty,u=(e,t)=>l.call(e,t),d=Array.isArray,f=e=>x(e)===`[object Map]`,p=e=>x(e)===`[object Set]`,m=e=>x(e)===`[object Date]`,h=e=>typeof e==`function`,g=e=>typeof e==`string`,_=e=>typeof e==`symbol`,v=e=>typeof e==`object`&&!!e,y=e=>(v(e)||h(e))&&h(e.then)&&h(e.catch),b=Object.prototype.toString,x=e=>b.call(e),S=e=>x(e).slice(8,-1),C=e=>x(e)===`[object Object]`,w=e=>g(e)&&e!==`NaN`&&e[0]!==`-`&&``+parseInt(e,10)===e,ee=e(`,key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted`),te=e=>{let t=Object.create(null);return(n=>t[n]||(t[n]=e(n)))},ne=/-\w/g,T=te(e=>e.replace(ne,e=>e.slice(1).toUpperCase())),re=/\B([A-Z])/g,E=te(e=>e.replace(re,`-$1`).toLowerCase()),ie=te(e=>e.charAt(0).toUpperCase()+e.slice(1)),ae=te(e=>e?`on${ie(e)}`:``),D=(e,t)=>!Object.is(e,t),oe=(e,...t)=>{for(let n=0;n<e.length;n++)e[n](...t)},O=(e,t,n,r=!1)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:r,value:n})},se=e=>{let t=parseFloat(e);return isNaN(t)?e:t},ce,le=()=>ce||=typeof globalThis<`u`?globalThis:typeof self<`u`?self:typeof window<`u`?window:typeof global<`u`?global:{};function ue(e){if(d(e)){let t={};for(let n=0;n<e.length;n++){let r=e[n],i=g(r)?me(r):ue(r);if(i)for(let e in i)t[e]=i[e]}return t}else if(g(e)||v(e))return e}var de=/;(?![^(]*\))/g,fe=/:([^]+)/,pe=/\/\*[^]*?\*\//g;function me(e){let t={};return e.replace(pe,``).split(de).forEach(e=>{if(e){let n=e.split(fe);n.length>1&&(t[n[0].trim()]=n[1].trim())}}),t}function he(e){let t=``;if(g(e))t=e;else if(d(e))for(let n=0;n<e.length;n++){let r=he(e[n]);r&&(t+=r+` `)}else if(v(e))for(let n in e)e[n]&&(t+=n+` `);return t.trim()}var ge=`itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`,_e=e(ge);ge+``;function ve(e){return!!e||e===``}function ye(e,t){if(e.length!==t.length)return!1;let n=!0;for(let r=0;n&&r<e.length;r++)n=be(e[r],t[r]);return n}function be(e,t){if(e===t)return!0;let n=m(e),r=m(t);if(n||r)return n&&r?e.getTime()===t.getTime():!1;if(n=_(e),r=_(t),n||r)return e===t;if(n=d(e),r=d(t),n||r)return n&&r?ye(e,t):!1;if(n=v(e),r=v(t),n||r){if(!n||!r||Object.keys(e).length!==Object.keys(t).length)return!1;for(let n in e){let r=e.hasOwnProperty(n),i=t.hasOwnProperty(n);if(r&&!i||!r&&i||!be(e[n],t[n]))return!1}}return String(e)===String(t)}var xe=e=>!!(e&&e.__v_isRef===!0),k=e=>g(e)?e:e==null?``:d(e)||v(e)&&(e.toString===b||!h(e.toString))?xe(e)?k(e.value):JSON.stringify(e,Se,2):String(e),Se=(e,t)=>xe(t)?Se(e,t.value):f(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((e,[t,n],r)=>(e[Ce(t,r)+` =>`]=n,e),{})}:p(t)?{[`Set(${t.size})`]:[...t.values()].map(e=>Ce(e))}:_(t)?Ce(t):v(t)&&!d(t)&&!C(t)?String(t):t,Ce=(e,t=``)=>_(e)?`Symbol(${e.description??t})`:e,A,we=class{constructor(e=!1){this.detached=e,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.__v_skip=!0,this.parent=A,!e&&A&&(this.index=(A.scopes||=[]).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].pause();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].resume();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].resume()}}run(e){if(this._active){let t=A;try{return A=this,e()}finally{A=t}}}on(){++this._on===1&&(this.prevScope=A,A=this)}off(){this._on>0&&--this._on===0&&(A=this.prevScope,this.prevScope=void 0)}stop(e){if(this._active){this._active=!1;let t,n;for(t=0,n=this.effects.length;t<n;t++)this.effects[t].stop();for(this.effects.length=0,t=0,n=this.cleanups.length;t<n;t++)this.cleanups[t]();if(this.cleanups.length=0,this.scopes){for(t=0,n=this.scopes.length;t<n;t++)this.scopes[t].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!e){let e=this.parent.scopes.pop();e&&e!==this&&(this.parent.scopes[this.index]=e,e.index=this.index)}this.parent=void 0}}};function Te(){return A}var j,Ee=new WeakSet,De=class{constructor(e){this.fn=e,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,A&&A.active&&A.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,Ee.has(this)&&(Ee.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||je(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,We(this),Pe(this);let e=j,t=Be;j=this,Be=!0;try{return this.fn()}finally{Fe(this),j=e,Be=t,this.flags&=-3}}stop(){if(this.flags&1){for(let e=this.deps;e;e=e.nextDep)Re(e);this.deps=this.depsTail=void 0,We(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?Ee.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){Ie(this)&&this.run()}get dirty(){return Ie(this)}},Oe=0,ke,Ae;function je(e,t=!1){if(e.flags|=8,t){e.next=Ae,Ae=e;return}e.next=ke,ke=e}function Me(){Oe++}function Ne(){if(--Oe>0)return;if(Ae){let e=Ae;for(Ae=void 0;e;){let t=e.next;e.next=void 0,e.flags&=-9,e=t}}let e;for(;ke;){let t=ke;for(ke=void 0;t;){let n=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(t){e||=t}t=n}}if(e)throw e}function Pe(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function Fe(e){let t,n=e.depsTail,r=n;for(;r;){let e=r.prevDep;r.version===-1?(r===n&&(n=e),Re(r),ze(r)):t=r,r.dep.activeLink=r.prevActiveLink,r.prevActiveLink=void 0,r=e}e.deps=t,e.depsTail=n}function Ie(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(Le(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function Le(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===Ge)||(e.globalVersion=Ge,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!Ie(e))))return;e.flags|=2;let t=e.dep,n=j,r=Be;j=e,Be=!0;try{Pe(e);let n=e.fn(e._value);(t.version===0||D(n,e._value))&&(e.flags|=128,e._value=n,t.version++)}catch(e){throw t.version++,e}finally{j=n,Be=r,Fe(e),e.flags&=-3}}function Re(e,t=!1){let{dep:n,prevSub:r,nextSub:i}=e;if(r&&(r.nextSub=i,e.prevSub=void 0),i&&(i.prevSub=r,e.nextSub=void 0),n.subs===e&&(n.subs=r,!r&&n.computed)){n.computed.flags&=-5;for(let e=n.computed.deps;e;e=e.nextDep)Re(e,!0)}!t&&!--n.sc&&n.map&&n.map.delete(n.key)}function ze(e){let{prevDep:t,nextDep:n}=e;t&&(t.nextDep=n,e.prevDep=void 0),n&&(n.prevDep=t,e.nextDep=void 0)}var Be=!0,Ve=[];function He(){Ve.push(Be),Be=!1}function Ue(){let e=Ve.pop();Be=e===void 0?!0:e}function We(e){let{cleanup:t}=e;if(e.cleanup=void 0,t){let e=j;j=void 0;try{t()}finally{j=e}}}var Ge=0,Ke=class{constructor(e,t){this.sub=e,this.dep=t,this.version=t.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}},qe=class{constructor(e){this.computed=e,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(e){if(!j||!Be||j===this.computed)return;let t=this.activeLink;if(t===void 0||t.sub!==j)t=this.activeLink=new Ke(j,this),j.deps?(t.prevDep=j.depsTail,j.depsTail.nextDep=t,j.depsTail=t):j.deps=j.depsTail=t,Je(t);else if(t.version===-1&&(t.version=this.version,t.nextDep)){let e=t.nextDep;e.prevDep=t.prevDep,t.prevDep&&(t.prevDep.nextDep=e),t.prevDep=j.depsTail,t.nextDep=void 0,j.depsTail.nextDep=t,j.depsTail=t,j.deps===t&&(j.deps=e)}return t}trigger(e){this.version++,Ge++,this.notify(e)}notify(e){Me();try{for(let e=this.subs;e;e=e.prevSub)e.sub.notify()&&e.sub.dep.notify()}finally{Ne()}}};function Je(e){if(e.dep.sc++,e.sub.flags&4){let t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let e=t.deps;e;e=e.nextDep)Je(e)}let n=e.dep.subs;n!==e&&(e.prevSub=n,n&&(n.nextSub=e)),e.dep.subs=e}}var Ye=new WeakMap,Xe=Symbol(``),Ze=Symbol(``),Qe=Symbol(``);function M(e,t,n){if(Be&&j){let t=Ye.get(e);t||Ye.set(e,t=new Map);let r=t.get(n);r||(t.set(n,r=new qe),r.map=t,r.key=n),r.track()}}function $e(e,t,n,r,i,a){let o=Ye.get(e);if(!o){Ge++;return}let s=e=>{e&&e.trigger()};if(Me(),t===`clear`)o.forEach(s);else{let i=d(e),a=i&&w(n);if(i&&n===`length`){let e=Number(r);o.forEach((t,n)=>{(n===`length`||n===Qe||!_(n)&&n>=e)&&s(t)})}else switch((n!==void 0||o.has(void 0))&&s(o.get(n)),a&&s(o.get(Qe)),t){case`add`:i?a&&s(o.get(`length`)):(s(o.get(Xe)),f(e)&&s(o.get(Ze)));break;case`delete`:i||(s(o.get(Xe)),f(e)&&s(o.get(Ze)));break;case`set`:f(e)&&s(o.get(Xe));break}}Ne()}function et(e){let t=P(e);return t===e?t:(M(t,`iterate`,Qe),N(e)?t:t.map(Ht))}function tt(e){return M(e=P(e),`iterate`,Qe),e}function nt(e,t){return zt(e)?Ut(Rt(e)?Ht(t):t):Ht(t)}var rt={__proto__:null,[Symbol.iterator](){return it(this,Symbol.iterator,e=>nt(this,e))},concat(...e){return et(this).concat(...e.map(e=>d(e)?et(e):e))},entries(){return it(this,`entries`,e=>(e[1]=nt(this,e[1]),e))},every(e,t){return ot(this,`every`,e,t,void 0,arguments)},filter(e,t){return ot(this,`filter`,e,t,e=>e.map(e=>nt(this,e)),arguments)},find(e,t){return ot(this,`find`,e,t,e=>nt(this,e),arguments)},findIndex(e,t){return ot(this,`findIndex`,e,t,void 0,arguments)},findLast(e,t){return ot(this,`findLast`,e,t,e=>nt(this,e),arguments)},findLastIndex(e,t){return ot(this,`findLastIndex`,e,t,void 0,arguments)},forEach(e,t){return ot(this,`forEach`,e,t,void 0,arguments)},includes(...e){return ct(this,`includes`,e)},indexOf(...e){return ct(this,`indexOf`,e)},join(e){return et(this).join(e)},lastIndexOf(...e){return ct(this,`lastIndexOf`,e)},map(e,t){return ot(this,`map`,e,t,void 0,arguments)},pop(){return lt(this,`pop`)},push(...e){return lt(this,`push`,e)},reduce(e,...t){return st(this,`reduce`,e,t)},reduceRight(e,...t){return st(this,`reduceRight`,e,t)},shift(){return lt(this,`shift`)},some(e,t){return ot(this,`some`,e,t,void 0,arguments)},splice(...e){return lt(this,`splice`,e)},toReversed(){return et(this).toReversed()},toSorted(e){return et(this).toSorted(e)},toSpliced(...e){return et(this).toSpliced(...e)},unshift(...e){return lt(this,`unshift`,e)},values(){return it(this,`values`,e=>nt(this,e))}};function it(e,t,n){let r=tt(e),i=r[t]();return r!==e&&!N(e)&&(i._next=i.next,i.next=()=>{let e=i._next();return e.done||(e.value=n(e.value)),e}),i}var at=Array.prototype;function ot(e,t,n,r,i,a){let o=tt(e),s=o!==e&&!N(e),c=o[t];if(c!==at[t]){let t=c.apply(e,a);return s?Ht(t):t}let l=n;o!==e&&(s?l=function(t,r){return n.call(this,nt(e,t),r,e)}:n.length>2&&(l=function(t,r){return n.call(this,t,r,e)}));let u=c.call(o,l,r);return s&&i?i(u):u}function st(e,t,n,r){let i=tt(e),a=i!==e&&!N(e),o=n,s=!1;i!==e&&(a?(s=r.length===0,o=function(t,r,i){return s&&(s=!1,t=nt(e,t)),n.call(this,t,nt(e,r),i,e)}):n.length>3&&(o=function(t,r,i){return n.call(this,t,r,i,e)}));let c=i[t](o,...r);return s?nt(e,c):c}function ct(e,t,n){let r=P(e);M(r,`iterate`,Qe);let i=r[t](...n);return(i===-1||i===!1)&&Bt(n[0])?(n[0]=P(n[0]),r[t](...n)):i}function lt(e,t,n=[]){He(),Me();let r=P(e)[t].apply(e,n);return Ne(),Ue(),r}var ut=e(`__proto__,__v_isRef,__isVue`),dt=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!==`arguments`&&e!==`caller`).map(e=>Symbol[e]).filter(_));function ft(e){_(e)||(e=String(e));let t=P(this);return M(t,`has`,e),t.hasOwnProperty(e)}var pt=class{constructor(e=!1,t=!1){this._isReadonly=e,this._isShallow=t}get(e,t,n){if(t===`__v_skip`)return e.__v_skip;let r=this._isReadonly,i=this._isShallow;if(t===`__v_isReactive`)return!r;if(t===`__v_isReadonly`)return r;if(t===`__v_isShallow`)return i;if(t===`__v_raw`)return n===(r?i?jt:At:i?kt:Ot).get(e)||Object.getPrototypeOf(e)===Object.getPrototypeOf(n)?e:void 0;let a=d(e);if(!r){let e;if(a&&(e=rt[t]))return e;if(t===`hasOwnProperty`)return ft}let o=Reflect.get(e,t,F(e)?e:n);if((_(t)?dt.has(t):ut(t))||(r||M(e,`get`,t),i))return o;if(F(o)){let e=a&&w(t)?o:o.value;return r&&v(e)?It(e):e}return v(o)?r?It(o):Pt(o):o}},mt=class extends pt{constructor(e=!1){super(!1,e)}set(e,t,n,r){let i=e[t],a=d(e)&&w(t);if(!this._isShallow){let e=zt(i);if(!N(n)&&!zt(n)&&(i=P(i),n=P(n)),!a&&F(i)&&!F(n))return e||(i.value=n),!0}let o=a?Number(t)<e.length:u(e,t),s=Reflect.set(e,t,n,F(e)?e:r);return e===P(r)&&(o?D(n,i)&&$e(e,`set`,t,n,i):$e(e,`add`,t,n)),s}deleteProperty(e,t){let n=u(e,t),r=e[t],i=Reflect.deleteProperty(e,t);return i&&n&&$e(e,`delete`,t,void 0,r),i}has(e,t){let n=Reflect.has(e,t);return(!_(t)||!dt.has(t))&&M(e,`has`,t),n}ownKeys(e){return M(e,`iterate`,d(e)?`length`:Xe),Reflect.ownKeys(e)}},ht=class extends pt{constructor(e=!1){super(!0,e)}set(e,t){return!0}deleteProperty(e,t){return!0}},gt=new mt,_t=new ht,vt=new mt(!0),yt=e=>e,bt=e=>Reflect.getPrototypeOf(e);function xt(e,t,n){return function(...r){let i=this.__v_raw,a=P(i),o=f(a),c=e===`entries`||e===Symbol.iterator&&o,l=e===`keys`&&o,u=i[e](...r),d=n?yt:t?Ut:Ht;return!t&&M(a,`iterate`,l?Ze:Xe),s(Object.create(u),{next(){let{value:e,done:t}=u.next();return t?{value:e,done:t}:{value:c?[d(e[0]),d(e[1])]:d(e),done:t}}})}}function St(e){return function(...t){return e===`delete`?!1:e===`clear`?void 0:this}}function Ct(e,t){let n={get(n){let r=this.__v_raw,i=P(r),a=P(n);e||(D(n,a)&&M(i,`get`,n),M(i,`get`,a));let{has:o}=bt(i),s=t?yt:e?Ut:Ht;if(o.call(i,n))return s(r.get(n));if(o.call(i,a))return s(r.get(a));r!==i&&r.get(n)},get size(){let t=this.__v_raw;return!e&&M(P(t),`iterate`,Xe),t.size},has(t){let n=this.__v_raw,r=P(n),i=P(t);return e||(D(t,i)&&M(r,`has`,t),M(r,`has`,i)),t===i?n.has(t):n.has(t)||n.has(i)},forEach(n,r){let i=this,a=i.__v_raw,o=P(a),s=t?yt:e?Ut:Ht;return!e&&M(o,`iterate`,Xe),a.forEach((e,t)=>n.call(r,s(e),s(t),i))}};return s(n,e?{add:St(`add`),set:St(`set`),delete:St(`delete`),clear:St(`clear`)}:{add(e){let n=P(this),r=bt(n),i=P(e),a=!t&&!N(e)&&!zt(e)?i:e;return r.has.call(n,a)||D(e,a)&&r.has.call(n,e)||D(i,a)&&r.has.call(n,i)||(n.add(a),$e(n,`add`,a,a)),this},set(e,n){!t&&!N(n)&&!zt(n)&&(n=P(n));let r=P(this),{has:i,get:a}=bt(r),o=i.call(r,e);o||=(e=P(e),i.call(r,e));let s=a.call(r,e);return r.set(e,n),o?D(n,s)&&$e(r,`set`,e,n,s):$e(r,`add`,e,n),this},delete(e){let t=P(this),{has:n,get:r}=bt(t),i=n.call(t,e);i||=(e=P(e),n.call(t,e));let a=r?r.call(t,e):void 0,o=t.delete(e);return i&&$e(t,`delete`,e,void 0,a),o},clear(){let e=P(this),t=e.size!==0,n=e.clear();return t&&$e(e,`clear`,void 0,void 0,void 0),n}}),[`keys`,`values`,`entries`,Symbol.iterator].forEach(r=>{n[r]=xt(r,e,t)}),n}function wt(e,t){let n=Ct(e,t);return(t,r,i)=>r===`__v_isReactive`?!e:r===`__v_isReadonly`?e:r===`__v_raw`?t:Reflect.get(u(n,r)&&r in t?n:t,r,i)}var Tt={get:wt(!1,!1)},Et={get:wt(!1,!0)},Dt={get:wt(!0,!1)},Ot=new WeakMap,kt=new WeakMap,At=new WeakMap,jt=new WeakMap;function Mt(e){switch(e){case`Object`:case`Array`:return 1;case`Map`:case`Set`:case`WeakMap`:case`WeakSet`:return 2;default:return 0}}function Nt(e){return e.__v_skip||!Object.isExtensible(e)?0:Mt(S(e))}function Pt(e){return zt(e)?e:Lt(e,!1,gt,Tt,Ot)}function Ft(e){return Lt(e,!1,vt,Et,kt)}function It(e){return Lt(e,!0,_t,Dt,At)}function Lt(e,t,n,r,i){if(!v(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;let a=Nt(e);if(a===0)return e;let o=i.get(e);if(o)return o;let s=new Proxy(e,a===2?r:n);return i.set(e,s),s}function Rt(e){return zt(e)?Rt(e.__v_raw):!!(e&&e.__v_isReactive)}function zt(e){return!!(e&&e.__v_isReadonly)}function N(e){return!!(e&&e.__v_isShallow)}function Bt(e){return e?!!e.__v_raw:!1}function P(e){let t=e&&e.__v_raw;return t?P(t):e}function Vt(e){return!u(e,`__v_skip`)&&Object.isExtensible(e)&&O(e,`__v_skip`,!0),e}var Ht=e=>v(e)?Pt(e):e,Ut=e=>v(e)?It(e):e;function F(e){return e?e.__v_isRef===!0:!1}function Wt(e){return Gt(e,!1)}function Gt(e,t){return F(e)?e:new Kt(e,t)}var Kt=class{constructor(e,t){this.dep=new qe,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=t?e:P(e),this._value=t?e:Ht(e),this.__v_isShallow=t}get value(){return this.dep.track(),this._value}set value(e){let t=this._rawValue,n=this.__v_isShallow||N(e)||zt(e);e=n?e:P(e),D(e,t)&&(this._rawValue=e,this._value=n?e:Ht(e),this.dep.trigger())}};function I(e){return F(e)?e.value:e}var qt={get:(e,t,n)=>t===`__v_raw`?e:I(Reflect.get(e,t,n)),set:(e,t,n,r)=>{let i=e[t];return F(i)&&!F(n)?(i.value=n,!0):Reflect.set(e,t,n,r)}};function Jt(e){return Rt(e)?e:new Proxy(e,qt)}var Yt=class{constructor(e,t,n){this.fn=e,this.setter=t,this._value=void 0,this.dep=new qe(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=Ge-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!t,this.isSSR=n}notify(){if(this.flags|=16,!(this.flags&8)&&j!==this)return je(this,!0),!0}get value(){let e=this.dep.track();return Le(this),e&&(e.version=this.dep.version),this._value}set value(e){this.setter&&this.setter(e)}};function Xt(e,t,n=!1){let r,i;return h(e)?r=e:(r=e.get,i=e.set),new Yt(r,i,n)}var Zt={},Qt=new WeakMap,$t=void 0;function en(e,t=!1,n=$t){if(n){let t=Qt.get(n);t||Qt.set(n,t=[]),t.push(e)}}function tn(e,n,i=t){let{immediate:a,deep:o,once:s,scheduler:l,augmentJob:u,call:f}=i,p=e=>o?e:N(e)||o===!1||o===0?nn(e,1):nn(e),m,g,_,v,y=!1,b=!1;if(F(e)?(g=()=>e.value,y=N(e)):Rt(e)?(g=()=>p(e),y=!0):d(e)?(b=!0,y=e.some(e=>Rt(e)||N(e)),g=()=>e.map(e=>{if(F(e))return e.value;if(Rt(e))return p(e);if(h(e))return f?f(e,2):e()})):g=h(e)?n?f?()=>f(e,2):e:()=>{if(_){He();try{_()}finally{Ue()}}let t=$t;$t=m;try{return f?f(e,3,[v]):e(v)}finally{$t=t}}:r,n&&o){let e=g,t=o===!0?1/0:o;g=()=>nn(e(),t)}let x=Te(),S=()=>{m.stop(),x&&x.active&&c(x.effects,m)};if(s&&n){let e=n;n=(...t)=>{e(...t),S()}}let C=b?Array(e.length).fill(Zt):Zt,w=e=>{if(!(!(m.flags&1)||!m.dirty&&!e))if(n){let e=m.run();if(o||y||(b?e.some((e,t)=>D(e,C[t])):D(e,C))){_&&_();let t=$t;$t=m;try{let t=[e,C===Zt?void 0:b&&C[0]===Zt?[]:C,v];C=e,f?f(n,3,t):n(...t)}finally{$t=t}}}else m.run()};return u&&u(w),m=new De(g),m.scheduler=l?()=>l(w,!1):w,v=e=>en(e,!1,m),_=m.onStop=()=>{let e=Qt.get(m);if(e){if(f)f(e,4);else for(let t of e)t();Qt.delete(m)}},n?a?w(!0):C=m.run():l?l(w.bind(null,!0),!0):m.run(),S.pause=m.pause.bind(m),S.resume=m.resume.bind(m),S.stop=S,S}function nn(e,t=1/0,n){if(t<=0||!v(e)||e.__v_skip||(n||=new Map,(n.get(e)||0)>=t))return e;if(n.set(e,t),t--,F(e))nn(e.value,t,n);else if(d(e))for(let r=0;r<e.length;r++)nn(e[r],t,n);else if(p(e)||f(e))e.forEach(e=>{nn(e,t,n)});else if(C(e)){for(let r in e)nn(e[r],t,n);for(let r of Object.getOwnPropertySymbols(e))Object.prototype.propertyIsEnumerable.call(e,r)&&nn(e[r],t,n)}return e}function rn(e,t,n,r){try{return r?e(...r):e()}catch(e){on(e,t,n)}}function an(e,t,n,r){if(h(e)){let i=rn(e,t,n,r);return i&&y(i)&&i.catch(e=>{on(e,t,n)}),i}if(d(e)){let i=[];for(let a=0;a<e.length;a++)i.push(an(e[a],t,n,r));return i}}function on(e,n,r,i=!0){let a=n?n.vnode:null,{errorHandler:o,throwUnhandledErrorInProduction:s}=n&&n.appContext.config||t;if(n){let t=n.parent,i=n.proxy,a=`https://vuejs.org/error-reference/#runtime-${r}`;for(;t;){let n=t.ec;if(n){for(let t=0;t<n.length;t++)if(n[t](e,i,a)===!1)return}t=t.parent}if(o){He(),rn(o,null,10,[e,i,a]),Ue();return}}sn(e,r,a,i,s)}function sn(e,t,n,r=!0,i=!1){if(i)throw e;console.error(e)}var L=[],cn=-1,ln=[],un=null,dn=0,fn=Promise.resolve(),pn=null;function mn(e){let t=pn||fn;return e?t.then(this?e.bind(this):e):t}function hn(e){let t=cn+1,n=L.length;for(;t<n;){let r=t+n>>>1,i=L[r],a=xn(i);a<e||a===e&&i.flags&2?t=r+1:n=r}return t}function gn(e){if(!(e.flags&1)){let t=xn(e),n=L[L.length-1];!n||!(e.flags&2)&&t>=xn(n)?L.push(e):L.splice(hn(t),0,e),e.flags|=1,_n()}}function _n(){pn||=fn.then(Sn)}function vn(e){d(e)?ln.push(...e):un&&e.id===-1?un.splice(dn+1,0,e):e.flags&1||(ln.push(e),e.flags|=1),_n()}function yn(e,t,n=cn+1){for(;n<L.length;n++){let t=L[n];if(t&&t.flags&2){if(e&&t.id!==e.uid)continue;L.splice(n,1),n--,t.flags&4&&(t.flags&=-2),t(),t.flags&4||(t.flags&=-2)}}}function bn(e){if(ln.length){let e=[...new Set(ln)].sort((e,t)=>xn(e)-xn(t));if(ln.length=0,un){un.push(...e);return}for(un=e,dn=0;dn<un.length;dn++){let e=un[dn];e.flags&4&&(e.flags&=-2),e.flags&8||e(),e.flags&=-2}un=null,dn=0}}var xn=e=>e.id==null?e.flags&2?-1:1/0:e.id;function Sn(e){try{for(cn=0;cn<L.length;cn++){let e=L[cn];e&&!(e.flags&8)&&(e.flags&4&&(e.flags&=-2),rn(e,e.i,e.i?15:14),e.flags&4||(e.flags&=-2))}}finally{for(;cn<L.length;cn++){let e=L[cn];e&&(e.flags&=-2)}cn=-1,L.length=0,bn(e),pn=null,(L.length||ln.length)&&Sn(e)}}var Cn=null,wn=null;function Tn(e){let t=Cn;return Cn=e,wn=e&&e.type.__scopeId||null,t}function En(e,t=Cn,n){if(!t||e._n)return e;let r=(...n)=>{r._d&&Oi(-1);let i=Tn(t),a;try{a=e(...n)}finally{Tn(i),r._d&&Oi(1)}return a};return r._n=!0,r._c=!0,r._d=!0,r}function Dn(e,t,n,r){let i=e.dirs,a=t&&t.dirs;for(let o=0;o<i.length;o++){let s=i[o];a&&(s.oldValue=a[o].value);let c=s.dir[r];c&&(He(),an(c,n,8,[e.el,s,e,t]),Ue())}}function On(e,t){if(K){let n=K.provides,r=K.parent&&K.parent.provides;r===n&&(n=K.provides=Object.create(r)),n[e]=t}}function kn(e,t,n=!1){let r=Ji();if(r||Nr){let i=Nr?Nr._context.provides:r?r.parent==null||r.ce?r.vnode.appContext&&r.vnode.appContext.provides:r.parent.provides:void 0;if(i&&e in i)return i[e];if(arguments.length>1)return n&&h(t)?t.call(r&&r.proxy):t}}var An=Symbol.for(`v-scx`),jn=()=>kn(An);function Mn(e,t,n){return Nn(e,t,n)}function Nn(e,n,i=t){let{immediate:a,deep:o,flush:c,once:l}=i,u=s({},i),d=n&&a||!n&&c!==`post`,f;if(ea){if(c===`sync`){let e=jn();f=e.__watcherHandles||=[]}else if(!d){let e=()=>{};return e.stop=r,e.resume=r,e.pause=r,e}}let p=K;u.call=(e,t,n)=>an(e,p,t,n);let m=!1;c===`post`?u.scheduler=e=>{z(e,p&&p.suspense)}:c!==`sync`&&(m=!0,u.scheduler=(e,t)=>{t?e():gn(e)}),u.augmentJob=e=>{n&&(e.flags|=4),m&&(e.flags|=2,p&&(e.id=p.uid,e.i=p))};let h=tn(e,n,u);return ea&&(f?f.push(h):d&&h()),h}function Pn(e,t,n){let r=this.proxy,i=g(e)?e.includes(`.`)?Fn(r,e):()=>r[e]:e.bind(r,r),a;h(t)?a=t:(a=t.handler,n=t);let o=Zi(this),s=Nn(i,a.bind(r),n);return o(),s}function Fn(e,t){let n=t.split(`.`);return()=>{let t=e;for(let e=0;e<n.length&&t;e++)t=t[n[e]];return t}}var In=Symbol(`_vte`),Ln=e=>e.__isTeleport,Rn=Symbol(`_leaveCb`);function zn(e,t){e.shapeFlag&6&&e.component?(e.transition=t,zn(e.component.subTree,t)):e.shapeFlag&128?(e.ssContent.transition=t.clone(e.ssContent),e.ssFallback.transition=t.clone(e.ssFallback)):e.transition=t}function Bn(e){e.ids=[e.ids[0]+ e.ids[2]+++`-`,0,0]}function Vn(e,t){let n;return!!((n=Object.getOwnPropertyDescriptor(e,t))&&!n.configurable)}var Hn=new WeakMap;function Un(e,n,r,a,o=!1){if(d(e)){e.forEach((e,t)=>Un(e,n&&(d(n)?n[t]:n),r,a,o));return}if(Gn(a)&&!o){a.shapeFlag&512&&a.type.__asyncResolved&&a.component.subTree.component&&Un(e,n,r,a.component.subTree);return}let s=a.shapeFlag&4?la(a.component):a.el,l=o?null:s,{i:f,r:p}=e,m=n&&n.r,_=f.refs===t?f.refs={}:f.refs,v=f.setupState,y=P(v),b=v===t?i:e=>Vn(_,e)?!1:u(y,e),x=(e,t)=>!(t&&Vn(_,t));if(m!=null&&m!==p){if(Wn(n),g(m))_[m]=null,b(m)&&(v[m]=null);else if(F(m)){let e=n;x(m,e.k)&&(m.value=null),e.k&&(_[e.k]=null)}}if(h(p))rn(p,f,12,[l,_]);else{let t=g(p),n=F(p);if(t||n){let i=()=>{if(e.f){let n=t?b(p)?v[p]:_[p]:x(p)||!e.k?p.value:_[e.k];if(o)d(n)&&c(n,s);else if(d(n))n.includes(s)||n.push(s);else if(t)_[p]=[s],b(p)&&(v[p]=_[p]);else{let t=[s];x(p,e.k)&&(p.value=t),e.k&&(_[e.k]=t)}}else t?(_[p]=l,b(p)&&(v[p]=l)):n&&(x(p,e.k)&&(p.value=l),e.k&&(_[e.k]=l))};if(l){let t=()=>{i(),Hn.delete(e)};t.id=-1,Hn.set(e,t),z(t,r)}else Wn(e),i()}}}function Wn(e){let t=Hn.get(e);t&&(t.flags|=8,Hn.delete(e))}le().requestIdleCallback,le().cancelIdleCallback;var Gn=e=>!!e.type.__asyncLoader,Kn=e=>e.type.__isKeepAlive;function qn(e,t){Yn(e,`a`,t)}function Jn(e,t){Yn(e,`da`,t)}function Yn(e,t,n=K){let r=e.__wdc||=()=>{let t=n;for(;t;){if(t.isDeactivated)return;t=t.parent}return e()};if(Zn(t,r,n),n){let e=n.parent;for(;e&&e.parent;)Kn(e.parent.vnode)&&Xn(r,t,n,e),e=e.parent}}function Xn(e,t,n,r){let i=Zn(t,e,r,!0);ir(()=>{c(r[t],i)},n)}function Zn(e,t,n=K,r=!1){if(n){let i=n[e]||(n[e]=[]),a=t.__weh||=(...r)=>{He();let i=Zi(n),a=an(t,n,e,r);return i(),Ue(),a};return r?i.unshift(a):i.push(a),a}}var Qn=e=>(t,n=K)=>{(!ea||e===`sp`)&&Zn(e,(...e)=>t(...e),n)},$n=Qn(`bm`),er=Qn(`m`),tr=Qn(`bu`),nr=Qn(`u`),rr=Qn(`bum`),ir=Qn(`um`),ar=Qn(`sp`),or=Qn(`rtg`),sr=Qn(`rtc`);function cr(e,t=K){Zn(`ec`,e,t)}var lr=Symbol.for(`v-ndc`);function ur(e,t,n,r){let i,a=n&&n[r],o=d(e);if(o||g(e)){let n=o&&Rt(e),r=!1,s=!1;n&&(r=!N(e),s=zt(e),e=tt(e)),i=Array(e.length);for(let n=0,o=e.length;n<o;n++)i[n]=t(r?s?Ut(Ht(e[n])):Ht(e[n]):e[n],n,void 0,a&&a[n])}else if(typeof e==`number`){i=Array(e);for(let n=0;n<e;n++)i[n]=t(n+1,n,void 0,a&&a[n])}else if(v(e))if(e[Symbol.iterator])i=Array.from(e,(e,n)=>t(e,n,void 0,a&&a[n]));else{let n=Object.keys(e);i=Array(n.length);for(let r=0,o=n.length;r<o;r++){let o=n[r];i[r]=t(e[o],o,r,a&&a[r])}}else i=[];return n&&(n[r]=i),i}var dr=e=>e?$i(e)?la(e):dr(e.parent):null,fr=s(Object.create(null),{$:e=>e,$el:e=>e.vnode.el,$data:e=>e.data,$props:e=>e.props,$attrs:e=>e.attrs,$slots:e=>e.slots,$refs:e=>e.refs,$parent:e=>dr(e.parent),$root:e=>dr(e.root),$host:e=>e.ce,$emit:e=>e.emit,$options:e=>xr(e),$forceUpdate:e=>e.f||=()=>{gn(e.update)},$nextTick:e=>e.n||=mn.bind(e.proxy),$watch:e=>Pn.bind(e)}),pr=(e,n)=>e!==t&&!e.__isScriptSetup&&u(e,n),mr={get({_:e},n){if(n===`__v_skip`)return!0;let{ctx:r,setupState:i,data:a,props:o,accessCache:s,type:c,appContext:l}=e;if(n[0]!==`$`){let e=s[n];if(e!==void 0)switch(e){case 1:return i[n];case 2:return a[n];case 4:return r[n];case 3:return o[n]}else if(pr(i,n))return s[n]=1,i[n];else if(a!==t&&u(a,n))return s[n]=2,a[n];else if(u(o,n))return s[n]=3,o[n];else if(r!==t&&u(r,n))return s[n]=4,r[n];else gr&&(s[n]=0)}let d=fr[n],f,p;if(d)return n===`$attrs`&&M(e.attrs,`get`,``),d(e);if((f=c.__cssModules)&&(f=f[n]))return f;if(r!==t&&u(r,n))return s[n]=4,r[n];if(p=l.config.globalProperties,u(p,n))return p[n]},set({_:e},n,r){let{data:i,setupState:a,ctx:o}=e;return pr(a,n)?(a[n]=r,!0):i!==t&&u(i,n)?(i[n]=r,!0):u(e.props,n)||n[0]===`$`&&n.slice(1)in e?!1:(o[n]=r,!0)},has({_:{data:e,setupState:n,accessCache:r,ctx:i,appContext:a,props:o,type:s}},c){let l;return!!(r[c]||e!==t&&c[0]!==`$`&&u(e,c)||pr(n,c)||u(o,c)||u(i,c)||u(fr,c)||u(a.config.globalProperties,c)||(l=s.__cssModules)&&l[c])},defineProperty(e,t,n){return n.get==null?u(n,`value`)&&this.set(e,t,n.value,null):e._.accessCache[t]=0,Reflect.defineProperty(e,t,n)}};function hr(e){return d(e)?e.reduce((e,t)=>(e[t]=null,e),{}):e}var gr=!0;function _r(e){let t=xr(e),n=e.proxy,i=e.ctx;gr=!1,t.beforeCreate&&yr(t.beforeCreate,e,`bc`);let{data:a,computed:o,methods:s,watch:c,provide:l,inject:u,created:f,beforeMount:p,mounted:m,beforeUpdate:g,updated:_,activated:y,deactivated:b,beforeDestroy:x,beforeUnmount:S,destroyed:C,unmounted:w,render:ee,renderTracked:te,renderTriggered:ne,errorCaptured:T,serverPrefetch:re,expose:E,inheritAttrs:ie,components:ae,directives:D,filters:oe}=t;if(u&&vr(u,i,null),s)for(let e in s){let t=s[e];h(t)&&(i[e]=t.bind(n))}if(a){let t=a.call(n,n);v(t)&&(e.data=Pt(t))}if(gr=!0,o)for(let e in o){let t=o[e],a=da({get:h(t)?t.bind(n,n):h(t.get)?t.get.bind(n,n):r,set:!h(t)&&h(t.set)?t.set.bind(n):r});Object.defineProperty(i,e,{enumerable:!0,configurable:!0,get:()=>a.value,set:e=>a.value=e})}if(c)for(let e in c)br(c[e],i,n,e);if(l){let e=h(l)?l.call(n):l;Reflect.ownKeys(e).forEach(t=>{On(t,e[t])})}f&&yr(f,e,`c`);function O(e,t){d(t)?t.forEach(t=>e(t.bind(n))):t&&e(t.bind(n))}if(O($n,p),O(er,m),O(tr,g),O(nr,_),O(qn,y),O(Jn,b),O(cr,T),O(sr,te),O(or,ne),O(rr,S),O(ir,w),O(ar,re),d(E))if(E.length){let t=e.exposed||={};E.forEach(e=>{Object.defineProperty(t,e,{get:()=>n[e],set:t=>n[e]=t,enumerable:!0})})}else e.exposed||={};ee&&e.render===r&&(e.render=ee),ie!=null&&(e.inheritAttrs=ie),ae&&(e.components=ae),D&&(e.directives=D),re&&Bn(e)}function vr(e,t,n=r){d(e)&&(e=Er(e));for(let n in e){let r=e[n],i;i=v(r)?`default`in r?kn(r.from||n,r.default,!0):kn(r.from||n):kn(r),F(i)?Object.defineProperty(t,n,{enumerable:!0,configurable:!0,get:()=>i.value,set:e=>i.value=e}):t[n]=i}}function yr(e,t,n){an(d(e)?e.map(e=>e.bind(t.proxy)):e.bind(t.proxy),t,n)}function br(e,t,n,r){let i=r.includes(`.`)?Fn(n,r):()=>n[r];if(g(e)){let n=t[e];h(n)&&Mn(i,n)}else if(h(e))Mn(i,e.bind(n));else if(v(e))if(d(e))e.forEach(e=>br(e,t,n,r));else{let r=h(e.handler)?e.handler.bind(n):t[e.handler];h(r)&&Mn(i,r,e)}}function xr(e){let t=e.type,{mixins:n,extends:r}=t,{mixins:i,optionsCache:a,config:{optionMergeStrategies:o}}=e.appContext,s=a.get(t),c;return s?c=s:!i.length&&!n&&!r?c=t:(c={},i.length&&i.forEach(e=>Sr(c,e,o,!0)),Sr(c,t,o)),v(t)&&a.set(t,c),c}function Sr(e,t,n,r=!1){let{mixins:i,extends:a}=t;a&&Sr(e,a,n,!0),i&&i.forEach(t=>Sr(e,t,n,!0));for(let i in t)if(!(r&&i===`expose`)){let r=Cr[i]||n&&n[i];e[i]=r?r(e[i],t[i]):t[i]}return e}var Cr={data:wr,props:Or,emits:Or,methods:Dr,computed:Dr,beforeCreate:R,created:R,beforeMount:R,mounted:R,beforeUpdate:R,updated:R,beforeDestroy:R,beforeUnmount:R,destroyed:R,unmounted:R,activated:R,deactivated:R,errorCaptured:R,serverPrefetch:R,components:Dr,directives:Dr,watch:kr,provide:wr,inject:Tr};function wr(e,t){return t?e?function(){return s(h(e)?e.call(this,this):e,h(t)?t.call(this,this):t)}:t:e}function Tr(e,t){return Dr(Er(e),Er(t))}function Er(e){if(d(e)){let t={};for(let n=0;n<e.length;n++)t[e[n]]=e[n];return t}return e}function R(e,t){return e?[...new Set([].concat(e,t))]:t}function Dr(e,t){return e?s(Object.create(null),e,t):t}function Or(e,t){return e?d(e)&&d(t)?[...new Set([...e,...t])]:s(Object.create(null),hr(e),hr(t??{})):t}function kr(e,t){if(!e)return t;if(!t)return e;let n=s(Object.create(null),e);for(let r in t)n[r]=R(e[r],t[r]);return n}function Ar(){return{app:null,config:{isNativeTag:i,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}var jr=0;function Mr(e,t){return function(n,r=null){h(n)||(n=s({},n)),r!=null&&!v(r)&&(r=null);let i=Ar(),a=new WeakSet,o=[],c=!1,l=i.app={_uid:jr++,_component:n,_props:r,_container:null,_context:i,_instance:null,version:fa,get config(){return i.config},set config(e){},use(e,...t){return a.has(e)||(e&&h(e.install)?(a.add(e),e.install(l,...t)):h(e)&&(a.add(e),e(l,...t))),l},mixin(e){return i.mixins.includes(e)||i.mixins.push(e),l},component(e,t){return t?(i.components[e]=t,l):i.components[e]},directive(e,t){return t?(i.directives[e]=t,l):i.directives[e]},mount(a,o,s){if(!c){let u=l._ceVNode||G(n,r);return u.appContext=i,s===!0?s=`svg`:s===!1&&(s=void 0),o&&t?t(u,a):e(u,a,s),c=!0,l._container=a,a.__vue_app__=l,la(u.component)}},onUnmount(e){o.push(e)},unmount(){c&&(an(o,l._instance,16),e(null,l._container),delete l._container.__vue_app__)},provide(e,t){return i.provides[e]=t,l},runWithContext(e){let t=Nr;Nr=l;try{return e()}finally{Nr=t}}};return l}}var Nr=null,Pr=(e,t)=>t===`modelValue`||t===`model-value`?e.modelModifiers:e[`${t}Modifiers`]||e[`${T(t)}Modifiers`]||e[`${E(t)}Modifiers`];function Fr(e,n,...r){if(e.isUnmounted)return;let i=e.vnode.props||t,a=r,o=n.startsWith(`update:`),s=o&&Pr(i,n.slice(7));s&&(s.trim&&(a=r.map(e=>g(e)?e.trim():e)),s.number&&(a=r.map(se)));let c,l=i[c=ae(n)]||i[c=ae(T(n))];!l&&o&&(l=i[c=ae(E(n))]),l&&an(l,e,6,a);let u=i[c+`Once`];if(u){if(!e.emitted)e.emitted={};else if(e.emitted[c])return;e.emitted[c]=!0,an(u,e,6,a)}}var Ir=new WeakMap;function Lr(e,t,n=!1){let r=n?Ir:t.emitsCache,i=r.get(e);if(i!==void 0)return i;let a=e.emits,o={},c=!1;if(!h(e)){let r=e=>{let n=Lr(e,t,!0);n&&(c=!0,s(o,n))};!n&&t.mixins.length&&t.mixins.forEach(r),e.extends&&r(e.extends),e.mixins&&e.mixins.forEach(r)}return!a&&!c?(v(e)&&r.set(e,null),null):(d(a)?a.forEach(e=>o[e]=null):s(o,a),v(e)&&r.set(e,o),o)}function Rr(e,t){return!e||!a(t)?!1:(t=t.slice(2).replace(/Once$/,``),u(e,t[0].toLowerCase()+t.slice(1))||u(e,E(t))||u(e,t))}function zr(e){let{type:t,vnode:n,proxy:r,withProxy:i,propsOptions:[a],slots:s,attrs:c,emit:l,render:u,renderCache:d,props:f,data:p,setupState:m,ctx:h,inheritAttrs:g}=e,_=Tn(e),v,y;try{if(n.shapeFlag&4){let e=i||r,t=e;v=Bi(u.call(t,e,d,f,m,p,h)),y=c}else{let e=t;v=Bi(e.length>1?e(f,{attrs:c,slots:s,emit:l}):e(f,null)),y=t.props?c:Br(c)}}catch(t){Ti.length=0,on(t,e,1),v=G(Ci)}let b=v;if(y&&g!==!1){let e=Object.keys(y),{shapeFlag:t}=b;e.length&&t&7&&(a&&e.some(o)&&(y=Vr(y,a)),b=Li(b,y,!1,!0))}return n.dirs&&(b=Li(b,null,!1,!0),b.dirs=b.dirs?b.dirs.concat(n.dirs):n.dirs),n.transition&&zn(b,n.transition),v=b,Tn(_),v}var Br=e=>{let t;for(let n in e)(n===`class`||n===`style`||a(n))&&((t||={})[n]=e[n]);return t},Vr=(e,t)=>{let n={};for(let r in e)(!o(r)||!(r.slice(9)in t))&&(n[r]=e[r]);return n};function Hr(e,t,n){let{props:r,children:i,component:a}=e,{props:o,children:s,patchFlag:c}=t,l=a.emitsOptions;if(t.dirs||t.transition)return!0;if(n&&c>=0){if(c&1024)return!0;if(c&16)return r?Ur(r,o,l):!!o;if(c&8){let e=t.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t];if(Wr(o,r,n)&&!Rr(l,n))return!0}}}else return(i||s)&&(!s||!s.$stable)?!0:r===o?!1:r?o?Ur(r,o,l):!0:!!o;return!1}function Ur(e,t,n){let r=Object.keys(t);if(r.length!==Object.keys(e).length)return!0;for(let i=0;i<r.length;i++){let a=r[i];if(Wr(t,e,a)&&!Rr(n,a))return!0}return!1}function Wr(e,t,n){let r=e[n],i=t[n];return n===`style`&&v(r)&&v(i)?!be(r,i):r!==i}function Gr({vnode:e,parent:t,suspense:n},r){for(;t;){let n=t.subTree;if(n.suspense&&n.suspense.activeBranch===e&&(n.suspense.vnode.el=n.el=r,e=n),n===e)(e=t.vnode).el=r,t=t.parent;else break}n&&n.activeBranch===e&&(n.vnode.el=r)}var Kr={},qr=()=>Object.create(Kr),Jr=e=>Object.getPrototypeOf(e)===Kr;function Yr(e,t,n,r=!1){let i={},a=qr();e.propsDefaults=Object.create(null),Zr(e,t,i,a);for(let t in e.propsOptions[0])t in i||(i[t]=void 0);n?e.props=r?i:Ft(i):e.type.props?e.props=i:e.props=a,e.attrs=a}function Xr(e,t,n,r){let{props:i,attrs:a,vnode:{patchFlag:o}}=e,s=P(i),[c]=e.propsOptions,l=!1;if((r||o>0)&&!(o&16)){if(o&8){let n=e.vnode.dynamicProps;for(let r=0;r<n.length;r++){let o=n[r];if(Rr(e.emitsOptions,o))continue;let d=t[o];if(c)if(u(a,o))d!==a[o]&&(a[o]=d,l=!0);else{let t=T(o);i[t]=Qr(c,s,t,d,e,!1)}else d!==a[o]&&(a[o]=d,l=!0)}}}else{Zr(e,t,i,a)&&(l=!0);let r;for(let a in s)(!t||!u(t,a)&&((r=E(a))===a||!u(t,r)))&&(c?n&&(n[a]!==void 0||n[r]!==void 0)&&(i[a]=Qr(c,s,a,void 0,e,!0)):delete i[a]);if(a!==s)for(let e in a)(!t||!u(t,e))&&(delete a[e],l=!0)}l&&$e(e.attrs,`set`,``)}function Zr(e,n,r,i){let[a,o]=e.propsOptions,s=!1,c;if(n)for(let t in n){if(ee(t))continue;let l=n[t],d;a&&u(a,d=T(t))?!o||!o.includes(d)?r[d]=l:(c||={})[d]=l:Rr(e.emitsOptions,t)||(!(t in i)||l!==i[t])&&(i[t]=l,s=!0)}if(o){let n=P(r),i=c||t;for(let t=0;t<o.length;t++){let s=o[t];r[s]=Qr(a,n,s,i[s],e,!u(i,s))}}return s}function Qr(e,t,n,r,i,a){let o=e[n];if(o!=null){let e=u(o,`default`);if(e&&r===void 0){let e=o.default;if(o.type!==Function&&!o.skipFactory&&h(e)){let{propsDefaults:a}=i;if(n in a)r=a[n];else{let o=Zi(i);r=a[n]=e.call(null,t),o()}}else r=e;i.ce&&i.ce._setProp(n,r)}o[0]&&(a&&!e?r=!1:o[1]&&(r===``||r===E(n))&&(r=!0))}return r}var $r=new WeakMap;function ei(e,r,i=!1){let a=i?$r:r.propsCache,o=a.get(e);if(o)return o;let c=e.props,l={},f=[],p=!1;if(!h(e)){let t=e=>{p=!0;let[t,n]=ei(e,r,!0);s(l,t),n&&f.push(...n)};!i&&r.mixins.length&&r.mixins.forEach(t),e.extends&&t(e.extends),e.mixins&&e.mixins.forEach(t)}if(!c&&!p)return v(e)&&a.set(e,n),n;if(d(c))for(let e=0;e<c.length;e++){let n=T(c[e]);ti(n)&&(l[n]=t)}else if(c)for(let e in c){let t=T(e);if(ti(t)){let n=c[e],r=l[t]=d(n)||h(n)?{type:n}:s({},n),i=r.type,a=!1,o=!0;if(d(i))for(let e=0;e<i.length;++e){let t=i[e],n=h(t)&&t.name;if(n===`Boolean`){a=!0;break}else n===`String`&&(o=!1)}else a=h(i)&&i.name===`Boolean`;r[0]=a,r[1]=o,(a||u(r,`default`))&&f.push(t)}}let m=[l,f];return v(e)&&a.set(e,m),m}function ti(e){return e[0]!==`$`&&!ee(e)}var ni=e=>e===`_`||e===`_ctx`||e===`$stable`,ri=e=>d(e)?e.map(Bi):[Bi(e)],ii=(e,t,n)=>{if(t._n)return t;let r=En((...e)=>ri(t(...e)),n);return r._c=!1,r},ai=(e,t,n)=>{let r=e._ctx;for(let n in e){if(ni(n))continue;let i=e[n];if(h(i))t[n]=ii(n,i,r);else if(i!=null){let e=ri(i);t[n]=()=>e}}},oi=(e,t)=>{let n=ri(t);e.slots.default=()=>n},si=(e,t,n)=>{for(let r in t)(n||!ni(r))&&(e[r]=t[r])},ci=(e,t,n)=>{let r=e.slots=qr();if(e.vnode.shapeFlag&32){let e=t._;e?(si(r,t,n),n&&O(r,`_`,e,!0)):ai(t,r)}else t&&oi(e,t)},li=(e,n,r)=>{let{vnode:i,slots:a}=e,o=!0,s=t;if(i.shapeFlag&32){let e=n._;e?r&&e===1?o=!1:si(a,n,r):(o=!n.$stable,ai(n,a)),s=n}else n&&(oi(e,n),s={default:1});if(o)for(let e in a)!ni(e)&&s[e]==null&&delete a[e]},z=xi;function ui(e){return di(e)}function di(e,i){let a=le();a.__VUE__=!0;let{insert:o,remove:s,patchProp:c,createElement:l,createText:u,createComment:d,setText:f,setElementText:p,parentNode:m,nextSibling:h,setScopeId:g=r,insertStaticContent:_}=e,v=(e,t,n,r=null,i=null,a=null,o=void 0,s=null,c=!!t.dynamicChildren)=>{if(e===t)return;e&&!Mi(e,t)&&(r=be(e),he(e,i,a,!0),e=null),t.patchFlag===-2&&(c=!1,t.dynamicChildren=null);let{type:l,ref:u,shapeFlag:d}=t;switch(l){case Si:y(e,t,n,r);break;case Ci:b(e,t,n,r);break;case wi:e??x(t,n,r,o);break;case B:ae(e,t,n,r,i,a,o,s,c);break;default:d&1?w(e,t,n,r,i,a,o,s,c):d&6?D(e,t,n,r,i,a,o,s,c):(d&64||d&128)&&l.process(e,t,n,r,i,a,o,s,c,Se)}u!=null&&i?Un(u,e&&e.ref,a,t||e,!t):u==null&&e&&e.ref!=null&&Un(e.ref,null,a,e,!0)},y=(e,t,n,r)=>{if(e==null)o(t.el=u(t.children),n,r);else{let n=t.el=e.el;t.children!==e.children&&f(n,t.children)}},b=(e,t,n,r)=>{e==null?o(t.el=d(t.children||``),n,r):t.el=e.el},x=(e,t,n,r)=>{[e.el,e.anchor]=_(e.children,t,n,r,e.el,e.anchor)},S=({el:e,anchor:t},n,r)=>{let i;for(;e&&e!==t;)i=h(e),o(e,n,r),e=i;o(t,n,r)},C=({el:e,anchor:t})=>{let n;for(;e&&e!==t;)n=h(e),s(e),e=n;s(t)},w=(e,t,n,r,i,a,o,s,c)=>{if(t.type===`svg`?o=`svg`:t.type===`math`&&(o=`mathml`),e==null)te(t,n,r,i,a,o,s,c);else{let n=e.el&&e.el._isVueCE?e.el:null;try{n&&n._beginPatch(),re(e,t,i,a,o,s,c)}finally{n&&n._endPatch()}}},te=(e,t,n,r,i,a,s,u)=>{let d,f,{props:m,shapeFlag:h,transition:g,dirs:_}=e;if(d=e.el=l(e.type,a,m&&m.is,m),h&8?p(d,e.children):h&16&&T(e.children,d,null,r,i,fi(e,a),s,u),_&&Dn(e,null,r,`created`),ne(d,e,e.scopeId,s,r),m){for(let e in m)e!==`value`&&!ee(e)&&c(d,e,null,m[e],a,r);`value`in m&&c(d,`value`,null,m.value,a),(f=m.onVnodeBeforeMount)&&Wi(f,r,e)}_&&Dn(e,null,r,`beforeMount`);let v=mi(i,g);v&&g.beforeEnter(d),o(d,t,n),((f=m&&m.onVnodeMounted)||v||_)&&z(()=>{try{f&&Wi(f,r,e),v&&g.enter(d),_&&Dn(e,null,r,`mounted`)}finally{}},i)},ne=(e,t,n,r,i)=>{if(n&&g(e,n),r)for(let t=0;t<r.length;t++)g(e,r[t]);if(i){let n=i.subTree;if(t===n||bi(n.type)&&(n.ssContent===t||n.ssFallback===t)){let t=i.vnode;ne(e,t,t.scopeId,t.slotScopeIds,i.parent)}}},T=(e,t,n,r,i,a,o,s,c=0)=>{for(let l=c;l<e.length;l++)v(null,e[l]=s?Vi(e[l]):Bi(e[l]),t,n,r,i,a,o,s)},re=(e,n,r,i,a,o,s)=>{let l=n.el=e.el,{patchFlag:u,dynamicChildren:d,dirs:f}=n;u|=e.patchFlag&16;let m=e.props||t,h=n.props||t,g;if(r&&pi(r,!1),(g=h.onVnodeBeforeUpdate)&&Wi(g,r,n,e),f&&Dn(n,e,r,`beforeUpdate`),r&&pi(r,!0),(m.innerHTML&&h.innerHTML==null||m.textContent&&h.textContent==null)&&p(l,``),d?E(e.dynamicChildren,d,l,r,i,fi(n,a),o):s||de(e,n,l,null,r,i,fi(n,a),o,!1),u>0){if(u&16)ie(l,m,h,r,a);else if(u&2&&m.class!==h.class&&c(l,`class`,null,h.class,a),u&4&&c(l,`style`,m.style,h.style,a),u&8){let e=n.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t],i=m[n],o=h[n];(o!==i||n===`value`)&&c(l,n,i,o,a,r)}}u&1&&e.children!==n.children&&p(l,n.children)}else !s&&d==null&&ie(l,m,h,r,a);((g=h.onVnodeUpdated)||f)&&z(()=>{g&&Wi(g,r,n,e),f&&Dn(n,e,r,`updated`)},i)},E=(e,t,n,r,i,a,o)=>{for(let s=0;s<t.length;s++){let c=e[s],l=t[s];v(c,l,c.el&&(c.type===B||!Mi(c,l)||c.shapeFlag&198)?m(c.el):n,null,r,i,a,o,!0)}},ie=(e,n,r,i,a)=>{if(n!==r){if(n!==t)for(let t in n)!ee(t)&&!(t in r)&&c(e,t,n[t],null,a,i);for(let t in r){if(ee(t))continue;let o=r[t],s=n[t];o!==s&&t!==`value`&&c(e,t,s,o,a,i)}`value`in r&&c(e,`value`,n.value,r.value,a)}},ae=(e,t,n,r,i,a,s,c,l)=>{let d=t.el=e?e.el:u(``),f=t.anchor=e?e.anchor:u(``),{patchFlag:p,dynamicChildren:m,slotScopeIds:h}=t;h&&(c=c?c.concat(h):h),e==null?(o(d,n,r),o(f,n,r),T(t.children||[],n,f,i,a,s,c,l)):p>0&&p&64&&m&&e.dynamicChildren&&e.dynamicChildren.length===m.length?(E(e.dynamicChildren,m,n,i,a,s,c),(t.key!=null||i&&t===i.subTree)&&hi(e,t,!0)):de(e,t,n,f,i,a,s,c,l)},D=(e,t,n,r,i,a,o,s,c)=>{t.slotScopeIds=s,e==null?t.shapeFlag&512?i.ctx.activate(t,n,r,o,c):O(t,n,r,i,a,o,c):se(e,t,c)},O=(e,t,n,r,i,a,o)=>{let s=e.component=qi(e,r,i);if(Kn(e)&&(s.ctx.renderer=Se),ta(s,!1,o),s.asyncDep){if(i&&i.registerDep(s,ce,o),!e.el){let r=s.subTree=G(Ci);b(null,r,t,n),e.placeholder=r.el}}else ce(s,e,t,n,i,a,o)},se=(e,t,n)=>{let r=t.component=e.component;if(Hr(e,t,n))if(r.asyncDep&&!r.asyncResolved){ue(r,t,n);return}else r.next=t,r.update();else t.el=e.el,r.vnode=t},ce=(e,t,n,r,i,a,o)=>{let s=()=>{if(e.isMounted){let{next:t,bu:n,u:r,parent:s,vnode:c}=e;{let n=_i(e);if(n){t&&(t.el=c.el,ue(e,t,o)),n.asyncDep.then(()=>{z(()=>{e.isUnmounted||l()},i)});return}}let u=t,d;pi(e,!1),t?(t.el=c.el,ue(e,t,o)):t=c,n&&oe(n),(d=t.props&&t.props.onVnodeBeforeUpdate)&&Wi(d,s,t,c),pi(e,!0);let f=zr(e),p=e.subTree;e.subTree=f,v(p,f,m(p.el),be(p),e,i,a),t.el=f.el,u===null&&Gr(e,f.el),r&&z(r,i),(d=t.props&&t.props.onVnodeUpdated)&&z(()=>Wi(d,s,t,c),i)}else{let o,{el:s,props:c}=t,{bm:l,m:u,parent:d,root:f,type:p}=e,m=Gn(t);if(pi(e,!1),l&&oe(l),!m&&(o=c&&c.onVnodeBeforeMount)&&Wi(o,d,t),pi(e,!0),s&&A){let t=()=>{e.subTree=zr(e),A(s,e.subTree,e,i,null)};m&&p.__asyncHydrate?p.__asyncHydrate(s,e,t):t()}else{f.ce&&f.ce._hasShadowRoot()&&f.ce._injectChildStyle(p,e.parent?e.parent.type:void 0);let o=e.subTree=zr(e);v(null,o,n,r,e,i,a),t.el=o.el}if(u&&z(u,i),!m&&(o=c&&c.onVnodeMounted)){let e=t;z(()=>Wi(o,d,e),i)}(t.shapeFlag&256||d&&Gn(d.vnode)&&d.vnode.shapeFlag&256)&&e.a&&z(e.a,i),e.isMounted=!0,t=n=r=null}};e.scope.on();let c=e.effect=new De(s);e.scope.off();let l=e.update=c.run.bind(c),u=e.job=c.runIfDirty.bind(c);u.i=e,u.id=e.uid,c.scheduler=()=>gn(u),pi(e,!0),l()},ue=(e,t,n)=>{t.component=e;let r=e.vnode.props;e.vnode=t,e.next=null,Xr(e,t.props,r,n),li(e,t.children,n),He(),yn(e),Ue()},de=(e,t,n,r,i,a,o,s,c=!1)=>{let l=e&&e.children,u=e?e.shapeFlag:0,d=t.children,{patchFlag:f,shapeFlag:m}=t;if(f>0){if(f&128){pe(l,d,n,r,i,a,o,s,c);return}else if(f&256){fe(l,d,n,r,i,a,o,s,c);return}}m&8?(u&16&&ye(l,i,a),d!==l&&p(n,d)):u&16?m&16?pe(l,d,n,r,i,a,o,s,c):ye(l,i,a,!0):(u&8&&p(n,``),m&16&&T(d,n,r,i,a,o,s,c))},fe=(e,t,r,i,a,o,s,c,l)=>{e||=n,t||=n;let u=e.length,d=t.length,f=Math.min(u,d),p;for(p=0;p<f;p++){let n=t[p]=l?Vi(t[p]):Bi(t[p]);v(e[p],n,r,null,a,o,s,c,l)}u>d?ye(e,a,o,!0,!1,f):T(t,r,i,a,o,s,c,l,f)},pe=(e,t,r,i,a,o,s,c,l)=>{let u=0,d=t.length,f=e.length-1,p=d-1;for(;u<=f&&u<=p;){let n=e[u],i=t[u]=l?Vi(t[u]):Bi(t[u]);if(Mi(n,i))v(n,i,r,null,a,o,s,c,l);else break;u++}for(;u<=f&&u<=p;){let n=e[f],i=t[p]=l?Vi(t[p]):Bi(t[p]);if(Mi(n,i))v(n,i,r,null,a,o,s,c,l);else break;f--,p--}if(u>f){if(u<=p){let e=p+1,n=e<d?t[e].el:i;for(;u<=p;)v(null,t[u]=l?Vi(t[u]):Bi(t[u]),r,n,a,o,s,c,l),u++}}else if(u>p)for(;u<=f;)he(e[u],a,o,!0),u++;else{let m=u,h=u,g=new Map;for(u=h;u<=p;u++){let e=t[u]=l?Vi(t[u]):Bi(t[u]);e.key!=null&&g.set(e.key,u)}let _,y=0,b=p-h+1,x=!1,S=0,C=Array(b);for(u=0;u<b;u++)C[u]=0;for(u=m;u<=f;u++){let n=e[u];if(y>=b){he(n,a,o,!0);continue}let i;if(n.key!=null)i=g.get(n.key);else for(_=h;_<=p;_++)if(C[_-h]===0&&Mi(n,t[_])){i=_;break}i===void 0?he(n,a,o,!0):(C[i-h]=u+1,i>=S?S=i:x=!0,v(n,t[i],r,null,a,o,s,c,l),y++)}let w=x?gi(C):n;for(_=w.length-1,u=b-1;u>=0;u--){let e=h+u,n=t[e],f=t[e+1],p=e+1<d?f.el||yi(f):i;C[u]===0?v(null,n,r,p,a,o,s,c,l):x&&(_<0||u!==w[_]?me(n,r,p,2):_--)}}},me=(e,t,n,r,i=null)=>{let{el:a,type:c,transition:l,children:u,shapeFlag:d}=e;if(d&6){me(e.component.subTree,t,n,r);return}if(d&128){e.suspense.move(t,n,r);return}if(d&64){c.move(e,t,n,Se);return}if(c===B){o(a,t,n);for(let e=0;e<u.length;e++)me(u[e],t,n,r);o(e.anchor,t,n);return}if(c===wi){S(e,t,n);return}if(r!==2&&d&1&&l)if(r===0)l.beforeEnter(a),o(a,t,n),z(()=>l.enter(a),i);else{let{leave:r,delayLeave:i,afterLeave:c}=l,u=()=>{e.ctx.isUnmounted?s(a):o(a,t,n)},d=()=>{a._isLeaving&&a[Rn](!0),r(a,()=>{u(),c&&c()})};i?i(a,u,d):d()}else o(a,t,n)},he=(e,t,n,r=!1,i=!1)=>{let{type:a,props:o,ref:s,children:c,dynamicChildren:l,shapeFlag:u,patchFlag:d,dirs:f,cacheIndex:p,memo:m}=e;if(d===-2&&(i=!1),s!=null&&(He(),Un(s,null,n,e,!0),Ue()),p!=null&&(t.renderCache[p]=void 0),u&256){t.ctx.deactivate(e);return}let h=u&1&&f,g=!Gn(e),_;if(g&&(_=o&&o.onVnodeBeforeUnmount)&&Wi(_,t,e),u&6)ve(e.component,n,r);else{if(u&128){e.suspense.unmount(n,r);return}h&&Dn(e,null,t,`beforeUnmount`),u&64?e.type.remove(e,t,n,Se,r):l&&!l.hasOnce&&(a!==B||d>0&&d&64)?ye(l,t,n,!1,!0):(a===B&&d&384||!i&&u&16)&&ye(c,t,n),r&&ge(e)}let v=m!=null&&p==null;(g&&(_=o&&o.onVnodeUnmounted)||h||v)&&z(()=>{_&&Wi(_,t,e),h&&Dn(e,null,t,`unmounted`),v&&(e.el=null)},n)},ge=e=>{let{type:t,el:n,anchor:r,transition:i}=e;if(t===B){_e(n,r);return}if(t===wi){C(e);return}let a=()=>{s(n),i&&!i.persisted&&i.afterLeave&&i.afterLeave()};if(e.shapeFlag&1&&i&&!i.persisted){let{leave:t,delayLeave:r}=i,o=()=>t(n,a);r?r(e.el,a,o):o()}else a()},_e=(e,t)=>{let n;for(;e!==t;)n=h(e),s(e),e=n;s(t)},ve=(e,t,n)=>{let{bum:r,scope:i,job:a,subTree:o,um:s,m:c,a:l}=e;vi(c),vi(l),r&&oe(r),i.stop(),a&&(a.flags|=8,he(o,e,t,n)),s&&z(s,t),z(()=>{e.isUnmounted=!0},t)},ye=(e,t,n,r=!1,i=!1,a=0)=>{for(let o=a;o<e.length;o++)he(e[o],t,n,r,i)},be=e=>{if(e.shapeFlag&6)return be(e.component.subTree);if(e.shapeFlag&128)return e.suspense.next();let t=h(e.anchor||e.el),n=t&&t[In];return n?h(n):t},xe=!1,k=(e,t,n)=>{let r;e==null?t._vnode&&(he(t._vnode,null,null,!0),r=t._vnode.component):v(t._vnode||null,e,t,null,null,null,n),t._vnode=e,xe||=(xe=!0,yn(r),bn(),!1)},Se={p:v,um:he,m:me,r:ge,mt:O,mc:T,pc:de,pbc:E,n:be,o:e},Ce,A;return i&&([Ce,A]=i(Se)),{render:k,hydrate:Ce,createApp:Mr(k,Ce)}}function fi({type:e,props:t},n){return n===`svg`&&e===`foreignObject`||n===`mathml`&&e===`annotation-xml`&&t&&t.encoding&&t.encoding.includes(`html`)?void 0:n}function pi({effect:e,job:t},n){n?(e.flags|=32,t.flags|=4):(e.flags&=-33,t.flags&=-5)}function mi(e,t){return(!e||e&&!e.pendingBranch)&&t&&!t.persisted}function hi(e,t,n=!1){let r=e.children,i=t.children;if(d(r)&&d(i))for(let e=0;e<r.length;e++){let t=r[e],a=i[e];a.shapeFlag&1&&!a.dynamicChildren&&((a.patchFlag<=0||a.patchFlag===32)&&(a=i[e]=Vi(i[e]),a.el=t.el),!n&&a.patchFlag!==-2&&hi(t,a)),a.type===Si&&(a.patchFlag===-1&&(a=i[e]=Vi(a)),a.el=t.el),a.type===Ci&&!a.el&&(a.el=t.el)}}function gi(e){let t=e.slice(),n=[0],r,i,a,o,s,c=e.length;for(r=0;r<c;r++){let c=e[r];if(c!==0){if(i=n[n.length-1],e[i]<c){t[r]=i,n.push(r);continue}for(a=0,o=n.length-1;a<o;)s=a+o>>1,e[n[s]]<c?a=s+1:o=s;c<e[n[a]]&&(a>0&&(t[r]=n[a-1]),n[a]=r)}}for(a=n.length,o=n[a-1];a-- >0;)n[a]=o,o=t[o];return n}function _i(e){let t=e.subTree.component;if(t)return t.asyncDep&&!t.asyncResolved?t:_i(t)}function vi(e){if(e)for(let t=0;t<e.length;t++)e[t].flags|=8}function yi(e){if(e.placeholder)return e.placeholder;let t=e.component;return t?yi(t.subTree):null}var bi=e=>e.__isSuspense;function xi(e,t){t&&t.pendingBranch?d(e)?t.effects.push(...e):t.effects.push(e):vn(e)}var B=Symbol.for(`v-fgt`),Si=Symbol.for(`v-txt`),Ci=Symbol.for(`v-cmt`),wi=Symbol.for(`v-stc`),Ti=[],V=null;function H(e=!1){Ti.push(V=e?null:[])}function Ei(){Ti.pop(),V=Ti[Ti.length-1]||null}var Di=1;function Oi(e,t=!1){Di+=e,e<0&&V&&t&&(V.hasOnce=!0)}function ki(e){return e.dynamicChildren=Di>0?V||n:null,Ei(),Di>0&&V&&V.push(e),e}function U(e,t,n,r,i,a){return ki(W(e,t,n,r,i,a,!0))}function Ai(e,t,n,r,i){return ki(G(e,t,n,r,i,!0))}function ji(e){return e?e.__v_isVNode===!0:!1}function Mi(e,t){return e.type===t.type&&e.key===t.key}var Ni=({key:e})=>e??null,Pi=({ref:e,ref_key:t,ref_for:n})=>(typeof e==`number`&&(e=``+e),e==null?null:g(e)||F(e)||h(e)?{i:Cn,r:e,k:t,f:!!n}:e);function W(e,t=null,n=null,r=0,i=null,a=e===B?0:1,o=!1,s=!1){let c={__v_isVNode:!0,__v_skip:!0,type:e,props:t,key:t&&Ni(t),ref:t&&Pi(t),scopeId:wn,slotScopeIds:null,children:n,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetStart:null,targetAnchor:null,staticCount:0,shapeFlag:a,patchFlag:r,dynamicProps:i,dynamicChildren:null,appContext:null,ctx:Cn};return s?(Hi(c,n),a&128&&e.normalize(c)):n&&(c.shapeFlag|=g(n)?8:16),Di>0&&!o&&V&&(c.patchFlag>0||a&6)&&c.patchFlag!==32&&V.push(c),c}var G=Fi;function Fi(e,t=null,n=null,r=0,i=null,a=!1){if((!e||e===lr)&&(e=Ci),ji(e)){let r=Li(e,t,!0);return n&&Hi(r,n),Di>0&&!a&&V&&(r.shapeFlag&6?V[V.indexOf(e)]=r:V.push(r)),r.patchFlag=-2,r}if(ua(e)&&(e=e.__vccOpts),t){t=Ii(t);let{class:e,style:n}=t;e&&!g(e)&&(t.class=he(e)),v(n)&&(Bt(n)&&!d(n)&&(n=s({},n)),t.style=ue(n))}let o=g(e)?1:bi(e)?128:Ln(e)?64:v(e)?4:h(e)?2:0;return W(e,t,n,r,i,o,a,!0)}function Ii(e){return e?Bt(e)||Jr(e)?s({},e):e:null}function Li(e,t,n=!1,r=!1){let{props:i,ref:a,patchFlag:o,children:s,transition:c}=e,l=t?Ui(i||{},t):i,u={__v_isVNode:!0,__v_skip:!0,type:e.type,props:l,key:l&&Ni(l),ref:t&&t.ref?n&&a?d(a)?a.concat(Pi(t)):[a,Pi(t)]:Pi(t):a,scopeId:e.scopeId,slotScopeIds:e.slotScopeIds,children:s,target:e.target,targetStart:e.targetStart,targetAnchor:e.targetAnchor,staticCount:e.staticCount,shapeFlag:e.shapeFlag,patchFlag:t&&e.type!==B?o===-1?16:o|16:o,dynamicProps:e.dynamicProps,dynamicChildren:e.dynamicChildren,appContext:e.appContext,dirs:e.dirs,transition:c,component:e.component,suspense:e.suspense,ssContent:e.ssContent&&Li(e.ssContent),ssFallback:e.ssFallback&&Li(e.ssFallback),placeholder:e.placeholder,el:e.el,anchor:e.anchor,ctx:e.ctx,ce:e.ce};return c&&r&&zn(u,c.clone(u)),u}function Ri(e=` `,t=0){return G(Si,null,e,t)}function zi(e=``,t=!1){return t?(H(),Ai(Ci,null,e)):G(Ci,null,e)}function Bi(e){return e==null||typeof e==`boolean`?G(Ci):d(e)?G(B,null,e.slice()):ji(e)?Vi(e):G(Si,null,String(e))}function Vi(e){return e.el===null&&e.patchFlag!==-1||e.memo?e:Li(e)}function Hi(e,t){let n=0,{shapeFlag:r}=e;if(t==null)t=null;else if(d(t))n=16;else if(typeof t==`object`)if(r&65){let n=t.default;n&&(n._c&&(n._d=!1),Hi(e,n()),n._c&&(n._d=!0));return}else{n=32;let r=t._;!r&&!Jr(t)?t._ctx=Cn:r===3&&Cn&&(Cn.slots._===1?t._=1:(t._=2,e.patchFlag|=1024))}else h(t)?(t={default:t,_ctx:Cn},n=32):(t=String(t),r&64?(n=16,t=[Ri(t)]):n=8);e.children=t,e.shapeFlag|=n}function Ui(...e){let t={};for(let n=0;n<e.length;n++){let r=e[n];for(let e in r)if(e===`class`)t.class!==r.class&&(t.class=he([t.class,r.class]));else if(e===`style`)t.style=ue([t.style,r.style]);else if(a(e)){let n=t[e],i=r[e];i&&n!==i&&!(d(n)&&n.includes(i))?t[e]=n?[].concat(n,i):i:i==null&&n==null&&!o(e)&&(t[e]=i)}else e!==``&&(t[e]=r[e])}return t}function Wi(e,t,n,r=null){an(e,t,7,[n,r])}var Gi=Ar(),Ki=0;function qi(e,n,r){let i=e.type,a=(n?n.appContext:e.appContext)||Gi,o={uid:Ki++,vnode:e,type:i,parent:n,appContext:a,root:null,next:null,subTree:null,effect:null,update:null,job:null,scope:new we(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:n?n.provides:Object.create(a.provides),ids:n?n.ids:[``,0,0],accessCache:null,renderCache:[],components:null,directives:null,propsOptions:ei(i,a),emitsOptions:Lr(i,a),emit:null,emitted:null,propsDefaults:t,inheritAttrs:i.inheritAttrs,ctx:t,data:t,props:t,attrs:t,slots:t,refs:t,setupState:t,setupContext:null,suspense:r,suspenseId:r?r.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return o.ctx={_:o},o.root=n?n.root:o,o.emit=Fr.bind(null,o),e.ce&&e.ce(o),o}var K=null,Ji=()=>K||Cn,Yi,Xi;{let e=le(),t=(t,n)=>{let r;return(r=e[t])||(r=e[t]=[]),r.push(n),e=>{r.length>1?r.forEach(t=>t(e)):r[0](e)}};Yi=t(`__VUE_INSTANCE_SETTERS__`,e=>K=e),Xi=t(`__VUE_SSR_SETTERS__`,e=>ea=e)}var Zi=e=>{let t=K;return Yi(e),e.scope.on(),()=>{e.scope.off(),Yi(t)}},Qi=()=>{K&&K.scope.off(),Yi(null)};function $i(e){return e.vnode.shapeFlag&4}var ea=!1;function ta(e,t=!1,n=!1){t&&Xi(t);let{props:r,children:i}=e.vnode,a=$i(e);Yr(e,r,a,t),ci(e,i,n||t);let o=a?na(e,t):void 0;return t&&Xi(!1),o}function na(e,t){let n=e.type;e.accessCache=Object.create(null),e.proxy=new Proxy(e.ctx,mr);let{setup:r}=n;if(r){He();let n=e.setupContext=r.length>1?ca(e):null,i=Zi(e),a=rn(r,e,0,[e.props,n]),o=y(a);if(Ue(),i(),(o||e.sp)&&!Gn(e)&&Bn(e),o){if(a.then(Qi,Qi),t)return a.then(n=>{ra(e,n,t)}).catch(t=>{on(t,e,0)});e.asyncDep=a}else ra(e,a,t)}else oa(e,t)}function ra(e,t,n){h(t)?e.type.__ssrInlineRender?e.ssrRender=t:e.render=t:v(t)&&(e.setupState=Jt(t)),oa(e,n)}var ia,aa;function oa(e,t,n){let i=e.type;if(!e.render){if(!t&&ia&&!i.render){let t=i.template||xr(e).template;if(t){let{isCustomElement:n,compilerOptions:r}=e.appContext.config,{delimiters:a,compilerOptions:o}=i;i.render=ia(t,s(s({isCustomElement:n,delimiters:a},r),o))}}e.render=i.render||r,aa&&aa(e)}{let t=Zi(e);He();try{_r(e)}finally{Ue(),t()}}}var sa={get(e,t){return M(e,`get`,``),e[t]}};function ca(e){return{attrs:new Proxy(e.attrs,sa),slots:e.slots,emit:e.emit,expose:t=>{e.exposed=t||{}}}}function la(e){return e.exposed?e.exposeProxy||=new Proxy(Jt(Vt(e.exposed)),{get(t,n){if(n in t)return t[n];if(n in fr)return fr[n](e)},has(e,t){return t in e||t in fr}}):e.proxy}function ua(e){return h(e)&&`__vccOpts`in e}var da=(e,t)=>Xt(e,t,ea),fa=`3.5.32`,pa=void 0,ma=typeof window<`u`&&window.trustedTypes;if(ma)try{pa=ma.createPolicy(`vue`,{createHTML:e=>e})}catch{}var ha=pa?e=>pa.createHTML(e):e=>e,ga=`http://www.w3.org/2000/svg`,_a=`http://www.w3.org/1998/Math/MathML`,va=typeof document<`u`?document:null,ya=va&&va.createElement(`template`),ba={insert:(e,t,n)=>{t.insertBefore(e,n||null)},remove:e=>{let t=e.parentNode;t&&t.removeChild(e)},createElement:(e,t,n,r)=>{let i=t===`svg`?va.createElementNS(ga,e):t===`mathml`?va.createElementNS(_a,e):n?va.createElement(e,{is:n}):va.createElement(e);return e===`select`&&r&&r.multiple!=null&&i.setAttribute(`multiple`,r.multiple),i},createText:e=>va.createTextNode(e),createComment:e=>va.createComment(e),setText:(e,t)=>{e.nodeValue=t},setElementText:(e,t)=>{e.textContent=t},parentNode:e=>e.parentNode,nextSibling:e=>e.nextSibling,querySelector:e=>va.querySelector(e),setScopeId(e,t){e.setAttribute(t,``)},insertStaticContent(e,t,n,r,i,a){let o=n?n.previousSibling:t.lastChild;if(i&&(i===a||i.nextSibling))for(;t.insertBefore(i.cloneNode(!0),n),!(i===a||!(i=i.nextSibling)););else{ya.innerHTML=ha(r===`svg`?`<svg>${e}</svg>`:r===`mathml`?`<math>${e}</math>`:e);let i=ya.content;if(r===`svg`||r===`mathml`){let e=i.firstChild;for(;e.firstChild;)i.appendChild(e.firstChild);i.removeChild(e)}t.insertBefore(i,n)}return[o?o.nextSibling:t.firstChild,n?n.previousSibling:t.lastChild]}},xa=Symbol(`_vtc`);function Sa(e,t,n){let r=e[xa];r&&(t=(t?[t,...r]:[...r]).join(` `)),t==null?e.removeAttribute(`class`):n?e.setAttribute(`class`,t):e.className=t}var Ca=Symbol(`_vod`),wa=Symbol(`_vsh`),Ta=Symbol(``),Ea=/(?:^|;)\s*display\s*:/;function Da(e,t,n){let r=e.style,i=g(n),a=!1;if(n&&!i){if(t)if(g(t))for(let e of t.split(`;`)){let t=e.slice(0,e.indexOf(`:`)).trim();n[t]??ka(r,t,``)}else for(let e in t)n[e]??ka(r,e,``);for(let e in n)e===`display`&&(a=!0),ka(r,e,n[e])}else if(i){if(t!==n){let e=r[Ta];e&&(n+=`;`+e),r.cssText=n,a=Ea.test(n)}}else t&&e.removeAttribute(`style`);Ca in e&&(e[Ca]=a?r.display:``,e[wa]&&(r.display=`none`))}var Oa=/\s*!important$/;function ka(e,t,n){if(d(n))n.forEach(n=>ka(e,t,n));else if(n??=``,t.startsWith(`--`))e.setProperty(t,n);else{let r=Ma(e,t);Oa.test(n)?e.setProperty(E(r),n.replace(Oa,``),`important`):e[r]=n}}var Aa=[`Webkit`,`Moz`,`ms`],ja={};function Ma(e,t){let n=ja[t];if(n)return n;let r=T(t);if(r!==`filter`&&r in e)return ja[t]=r;r=ie(r);for(let n=0;n<Aa.length;n++){let i=Aa[n]+r;if(i in e)return ja[t]=i}return t}var Na=`http://www.w3.org/1999/xlink`;function Pa(e,t,n,r,i,a=_e(t)){r&&t.startsWith(`xlink:`)?n==null?e.removeAttributeNS(Na,t.slice(6,t.length)):e.setAttributeNS(Na,t,n):n==null||a&&!ve(n)?e.removeAttribute(t):e.setAttribute(t,a?``:_(n)?String(n):n)}function Fa(e,t,n,r,i){if(t===`innerHTML`||t===`textContent`){n!=null&&(e[t]=t===`innerHTML`?ha(n):n);return}let a=e.tagName;if(t===`value`&&a!==`PROGRESS`&&!a.includes(`-`)){let r=a===`OPTION`?e.getAttribute(`value`)||``:e.value,i=n==null?e.type===`checkbox`?`on`:``:String(n);(r!==i||!(`_value`in e))&&(e.value=i),n??e.removeAttribute(t),e._value=n;return}let o=!1;if(n===``||n==null){let r=typeof e[t];r===`boolean`?n=ve(n):n==null&&r===`string`?(n=``,o=!0):r===`number`&&(n=0,o=!0)}try{e[t]=n}catch{}o&&e.removeAttribute(i||t)}function Ia(e,t,n,r){e.addEventListener(t,n,r)}function La(e,t,n,r){e.removeEventListener(t,n,r)}var Ra=Symbol(`_vei`);function za(e,t,n,r,i=null){let a=e[Ra]||(e[Ra]={}),o=a[t];if(r&&o)o.value=r;else{let[n,s]=Va(t);r?Ia(e,n,a[t]=Ga(r,i),s):o&&(La(e,n,o,s),a[t]=void 0)}}var Ba=/(?:Once|Passive|Capture)$/;function Va(e){let t;if(Ba.test(e)){t={};let n;for(;n=e.match(Ba);)e=e.slice(0,e.length-n[0].length),t[n[0].toLowerCase()]=!0}return[e[2]===`:`?e.slice(3):E(e.slice(2)),t]}var Ha=0,Ua=Promise.resolve(),Wa=()=>Ha||=(Ua.then(()=>Ha=0),Date.now());function Ga(e,t){let n=e=>{if(!e._vts)e._vts=Date.now();else if(e._vts<=n.attached)return;an(Ka(e,n.value),t,5,[e])};return n.value=e,n.attached=Wa(),n}function Ka(e,t){if(d(t)){let n=e.stopImmediatePropagation;return e.stopImmediatePropagation=()=>{n.call(e),e._stopped=!0},t.map(e=>t=>!t._stopped&&e&&e(t))}else return t}var qa=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&e.charCodeAt(2)>96&&e.charCodeAt(2)<123,Ja=(e,t,n,r,i,s)=>{let c=i===`svg`;t===`class`?Sa(e,r,c):t===`style`?Da(e,n,r):a(t)?o(t)||za(e,t,n,r,s):(t[0]===`.`?(t=t.slice(1),!0):t[0]===`^`?(t=t.slice(1),!1):Ya(e,t,r,c))?(Fa(e,t,r),!e.tagName.includes(`-`)&&(t===`value`||t===`checked`||t===`selected`)&&Pa(e,t,r,c,s,t!==`value`)):e._isVueCE&&(Xa(e,t)||e._def.__asyncLoader&&(/[A-Z]/.test(t)||!g(r)))?Fa(e,T(t),r,s,t):(t===`true-value`?e._trueValue=r:t===`false-value`&&(e._falseValue=r),Pa(e,t,r,c))};function Ya(e,t,n,r){if(r)return!!(t===`innerHTML`||t===`textContent`||t in e&&qa(t)&&h(n));if(t===`spellcheck`||t===`draggable`||t===`translate`||t===`autocorrect`||t===`sandbox`&&e.tagName===`IFRAME`||t===`form`||t===`list`&&e.tagName===`INPUT`||t===`type`&&e.tagName===`TEXTAREA`)return!1;if(t===`width`||t===`height`){let t=e.tagName;if(t===`IMG`||t===`VIDEO`||t===`CANVAS`||t===`SOURCE`)return!1}return qa(t)&&g(n)?!1:t in e}function Xa(e,t){let n=e._def.props;if(!n)return!1;let r=T(t);return Array.isArray(n)?n.some(e=>T(e)===r):Object.keys(n).some(e=>T(e)===r)}var Za=s({patchProp:Ja},ba),Qa;function $a(){return Qa||=ui(Za)}var eo=((...e)=>{let t=$a().createApp(...e),{mount:n}=t;return t.mount=e=>{let r=no(e);if(!r)return;let i=t._component;!h(i)&&!i.render&&!i.template&&(i.template=r.innerHTML),r.nodeType===1&&(r.textContent=``);let a=n(r,!1,to(r));return r instanceof Element&&(r.removeAttribute(`v-cloak`),r.setAttribute(`data-v-app`,``)),a},t});function to(e){if(e instanceof SVGElement)return`svg`;if(typeof MathMLElement==`function`&&e instanceof MathMLElement)return`mathml`}function no(e){return g(e)?document.querySelector(e):e}var ro=`<header>
+(function(){let e=document.createElement(`link`).relList;if(e&&e.supports&&e.supports(`modulepreload`))return;for(let e of document.querySelectorAll(`link[rel="modulepreload"]`))n(e);new MutationObserver(e=>{for(let t of e)if(t.type===`childList`)for(let e of t.addedNodes)e.tagName===`LINK`&&e.rel===`modulepreload`&&n(e)}).observe(document,{childList:!0,subtree:!0});function t(e){let t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),e.crossOrigin===`use-credentials`?t.credentials=`include`:e.crossOrigin===`anonymous`?t.credentials=`omit`:t.credentials=`same-origin`,t}function n(e){if(e.ep)return;e.ep=!0;let n=t(e);fetch(e.href,n)}})();function e(e){let t=Object.create(null);for(let n of e.split(`,`))t[n]=1;return e=>e in t}var t={},n=[],r=()=>{},i=()=>!1,a=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),o=e=>e.startsWith(`onUpdate:`),s=Object.assign,c=(e,t)=>{let n=e.indexOf(t);n>-1&&e.splice(n,1)},l=Object.prototype.hasOwnProperty,u=(e,t)=>l.call(e,t),d=Array.isArray,f=e=>x(e)===`[object Map]`,p=e=>x(e)===`[object Set]`,m=e=>x(e)===`[object Date]`,h=e=>typeof e==`function`,g=e=>typeof e==`string`,_=e=>typeof e==`symbol`,v=e=>typeof e==`object`&&!!e,y=e=>(v(e)||h(e))&&h(e.then)&&h(e.catch),b=Object.prototype.toString,x=e=>b.call(e),ee=e=>x(e).slice(8,-1),S=e=>x(e)===`[object Object]`,te=e=>g(e)&&e!==`NaN`&&e[0]!==`-`&&``+parseInt(e,10)===e,ne=e(`,key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted`),re=e=>{let t=Object.create(null);return(n=>t[n]||(t[n]=e(n)))},ie=/-\w/g,C=re(e=>e.replace(ie,e=>e.slice(1).toUpperCase())),ae=/\B([A-Z])/g,w=re(e=>e.replace(ae,`-$1`).toLowerCase()),oe=re(e=>e.charAt(0).toUpperCase()+e.slice(1)),se=re(e=>e?`on${oe(e)}`:``),T=(e,t)=>!Object.is(e,t),ce=(e,...t)=>{for(let n=0;n<e.length;n++)e[n](...t)},E=(e,t,n,r=!1)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:r,value:n})},le=e=>{let t=parseFloat(e);return isNaN(t)?e:t},ue,de=()=>ue||=typeof globalThis<`u`?globalThis:typeof self<`u`?self:typeof window<`u`?window:typeof global<`u`?global:{};function fe(e){if(d(e)){let t={};for(let n=0;n<e.length;n++){let r=e[n],i=g(r)?ge(r):fe(r);if(i)for(let e in i)t[e]=i[e]}return t}else if(g(e)||v(e))return e}var pe=/;(?![^(]*\))/g,me=/:([^]+)/,he=/\/\*[^]*?\*\//g;function ge(e){let t={};return e.replace(he,``).split(pe).forEach(e=>{if(e){let n=e.split(me);n.length>1&&(t[n[0].trim()]=n[1].trim())}}),t}function _e(e){let t=``;if(g(e))t=e;else if(d(e))for(let n=0;n<e.length;n++){let r=_e(e[n]);r&&(t+=r+` `)}else if(v(e))for(let n in e)e[n]&&(t+=n+` `);return t.trim()}var ve=`itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`,ye=e(ve);ve+``;function be(e){return!!e||e===``}function xe(e,t){if(e.length!==t.length)return!1;let n=!0;for(let r=0;n&&r<e.length;r++)n=Se(e[r],t[r]);return n}function Se(e,t){if(e===t)return!0;let n=m(e),r=m(t);if(n||r)return n&&r?e.getTime()===t.getTime():!1;if(n=_(e),r=_(t),n||r)return e===t;if(n=d(e),r=d(t),n||r)return n&&r?xe(e,t):!1;if(n=v(e),r=v(t),n||r){if(!n||!r||Object.keys(e).length!==Object.keys(t).length)return!1;for(let n in e){let r=e.hasOwnProperty(n),i=t.hasOwnProperty(n);if(r&&!i||!r&&i||!Se(e[n],t[n]))return!1}}return String(e)===String(t)}function Ce(e,t){return e.findIndex(e=>Se(e,t))}var we=e=>!!(e&&e.__v_isRef===!0),D=e=>g(e)?e:e==null?``:d(e)||v(e)&&(e.toString===b||!h(e.toString))?we(e)?D(e.value):JSON.stringify(e,Te,2):String(e),Te=(e,t)=>we(t)?Te(e,t.value):f(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((e,[t,n],r)=>(e[Ee(t,r)+` =>`]=n,e),{})}:p(t)?{[`Set(${t.size})`]:[...t.values()].map(e=>Ee(e))}:_(t)?Ee(t):v(t)&&!d(t)&&!S(t)?String(t):t,Ee=(e,t=``)=>_(e)?`Symbol(${e.description??t})`:e,O,De=class{constructor(e=!1){this.detached=e,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.__v_skip=!0,this.parent=O,!e&&O&&(this.index=(O.scopes||=[]).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].pause();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].resume();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].resume()}}run(e){if(this._active){let t=O;try{return O=this,e()}finally{O=t}}}on(){++this._on===1&&(this.prevScope=O,O=this)}off(){this._on>0&&--this._on===0&&(O=this.prevScope,this.prevScope=void 0)}stop(e){if(this._active){this._active=!1;let t,n;for(t=0,n=this.effects.length;t<n;t++)this.effects[t].stop();for(this.effects.length=0,t=0,n=this.cleanups.length;t<n;t++)this.cleanups[t]();if(this.cleanups.length=0,this.scopes){for(t=0,n=this.scopes.length;t<n;t++)this.scopes[t].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!e){let e=this.parent.scopes.pop();e&&e!==this&&(this.parent.scopes[this.index]=e,e.index=this.index)}this.parent=void 0}}};function Oe(){return O}var k,ke=new WeakSet,Ae=class{constructor(e){this.fn=e,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,O&&O.active&&O.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,ke.has(this)&&(ke.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||Pe(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,qe(this),Le(this);let e=k,t=Ue;k=this,Ue=!0;try{return this.fn()}finally{Re(this),k=e,Ue=t,this.flags&=-3}}stop(){if(this.flags&1){for(let e=this.deps;e;e=e.nextDep)Ve(e);this.deps=this.depsTail=void 0,qe(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?ke.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){ze(this)&&this.run()}get dirty(){return ze(this)}},je=0,Me,Ne;function Pe(e,t=!1){if(e.flags|=8,t){e.next=Ne,Ne=e;return}e.next=Me,Me=e}function Fe(){je++}function Ie(){if(--je>0)return;if(Ne){let e=Ne;for(Ne=void 0;e;){let t=e.next;e.next=void 0,e.flags&=-9,e=t}}let e;for(;Me;){let t=Me;for(Me=void 0;t;){let n=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(t){e||=t}t=n}}if(e)throw e}function Le(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function Re(e){let t,n=e.depsTail,r=n;for(;r;){let e=r.prevDep;r.version===-1?(r===n&&(n=e),Ve(r),He(r)):t=r,r.dep.activeLink=r.prevActiveLink,r.prevActiveLink=void 0,r=e}e.deps=t,e.depsTail=n}function ze(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(Be(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function Be(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===Je)||(e.globalVersion=Je,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!ze(e))))return;e.flags|=2;let t=e.dep,n=k,r=Ue;k=e,Ue=!0;try{Le(e);let n=e.fn(e._value);(t.version===0||T(n,e._value))&&(e.flags|=128,e._value=n,t.version++)}catch(e){throw t.version++,e}finally{k=n,Ue=r,Re(e),e.flags&=-3}}function Ve(e,t=!1){let{dep:n,prevSub:r,nextSub:i}=e;if(r&&(r.nextSub=i,e.prevSub=void 0),i&&(i.prevSub=r,e.nextSub=void 0),n.subs===e&&(n.subs=r,!r&&n.computed)){n.computed.flags&=-5;for(let e=n.computed.deps;e;e=e.nextDep)Ve(e,!0)}!t&&!--n.sc&&n.map&&n.map.delete(n.key)}function He(e){let{prevDep:t,nextDep:n}=e;t&&(t.nextDep=n,e.prevDep=void 0),n&&(n.prevDep=t,e.nextDep=void 0)}var Ue=!0,We=[];function Ge(){We.push(Ue),Ue=!1}function Ke(){let e=We.pop();Ue=e===void 0?!0:e}function qe(e){let{cleanup:t}=e;if(e.cleanup=void 0,t){let e=k;k=void 0;try{t()}finally{k=e}}}var Je=0,Ye=class{constructor(e,t){this.sub=e,this.dep=t,this.version=t.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}},Xe=class{constructor(e){this.computed=e,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(e){if(!k||!Ue||k===this.computed)return;let t=this.activeLink;if(t===void 0||t.sub!==k)t=this.activeLink=new Ye(k,this),k.deps?(t.prevDep=k.depsTail,k.depsTail.nextDep=t,k.depsTail=t):k.deps=k.depsTail=t,Ze(t);else if(t.version===-1&&(t.version=this.version,t.nextDep)){let e=t.nextDep;e.prevDep=t.prevDep,t.prevDep&&(t.prevDep.nextDep=e),t.prevDep=k.depsTail,t.nextDep=void 0,k.depsTail.nextDep=t,k.depsTail=t,k.deps===t&&(k.deps=e)}return t}trigger(e){this.version++,Je++,this.notify(e)}notify(e){Fe();try{for(let e=this.subs;e;e=e.prevSub)e.sub.notify()&&e.sub.dep.notify()}finally{Ie()}}};function Ze(e){if(e.dep.sc++,e.sub.flags&4){let t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let e=t.deps;e;e=e.nextDep)Ze(e)}let n=e.dep.subs;n!==e&&(e.prevSub=n,n&&(n.nextSub=e)),e.dep.subs=e}}var Qe=new WeakMap,$e=Symbol(``),et=Symbol(``),tt=Symbol(``);function A(e,t,n){if(Ue&&k){let t=Qe.get(e);t||Qe.set(e,t=new Map);let r=t.get(n);r||(t.set(n,r=new Xe),r.map=t,r.key=n),r.track()}}function nt(e,t,n,r,i,a){let o=Qe.get(e);if(!o){Je++;return}let s=e=>{e&&e.trigger()};if(Fe(),t===`clear`)o.forEach(s);else{let i=d(e),a=i&&te(n);if(i&&n===`length`){let e=Number(r);o.forEach((t,n)=>{(n===`length`||n===tt||!_(n)&&n>=e)&&s(t)})}else switch((n!==void 0||o.has(void 0))&&s(o.get(n)),a&&s(o.get(tt)),t){case`add`:i?a&&s(o.get(`length`)):(s(o.get($e)),f(e)&&s(o.get(et)));break;case`delete`:i||(s(o.get($e)),f(e)&&s(o.get(et)));break;case`set`:f(e)&&s(o.get($e));break}}Ie()}function rt(e){let t=j(e);return t===e?t:(A(t,`iterate`,tt),Ut(e)?t:t.map(Kt))}function it(e){return A(e=j(e),`iterate`,tt),e}function at(e,t){return Ht(e)?qt(Vt(e)?Kt(t):t):Kt(t)}var ot={__proto__:null,[Symbol.iterator](){return st(this,Symbol.iterator,e=>at(this,e))},concat(...e){return rt(this).concat(...e.map(e=>d(e)?rt(e):e))},entries(){return st(this,`entries`,e=>(e[1]=at(this,e[1]),e))},every(e,t){return lt(this,`every`,e,t,void 0,arguments)},filter(e,t){return lt(this,`filter`,e,t,e=>e.map(e=>at(this,e)),arguments)},find(e,t){return lt(this,`find`,e,t,e=>at(this,e),arguments)},findIndex(e,t){return lt(this,`findIndex`,e,t,void 0,arguments)},findLast(e,t){return lt(this,`findLast`,e,t,e=>at(this,e),arguments)},findLastIndex(e,t){return lt(this,`findLastIndex`,e,t,void 0,arguments)},forEach(e,t){return lt(this,`forEach`,e,t,void 0,arguments)},includes(...e){return dt(this,`includes`,e)},indexOf(...e){return dt(this,`indexOf`,e)},join(e){return rt(this).join(e)},lastIndexOf(...e){return dt(this,`lastIndexOf`,e)},map(e,t){return lt(this,`map`,e,t,void 0,arguments)},pop(){return ft(this,`pop`)},push(...e){return ft(this,`push`,e)},reduce(e,...t){return ut(this,`reduce`,e,t)},reduceRight(e,...t){return ut(this,`reduceRight`,e,t)},shift(){return ft(this,`shift`)},some(e,t){return lt(this,`some`,e,t,void 0,arguments)},splice(...e){return ft(this,`splice`,e)},toReversed(){return rt(this).toReversed()},toSorted(e){return rt(this).toSorted(e)},toSpliced(...e){return rt(this).toSpliced(...e)},unshift(...e){return ft(this,`unshift`,e)},values(){return st(this,`values`,e=>at(this,e))}};function st(e,t,n){let r=it(e),i=r[t]();return r!==e&&!Ut(e)&&(i._next=i.next,i.next=()=>{let e=i._next();return e.done||(e.value=n(e.value)),e}),i}var ct=Array.prototype;function lt(e,t,n,r,i,a){let o=it(e),s=o!==e&&!Ut(e),c=o[t];if(c!==ct[t]){let t=c.apply(e,a);return s?Kt(t):t}let l=n;o!==e&&(s?l=function(t,r){return n.call(this,at(e,t),r,e)}:n.length>2&&(l=function(t,r){return n.call(this,t,r,e)}));let u=c.call(o,l,r);return s&&i?i(u):u}function ut(e,t,n,r){let i=it(e),a=i!==e&&!Ut(e),o=n,s=!1;i!==e&&(a?(s=r.length===0,o=function(t,r,i){return s&&(s=!1,t=at(e,t)),n.call(this,t,at(e,r),i,e)}):n.length>3&&(o=function(t,r,i){return n.call(this,t,r,i,e)}));let c=i[t](o,...r);return s?at(e,c):c}function dt(e,t,n){let r=j(e);A(r,`iterate`,tt);let i=r[t](...n);return(i===-1||i===!1)&&Wt(n[0])?(n[0]=j(n[0]),r[t](...n)):i}function ft(e,t,n=[]){Ge(),Fe();let r=j(e)[t].apply(e,n);return Ie(),Ke(),r}var pt=e(`__proto__,__v_isRef,__isVue`),mt=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!==`arguments`&&e!==`caller`).map(e=>Symbol[e]).filter(_));function ht(e){_(e)||(e=String(e));let t=j(this);return A(t,`has`,e),t.hasOwnProperty(e)}var gt=class{constructor(e=!1,t=!1){this._isReadonly=e,this._isShallow=t}get(e,t,n){if(t===`__v_skip`)return e.__v_skip;let r=this._isReadonly,i=this._isShallow;if(t===`__v_isReactive`)return!r;if(t===`__v_isReadonly`)return r;if(t===`__v_isShallow`)return i;if(t===`__v_raw`)return n===(r?i?Pt:Nt:i?Mt:jt).get(e)||Object.getPrototypeOf(e)===Object.getPrototypeOf(n)?e:void 0;let a=d(e);if(!r){let e;if(a&&(e=ot[t]))return e;if(t===`hasOwnProperty`)return ht}let o=Reflect.get(e,t,M(e)?e:n);if((_(t)?mt.has(t):pt(t))||(r||A(e,`get`,t),i))return o;if(M(o)){let e=a&&te(t)?o:o.value;return r&&v(e)?zt(e):e}return v(o)?r?zt(o):Lt(o):o}},_t=class extends gt{constructor(e=!1){super(!1,e)}set(e,t,n,r){let i=e[t],a=d(e)&&te(t);if(!this._isShallow){let e=Ht(i);if(!Ut(n)&&!Ht(n)&&(i=j(i),n=j(n)),!a&&M(i)&&!M(n))return e||(i.value=n),!0}let o=a?Number(t)<e.length:u(e,t),s=Reflect.set(e,t,n,M(e)?e:r);return e===j(r)&&(o?T(n,i)&&nt(e,`set`,t,n,i):nt(e,`add`,t,n)),s}deleteProperty(e,t){let n=u(e,t),r=e[t],i=Reflect.deleteProperty(e,t);return i&&n&&nt(e,`delete`,t,void 0,r),i}has(e,t){let n=Reflect.has(e,t);return(!_(t)||!mt.has(t))&&A(e,`has`,t),n}ownKeys(e){return A(e,`iterate`,d(e)?`length`:$e),Reflect.ownKeys(e)}},vt=class extends gt{constructor(e=!1){super(!0,e)}set(e,t){return!0}deleteProperty(e,t){return!0}},yt=new _t,bt=new vt,xt=new _t(!0),St=e=>e,Ct=e=>Reflect.getPrototypeOf(e);function wt(e,t,n){return function(...r){let i=this.__v_raw,a=j(i),o=f(a),c=e===`entries`||e===Symbol.iterator&&o,l=e===`keys`&&o,u=i[e](...r),d=n?St:t?qt:Kt;return!t&&A(a,`iterate`,l?et:$e),s(Object.create(u),{next(){let{value:e,done:t}=u.next();return t?{value:e,done:t}:{value:c?[d(e[0]),d(e[1])]:d(e),done:t}}})}}function Tt(e){return function(...t){return e===`delete`?!1:e===`clear`?void 0:this}}function Et(e,t){let n={get(n){let r=this.__v_raw,i=j(r),a=j(n);e||(T(n,a)&&A(i,`get`,n),A(i,`get`,a));let{has:o}=Ct(i),s=t?St:e?qt:Kt;if(o.call(i,n))return s(r.get(n));if(o.call(i,a))return s(r.get(a));r!==i&&r.get(n)},get size(){let t=this.__v_raw;return!e&&A(j(t),`iterate`,$e),t.size},has(t){let n=this.__v_raw,r=j(n),i=j(t);return e||(T(t,i)&&A(r,`has`,t),A(r,`has`,i)),t===i?n.has(t):n.has(t)||n.has(i)},forEach(n,r){let i=this,a=i.__v_raw,o=j(a),s=t?St:e?qt:Kt;return!e&&A(o,`iterate`,$e),a.forEach((e,t)=>n.call(r,s(e),s(t),i))}};return s(n,e?{add:Tt(`add`),set:Tt(`set`),delete:Tt(`delete`),clear:Tt(`clear`)}:{add(e){let n=j(this),r=Ct(n),i=j(e),a=!t&&!Ut(e)&&!Ht(e)?i:e;return r.has.call(n,a)||T(e,a)&&r.has.call(n,e)||T(i,a)&&r.has.call(n,i)||(n.add(a),nt(n,`add`,a,a)),this},set(e,n){!t&&!Ut(n)&&!Ht(n)&&(n=j(n));let r=j(this),{has:i,get:a}=Ct(r),o=i.call(r,e);o||=(e=j(e),i.call(r,e));let s=a.call(r,e);return r.set(e,n),o?T(n,s)&&nt(r,`set`,e,n,s):nt(r,`add`,e,n),this},delete(e){let t=j(this),{has:n,get:r}=Ct(t),i=n.call(t,e);i||=(e=j(e),n.call(t,e));let a=r?r.call(t,e):void 0,o=t.delete(e);return i&&nt(t,`delete`,e,void 0,a),o},clear(){let e=j(this),t=e.size!==0,n=e.clear();return t&&nt(e,`clear`,void 0,void 0,void 0),n}}),[`keys`,`values`,`entries`,Symbol.iterator].forEach(r=>{n[r]=wt(r,e,t)}),n}function Dt(e,t){let n=Et(e,t);return(t,r,i)=>r===`__v_isReactive`?!e:r===`__v_isReadonly`?e:r===`__v_raw`?t:Reflect.get(u(n,r)&&r in t?n:t,r,i)}var Ot={get:Dt(!1,!1)},kt={get:Dt(!1,!0)},At={get:Dt(!0,!1)},jt=new WeakMap,Mt=new WeakMap,Nt=new WeakMap,Pt=new WeakMap;function Ft(e){switch(e){case`Object`:case`Array`:return 1;case`Map`:case`Set`:case`WeakMap`:case`WeakSet`:return 2;default:return 0}}function It(e){return e.__v_skip||!Object.isExtensible(e)?0:Ft(ee(e))}function Lt(e){return Ht(e)?e:Bt(e,!1,yt,Ot,jt)}function Rt(e){return Bt(e,!1,xt,kt,Mt)}function zt(e){return Bt(e,!0,bt,At,Nt)}function Bt(e,t,n,r,i){if(!v(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;let a=It(e);if(a===0)return e;let o=i.get(e);if(o)return o;let s=new Proxy(e,a===2?r:n);return i.set(e,s),s}function Vt(e){return Ht(e)?Vt(e.__v_raw):!!(e&&e.__v_isReactive)}function Ht(e){return!!(e&&e.__v_isReadonly)}function Ut(e){return!!(e&&e.__v_isShallow)}function Wt(e){return e?!!e.__v_raw:!1}function j(e){let t=e&&e.__v_raw;return t?j(t):e}function Gt(e){return!u(e,`__v_skip`)&&Object.isExtensible(e)&&E(e,`__v_skip`,!0),e}var Kt=e=>v(e)?Lt(e):e,qt=e=>v(e)?zt(e):e;function M(e){return e?e.__v_isRef===!0:!1}function Jt(e){return Yt(e,!1)}function Yt(e,t){return M(e)?e:new Xt(e,t)}var Xt=class{constructor(e,t){this.dep=new Xe,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=t?e:j(e),this._value=t?e:Kt(e),this.__v_isShallow=t}get value(){return this.dep.track(),this._value}set value(e){let t=this._rawValue,n=this.__v_isShallow||Ut(e)||Ht(e);e=n?e:j(e),T(e,t)&&(this._rawValue=e,this._value=n?e:Kt(e),this.dep.trigger())}};function N(e){return M(e)?e.value:e}var Zt={get:(e,t,n)=>t===`__v_raw`?e:N(Reflect.get(e,t,n)),set:(e,t,n,r)=>{let i=e[t];return M(i)&&!M(n)?(i.value=n,!0):Reflect.set(e,t,n,r)}};function Qt(e){return Vt(e)?e:new Proxy(e,Zt)}var $t=class{constructor(e,t,n){this.fn=e,this.setter=t,this._value=void 0,this.dep=new Xe(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=Je-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!t,this.isSSR=n}notify(){if(this.flags|=16,!(this.flags&8)&&k!==this)return Pe(this,!0),!0}get value(){let e=this.dep.track();return Be(this),e&&(e.version=this.dep.version),this._value}set value(e){this.setter&&this.setter(e)}};function en(e,t,n=!1){let r,i;return h(e)?r=e:(r=e.get,i=e.set),new $t(r,i,n)}var tn={},nn=new WeakMap,rn=void 0;function an(e,t=!1,n=rn){if(n){let t=nn.get(n);t||nn.set(n,t=[]),t.push(e)}}function on(e,n,i=t){let{immediate:a,deep:o,once:s,scheduler:l,augmentJob:u,call:f}=i,p=e=>o?e:Ut(e)||o===!1||o===0?sn(e,1):sn(e),m,g,_,v,y=!1,b=!1;if(M(e)?(g=()=>e.value,y=Ut(e)):Vt(e)?(g=()=>p(e),y=!0):d(e)?(b=!0,y=e.some(e=>Vt(e)||Ut(e)),g=()=>e.map(e=>{if(M(e))return e.value;if(Vt(e))return p(e);if(h(e))return f?f(e,2):e()})):g=h(e)?n?f?()=>f(e,2):e:()=>{if(_){Ge();try{_()}finally{Ke()}}let t=rn;rn=m;try{return f?f(e,3,[v]):e(v)}finally{rn=t}}:r,n&&o){let e=g,t=o===!0?1/0:o;g=()=>sn(e(),t)}let x=Oe(),ee=()=>{m.stop(),x&&x.active&&c(x.effects,m)};if(s&&n){let e=n;n=(...t)=>{e(...t),ee()}}let S=b?Array(e.length).fill(tn):tn,te=e=>{if(!(!(m.flags&1)||!m.dirty&&!e))if(n){let e=m.run();if(o||y||(b?e.some((e,t)=>T(e,S[t])):T(e,S))){_&&_();let t=rn;rn=m;try{let t=[e,S===tn?void 0:b&&S[0]===tn?[]:S,v];S=e,f?f(n,3,t):n(...t)}finally{rn=t}}}else m.run()};return u&&u(te),m=new Ae(g),m.scheduler=l?()=>l(te,!1):te,v=e=>an(e,!1,m),_=m.onStop=()=>{let e=nn.get(m);if(e){if(f)f(e,4);else for(let t of e)t();nn.delete(m)}},n?a?te(!0):S=m.run():l?l(te.bind(null,!0),!0):m.run(),ee.pause=m.pause.bind(m),ee.resume=m.resume.bind(m),ee.stop=ee,ee}function sn(e,t=1/0,n){if(t<=0||!v(e)||e.__v_skip||(n||=new Map,(n.get(e)||0)>=t))return e;if(n.set(e,t),t--,M(e))sn(e.value,t,n);else if(d(e))for(let r=0;r<e.length;r++)sn(e[r],t,n);else if(p(e)||f(e))e.forEach(e=>{sn(e,t,n)});else if(S(e)){for(let r in e)sn(e[r],t,n);for(let r of Object.getOwnPropertySymbols(e))Object.prototype.propertyIsEnumerable.call(e,r)&&sn(e[r],t,n)}return e}function cn(e,t,n,r){try{return r?e(...r):e()}catch(e){un(e,t,n)}}function ln(e,t,n,r){if(h(e)){let i=cn(e,t,n,r);return i&&y(i)&&i.catch(e=>{un(e,t,n)}),i}if(d(e)){let i=[];for(let a=0;a<e.length;a++)i.push(ln(e[a],t,n,r));return i}}function un(e,n,r,i=!0){let a=n?n.vnode:null,{errorHandler:o,throwUnhandledErrorInProduction:s}=n&&n.appContext.config||t;if(n){let t=n.parent,i=n.proxy,a=`https://vuejs.org/error-reference/#runtime-${r}`;for(;t;){let n=t.ec;if(n){for(let t=0;t<n.length;t++)if(n[t](e,i,a)===!1)return}t=t.parent}if(o){Ge(),cn(o,null,10,[e,i,a]),Ke();return}}dn(e,r,a,i,s)}function dn(e,t,n,r=!0,i=!1){if(i)throw e;console.error(e)}var P=[],fn=-1,pn=[],mn=null,hn=0,gn=Promise.resolve(),_n=null;function vn(e){let t=_n||gn;return e?t.then(this?e.bind(this):e):t}function yn(e){let t=fn+1,n=P.length;for(;t<n;){let r=t+n>>>1,i=P[r],a=Tn(i);a<e||a===e&&i.flags&2?t=r+1:n=r}return t}function bn(e){if(!(e.flags&1)){let t=Tn(e),n=P[P.length-1];!n||!(e.flags&2)&&t>=Tn(n)?P.push(e):P.splice(yn(t),0,e),e.flags|=1,xn()}}function xn(){_n||=gn.then(En)}function Sn(e){d(e)?pn.push(...e):mn&&e.id===-1?mn.splice(hn+1,0,e):e.flags&1||(pn.push(e),e.flags|=1),xn()}function Cn(e,t,n=fn+1){for(;n<P.length;n++){let t=P[n];if(t&&t.flags&2){if(e&&t.id!==e.uid)continue;P.splice(n,1),n--,t.flags&4&&(t.flags&=-2),t(),t.flags&4||(t.flags&=-2)}}}function wn(e){if(pn.length){let e=[...new Set(pn)].sort((e,t)=>Tn(e)-Tn(t));if(pn.length=0,mn){mn.push(...e);return}for(mn=e,hn=0;hn<mn.length;hn++){let e=mn[hn];e.flags&4&&(e.flags&=-2),e.flags&8||e(),e.flags&=-2}mn=null,hn=0}}var Tn=e=>e.id==null?e.flags&2?-1:1/0:e.id;function En(e){try{for(fn=0;fn<P.length;fn++){let e=P[fn];e&&!(e.flags&8)&&(e.flags&4&&(e.flags&=-2),cn(e,e.i,e.i?15:14),e.flags&4||(e.flags&=-2))}}finally{for(;fn<P.length;fn++){let e=P[fn];e&&(e.flags&=-2)}fn=-1,P.length=0,wn(e),_n=null,(P.length||pn.length)&&En(e)}}var Dn=null,On=null;function kn(e){let t=Dn;return Dn=e,On=e&&e.type.__scopeId||null,t}function An(e,t=Dn,n){if(!t||e._n)return e;let r=(...n)=>{r._d&&Mi(-1);let i=kn(t),a;try{a=e(...n)}finally{kn(i),r._d&&Mi(1)}return a};return r._n=!0,r._c=!0,r._d=!0,r}function F(e,n){if(Dn===null)return e;let r=ma(Dn),i=e.dirs||=[];for(let e=0;e<n.length;e++){let[a,o,s,c=t]=n[e];a&&(h(a)&&(a={mounted:a,updated:a}),a.deep&&sn(o),i.push({dir:a,instance:r,value:o,oldValue:void 0,arg:s,modifiers:c}))}return e}function jn(e,t,n,r){let i=e.dirs,a=t&&t.dirs;for(let o=0;o<i.length;o++){let s=i[o];a&&(s.oldValue=a[o].value);let c=s.dir[r];c&&(Ge(),ln(c,n,8,[e.el,s,e,t]),Ke())}}function Mn(e,t){if(W){let n=W.provides,r=W.parent&&W.parent.provides;r===n&&(n=W.provides=Object.create(r)),n[e]=t}}function Nn(e,t,n=!1){let r=$i();if(r||Lr){let i=Lr?Lr._context.provides:r?r.parent==null||r.ce?r.vnode.appContext&&r.vnode.appContext.provides:r.parent.provides:void 0;if(i&&e in i)return i[e];if(arguments.length>1)return n&&h(t)?t.call(r&&r.proxy):t}}var Pn=Symbol.for(`v-scx`),Fn=()=>Nn(Pn);function In(e,t,n){return Ln(e,t,n)}function Ln(e,n,i=t){let{immediate:a,deep:o,flush:c,once:l}=i,u=s({},i),d=n&&a||!n&&c!==`post`,f;if(aa){if(c===`sync`){let e=Fn();f=e.__watcherHandles||=[]}else if(!d){let e=()=>{};return e.stop=r,e.resume=r,e.pause=r,e}}let p=W;u.call=(e,t,n)=>ln(e,p,t,n);let m=!1;c===`post`?u.scheduler=e=>{L(e,p&&p.suspense)}:c!==`sync`&&(m=!0,u.scheduler=(e,t)=>{t?e():bn(e)}),u.augmentJob=e=>{n&&(e.flags|=4),m&&(e.flags|=2,p&&(e.id=p.uid,e.i=p))};let h=on(e,n,u);return aa&&(f?f.push(h):d&&h()),h}function Rn(e,t,n){let r=this.proxy,i=g(e)?e.includes(`.`)?zn(r,e):()=>r[e]:e.bind(r,r),a;h(t)?a=t:(a=t.handler,n=t);let o=na(this),s=Ln(i,a.bind(r),n);return o(),s}function zn(e,t){let n=t.split(`.`);return()=>{let t=e;for(let e=0;e<n.length&&t;e++)t=t[n[e]];return t}}var Bn=Symbol(`_vte`),Vn=e=>e.__isTeleport,Hn=Symbol(`_leaveCb`);function Un(e,t){e.shapeFlag&6&&e.component?(e.transition=t,Un(e.component.subTree,t)):e.shapeFlag&128?(e.ssContent.transition=t.clone(e.ssContent),e.ssFallback.transition=t.clone(e.ssFallback)):e.transition=t}function Wn(e){e.ids=[e.ids[0]+ e.ids[2]+++`-`,0,0]}function Gn(e,t){let n;return!!((n=Object.getOwnPropertyDescriptor(e,t))&&!n.configurable)}var Kn=new WeakMap;function qn(e,n,r,a,o=!1){if(d(e)){e.forEach((e,t)=>qn(e,n&&(d(n)?n[t]:n),r,a,o));return}if(Yn(a)&&!o){a.shapeFlag&512&&a.type.__asyncResolved&&a.component.subTree.component&&qn(e,n,r,a.component.subTree);return}let s=a.shapeFlag&4?ma(a.component):a.el,l=o?null:s,{i:f,r:p}=e,m=n&&n.r,_=f.refs===t?f.refs={}:f.refs,v=f.setupState,y=j(v),b=v===t?i:e=>Gn(_,e)?!1:u(y,e),x=(e,t)=>!(t&&Gn(_,t));if(m!=null&&m!==p){if(Jn(n),g(m))_[m]=null,b(m)&&(v[m]=null);else if(M(m)){let e=n;x(m,e.k)&&(m.value=null),e.k&&(_[e.k]=null)}}if(h(p))cn(p,f,12,[l,_]);else{let t=g(p),n=M(p);if(t||n){let i=()=>{if(e.f){let n=t?b(p)?v[p]:_[p]:x(p)||!e.k?p.value:_[e.k];if(o)d(n)&&c(n,s);else if(d(n))n.includes(s)||n.push(s);else if(t)_[p]=[s],b(p)&&(v[p]=_[p]);else{let t=[s];x(p,e.k)&&(p.value=t),e.k&&(_[e.k]=t)}}else t?(_[p]=l,b(p)&&(v[p]=l)):n&&(x(p,e.k)&&(p.value=l),e.k&&(_[e.k]=l))};if(l){let t=()=>{i(),Kn.delete(e)};t.id=-1,Kn.set(e,t),L(t,r)}else Jn(e),i()}}}function Jn(e){let t=Kn.get(e);t&&(t.flags|=8,Kn.delete(e))}de().requestIdleCallback,de().cancelIdleCallback;var Yn=e=>!!e.type.__asyncLoader,Xn=e=>e.type.__isKeepAlive;function Zn(e,t){$n(e,`a`,t)}function Qn(e,t){$n(e,`da`,t)}function $n(e,t,n=W){let r=e.__wdc||=()=>{let t=n;for(;t;){if(t.isDeactivated)return;t=t.parent}return e()};if(tr(t,r,n),n){let e=n.parent;for(;e&&e.parent;)Xn(e.parent.vnode)&&er(r,t,n,e),e=e.parent}}function er(e,t,n,r){let i=tr(t,e,r,!0);cr(()=>{c(r[t],i)},n)}function tr(e,t,n=W,r=!1){if(n){let i=n[e]||(n[e]=[]),a=t.__weh||=(...r)=>{Ge();let i=na(n),a=ln(t,n,e,r);return i(),Ke(),a};return r?i.unshift(a):i.push(a),a}}var nr=e=>(t,n=W)=>{(!aa||e===`sp`)&&tr(e,(...e)=>t(...e),n)},rr=nr(`bm`),ir=nr(`m`),ar=nr(`bu`),or=nr(`u`),sr=nr(`bum`),cr=nr(`um`),lr=nr(`sp`),ur=nr(`rtg`),dr=nr(`rtc`);function fr(e,t=W){tr(`ec`,e,t)}var pr=Symbol.for(`v-ndc`);function mr(e,t,n,r){let i,a=n&&n[r],o=d(e);if(o||g(e)){let n=o&&Vt(e),r=!1,s=!1;n&&(r=!Ut(e),s=Ht(e),e=it(e)),i=Array(e.length);for(let n=0,o=e.length;n<o;n++)i[n]=t(r?s?qt(Kt(e[n])):Kt(e[n]):e[n],n,void 0,a&&a[n])}else if(typeof e==`number`){i=Array(e);for(let n=0;n<e;n++)i[n]=t(n+1,n,void 0,a&&a[n])}else if(v(e))if(e[Symbol.iterator])i=Array.from(e,(e,n)=>t(e,n,void 0,a&&a[n]));else{let n=Object.keys(e);i=Array(n.length);for(let r=0,o=n.length;r<o;r++){let o=n[r];i[r]=t(e[o],o,r,a&&a[r])}}else i=[];return n&&(n[r]=i),i}var hr=e=>e?ia(e)?ma(e):hr(e.parent):null,gr=s(Object.create(null),{$:e=>e,$el:e=>e.vnode.el,$data:e=>e.data,$props:e=>e.props,$attrs:e=>e.attrs,$slots:e=>e.slots,$refs:e=>e.refs,$parent:e=>hr(e.parent),$root:e=>hr(e.root),$host:e=>e.ce,$emit:e=>e.emit,$options:e=>Tr(e),$forceUpdate:e=>e.f||=()=>{bn(e.update)},$nextTick:e=>e.n||=vn.bind(e.proxy),$watch:e=>Rn.bind(e)}),_r=(e,n)=>e!==t&&!e.__isScriptSetup&&u(e,n),vr={get({_:e},n){if(n===`__v_skip`)return!0;let{ctx:r,setupState:i,data:a,props:o,accessCache:s,type:c,appContext:l}=e;if(n[0]!==`$`){let e=s[n];if(e!==void 0)switch(e){case 1:return i[n];case 2:return a[n];case 4:return r[n];case 3:return o[n]}else if(_r(i,n))return s[n]=1,i[n];else if(a!==t&&u(a,n))return s[n]=2,a[n];else if(u(o,n))return s[n]=3,o[n];else if(r!==t&&u(r,n))return s[n]=4,r[n];else br&&(s[n]=0)}let d=gr[n],f,p;if(d)return n===`$attrs`&&A(e.attrs,`get`,``),d(e);if((f=c.__cssModules)&&(f=f[n]))return f;if(r!==t&&u(r,n))return s[n]=4,r[n];if(p=l.config.globalProperties,u(p,n))return p[n]},set({_:e},n,r){let{data:i,setupState:a,ctx:o}=e;return _r(a,n)?(a[n]=r,!0):i!==t&&u(i,n)?(i[n]=r,!0):u(e.props,n)||n[0]===`$`&&n.slice(1)in e?!1:(o[n]=r,!0)},has({_:{data:e,setupState:n,accessCache:r,ctx:i,appContext:a,props:o,type:s}},c){let l;return!!(r[c]||e!==t&&c[0]!==`$`&&u(e,c)||_r(n,c)||u(o,c)||u(i,c)||u(gr,c)||u(a.config.globalProperties,c)||(l=s.__cssModules)&&l[c])},defineProperty(e,t,n){return n.get==null?u(n,`value`)&&this.set(e,t,n.value,null):e._.accessCache[t]=0,Reflect.defineProperty(e,t,n)}};function yr(e){return d(e)?e.reduce((e,t)=>(e[t]=null,e),{}):e}var br=!0;function xr(e){let t=Tr(e),n=e.proxy,i=e.ctx;br=!1,t.beforeCreate&&Cr(t.beforeCreate,e,`bc`);let{data:a,computed:o,methods:s,watch:c,provide:l,inject:u,created:f,beforeMount:p,mounted:m,beforeUpdate:g,updated:_,activated:y,deactivated:b,beforeDestroy:x,beforeUnmount:ee,destroyed:S,unmounted:te,render:ne,renderTracked:re,renderTriggered:ie,errorCaptured:C,serverPrefetch:ae,expose:w,inheritAttrs:oe,components:se,directives:T,filters:ce}=t;if(u&&Sr(u,i,null),s)for(let e in s){let t=s[e];h(t)&&(i[e]=t.bind(n))}if(a){let t=a.call(n,n);v(t)&&(e.data=Lt(t))}if(br=!0,o)for(let e in o){let t=o[e],a=ga({get:h(t)?t.bind(n,n):h(t.get)?t.get.bind(n,n):r,set:!h(t)&&h(t.set)?t.set.bind(n):r});Object.defineProperty(i,e,{enumerable:!0,configurable:!0,get:()=>a.value,set:e=>a.value=e})}if(c)for(let e in c)wr(c[e],i,n,e);if(l){let e=h(l)?l.call(n):l;Reflect.ownKeys(e).forEach(t=>{Mn(t,e[t])})}f&&Cr(f,e,`c`);function E(e,t){d(t)?t.forEach(t=>e(t.bind(n))):t&&e(t.bind(n))}if(E(rr,p),E(ir,m),E(ar,g),E(or,_),E(Zn,y),E(Qn,b),E(fr,C),E(dr,re),E(ur,ie),E(sr,ee),E(cr,te),E(lr,ae),d(w))if(w.length){let t=e.exposed||={};w.forEach(e=>{Object.defineProperty(t,e,{get:()=>n[e],set:t=>n[e]=t,enumerable:!0})})}else e.exposed||={};ne&&e.render===r&&(e.render=ne),oe!=null&&(e.inheritAttrs=oe),se&&(e.components=se),T&&(e.directives=T),ae&&Wn(e)}function Sr(e,t,n=r){d(e)&&(e=Ar(e));for(let n in e){let r=e[n],i;i=v(r)?`default`in r?Nn(r.from||n,r.default,!0):Nn(r.from||n):Nn(r),M(i)?Object.defineProperty(t,n,{enumerable:!0,configurable:!0,get:()=>i.value,set:e=>i.value=e}):t[n]=i}}function Cr(e,t,n){ln(d(e)?e.map(e=>e.bind(t.proxy)):e.bind(t.proxy),t,n)}function wr(e,t,n,r){let i=r.includes(`.`)?zn(n,r):()=>n[r];if(g(e)){let n=t[e];h(n)&&In(i,n)}else if(h(e))In(i,e.bind(n));else if(v(e))if(d(e))e.forEach(e=>wr(e,t,n,r));else{let r=h(e.handler)?e.handler.bind(n):t[e.handler];h(r)&&In(i,r,e)}}function Tr(e){let t=e.type,{mixins:n,extends:r}=t,{mixins:i,optionsCache:a,config:{optionMergeStrategies:o}}=e.appContext,s=a.get(t),c;return s?c=s:!i.length&&!n&&!r?c=t:(c={},i.length&&i.forEach(e=>Er(c,e,o,!0)),Er(c,t,o)),v(t)&&a.set(t,c),c}function Er(e,t,n,r=!1){let{mixins:i,extends:a}=t;a&&Er(e,a,n,!0),i&&i.forEach(t=>Er(e,t,n,!0));for(let i in t)if(!(r&&i===`expose`)){let r=Dr[i]||n&&n[i];e[i]=r?r(e[i],t[i]):t[i]}return e}var Dr={data:Or,props:Mr,emits:Mr,methods:jr,computed:jr,beforeCreate:I,created:I,beforeMount:I,mounted:I,beforeUpdate:I,updated:I,beforeDestroy:I,beforeUnmount:I,destroyed:I,unmounted:I,activated:I,deactivated:I,errorCaptured:I,serverPrefetch:I,components:jr,directives:jr,watch:Nr,provide:Or,inject:kr};function Or(e,t){return t?e?function(){return s(h(e)?e.call(this,this):e,h(t)?t.call(this,this):t)}:t:e}function kr(e,t){return jr(Ar(e),Ar(t))}function Ar(e){if(d(e)){let t={};for(let n=0;n<e.length;n++)t[e[n]]=e[n];return t}return e}function I(e,t){return e?[...new Set([].concat(e,t))]:t}function jr(e,t){return e?s(Object.create(null),e,t):t}function Mr(e,t){return e?d(e)&&d(t)?[...new Set([...e,...t])]:s(Object.create(null),yr(e),yr(t??{})):t}function Nr(e,t){if(!e)return t;if(!t)return e;let n=s(Object.create(null),e);for(let r in t)n[r]=I(e[r],t[r]);return n}function Pr(){return{app:null,config:{isNativeTag:i,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}var Fr=0;function Ir(e,t){return function(n,r=null){h(n)||(n=s({},n)),r!=null&&!v(r)&&(r=null);let i=Pr(),a=new WeakSet,o=[],c=!1,l=i.app={_uid:Fr++,_component:n,_props:r,_container:null,_context:i,_instance:null,version:_a,get config(){return i.config},set config(e){},use(e,...t){return a.has(e)||(e&&h(e.install)?(a.add(e),e.install(l,...t)):h(e)&&(a.add(e),e(l,...t))),l},mixin(e){return i.mixins.includes(e)||i.mixins.push(e),l},component(e,t){return t?(i.components[e]=t,l):i.components[e]},directive(e,t){return t?(i.directives[e]=t,l):i.directives[e]},mount(a,o,s){if(!c){let u=l._ceVNode||U(n,r);return u.appContext=i,s===!0?s=`svg`:s===!1&&(s=void 0),o&&t?t(u,a):e(u,a,s),c=!0,l._container=a,a.__vue_app__=l,ma(u.component)}},onUnmount(e){o.push(e)},unmount(){c&&(ln(o,l._instance,16),e(null,l._container),delete l._container.__vue_app__)},provide(e,t){return i.provides[e]=t,l},runWithContext(e){let t=Lr;Lr=l;try{return e()}finally{Lr=t}}};return l}}var Lr=null,Rr=(e,t)=>t===`modelValue`||t===`model-value`?e.modelModifiers:e[`${t}Modifiers`]||e[`${C(t)}Modifiers`]||e[`${w(t)}Modifiers`];function zr(e,n,...r){if(e.isUnmounted)return;let i=e.vnode.props||t,a=r,o=n.startsWith(`update:`),s=o&&Rr(i,n.slice(7));s&&(s.trim&&(a=r.map(e=>g(e)?e.trim():e)),s.number&&(a=r.map(le)));let c,l=i[c=se(n)]||i[c=se(C(n))];!l&&o&&(l=i[c=se(w(n))]),l&&ln(l,e,6,a);let u=i[c+`Once`];if(u){if(!e.emitted)e.emitted={};else if(e.emitted[c])return;e.emitted[c]=!0,ln(u,e,6,a)}}var Br=new WeakMap;function Vr(e,t,n=!1){let r=n?Br:t.emitsCache,i=r.get(e);if(i!==void 0)return i;let a=e.emits,o={},c=!1;if(!h(e)){let r=e=>{let n=Vr(e,t,!0);n&&(c=!0,s(o,n))};!n&&t.mixins.length&&t.mixins.forEach(r),e.extends&&r(e.extends),e.mixins&&e.mixins.forEach(r)}return!a&&!c?(v(e)&&r.set(e,null),null):(d(a)?a.forEach(e=>o[e]=null):s(o,a),v(e)&&r.set(e,o),o)}function Hr(e,t){return!e||!a(t)?!1:(t=t.slice(2).replace(/Once$/,``),u(e,t[0].toLowerCase()+t.slice(1))||u(e,w(t))||u(e,t))}function Ur(e){let{type:t,vnode:n,proxy:r,withProxy:i,propsOptions:[a],slots:s,attrs:c,emit:l,render:u,renderCache:d,props:f,data:p,setupState:m,ctx:h,inheritAttrs:g}=e,_=kn(e),v,y;try{if(n.shapeFlag&4){let e=i||r,t=e;v=Gi(u.call(t,e,d,f,m,p,h)),y=c}else{let e=t;v=Gi(e.length>1?e(f,{attrs:c,slots:s,emit:l}):e(f,null)),y=t.props?c:Wr(c)}}catch(t){ki.length=0,un(t,e,1),v=U(Di)}let b=v;if(y&&g!==!1){let e=Object.keys(y),{shapeFlag:t}=b;e.length&&t&7&&(a&&e.some(o)&&(y=Gr(y,a)),b=Vi(b,y,!1,!0))}return n.dirs&&(b=Vi(b,null,!1,!0),b.dirs=b.dirs?b.dirs.concat(n.dirs):n.dirs),n.transition&&Un(b,n.transition),v=b,kn(_),v}var Wr=e=>{let t;for(let n in e)(n===`class`||n===`style`||a(n))&&((t||={})[n]=e[n]);return t},Gr=(e,t)=>{let n={};for(let r in e)(!o(r)||!(r.slice(9)in t))&&(n[r]=e[r]);return n};function Kr(e,t,n){let{props:r,children:i,component:a}=e,{props:o,children:s,patchFlag:c}=t,l=a.emitsOptions;if(t.dirs||t.transition)return!0;if(n&&c>=0){if(c&1024)return!0;if(c&16)return r?qr(r,o,l):!!o;if(c&8){let e=t.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t];if(Jr(o,r,n)&&!Hr(l,n))return!0}}}else return(i||s)&&(!s||!s.$stable)?!0:r===o?!1:r?o?qr(r,o,l):!0:!!o;return!1}function qr(e,t,n){let r=Object.keys(t);if(r.length!==Object.keys(e).length)return!0;for(let i=0;i<r.length;i++){let a=r[i];if(Jr(t,e,a)&&!Hr(n,a))return!0}return!1}function Jr(e,t,n){let r=e[n],i=t[n];return n===`style`&&v(r)&&v(i)?!Se(r,i):r!==i}function Yr({vnode:e,parent:t,suspense:n},r){for(;t;){let n=t.subTree;if(n.suspense&&n.suspense.activeBranch===e&&(n.suspense.vnode.el=n.el=r,e=n),n===e)(e=t.vnode).el=r,t=t.parent;else break}n&&n.activeBranch===e&&(n.vnode.el=r)}var Xr={},Zr=()=>Object.create(Xr),Qr=e=>Object.getPrototypeOf(e)===Xr;function $r(e,t,n,r=!1){let i={},a=Zr();e.propsDefaults=Object.create(null),ti(e,t,i,a);for(let t in e.propsOptions[0])t in i||(i[t]=void 0);n?e.props=r?i:Rt(i):e.type.props?e.props=i:e.props=a,e.attrs=a}function ei(e,t,n,r){let{props:i,attrs:a,vnode:{patchFlag:o}}=e,s=j(i),[c]=e.propsOptions,l=!1;if((r||o>0)&&!(o&16)){if(o&8){let n=e.vnode.dynamicProps;for(let r=0;r<n.length;r++){let o=n[r];if(Hr(e.emitsOptions,o))continue;let d=t[o];if(c)if(u(a,o))d!==a[o]&&(a[o]=d,l=!0);else{let t=C(o);i[t]=ni(c,s,t,d,e,!1)}else d!==a[o]&&(a[o]=d,l=!0)}}}else{ti(e,t,i,a)&&(l=!0);let r;for(let a in s)(!t||!u(t,a)&&((r=w(a))===a||!u(t,r)))&&(c?n&&(n[a]!==void 0||n[r]!==void 0)&&(i[a]=ni(c,s,a,void 0,e,!0)):delete i[a]);if(a!==s)for(let e in a)(!t||!u(t,e))&&(delete a[e],l=!0)}l&&nt(e.attrs,`set`,``)}function ti(e,n,r,i){let[a,o]=e.propsOptions,s=!1,c;if(n)for(let t in n){if(ne(t))continue;let l=n[t],d;a&&u(a,d=C(t))?!o||!o.includes(d)?r[d]=l:(c||={})[d]=l:Hr(e.emitsOptions,t)||(!(t in i)||l!==i[t])&&(i[t]=l,s=!0)}if(o){let n=j(r),i=c||t;for(let t=0;t<o.length;t++){let s=o[t];r[s]=ni(a,n,s,i[s],e,!u(i,s))}}return s}function ni(e,t,n,r,i,a){let o=e[n];if(o!=null){let e=u(o,`default`);if(e&&r===void 0){let e=o.default;if(o.type!==Function&&!o.skipFactory&&h(e)){let{propsDefaults:a}=i;if(n in a)r=a[n];else{let o=na(i);r=a[n]=e.call(null,t),o()}}else r=e;i.ce&&i.ce._setProp(n,r)}o[0]&&(a&&!e?r=!1:o[1]&&(r===``||r===w(n))&&(r=!0))}return r}var ri=new WeakMap;function ii(e,r,i=!1){let a=i?ri:r.propsCache,o=a.get(e);if(o)return o;let c=e.props,l={},f=[],p=!1;if(!h(e)){let t=e=>{p=!0;let[t,n]=ii(e,r,!0);s(l,t),n&&f.push(...n)};!i&&r.mixins.length&&r.mixins.forEach(t),e.extends&&t(e.extends),e.mixins&&e.mixins.forEach(t)}if(!c&&!p)return v(e)&&a.set(e,n),n;if(d(c))for(let e=0;e<c.length;e++){let n=C(c[e]);ai(n)&&(l[n]=t)}else if(c)for(let e in c){let t=C(e);if(ai(t)){let n=c[e],r=l[t]=d(n)||h(n)?{type:n}:s({},n),i=r.type,a=!1,o=!0;if(d(i))for(let e=0;e<i.length;++e){let t=i[e],n=h(t)&&t.name;if(n===`Boolean`){a=!0;break}else n===`String`&&(o=!1)}else a=h(i)&&i.name===`Boolean`;r[0]=a,r[1]=o,(a||u(r,`default`))&&f.push(t)}}let m=[l,f];return v(e)&&a.set(e,m),m}function ai(e){return e[0]!==`$`&&!ne(e)}var oi=e=>e===`_`||e===`_ctx`||e===`$stable`,si=e=>d(e)?e.map(Gi):[Gi(e)],ci=(e,t,n)=>{if(t._n)return t;let r=An((...e)=>si(t(...e)),n);return r._c=!1,r},li=(e,t,n)=>{let r=e._ctx;for(let n in e){if(oi(n))continue;let i=e[n];if(h(i))t[n]=ci(n,i,r);else if(i!=null){let e=si(i);t[n]=()=>e}}},ui=(e,t)=>{let n=si(t);e.slots.default=()=>n},di=(e,t,n)=>{for(let r in t)(n||!oi(r))&&(e[r]=t[r])},fi=(e,t,n)=>{let r=e.slots=Zr();if(e.vnode.shapeFlag&32){let e=t._;e?(di(r,t,n),n&&E(r,`_`,e,!0)):li(t,r)}else t&&ui(e,t)},pi=(e,n,r)=>{let{vnode:i,slots:a}=e,o=!0,s=t;if(i.shapeFlag&32){let e=n._;e?r&&e===1?o=!1:di(a,n,r):(o=!n.$stable,li(n,a)),s=n}else n&&(ui(e,n),s={default:1});if(o)for(let e in a)!oi(e)&&s[e]==null&&delete a[e]},L=Ti;function mi(e){return hi(e)}function hi(e,i){let a=de();a.__VUE__=!0;let{insert:o,remove:s,patchProp:c,createElement:l,createText:u,createComment:d,setText:f,setElementText:p,parentNode:m,nextSibling:h,setScopeId:g=r,insertStaticContent:_}=e,v=(e,t,n,r=null,i=null,a=null,o=void 0,s=null,c=!!t.dynamicChildren)=>{if(e===t)return;e&&!Ii(e,t)&&(r=Se(e),_e(e,i,a,!0),e=null),t.patchFlag===-2&&(c=!1,t.dynamicChildren=null);let{type:l,ref:u,shapeFlag:d}=t;switch(l){case Ei:y(e,t,n,r);break;case Di:b(e,t,n,r);break;case Oi:e??x(t,n,r,o);break;case R:se(e,t,n,r,i,a,o,s,c);break;default:d&1?te(e,t,n,r,i,a,o,s,c):d&6?T(e,t,n,r,i,a,o,s,c):(d&64||d&128)&&l.process(e,t,n,r,i,a,o,s,c,D)}u!=null&&i?qn(u,e&&e.ref,a,t||e,!t):u==null&&e&&e.ref!=null&&qn(e.ref,null,a,e,!0)},y=(e,t,n,r)=>{if(e==null)o(t.el=u(t.children),n,r);else{let n=t.el=e.el;t.children!==e.children&&f(n,t.children)}},b=(e,t,n,r)=>{e==null?o(t.el=d(t.children||``),n,r):t.el=e.el},x=(e,t,n,r)=>{[e.el,e.anchor]=_(e.children,t,n,r,e.el,e.anchor)},ee=({el:e,anchor:t},n,r)=>{let i;for(;e&&e!==t;)i=h(e),o(e,n,r),e=i;o(t,n,r)},S=({el:e,anchor:t})=>{let n;for(;e&&e!==t;)n=h(e),s(e),e=n;s(t)},te=(e,t,n,r,i,a,o,s,c)=>{if(t.type===`svg`?o=`svg`:t.type===`math`&&(o=`mathml`),e==null)re(t,n,r,i,a,o,s,c);else{let n=e.el&&e.el._isVueCE?e.el:null;try{n&&n._beginPatch(),ae(e,t,i,a,o,s,c)}finally{n&&n._endPatch()}}},re=(e,t,n,r,i,a,s,u)=>{let d,f,{props:m,shapeFlag:h,transition:g,dirs:_}=e;if(d=e.el=l(e.type,a,m&&m.is,m),h&8?p(d,e.children):h&16&&C(e.children,d,null,r,i,gi(e,a),s,u),_&&jn(e,null,r,`created`),ie(d,e,e.scopeId,s,r),m){for(let e in m)e!==`value`&&!ne(e)&&c(d,e,null,m[e],a,r);`value`in m&&c(d,`value`,null,m.value,a),(f=m.onVnodeBeforeMount)&&Yi(f,r,e)}_&&jn(e,null,r,`beforeMount`);let v=vi(i,g);v&&g.beforeEnter(d),o(d,t,n),((f=m&&m.onVnodeMounted)||v||_)&&L(()=>{try{f&&Yi(f,r,e),v&&g.enter(d),_&&jn(e,null,r,`mounted`)}finally{}},i)},ie=(e,t,n,r,i)=>{if(n&&g(e,n),r)for(let t=0;t<r.length;t++)g(e,r[t]);if(i){let n=i.subTree;if(t===n||wi(n.type)&&(n.ssContent===t||n.ssFallback===t)){let t=i.vnode;ie(e,t,t.scopeId,t.slotScopeIds,i.parent)}}},C=(e,t,n,r,i,a,o,s,c=0)=>{for(let l=c;l<e.length;l++)v(null,e[l]=s?Ki(e[l]):Gi(e[l]),t,n,r,i,a,o,s)},ae=(e,n,r,i,a,o,s)=>{let l=n.el=e.el,{patchFlag:u,dynamicChildren:d,dirs:f}=n;u|=e.patchFlag&16;let m=e.props||t,h=n.props||t,g;if(r&&_i(r,!1),(g=h.onVnodeBeforeUpdate)&&Yi(g,r,n,e),f&&jn(n,e,r,`beforeUpdate`),r&&_i(r,!0),(m.innerHTML&&h.innerHTML==null||m.textContent&&h.textContent==null)&&p(l,``),d?w(e.dynamicChildren,d,l,r,i,gi(n,a),o):s||pe(e,n,l,null,r,i,gi(n,a),o,!1),u>0){if(u&16)oe(l,m,h,r,a);else if(u&2&&m.class!==h.class&&c(l,`class`,null,h.class,a),u&4&&c(l,`style`,m.style,h.style,a),u&8){let e=n.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t],i=m[n],o=h[n];(o!==i||n===`value`)&&c(l,n,i,o,a,r)}}u&1&&e.children!==n.children&&p(l,n.children)}else !s&&d==null&&oe(l,m,h,r,a);((g=h.onVnodeUpdated)||f)&&L(()=>{g&&Yi(g,r,n,e),f&&jn(n,e,r,`updated`)},i)},w=(e,t,n,r,i,a,o)=>{for(let s=0;s<t.length;s++){let c=e[s],l=t[s];v(c,l,c.el&&(c.type===R||!Ii(c,l)||c.shapeFlag&198)?m(c.el):n,null,r,i,a,o,!0)}},oe=(e,n,r,i,a)=>{if(n!==r){if(n!==t)for(let t in n)!ne(t)&&!(t in r)&&c(e,t,n[t],null,a,i);for(let t in r){if(ne(t))continue;let o=r[t],s=n[t];o!==s&&t!==`value`&&c(e,t,s,o,a,i)}`value`in r&&c(e,`value`,n.value,r.value,a)}},se=(e,t,n,r,i,a,s,c,l)=>{let d=t.el=e?e.el:u(``),f=t.anchor=e?e.anchor:u(``),{patchFlag:p,dynamicChildren:m,slotScopeIds:h}=t;h&&(c=c?c.concat(h):h),e==null?(o(d,n,r),o(f,n,r),C(t.children||[],n,f,i,a,s,c,l)):p>0&&p&64&&m&&e.dynamicChildren&&e.dynamicChildren.length===m.length?(w(e.dynamicChildren,m,n,i,a,s,c),(t.key!=null||i&&t===i.subTree)&&yi(e,t,!0)):pe(e,t,n,f,i,a,s,c,l)},T=(e,t,n,r,i,a,o,s,c)=>{t.slotScopeIds=s,e==null?t.shapeFlag&512?i.ctx.activate(t,n,r,o,c):E(t,n,r,i,a,o,c):le(e,t,c)},E=(e,t,n,r,i,a,o)=>{let s=e.component=Qi(e,r,i);if(Xn(e)&&(s.ctx.renderer=D),oa(s,!1,o),s.asyncDep){if(i&&i.registerDep(s,ue,o),!e.el){let r=s.subTree=U(Di);b(null,r,t,n),e.placeholder=r.el}}else ue(s,e,t,n,i,a,o)},le=(e,t,n)=>{let r=t.component=e.component;if(Kr(e,t,n))if(r.asyncDep&&!r.asyncResolved){fe(r,t,n);return}else r.next=t,r.update();else t.el=e.el,r.vnode=t},ue=(e,t,n,r,i,a,o)=>{let s=()=>{if(e.isMounted){let{next:t,bu:n,u:r,parent:s,vnode:c}=e;{let n=xi(e);if(n){t&&(t.el=c.el,fe(e,t,o)),n.asyncDep.then(()=>{L(()=>{e.isUnmounted||l()},i)});return}}let u=t,d;_i(e,!1),t?(t.el=c.el,fe(e,t,o)):t=c,n&&ce(n),(d=t.props&&t.props.onVnodeBeforeUpdate)&&Yi(d,s,t,c),_i(e,!0);let f=Ur(e),p=e.subTree;e.subTree=f,v(p,f,m(p.el),Se(p),e,i,a),t.el=f.el,u===null&&Yr(e,f.el),r&&L(r,i),(d=t.props&&t.props.onVnodeUpdated)&&L(()=>Yi(d,s,t,c),i)}else{let o,{el:s,props:c}=t,{bm:l,m:u,parent:d,root:f,type:p}=e,m=Yn(t);if(_i(e,!1),l&&ce(l),!m&&(o=c&&c.onVnodeBeforeMount)&&Yi(o,d,t),_i(e,!0),s&&Ee){let t=()=>{e.subTree=Ur(e),Ee(s,e.subTree,e,i,null)};m&&p.__asyncHydrate?p.__asyncHydrate(s,e,t):t()}else{f.ce&&f.ce._hasShadowRoot()&&f.ce._injectChildStyle(p,e.parent?e.parent.type:void 0);let o=e.subTree=Ur(e);v(null,o,n,r,e,i,a),t.el=o.el}if(u&&L(u,i),!m&&(o=c&&c.onVnodeMounted)){let e=t;L(()=>Yi(o,d,e),i)}(t.shapeFlag&256||d&&Yn(d.vnode)&&d.vnode.shapeFlag&256)&&e.a&&L(e.a,i),e.isMounted=!0,t=n=r=null}};e.scope.on();let c=e.effect=new Ae(s);e.scope.off();let l=e.update=c.run.bind(c),u=e.job=c.runIfDirty.bind(c);u.i=e,u.id=e.uid,c.scheduler=()=>bn(u),_i(e,!0),l()},fe=(e,t,n)=>{t.component=e;let r=e.vnode.props;e.vnode=t,e.next=null,ei(e,t.props,r,n),pi(e,t.children,n),Ge(),Cn(e),Ke()},pe=(e,t,n,r,i,a,o,s,c=!1)=>{let l=e&&e.children,u=e?e.shapeFlag:0,d=t.children,{patchFlag:f,shapeFlag:m}=t;if(f>0){if(f&128){he(l,d,n,r,i,a,o,s,c);return}else if(f&256){me(l,d,n,r,i,a,o,s,c);return}}m&8?(u&16&&xe(l,i,a),d!==l&&p(n,d)):u&16?m&16?he(l,d,n,r,i,a,o,s,c):xe(l,i,a,!0):(u&8&&p(n,``),m&16&&C(d,n,r,i,a,o,s,c))},me=(e,t,r,i,a,o,s,c,l)=>{e||=n,t||=n;let u=e.length,d=t.length,f=Math.min(u,d),p;for(p=0;p<f;p++){let n=t[p]=l?Ki(t[p]):Gi(t[p]);v(e[p],n,r,null,a,o,s,c,l)}u>d?xe(e,a,o,!0,!1,f):C(t,r,i,a,o,s,c,l,f)},he=(e,t,r,i,a,o,s,c,l)=>{let u=0,d=t.length,f=e.length-1,p=d-1;for(;u<=f&&u<=p;){let n=e[u],i=t[u]=l?Ki(t[u]):Gi(t[u]);if(Ii(n,i))v(n,i,r,null,a,o,s,c,l);else break;u++}for(;u<=f&&u<=p;){let n=e[f],i=t[p]=l?Ki(t[p]):Gi(t[p]);if(Ii(n,i))v(n,i,r,null,a,o,s,c,l);else break;f--,p--}if(u>f){if(u<=p){let e=p+1,n=e<d?t[e].el:i;for(;u<=p;)v(null,t[u]=l?Ki(t[u]):Gi(t[u]),r,n,a,o,s,c,l),u++}}else if(u>p)for(;u<=f;)_e(e[u],a,o,!0),u++;else{let m=u,h=u,g=new Map;for(u=h;u<=p;u++){let e=t[u]=l?Ki(t[u]):Gi(t[u]);e.key!=null&&g.set(e.key,u)}let _,y=0,b=p-h+1,x=!1,ee=0,S=Array(b);for(u=0;u<b;u++)S[u]=0;for(u=m;u<=f;u++){let n=e[u];if(y>=b){_e(n,a,o,!0);continue}let i;if(n.key!=null)i=g.get(n.key);else for(_=h;_<=p;_++)if(S[_-h]===0&&Ii(n,t[_])){i=_;break}i===void 0?_e(n,a,o,!0):(S[i-h]=u+1,i>=ee?ee=i:x=!0,v(n,t[i],r,null,a,o,s,c,l),y++)}let te=x?bi(S):n;for(_=te.length-1,u=b-1;u>=0;u--){let e=h+u,n=t[e],f=t[e+1],p=e+1<d?f.el||Ci(f):i;S[u]===0?v(null,n,r,p,a,o,s,c,l):x&&(_<0||u!==te[_]?ge(n,r,p,2):_--)}}},ge=(e,t,n,r,i=null)=>{let{el:a,type:c,transition:l,children:u,shapeFlag:d}=e;if(d&6){ge(e.component.subTree,t,n,r);return}if(d&128){e.suspense.move(t,n,r);return}if(d&64){c.move(e,t,n,D);return}if(c===R){o(a,t,n);for(let e=0;e<u.length;e++)ge(u[e],t,n,r);o(e.anchor,t,n);return}if(c===Oi){ee(e,t,n);return}if(r!==2&&d&1&&l)if(r===0)l.beforeEnter(a),o(a,t,n),L(()=>l.enter(a),i);else{let{leave:r,delayLeave:i,afterLeave:c}=l,u=()=>{e.ctx.isUnmounted?s(a):o(a,t,n)},d=()=>{a._isLeaving&&a[Hn](!0),r(a,()=>{u(),c&&c()})};i?i(a,u,d):d()}else o(a,t,n)},_e=(e,t,n,r=!1,i=!1)=>{let{type:a,props:o,ref:s,children:c,dynamicChildren:l,shapeFlag:u,patchFlag:d,dirs:f,cacheIndex:p,memo:m}=e;if(d===-2&&(i=!1),s!=null&&(Ge(),qn(s,null,n,e,!0),Ke()),p!=null&&(t.renderCache[p]=void 0),u&256){t.ctx.deactivate(e);return}let h=u&1&&f,g=!Yn(e),_;if(g&&(_=o&&o.onVnodeBeforeUnmount)&&Yi(_,t,e),u&6)be(e.component,n,r);else{if(u&128){e.suspense.unmount(n,r);return}h&&jn(e,null,t,`beforeUnmount`),u&64?e.type.remove(e,t,n,D,r):l&&!l.hasOnce&&(a!==R||d>0&&d&64)?xe(l,t,n,!1,!0):(a===R&&d&384||!i&&u&16)&&xe(c,t,n),r&&ve(e)}let v=m!=null&&p==null;(g&&(_=o&&o.onVnodeUnmounted)||h||v)&&L(()=>{_&&Yi(_,t,e),h&&jn(e,null,t,`unmounted`),v&&(e.el=null)},n)},ve=e=>{let{type:t,el:n,anchor:r,transition:i}=e;if(t===R){ye(n,r);return}if(t===Oi){S(e);return}let a=()=>{s(n),i&&!i.persisted&&i.afterLeave&&i.afterLeave()};if(e.shapeFlag&1&&i&&!i.persisted){let{leave:t,delayLeave:r}=i,o=()=>t(n,a);r?r(e.el,a,o):o()}else a()},ye=(e,t)=>{let n;for(;e!==t;)n=h(e),s(e),e=n;s(t)},be=(e,t,n)=>{let{bum:r,scope:i,job:a,subTree:o,um:s,m:c,a:l}=e;Si(c),Si(l),r&&ce(r),i.stop(),a&&(a.flags|=8,_e(o,e,t,n)),s&&L(s,t),L(()=>{e.isUnmounted=!0},t)},xe=(e,t,n,r=!1,i=!1,a=0)=>{for(let o=a;o<e.length;o++)_e(e[o],t,n,r,i)},Se=e=>{if(e.shapeFlag&6)return Se(e.component.subTree);if(e.shapeFlag&128)return e.suspense.next();let t=h(e.anchor||e.el),n=t&&t[Bn];return n?h(n):t},Ce=!1,we=(e,t,n)=>{let r;e==null?t._vnode&&(_e(t._vnode,null,null,!0),r=t._vnode.component):v(t._vnode||null,e,t,null,null,null,n),t._vnode=e,Ce||=(Ce=!0,Cn(r),wn(),!1)},D={p:v,um:_e,m:ge,r:ve,mt:E,mc:C,pc:pe,pbc:w,n:Se,o:e},Te,Ee;return i&&([Te,Ee]=i(D)),{render:we,hydrate:Te,createApp:Ir(we,Te)}}function gi({type:e,props:t},n){return n===`svg`&&e===`foreignObject`||n===`mathml`&&e===`annotation-xml`&&t&&t.encoding&&t.encoding.includes(`html`)?void 0:n}function _i({effect:e,job:t},n){n?(e.flags|=32,t.flags|=4):(e.flags&=-33,t.flags&=-5)}function vi(e,t){return(!e||e&&!e.pendingBranch)&&t&&!t.persisted}function yi(e,t,n=!1){let r=e.children,i=t.children;if(d(r)&&d(i))for(let e=0;e<r.length;e++){let t=r[e],a=i[e];a.shapeFlag&1&&!a.dynamicChildren&&((a.patchFlag<=0||a.patchFlag===32)&&(a=i[e]=Ki(i[e]),a.el=t.el),!n&&a.patchFlag!==-2&&yi(t,a)),a.type===Ei&&(a.patchFlag===-1&&(a=i[e]=Ki(a)),a.el=t.el),a.type===Di&&!a.el&&(a.el=t.el)}}function bi(e){let t=e.slice(),n=[0],r,i,a,o,s,c=e.length;for(r=0;r<c;r++){let c=e[r];if(c!==0){if(i=n[n.length-1],e[i]<c){t[r]=i,n.push(r);continue}for(a=0,o=n.length-1;a<o;)s=a+o>>1,e[n[s]]<c?a=s+1:o=s;c<e[n[a]]&&(a>0&&(t[r]=n[a-1]),n[a]=r)}}for(a=n.length,o=n[a-1];a-- >0;)n[a]=o,o=t[o];return n}function xi(e){let t=e.subTree.component;if(t)return t.asyncDep&&!t.asyncResolved?t:xi(t)}function Si(e){if(e)for(let t=0;t<e.length;t++)e[t].flags|=8}function Ci(e){if(e.placeholder)return e.placeholder;let t=e.component;return t?Ci(t.subTree):null}var wi=e=>e.__isSuspense;function Ti(e,t){t&&t.pendingBranch?d(e)?t.effects.push(...e):t.effects.push(e):Sn(e)}var R=Symbol.for(`v-fgt`),Ei=Symbol.for(`v-txt`),Di=Symbol.for(`v-cmt`),Oi=Symbol.for(`v-stc`),ki=[],z=null;function B(e=!1){ki.push(z=e?null:[])}function Ai(){ki.pop(),z=ki[ki.length-1]||null}var ji=1;function Mi(e,t=!1){ji+=e,e<0&&z&&t&&(z.hasOnce=!0)}function Ni(e){return e.dynamicChildren=ji>0?z||n:null,Ai(),ji>0&&z&&z.push(e),e}function V(e,t,n,r,i,a){return Ni(H(e,t,n,r,i,a,!0))}function Pi(e,t,n,r,i){return Ni(U(e,t,n,r,i,!0))}function Fi(e){return e?e.__v_isVNode===!0:!1}function Ii(e,t){return e.type===t.type&&e.key===t.key}var Li=({key:e})=>e??null,Ri=({ref:e,ref_key:t,ref_for:n})=>(typeof e==`number`&&(e=``+e),e==null?null:g(e)||M(e)||h(e)?{i:Dn,r:e,k:t,f:!!n}:e);function H(e,t=null,n=null,r=0,i=null,a=e===R?0:1,o=!1,s=!1){let c={__v_isVNode:!0,__v_skip:!0,type:e,props:t,key:t&&Li(t),ref:t&&Ri(t),scopeId:On,slotScopeIds:null,children:n,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetStart:null,targetAnchor:null,staticCount:0,shapeFlag:a,patchFlag:r,dynamicProps:i,dynamicChildren:null,appContext:null,ctx:Dn};return s?(qi(c,n),a&128&&e.normalize(c)):n&&(c.shapeFlag|=g(n)?8:16),ji>0&&!o&&z&&(c.patchFlag>0||a&6)&&c.patchFlag!==32&&z.push(c),c}var U=zi;function zi(e,t=null,n=null,r=0,i=null,a=!1){if((!e||e===pr)&&(e=Di),Fi(e)){let r=Vi(e,t,!0);return n&&qi(r,n),ji>0&&!a&&z&&(r.shapeFlag&6?z[z.indexOf(e)]=r:z.push(r)),r.patchFlag=-2,r}if(ha(e)&&(e=e.__vccOpts),t){t=Bi(t);let{class:e,style:n}=t;e&&!g(e)&&(t.class=_e(e)),v(n)&&(Wt(n)&&!d(n)&&(n=s({},n)),t.style=fe(n))}let o=g(e)?1:wi(e)?128:Vn(e)?64:v(e)?4:h(e)?2:0;return H(e,t,n,r,i,o,a,!0)}function Bi(e){return e?Wt(e)||Qr(e)?s({},e):e:null}function Vi(e,t,n=!1,r=!1){let{props:i,ref:a,patchFlag:o,children:s,transition:c}=e,l=t?Ji(i||{},t):i,u={__v_isVNode:!0,__v_skip:!0,type:e.type,props:l,key:l&&Li(l),ref:t&&t.ref?n&&a?d(a)?a.concat(Ri(t)):[a,Ri(t)]:Ri(t):a,scopeId:e.scopeId,slotScopeIds:e.slotScopeIds,children:s,target:e.target,targetStart:e.targetStart,targetAnchor:e.targetAnchor,staticCount:e.staticCount,shapeFlag:e.shapeFlag,patchFlag:t&&e.type!==R?o===-1?16:o|16:o,dynamicProps:e.dynamicProps,dynamicChildren:e.dynamicChildren,appContext:e.appContext,dirs:e.dirs,transition:c,component:e.component,suspense:e.suspense,ssContent:e.ssContent&&Vi(e.ssContent),ssFallback:e.ssFallback&&Vi(e.ssFallback),placeholder:e.placeholder,el:e.el,anchor:e.anchor,ctx:e.ctx,ce:e.ce};return c&&r&&Un(u,c.clone(u)),u}function Hi(e=` `,t=0){return U(Ei,null,e,t)}function Ui(e,t){let n=U(Oi,null,e);return n.staticCount=t,n}function Wi(e=``,t=!1){return t?(B(),Pi(Di,null,e)):U(Di,null,e)}function Gi(e){return e==null||typeof e==`boolean`?U(Di):d(e)?U(R,null,e.slice()):Fi(e)?Ki(e):U(Ei,null,String(e))}function Ki(e){return e.el===null&&e.patchFlag!==-1||e.memo?e:Vi(e)}function qi(e,t){let n=0,{shapeFlag:r}=e;if(t==null)t=null;else if(d(t))n=16;else if(typeof t==`object`)if(r&65){let n=t.default;n&&(n._c&&(n._d=!1),qi(e,n()),n._c&&(n._d=!0));return}else{n=32;let r=t._;!r&&!Qr(t)?t._ctx=Dn:r===3&&Dn&&(Dn.slots._===1?t._=1:(t._=2,e.patchFlag|=1024))}else h(t)?(t={default:t,_ctx:Dn},n=32):(t=String(t),r&64?(n=16,t=[Hi(t)]):n=8);e.children=t,e.shapeFlag|=n}function Ji(...e){let t={};for(let n=0;n<e.length;n++){let r=e[n];for(let e in r)if(e===`class`)t.class!==r.class&&(t.class=_e([t.class,r.class]));else if(e===`style`)t.style=fe([t.style,r.style]);else if(a(e)){let n=t[e],i=r[e];i&&n!==i&&!(d(n)&&n.includes(i))?t[e]=n?[].concat(n,i):i:i==null&&n==null&&!o(e)&&(t[e]=i)}else e!==``&&(t[e]=r[e])}return t}function Yi(e,t,n,r=null){ln(e,t,7,[n,r])}var Xi=Pr(),Zi=0;function Qi(e,n,r){let i=e.type,a=(n?n.appContext:e.appContext)||Xi,o={uid:Zi++,vnode:e,type:i,parent:n,appContext:a,root:null,next:null,subTree:null,effect:null,update:null,job:null,scope:new De(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:n?n.provides:Object.create(a.provides),ids:n?n.ids:[``,0,0],accessCache:null,renderCache:[],components:null,directives:null,propsOptions:ii(i,a),emitsOptions:Vr(i,a),emit:null,emitted:null,propsDefaults:t,inheritAttrs:i.inheritAttrs,ctx:t,data:t,props:t,attrs:t,slots:t,refs:t,setupState:t,setupContext:null,suspense:r,suspenseId:r?r.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return o.ctx={_:o},o.root=n?n.root:o,o.emit=zr.bind(null,o),e.ce&&e.ce(o),o}var W=null,$i=()=>W||Dn,ea,ta;{let e=de(),t=(t,n)=>{let r;return(r=e[t])||(r=e[t]=[]),r.push(n),e=>{r.length>1?r.forEach(t=>t(e)):r[0](e)}};ea=t(`__VUE_INSTANCE_SETTERS__`,e=>W=e),ta=t(`__VUE_SSR_SETTERS__`,e=>aa=e)}var na=e=>{let t=W;return ea(e),e.scope.on(),()=>{e.scope.off(),ea(t)}},ra=()=>{W&&W.scope.off(),ea(null)};function ia(e){return e.vnode.shapeFlag&4}var aa=!1;function oa(e,t=!1,n=!1){t&&ta(t);let{props:r,children:i}=e.vnode,a=ia(e);$r(e,r,a,t),fi(e,i,n||t);let o=a?sa(e,t):void 0;return t&&ta(!1),o}function sa(e,t){let n=e.type;e.accessCache=Object.create(null),e.proxy=new Proxy(e.ctx,vr);let{setup:r}=n;if(r){Ge();let n=e.setupContext=r.length>1?pa(e):null,i=na(e),a=cn(r,e,0,[e.props,n]),o=y(a);if(Ke(),i(),(o||e.sp)&&!Yn(e)&&Wn(e),o){if(a.then(ra,ra),t)return a.then(n=>{ca(e,n,t)}).catch(t=>{un(t,e,0)});e.asyncDep=a}else ca(e,a,t)}else da(e,t)}function ca(e,t,n){h(t)?e.type.__ssrInlineRender?e.ssrRender=t:e.render=t:v(t)&&(e.setupState=Qt(t)),da(e,n)}var la,ua;function da(e,t,n){let i=e.type;if(!e.render){if(!t&&la&&!i.render){let t=i.template||Tr(e).template;if(t){let{isCustomElement:n,compilerOptions:r}=e.appContext.config,{delimiters:a,compilerOptions:o}=i;i.render=la(t,s(s({isCustomElement:n,delimiters:a},r),o))}}e.render=i.render||r,ua&&ua(e)}{let t=na(e);Ge();try{xr(e)}finally{Ke(),t()}}}var fa={get(e,t){return A(e,`get`,``),e[t]}};function pa(e){return{attrs:new Proxy(e.attrs,fa),slots:e.slots,emit:e.emit,expose:t=>{e.exposed=t||{}}}}function ma(e){return e.exposed?e.exposeProxy||=new Proxy(Qt(Gt(e.exposed)),{get(t,n){if(n in t)return t[n];if(n in gr)return gr[n](e)},has(e,t){return t in e||t in gr}}):e.proxy}function ha(e){return h(e)&&`__vccOpts`in e}var ga=(e,t)=>en(e,t,aa),_a=`3.5.32`,va=void 0,ya=typeof window<`u`&&window.trustedTypes;if(ya)try{va=ya.createPolicy(`vue`,{createHTML:e=>e})}catch{}var ba=va?e=>va.createHTML(e):e=>e,xa=`http://www.w3.org/2000/svg`,Sa=`http://www.w3.org/1998/Math/MathML`,Ca=typeof document<`u`?document:null,wa=Ca&&Ca.createElement(`template`),Ta={insert:(e,t,n)=>{t.insertBefore(e,n||null)},remove:e=>{let t=e.parentNode;t&&t.removeChild(e)},createElement:(e,t,n,r)=>{let i=t===`svg`?Ca.createElementNS(xa,e):t===`mathml`?Ca.createElementNS(Sa,e):n?Ca.createElement(e,{is:n}):Ca.createElement(e);return e===`select`&&r&&r.multiple!=null&&i.setAttribute(`multiple`,r.multiple),i},createText:e=>Ca.createTextNode(e),createComment:e=>Ca.createComment(e),setText:(e,t)=>{e.nodeValue=t},setElementText:(e,t)=>{e.textContent=t},parentNode:e=>e.parentNode,nextSibling:e=>e.nextSibling,querySelector:e=>Ca.querySelector(e),setScopeId(e,t){e.setAttribute(t,``)},insertStaticContent(e,t,n,r,i,a){let o=n?n.previousSibling:t.lastChild;if(i&&(i===a||i.nextSibling))for(;t.insertBefore(i.cloneNode(!0),n),!(i===a||!(i=i.nextSibling)););else{wa.innerHTML=ba(r===`svg`?`<svg>${e}</svg>`:r===`mathml`?`<math>${e}</math>`:e);let i=wa.content;if(r===`svg`||r===`mathml`){let e=i.firstChild;for(;e.firstChild;)i.appendChild(e.firstChild);i.removeChild(e)}t.insertBefore(i,n)}return[o?o.nextSibling:t.firstChild,n?n.previousSibling:t.lastChild]}},Ea=Symbol(`_vtc`);function Da(e,t,n){let r=e[Ea];r&&(t=(t?[t,...r]:[...r]).join(` `)),t==null?e.removeAttribute(`class`):n?e.setAttribute(`class`,t):e.className=t}var Oa=Symbol(`_vod`),ka=Symbol(`_vsh`),Aa=Symbol(``),ja=/(?:^|;)\s*display\s*:/;function Ma(e,t,n){let r=e.style,i=g(n),a=!1;if(n&&!i){if(t)if(g(t))for(let e of t.split(`;`)){let t=e.slice(0,e.indexOf(`:`)).trim();n[t]??Pa(r,t,``)}else for(let e in t)n[e]??Pa(r,e,``);for(let e in n)e===`display`&&(a=!0),Pa(r,e,n[e])}else if(i){if(t!==n){let e=r[Aa];e&&(n+=`;`+e),r.cssText=n,a=ja.test(n)}}else t&&e.removeAttribute(`style`);Oa in e&&(e[Oa]=a?r.display:``,e[ka]&&(r.display=`none`))}var Na=/\s*!important$/;function Pa(e,t,n){if(d(n))n.forEach(n=>Pa(e,t,n));else if(n??=``,t.startsWith(`--`))e.setProperty(t,n);else{let r=La(e,t);Na.test(n)?e.setProperty(w(r),n.replace(Na,``),`important`):e[r]=n}}var Fa=[`Webkit`,`Moz`,`ms`],Ia={};function La(e,t){let n=Ia[t];if(n)return n;let r=C(t);if(r!==`filter`&&r in e)return Ia[t]=r;r=oe(r);for(let n=0;n<Fa.length;n++){let i=Fa[n]+r;if(i in e)return Ia[t]=i}return t}var Ra=`http://www.w3.org/1999/xlink`;function za(e,t,n,r,i,a=ye(t)){r&&t.startsWith(`xlink:`)?n==null?e.removeAttributeNS(Ra,t.slice(6,t.length)):e.setAttributeNS(Ra,t,n):n==null||a&&!be(n)?e.removeAttribute(t):e.setAttribute(t,a?``:_(n)?String(n):n)}function Ba(e,t,n,r,i){if(t===`innerHTML`||t===`textContent`){n!=null&&(e[t]=t===`innerHTML`?ba(n):n);return}let a=e.tagName;if(t===`value`&&a!==`PROGRESS`&&!a.includes(`-`)){let r=a===`OPTION`?e.getAttribute(`value`)||``:e.value,i=n==null?e.type===`checkbox`?`on`:``:String(n);(r!==i||!(`_value`in e))&&(e.value=i),n??e.removeAttribute(t),e._value=n;return}let o=!1;if(n===``||n==null){let r=typeof e[t];r===`boolean`?n=be(n):n==null&&r===`string`?(n=``,o=!0):r===`number`&&(n=0,o=!0)}try{e[t]=n}catch{}o&&e.removeAttribute(i||t)}function Va(e,t,n,r){e.addEventListener(t,n,r)}function Ha(e,t,n,r){e.removeEventListener(t,n,r)}var Ua=Symbol(`_vei`);function Wa(e,t,n,r,i=null){let a=e[Ua]||(e[Ua]={}),o=a[t];if(r&&o)o.value=r;else{let[n,s]=Ka(t);r?Va(e,n,a[t]=Xa(r,i),s):o&&(Ha(e,n,o,s),a[t]=void 0)}}var Ga=/(?:Once|Passive|Capture)$/;function Ka(e){let t;if(Ga.test(e)){t={};let n;for(;n=e.match(Ga);)e=e.slice(0,e.length-n[0].length),t[n[0].toLowerCase()]=!0}return[e[2]===`:`?e.slice(3):w(e.slice(2)),t]}var qa=0,Ja=Promise.resolve(),Ya=()=>qa||=(Ja.then(()=>qa=0),Date.now());function Xa(e,t){let n=e=>{if(!e._vts)e._vts=Date.now();else if(e._vts<=n.attached)return;ln(Za(e,n.value),t,5,[e])};return n.value=e,n.attached=Ya(),n}function Za(e,t){if(d(t)){let n=e.stopImmediatePropagation;return e.stopImmediatePropagation=()=>{n.call(e),e._stopped=!0},t.map(e=>t=>!t._stopped&&e&&e(t))}else return t}var Qa=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&e.charCodeAt(2)>96&&e.charCodeAt(2)<123,$a=(e,t,n,r,i,s)=>{let c=i===`svg`;t===`class`?Da(e,r,c):t===`style`?Ma(e,n,r):a(t)?o(t)||Wa(e,t,n,r,s):(t[0]===`.`?(t=t.slice(1),!0):t[0]===`^`?(t=t.slice(1),!1):eo(e,t,r,c))?(Ba(e,t,r),!e.tagName.includes(`-`)&&(t===`value`||t===`checked`||t===`selected`)&&za(e,t,r,c,s,t!==`value`)):e._isVueCE&&(to(e,t)||e._def.__asyncLoader&&(/[A-Z]/.test(t)||!g(r)))?Ba(e,C(t),r,s,t):(t===`true-value`?e._trueValue=r:t===`false-value`&&(e._falseValue=r),za(e,t,r,c))};function eo(e,t,n,r){if(r)return!!(t===`innerHTML`||t===`textContent`||t in e&&Qa(t)&&h(n));if(t===`spellcheck`||t===`draggable`||t===`translate`||t===`autocorrect`||t===`sandbox`&&e.tagName===`IFRAME`||t===`form`||t===`list`&&e.tagName===`INPUT`||t===`type`&&e.tagName===`TEXTAREA`)return!1;if(t===`width`||t===`height`){let t=e.tagName;if(t===`IMG`||t===`VIDEO`||t===`CANVAS`||t===`SOURCE`)return!1}return Qa(t)&&g(n)?!1:t in e}function to(e,t){let n=e._def.props;if(!n)return!1;let r=C(t);return Array.isArray(n)?n.some(e=>C(e)===r):Object.keys(n).some(e=>C(e)===r)}var no=e=>{let t=e.props[`onUpdate:modelValue`]||!1;return d(t)?e=>ce(t,e):t};function ro(e){e.target.composing=!0}function io(e){let t=e.target;t.composing&&(t.composing=!1,t.dispatchEvent(new Event(`input`)))}var ao=Symbol(`_assign`);function oo(e,t,n){return t&&(e=e.trim()),n&&(e=le(e)),e}var so={created(e,{modifiers:{lazy:t,trim:n,number:r}},i){e[ao]=no(i);let a=r||i.props&&i.props.type===`number`;Va(e,t?`change`:`input`,t=>{t.target.composing||e[ao](oo(e.value,n,a))}),(n||a)&&Va(e,`change`,()=>{e.value=oo(e.value,n,a)}),t||(Va(e,`compositionstart`,ro),Va(e,`compositionend`,io),Va(e,`change`,io))},mounted(e,{value:t}){e.value=t??``},beforeUpdate(e,{value:t,oldValue:n,modifiers:{lazy:r,trim:i,number:a}},o){if(e[ao]=no(o),e.composing)return;let s=(a||e.type===`number`)&&!/^0\d/.test(e.value)?le(e.value):e.value,c=t??``;if(s===c)return;let l=e.getRootNode();(l instanceof Document||l instanceof ShadowRoot)&&l.activeElement===e&&e.type!==`range`&&(r&&t===n||i&&e.value.trim()===c)||(e.value=c)}},co={deep:!0,created(e,{value:t,modifiers:{number:n}},r){let i=p(t);Va(e,`change`,()=>{let t=Array.prototype.filter.call(e.options,e=>e.selected).map(e=>n?le(uo(e)):uo(e));e[ao](e.multiple?i?new Set(t):t:t[0]),e._assigning=!0,vn(()=>{e._assigning=!1})}),e[ao]=no(r)},mounted(e,{value:t}){lo(e,t)},beforeUpdate(e,t,n){e[ao]=no(n)},updated(e,{value:t}){e._assigning||lo(e,t)}};function lo(e,t){let n=e.multiple,r=d(t);if(!(n&&!r&&!p(t))){for(let i=0,a=e.options.length;i<a;i++){let a=e.options[i],o=uo(a);if(n)if(r){let e=typeof o;e===`string`||e===`number`?a.selected=t.some(e=>String(e)===String(o)):a.selected=Ce(t,o)>-1}else a.selected=t.has(o);else if(Se(uo(a),t)){e.selectedIndex!==i&&(e.selectedIndex=i);return}}!n&&e.selectedIndex!==-1&&(e.selectedIndex=-1)}}function uo(e){return`_value`in e?e._value:e.value}var fo=s({patchProp:$a},Ta),po;function mo(){return po||=mi(fo)}var ho=((...e)=>{let t=mo().createApp(...e),{mount:n}=t;return t.mount=e=>{let r=_o(e);if(!r)return;let i=t._component;!h(i)&&!i.render&&!i.template&&(i.template=r.innerHTML),r.nodeType===1&&(r.textContent=``);let a=n(r,!1,go(r));return r instanceof Element&&(r.removeAttribute(`v-cloak`),r.setAttribute(`data-v-app`,``)),a},t});function go(e){if(e instanceof SVGElement)return`svg`;if(typeof MathMLElement==`function`&&e instanceof MathMLElement)return`mathml`}function _o(e){return g(e)?document.querySelector(e):e}var vo=`<header>
   <div class="logo">
     <div class="logo-badge">GZ</div>
     <div class="logo-name">故障注入平台</div>
@@ -46,18 +46,30 @@
     <button class="tbtn tbtn-save-res tbtn-disabled" onclick="doSaveRes()" id="btn-save-res">保存仿真结果</button>
   </div>
 </header>
-`,io=[`innerHTML`],ao={__name:`WorkbenchHeader`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`header-bar`,innerHTML:I(ro)},null,8,io))}},oo=`<aside class="lpanel">
+`,yo=[`innerHTML`],bo={__name:`WorkbenchHeader`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`header-bar`,innerHTML:N(vo)},null,8,yo))}},xo=`<aside class="lpanel">
   <div class="lscroll">
-    <div class="lgroup-head lgroup-head--system" onclick="toggleGroup('g1')">
-      <span class="lgroup-icon">系</span>
-      <span>系统建模组件</span>
-      <span class="lgroup-arrow open" id="arr-g1">&#9654;</span>
+    <div class="lgroup-head lgroup-head--system" data-palette-group="signals" onclick="toggleGroup('g-signals')">
+      <span class="lgroup-icon">信</span>
+      <span class="lgroup-label">系统信号</span>
+      <span class="lgroup-arrow open" id="arr-g-signals">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g1">
+    <div class="lgroup-body" id="g-signals" data-palette-body="signals">
       <div class="citem citem-draggable" draggable="true" data-component="signal_source">
         <span class="citem-icon-badge citem-icon-badge--source">S</span>
         <span class="citem-label">信号源</span>
       </div>
+      <div class="citem citem-draggable" draggable="true" data-component="middle_var_assign">
+        <span class="citem-icon-badge citem-icon-badge--middle">中</span>
+        <span class="citem-label">中间变量赋值块</span>
+      </div>
+    </div>
+
+    <div class="lgroup-head lgroup-head--system" data-palette-group="signal-ops" onclick="toggleGroup('g-signal-ops')">
+      <span class="lgroup-icon">算</span>
+      <span class="lgroup-label">信号运算</span>
+      <span class="lgroup-arrow open" id="arr-g-signal-ops">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-signal-ops" data-palette-body="signal-ops">
       <div class="citem citem-draggable" draggable="true" data-component="flow_block" title="统一输入输出的数据类型和格式">
         <span class="citem-icon-badge citem-icon-badge--flow">F</span>
         <span class="citem-label">信号适配块</span>
@@ -74,38 +86,72 @@
         <span class="citem-icon-badge citem-icon-badge--mux">M</span>
         <span class="citem-label">Mux 块</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="simulation_block">
+    </div>
+
+    <div class="lgroup-head lgroup-head--system" data-palette-group="simulation" onclick="toggleGroup('g-simulation')">
+      <span class="lgroup-icon">仿</span>
+      <span class="lgroup-label">仿真组件</span>
+      <span class="lgroup-arrow open" id="arr-g-simulation">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-simulation" data-palette-body="simulation">
+      <div class="citem citem-draggable" draggable="true" data-component="simulation_block" title="快速放置一个可绑定 Python 接口的仿真模块">
         <span class="citem-icon-badge citem-icon-badge--simulation">P</span>
-        <span class="citem-label">仿真块</span>
+        <span class="citem-label">通用仿真块</span>
       </div>
+      <button
+        type="button"
+        class="citem citem-authoring-action"
+        data-open-component-authoring
+        onclick="window.dispatchEvent(new CustomEvent('gz:open-component-authoring',{detail:{}}))"
+      >
+        <span class="citem-icon-badge citem-icon-badge--simulation">新</span>
+        <span class="citem-label">新增组件</span>
+      </button>
+    </div>
+
+    <div class="lgroup-head lgroup-head--system" data-palette-group="subsystem" onclick="toggleGroup('g-subsystem')">
+      <span class="lgroup-icon">子</span>
+      <span class="lgroup-label">子系统</span>
+      <span class="lgroup-arrow open" id="arr-g-subsystem">&#9654;</span>
+    </div>
+    <div class="lgroup-body" id="g-subsystem" data-palette-body="subsystem">
       <div class="citem citem-draggable" draggable="true" data-component="subsystem_block" title="双击进入子系统画布">
         <span class="citem-icon-badge citem-icon-badge--subsystem">子</span>
         <span class="citem-label">子系统块</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="middle_var_assign">
-        <span class="citem-icon-badge citem-icon-badge--middle">中</span>
-        <span class="citem-label">中间变量赋值块</span>
-      </div>
     </div>
 
-    <div class="lgroup-head lgroup-head--fault" onclick="toggleGroup('g2')">
+    <div class="lgroup-head lgroup-head--fault" data-palette-group="faults" onclick="toggleGroup('g-faults')">
       <span class="lgroup-icon">故</span>
-      <span>故障注入组件</span>
-      <span class="lgroup-arrow open" id="arr-g2">&#9654;</span>
+      <span class="lgroup-label">故障组件</span>
+      <span class="lgroup-arrow open" id="arr-g-faults">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g2">
+    <div class="lgroup-body" id="g-faults" data-palette-body="faults">
       <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
-        <span class="citem-label">故障组件</span>
+        <span class="citem-label">故障注入</span>
       </div>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="edge_fault_tag">
+        <span class="citem-icon-badge citem-icon-badge--fault">线</span>
+        <span class="citem-label">连线故障注入</span>
+      </div>
+      <button
+        type="button"
+        class="citem citem-authoring-action citem-authoring-action--fault"
+        data-open-fault-authoring-for-selected
+        onclick="window.__GZ_AUTHORING_RUNTIME__?.openFaultAuthoringForSelectedTarget?.()"
+      >
+        <span class="citem-icon-badge citem-icon-badge--fault">+</span>
+        <span class="citem-label">新增故障</span>
+      </button>
     </div>
 
-    <div class="lgroup-head lgroup-head--instrument" onclick="toggleGroup('g3')">
+    <div class="lgroup-head lgroup-head--instrument" data-palette-group="instruments" onclick="toggleGroup('g-instruments')">
       <span class="lgroup-icon">测</span>
-      <span>测量仪器组件</span>
-      <span class="lgroup-arrow open" id="arr-g3">&#9654;</span>
+      <span class="lgroup-label">测量仪器</span>
+      <span class="lgroup-arrow open" id="arr-g-instruments">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g3">
+    <div class="lgroup-body" id="g-instruments" data-palette-body="instruments">
       <div class="citem citem-scope citem-draggable" draggable="true" data-component="instrument_scope" title="接入信号后可双击查看波形">
         <span class="citem-icon-badge citem-icon-badge--scope">波</span>
         <span class="citem-label">示波器</span>
@@ -118,18 +164,14 @@
         <span class="citem-icon-badge citem-icon-badge--logger">记</span>
         <span class="citem-label">数据记录仪</span>
       </div>
-      <div class="citem citem-draggable" draggable="true" data-component="instrument_signal_flow" style="color:#174ea6;border:1px solid #bfdbfe;background:#f8fbff;">
-        <span class="citem-icon-badge citem-icon-badge--logger">流</span>
-        <span class="citem-label">多信号流图</span>
-      </div>
     </div>
 
-    <div class="lgroup-head lgroup-head--link" onclick="toggleGroup('g4')">
+    <div class="lgroup-head lgroup-head--link" data-palette-group="can-lines" onclick="toggleGroup('g-can-lines')">
       <span class="lgroup-icon">线</span>
-      <span>连接线组件</span>
-      <span class="lgroup-arrow open" id="arr-g4">&#9654;</span>
+      <span class="lgroup-label">连接线</span>
+      <span class="lgroup-arrow open" id="arr-g-can-lines">&#9654;</span>
     </div>
-    <div class="lgroup-body" id="g4">
+    <div class="lgroup-body" id="g-can-lines" data-palette-body="can-lines">
       <div class="citem citem-line-tool active" data-line-type="normal" onclick="setConnectionTool('normal')" style="color:var(--text2);">
         <div style="width:18px;height:2px;background:var(--border-dark);border-radius:1px;flex-shrink:0;"></div>
         普通连接线
@@ -141,7 +183,7 @@
     </div>
   </div>
 </aside>
-`,so=[`innerHTML`],co={__name:`LeftPalette`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`left-palette`,innerHTML:I(oo)},null,8,so))}},lo=`<div class="canvas-wrap" id="cw">
+`,G=Lt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null},componentAuthoring:{open:!1,parsedInterface:null},faultAuthoring:{open:!1,target:null}});function So(e={}){G.pythonBinding.open=!0,G.pythonBinding.targetNode=e.targetNode??null,G.pythonBinding.parsedInterface=e.parsedInterface??null,G.pythonBinding.boundSnapshot=e.boundSnapshot??null,G.pythonBinding.parseError=e.parseError??``}function Co(){G.pythonBinding.open=!1,G.pythonBinding.targetNode=null,G.pythonBinding.parsedInterface=null,G.pythonBinding.boundSnapshot=null,G.pythonBinding.parseError=``}function wo(e){G.pythonBinding.parsedInterface=e,G.pythonBinding.parseError=``}function To(e){G.pythonBinding.parseError=e}function Eo(e={}){G.componentAuthoring.open=!0,G.componentAuthoring.parsedInterface=e.parsedInterface??null}function Do(){G.componentAuthoring.open=!1,G.componentAuthoring.parsedInterface=null}function Oo(e={}){G.faultAuthoring.open=!0,G.faultAuthoring.target=e.target??null}function ko(){G.faultAuthoring.open=!1,G.faultAuthoring.target=null}function Ao(){return{dialogsState:G,openPythonBindingDialog:So,closePythonBindingDialog:Co,setPythonBindingPreview:wo,setPythonBindingError:To,openComponentAuthoringDialog:Eo,closeComponentAuthoringDialog:Do,openFaultAuthoringDialog:Oo,closeFaultAuthoringDialog:ko}}function jo(e){return JSON.parse(JSON.stringify(e??null))}function Mo(e){return Array.isArray(e)?jo(e):[]}function No(e){return e&&typeof e==`object`&&!Array.isArray(e)?jo(e):{}}function Po(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Fo({modelId:e=`untitled-model`,modelName:t=`未命名模型`}={}){return{schemaVersion:`3.0`,packageType:`flight-control-model`,modelInfo:{modelId:Po(e,`untitled-model`),modelName:Po(t,`未命名模型`)},componentTemplates:[],systemModel:{nodes:[],edges:[]},faultTypeCatalog:[],faultCapabilityMap:[],faultInstances:[],diagnosticModel:{testPoints:[],detectabilityMatrix:[]},pythonModules:[]}}function Io(e={}){let t=No(e),n=Fo({modelId:t.modelInfo?.modelId??t.modelId,modelName:t.modelInfo?.modelName??t.modelName}),r=No(t.modelInfo),i=No(t.systemModel),a=No(t.diagnosticModel);return{...n,...t,schemaVersion:`3.0`,packageType:Po(t.packageType,n.packageType),modelInfo:{...n.modelInfo,...r,modelId:Po(r.modelId??t.modelId,n.modelInfo.modelId),modelName:Po(r.modelName??t.modelName,n.modelInfo.modelName)},componentTemplates:Mo(t.componentTemplates),systemModel:{...i,nodes:Mo(i.nodes??t.nodes??t.workbenchSnapshot?.modelNodes),edges:Mo(i.edges??t.edges??t.workbenchSnapshot?.modelEdges)},faultTypeCatalog:Mo(t.faultTypeCatalog??t.faultLibrary??t.faultTypes),faultCapabilityMap:Mo(t.faultCapabilityMap),faultInstances:Mo(t.faultInstances),diagnosticModel:{...a,testPoints:Mo(a.testPoints??t.testPoints),detectabilityMatrix:Mo(a.detectabilityMatrix??t.detectabilityMatrix)},pythonModules:Mo(t.pythonModules)}}function Lo(e,t,n=`id`){let r=Mo(e),i=jo(t),a=i?.[n];if(!a)throw Error(`Missing ${n}`);let o=r.findIndex(e=>e?.[n]===a);return o===-1?[...r,i]:r.map((e,t)=>t===o?i:e)}var Ro=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],zo=[{type:`fault_tag`,label:`故障注入`},{type:`edge_fault_tag`,label:`连线故障注入`}],Bo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Vo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Ho(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Ro,faultInjection:zo,instruments:Bo,edges:Vo}}}var Uo=Lt(Ho()),Wo=Jt(!1),Go=Jt(null);function Ko(e){return e.displayName??e.comment??e.name}function qo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Jo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...qo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``}))}}}function Yo(){function e(){Wo.value=!0}function t(e){Go.value=e}return{shellState:Uo,runtimeReady:Wo,selectedNodeBinding:Go,markReady:e,setSelectedNodeBinding:t}}function Xo(e){return JSON.parse(JSON.stringify(e??null))}function K(e){return Array.isArray(e)?Xo(e):[]}function q(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Zo(e={}){return q(e.moduleName,typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):`python_module`)}function Qo(e,t,n){return q(t?.signalId,`${e}.${q(t?.name,`signal_${n}`)}`)}function $o(e,t){return q(e?.displayName,q(e?.comment,q(e?.name,t)))}function es(e,t,n){return K(e).map((e,r)=>{let i=Qo(n,e,r),a=$o(e,`${t}_${r}`),o=q(e.id??e.portId,`${t}-${r}`);return{id:o,portId:o,signalId:i,varName:q(e.name,`signal_${r}`),name:a,displayName:a,type:q(e.type,`any`),comment:q(e.comment),direction:t}})}function ts(e,t){return K(e).map((e,n)=>{let r=Qo(t,e,n),i=$o(e,`middle_${n}`);return{id:q(e.id??e.stateId,q(e.name,`state_${n}`)),stateId:r,signalId:r,varName:q(e.name,`signal_${n}`),name:i,displayName:i,type:q(e.type,`any`),comment:q(e.comment)}})}function ns(e,t){return K(e).filter(e=>e.default!==null&&e.default!==void 0).map((e,n)=>{let r=Qo(t,e,n),i=$o(e,`parameter_${n}`);return{id:q(e.id??e.parameterId,q(e.name,`parameter_${n}`)),parameterId:`${r}.default`,signalId:r,varName:q(e.name,`signal_${n}`),name:i,displayName:i,type:q(e.type,`any`),default:Xo(e.default),comment:q(e.comment)}})}function rs(e,t,n){let r=Xo(e);return r.portMapping={...r.portMapping,inputs:K(r.portMapping?.inputs).map((e,n)=>({...e,signalId:t.inputs[n]?.signalId??e.signalId})),outputs:K(r.portMapping?.outputs).map((e,n)=>({...e,signalId:t.outputs[n]?.signalId??e.signalId})),middleVars:K(r.portMapping?.middleVars).map((e,t)=>({...e,signalId:n[t]?.signalId??e.signalId}))},r}function is(e){return K(e).map(e=>({signalId:e.signalId,varName:e.varName,name:e.displayName,displayName:e.displayName,type:e.type,comment:e.comment}))}function as({templateId:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,parsedInterface:i}={}){if(!e)throw Error(`Missing templateId`);if(!i?.entryFunction)throw Error(`Missing parsed Python entry function`);let a=Xo(i),o=Zo(a),s={inputs:es(a.inputs,`input`,o),outputs:es(a.outputs,`output`,o)},c=ts(a.middleVars,o),l=rs(Jo(a,{moduleCategory:n}),s,c);return{templateId:e,type:`simulation_block`,displayName:q(t,a.description??e),category:n,geometry:r,ports:s,parameters:ns(a.inputs,o),stateVariables:c,pythonBinding:l,faultSlots:[]}}function os(e,t){let n=Xo(e),r=Xo(t),i=r?.slotId;if(!i)throw Error(`Missing slotId`);r.displayName=q(r.displayName??r.slotName,i),r.slotName=q(r.slotName??r.displayName,i),r.kind=q(r.kind,`output_signal`),r.allowedFaultTypeIds=K(r.allowedFaultTypeIds??r.allowedFaultIds),delete r.allowedFaultIds;let a=K(n.faultSlots),o=a.findIndex(e=>e?.slotId===i);return n.faultSlots=o===-1?[...a,r]:a.map((e,t)=>t===o?r:e),n}function ss(e,{id:t,x:n=0,y:r=0}={}){let i=Xo(e);if(!t)throw Error(`Missing id`);return{id:t,templateId:i.templateId,type:`simulation_block`,x:n,y:r,w:176,h:96,geometry:i.geometry??`rect`,props:{name:i.displayName,moduleType:i.category??`仿真模块`,geometry:i.geometry??`rect`,parameters:K(i.parameters),inputs:is(i.ports?.inputs),outputs:is(i.ports?.outputs),middleVars:is(i.stateVariables)},ports:Xo(i.ports),parameters:K(i.parameters),stateVariables:K(i.stateVariables),faultSlots:K(i.faultSlots),pythonBinding:{...Xo(i.pythonBinding),bound:!0}}}function cs(e){return JSON.parse(JSON.stringify(e??null))}function ls(e){return Array.isArray(e)?cs(e):[]}function us(e){return e&&typeof e==`object`&&!Array.isArray(e)?cs(e):{}}function ds(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function fs(e){return Object.fromEntries(Object.entries(us(e)).map(([e,t])=>[e,t&&typeof t==`object`&&ds(t,`default`)?cs(t.default):``]))}function ps(e,t){return t===`edge`?{section:`edges`,targets:ls(e.systemModel?.edges)}:{section:`nodes`,targets:ls(e.systemModel?.nodes)}}function ms(e){return ls(e?.allowedFaultTypeIds??e?.allowedFaultIds)}function hs(e,{targetKind:t,targetId:n,slotId:r}){let{section:i,targets:a}=ps(e,t),o=a.findIndex(e=>e?.id===n);if(o===-1)return null;let s=a[o],c=ls(s.faultSlots),l=c.findIndex(e=>e?.slotId===r);return l===-1?null:{section:i,targets:a,targetIndex:o,faultSlots:c,slotIndex:l,slot:c[l]}}function gs(e,{targetKind:t,targetId:n,slotId:r}){let i=ls(e.faultCapabilityMap),a=i.findIndex(e=>e?.targetId===n&&(e.targetKind||t)===t);if(a===-1)return null;let o=ls(i[a].faultSlots),s=o.findIndex(e=>e?.slotId===r);return s===-1?null:{capabilityMap:i,capabilityIndex:a,faultSlots:o,slotIndex:s,slot:o[s]}}function _s(e,t){return{systemSlot:hs(e,t),capabilitySlot:gs(e,t)}}function vs(e,t){return{...e,allowedFaultTypeIds:[...new Set([...ms(e),t])]}}function ys(e,t,n){let r=vs(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e),a=t.targets.map((e,n)=>n===t.targetIndex?{...e,faultSlots:i}:e);return{...e,systemModel:{...e.systemModel,[t.section]:a}}}function bs(e,t,n){let r=vs(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e);return{...e,faultCapabilityMap:t.capabilityMap.map((e,n)=>n===t.capabilityIndex?{...e,faultSlots:i}:e)}}function xs({id:e,displayName:t,layer:n=`electrical`,faultClass:r=`故障`,runtimeBehavior:i,formula:a=``,parameters:o={}}={}){if(!e)throw Error(`Missing fault type id`);if(!i)throw Error(`Missing runtime behavior`);return{id:e,displayName:t||e,name:t||e,layer:n,faultClass:r,modelClass:r,runtimeBehavior:i,formula:a,parameters:us(o),defaultParameters:fs(o)}}function Ss(e,{targetKind:t,targetId:n,slotId:r,faultTypeId:i}={}){let a=Io(e),{systemSlot:o,capabilitySlot:s}=_s(a,{targetKind:t,targetId:n,slotId:r});if(!o&&!s)throw Error(`Missing target slot`);let c=a;return o&&(c=ys(c,o,i)),s&&(c=bs(c,s,i)),c}function Cs(e){return JSON.parse(JSON.stringify(e??null))}function J(e){return Array.isArray(e)?Cs(e):[]}function ws(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Ts(e){return e&&typeof e==`object`&&!Array.isArray(e)?Cs(e):{}}function Es(){return window.__GZ_STATE__??null}function Ds(e,t=`item`){return String(e??``).trim().toLowerCase().replace(/[^a-z0-9_-]+/g,`-`).replace(/^[-_]+|[-_]+$/g,``)||t}function Os(e,t){let n=1,r=`${e}-${n}`;for(;t.has(r);)n+=1,r=`${e}-${n}`;return r}function ks(e){return J(e?.modelNodes?.length?e.modelNodes:e?.nodes)}function As(e){return J(e?.modelEdges?.length?e.modelEdges:e?.edges)}function js(e){let t=Io(e?.activeModelPackage??{modelInfo:{modelId:`runtime-authored-model`,modelName:`当前编辑模型`}});return{...t,systemModel:{...t.systemModel,nodes:ks(e),edges:As(e)},faultTypeCatalog:J(t.faultTypeCatalog?.length?t.faultTypeCatalog:e?.faultLibrary),faultCapabilityMap:J(t.faultCapabilityMap),faultInstances:J(e?.faultInstances?.length?e.faultInstances:t.faultInstances)}}function Ms(e,t){e.activeModelPackage=Cs(t),e.modelNodes=J(t.systemModel?.nodes),e.modelEdges=J(t.systemModel?.edges),e.nodes=e.modelNodes,e.edges=e.modelEdges,e.faultInstances=J(t.faultInstances),e.sysLoaded=!0,e.systemSaved=!1,e.workspaceSource=e.workspaceSource||`authored`,Array.isArray(t.faultTypeCatalog)&&(e.faultLibrary=J(t.faultTypeCatalog),e.faults=e.faultLibrary)}function Ns(e=``){window.renderModelNodes?.(),window.renderEdges?.(),e&&window.selectNode?.(e),window.updateUI?.()}function Ps(e,t){let n=J(e?.outputs)[0];return{signalId:n?.signalId||`${ws(e?.moduleName,t)}.${ws(n?.name,`output`)}`,name:n?.displayName||n?.comment||n?.name||`输出信号`}}function Fs(e={}){let t=Ds(e.displayName,`custom_component`).replace(/-/g,`_`);return{fileName:`${t}.py`,moduleName:t,description:ws(e.displayName,`自定义组件`),entryFunction:`process`,inputs:[{name:`input_0`,displayName:`输入 1`,type:`float`}],outputs:[{name:`output_0`,displayName:`输出 1`,type:`float`}],middleVars:[],rawSource:``}}function Is(e){return{targetKind:`node`,targetId:e.id,targetName:e.props?.name||e.id,faultSlots:J(e.faultSlots)}}function Ls({parsedInterface:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,slotName:i=``,slotKind:a=`output_signal`,x:o,y:s}={}){let c=Es();if(!c)return{ok:!1,error:`missing-runtime-state`};let l=e?.entryFunction?Cs(e):Fs({displayName:t}),u=Ds(l.moduleName||t,`custom-component`),d=Ps(l,u),f=`${u}-${Ds(d.signalId,`output`)}-fault-slot`,p=os(as({templateId:u,displayName:ws(t,l.description||u),category:n,geometry:r,parsedInterface:l}),{slotId:f,slotName:ws(i,`${d.name}故障位`),displayName:ws(i,`${d.name}故障位`),kind:a,signalId:d.signalId,allowedFaultTypeIds:[]}),m=new Set(ks(c).map(e=>e.id)),h=ss(p,{id:Os(`node-${u}`,m),x:Number.isFinite(o)?o:260+m.size*36,y:Number.isFinite(s)?s:220+m.size*18}),g=js(c),_=[...J(g.systemModel.nodes),h],v=Is(h),y=[...J(g.faultCapabilityMap).filter(e=>!(e.targetKind===`node`&&e.targetId===h.id)),v],b={...g,componentTemplates:Lo(g.componentTemplates,p,`templateId`),systemModel:{...g.systemModel,nodes:_,edges:As(c)},faultCapabilityMap:y};return Ms(c,b),Ns(h.id),{ok:!0,node:h,template:p,package:b}}function Rs(e,t={}){let n={type:`number`,default:Number(t.start??0)},r={type:`number`,default:t.duration??``};return e===`drift`?{rate:{type:`number`,default:Number(t.rate??.01)},start:n,duration:r}:e===`noise`?{amplitude:{type:`number`,default:Number(t.amplitude??.1)},start:n,duration:r}:e===`intermittent`?{probability:{type:`number`,default:Number(t.probability??.1)},start:n,duration:r}:e===`lock`?{lock_value:{type:`number`,default:Number(t.lock_value??0)},start:n,duration:r}:e===`tamper`?{scale:{type:`number`,default:Number(t.scale??1)},start:n,duration:r}:{bias:{type:`number`,default:Number(t.bias??.1)},start:n,duration:r}}function zs(e,t){let n=t.targetKind||`node`,r=t.targetId,i=t.slotId||`default-fault-slot`,a={slotId:i,slotName:t.slotName||t.slotDisplayName||i,displayName:t.slotName||t.slotDisplayName||i,kind:t.slotKind||`output_signal`,signalId:t.signalId||``,allowedFaultTypeIds:[]},o=J(e.faultCapabilityMap),s=o.findIndex(e=>e.targetKind===n&&e.targetId===r),c=s===-1?[...o,{targetKind:n,targetId:r,targetName:t.targetName||r,faultSlots:[a]}]:o.map((e,n)=>{if(n!==s)return e;let o=J(e.faultSlots);return{...e,targetName:e.targetName||t.targetName||r,faultSlots:o.some(e=>e.slotId===i)?o:[...o,a]}}),l=n===`edge`?`edges`:`nodes`,u=J(e.systemModel?.[l]).map(e=>{if(e.id!==r)return e;let t=J(e.faultSlots);return{...e,faultSlots:t.some(e=>e.slotId===i)?t:[...t,a]}});return{...e,faultCapabilityMap:c,systemModel:{...e.systemModel,[l]:u}}}function Bs({target:e,faultId:t,displayName:n,layer:r=`electrical`,faultClass:i=`自定义故障`,runtimeBehavior:a=`bias`,parameters:o={}}={}){let s=Es();if(!s)return{ok:!1,error:`missing-runtime-state`};if(!e?.targetId||!e?.slotId)return{ok:!1,error:`missing-target-slot`};let c=Ds(t||n,`custom-fault-${Date.now()}`),l=xs({id:c,displayName:ws(n,c),layer:r,faultClass:i,runtimeBehavior:a,formula:``,parameters:Rs(a,o)}),u=zs(js(s),{...Ts(e),targetKind:e.targetKind||`node`}),d=Ss({...u,faultTypeCatalog:Lo(u.faultTypeCatalog,l)},{targetKind:e.targetKind||`node`,targetId:e.targetId,slotId:e.slotId,faultTypeId:l.id});return Ms(s,d),Ns(e.targetKind===`node`?e.targetId:``),{ok:!0,faultType:l,package:d}}function Vs(e,t,n){return J(e?.activeModelPackage?.faultCapabilityMap).find(e=>e.targetKind===t&&e.targetId===n)??null}function Hs(){let e=Es();if(!e)return null;let t=e.selEdge?`edge`:`node`,n=e.selEdge||e.selBlk||``;if(!n)return null;let r=t===`edge`?As(e).find(e=>e.id===n):ks(e).find(e=>e.id===n);if(!r)return null;let i=Vs(e,t,n),a=J(r.faultSlots)[0]??J(i?.faultSlots)[0]??null;return a?{targetKind:t,targetId:n,targetName:r.props?.name||r.name||i?.targetName||n,slotId:a.slotId,slotName:a.slotName||a.displayName||a.slotId,slotKind:a.kind,signalId:a.signalId}:null}function Us(){let e=Hs();return e?(window.dispatchEvent(new CustomEvent(`gz:open-fault-authoring`,{detail:{target:e}})),!0):!1}typeof window<`u`&&(window.__GZ_AUTHORING_RUNTIME__={...window.__GZ_AUTHORING_RUNTIME__??{},addAuthoredComponentToRuntime:Ls,addAuthoredFaultToRuntime:Bs,openFaultAuthoringForSelectedTarget:Us});var Ws=[`innerHTML`],Gs={__name:`LeftPalette`,setup(e){function t(e){if(e.target?.closest?.(`[data-open-component-authoring]`)){e.preventDefault(),Eo({});return}e.target?.closest?.(`[data-open-fault-authoring-for-selected]`)&&(e.preventDefault(),Us())}return(e,n)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`left-palette`,onClick:t,innerHTML:N(xo)},null,8,Ws))}},Ks=`<div class="canvas-wrap" id="cw">
   <div class="canvas-grid"></div>
 
   <div class="canvas-chrome" aria-label="画布工具栏">
@@ -202,6 +244,9 @@
       <button type="button" class="canvas-tab" data-canvas-view="components">&#25925;&#38556;&#35270;&#22270;</button>
       <button type="button" class="canvas-tab" data-canvas-view="dataflow">多信号流图</button>
       <button type="button" class="canvas-tab" data-canvas-view="dmatrix">D矩阵</button>
+    </div>
+    <div class="fault-view-tools" data-fault-view-tools>
+      <button type="button" data-toggle-fault-view-testpoints aria-pressed="false">显示测点</button>
     </div>
     <div class="canvas-tools">
       <button type="button" class="canvas-tool is-active" title="选择" data-canvas-command="select">⌖</button>
@@ -292,7 +337,7 @@
     </div>
   </div>
 </div>
-`,uo=[`innerHTML`],fo={__name:`CanvasWorkbench`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`canvas-workbench`,innerHTML:I(lo)},null,8,uo))}},po=`<aside class="rpanel">
+`,qs=[`innerHTML`],Js={__name:`CanvasWorkbench`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`canvas-workbench`,innerHTML:N(Ks)},null,8,qs))}},Ys=`<aside class="rpanel">
   <div class="ph">
     <div class="ph-title">属性面板</div>
     <div class="ph-sub">当前选择 · 配置参数</div>
@@ -312,7 +357,7 @@
     <div id="pd" style="display:none"></div>
   </div>
 </aside>
-`,mo=[`innerHTML`],ho={__name:`RightInspector`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`right-inspector`,innerHTML:I(po)},null,8,mo))}},go=`<div class="sbar">
+`,Xs=[`innerHTML`],Zs={__name:`RightInspector`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`right-inspector`,innerHTML:N(Ys)},null,8,Xs))}},Qs=`<div class="sbar">
   <section class="sbar-log">
     <div class="sbar-log-head">
       <div class="sbar-tabs">
@@ -378,7 +423,7 @@
     </div>
   </section>
 </div>
-`,_o=[`innerHTML`],vo={__name:`WorkbenchStatusBar`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`status-bar`,innerHTML:I(go)},null,8,_o))}},yo=`<div class="overlay" id="ov-ifm">
+`,$s=[`innerHTML`],ec={__name:`WorkbenchStatusBar`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`status-bar`,innerHTML:N(Qs)},null,8,$s))}},tc=`<div class="overlay" id="ov-ifm">
   <div class="modal ifm-modal">
     <div class="mhead">
       <div>
@@ -450,7 +495,7 @@
     </div>
   </div>
 </div>
-`,bo=[`innerHTML`],xo={__name:`FaultLibraryDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`fault-library-dialog`,innerHTML:I(yo)},null,8,bo))}},So=`<div class="overlay" id="ov-tpl">
+`,nc=[`innerHTML`],rc={__name:`FaultLibraryDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`fault-library-dialog`,innerHTML:N(tc)},null,8,nc))}},ic=`<div class="overlay" id="ov-tpl">
   <div class="modal" style="width:820px;height:530px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--purple)">故障建模 · 模板库</div>
@@ -476,7 +521,7 @@
     </div>
   </div>
 </div>
-`,Co=[`innerHTML`],wo={__name:`TemplateDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`template-dialog`,innerHTML:I(So)},null,8,Co))}},To=`<div class="overlay" id="ov-elec">
+`,ac=[`innerHTML`],oc={__name:`TemplateDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`template-dialog`,innerHTML:N(ic)},null,8,ac))}},sc=`<div class="overlay" id="ov-elec">
   <div class="modal" style="width:860px;height:540px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--red)">电气层故障注入</div>
@@ -509,7 +554,7 @@
     </div>
   </div>
 </div>
-`,Eo=[`innerHTML`],Do={__name:`ElectricalFaultDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`electrical-fault-dialog`,innerHTML:I(To)},null,8,Eo))}},Oo=`<div class="overlay" id="ov-proto">
+`,cc=[`innerHTML`],lc={__name:`ElectricalFaultDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`electrical-fault-dialog`,innerHTML:N(sc)},null,8,cc))}},uc=`<div class="overlay" id="ov-proto">
   <div class="modal" style="width:860px;height:540px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--blue)">CAN 协议层故障注入</div>
@@ -542,7 +587,7 @@
     </div>
   </div>
 </div>
-`,ko=[`innerHTML`],Ao={__name:`ProtocolFaultDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`protocol-fault-dialog`,innerHTML:I(Oo)},null,8,ko))}},jo=`<div class="overlay" id="ov-cfg">
+`,dc=[`innerHTML`],fc={__name:`ProtocolFaultDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`protocol-fault-dialog`,innerHTML:N(uc)},null,8,dc))}},pc=`<div class="overlay" id="ov-cfg">
   <div class="modal" style="width:680px;height:490px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--red)">故障配置 · 注入参数</div>
@@ -609,14 +654,14 @@
     </div>
   </div>
 </div>
-`,Mo=[`innerHTML`],No={__name:`ConfigDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`config-dialog`,innerHTML:I(jo)},null,8,Mo))}},Po=`<div class="scope-dialog-stub" id="ov-scope" hidden data-scope-dialog-stub="true"></div>
-`,Fo=[`innerHTML`],Io={__name:`ScopeDialog`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:I(Po)},null,8,Fo))}},q=Pt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null}});function Lo(){function e(e={}){q.pythonBinding.open=!0,q.pythonBinding.targetNode=e.targetNode??null,q.pythonBinding.parsedInterface=e.parsedInterface??null,q.pythonBinding.boundSnapshot=e.boundSnapshot??null,q.pythonBinding.parseError=e.parseError??``}function t(){q.pythonBinding.open=!1,q.pythonBinding.targetNode=null,q.pythonBinding.parsedInterface=null,q.pythonBinding.boundSnapshot=null,q.pythonBinding.parseError=``}function n(e){q.pythonBinding.parsedInterface=e,q.pythonBinding.parseError=``}function r(e){q.pythonBinding.parseError=e}return{dialogsState:q,openPythonBindingDialog:e,closePythonBindingDialog:t,setPythonBindingPreview:n,setPythonBindingError:r}}var Ro=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],zo=[{type:`fault_tag`,label:`故障组件`}],Bo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Vo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Ho(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Ro,faultInjection:zo,instruments:Bo,edges:Vo}}}var Uo=Pt(Ho()),Wo=Wt(!1),Go=Wt(null);function Ko(e){return e.displayName??e.comment??e.name}function qo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Jo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...qo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``}))}}}function Yo(){function e(){Wo.value=!0}function t(e){Go.value=e}return{shellState:Uo,runtimeReady:Wo,selectedNodeBinding:Go,markReady:e,setSelectedNodeBinding:t}}function Xo(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function Zo(e){return e.replace(/\r\n/g,`
-`)}function Qo(e,t){let n=e.match(/("""|''')([\s\S]*?)\1/)?.[2]??``;return{moduleName:n.match(/Module:\s*([A-Za-z0-9_]+)/)?.[1]??t.replace(/\.py$/i,``),description:n.match(/Description:\s*(.+)/)?.[1]?.trim()??``}}function $o(e){let t=/(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g,n=[],r;for(;r=t.exec(e);){if((r[4]??``).length!==0)continue;let t=r.index+r[1].length,i=e.slice(0,t).split(`
-`).length;n.push({startIndex:t,line:i,isEntry:!!r[3],name:r[5],paramsSource:r[6],returnAnnotation:r[7]?.trim()??``,headerComment:r[8]?.trim()??``})}return n.sort((e,t)=>e.startIndex-t.startIndex).map((t,n,r)=>({...t,endIndex:r[n+1]?.startIndex??e.length}))}function es(e){if(e.length===0)throw Xo(`未找到可识别的入口函数`);let t=e.find(e=>e.isEntry);if(t)return t;let n=e.find(e=>e.name===`process`);if(n)return n;if(e.length===1)return e[0];throw Xo(`找到多个顶层函数，但没有 @entry 或 process 入口`)}function ts(e){let t=[],n=``,r=0;for(let i of e){if((i===`(`||i===`[`||i===`{`)&&(r+=1),(i===`)`||i===`]`||i===`}`)&&(r=Math.max(0,r-1)),i===`,`&&r===0){n.trim()&&t.push(n.trim()),n=``;continue}n+=i}return n.trim()&&t.push(n.trim()),t}function ns(e){return String(e??``).trim().replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u,``).trim()}function rs({name:e,comment:t}){return ns(t)||e}function is(e){let t=ns(e);return t?ts(t):[]}function as(e){let t=e.indexOf(`#`);return t<0?{signature:e.trim().replace(/,$/,``),comment:``}:{signature:e.slice(0,t).trim().replace(/,$/,``),comment:e.slice(t+1).trim()}}function os(e,t,n=``){let r=is(n),i=[];return e.includes(`#`)?e.split(`
-`).map(e=>e.trim()).filter(Boolean).forEach(e=>{let{signature:t,comment:n}=as(e),r=ts(t.replace(/,$/,``)).filter(Boolean),a=is(n);r.forEach((e,t)=>{i.push({signature:e,comment:a[t]??(r.length===1?ns(n):``)})})}):ts(e).filter(Boolean).forEach((e,t)=>{i.push({signature:e,comment:r[t]??``})}),i.map((e,n)=>{let{signature:i,comment:a}=typeof e==`string`?as(e):e,o=i.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);if(!o)throw Xo(`无法解析参数定义: ${i}`,t+n);let s=ns(a||r[n]||``);return{name:o[1],displayName:rs({name:o[1],comment:s}),type:o[2]?.trim()??`any`,default:o[3]?.trim()??null,comment:s}})}function ss(e,t){let n=e.slice(t.startIndex,t.endIndex),r=n.indexOf(`
-`);return r===-1?``:n.slice(r+1)}function cs(e,t){let n=[...e.split(`
-`)].reverse().find(e=>e.trim().startsWith(`return `))?.match(/return\s+(.+?)(?:\s*#\s*(.+))?$/),r=is(n?.[2]??``),i=1;return n?.[1]?i=ts(n[1]).length:/Tuple?\[/.test(t)&&(i=ts(t.replace(/^Tuple?\[/,``).replace(/\]$/,``)).length),Array.from({length:Math.max(1,i)},(e,t)=>{let n=`output_${t}`,i=ns(r[t]??``);return{name:n,displayName:rs({name:n,comment:i}),type:`float`,comment:i}})}function ls(e){let t=e.split(`
-`),n=[];for(let e=0;e<t.length;e+=1)if(t[e].includes(`@observable`))for(let r=e+1;r<t.length;r+=1){let e=t[r].trim();if(!e)continue;let i=e.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=.*?(?:#\s*(.+))?$/);if(i){let e=ns(i[2]??``);n.push({name:i[1],displayName:rs({name:i[1],comment:e}),type:`float`,comment:e})}break}return n}function us({fileName:e,source:t}){let n=Zo(t),{moduleName:r,description:i}=Qo(n,e),a=es($o(n)),o=ss(n,a);return{fileName:e,moduleName:r,description:i,entryFunction:a.name,inputs:os(a.paramsSource,a.line,a.headerComment),outputs:cs(o,a.returnAnnotation),middleVars:ls(o),rawSource:n}}var ds=(e,t)=>{let n=e.__vccOpts||e;for(let[e,r]of t)n[e]=r;return n},fs={key:0,class:`overlay overlay--vue open`,"data-testid":`python-binding-dialog`},ps={class:`modal python-binding-modal`},ms={class:`mhead`},hs={class:`python-binding-modal__sub`},gs={class:`mbody python-binding-modal__body`},_s={class:`python-binding-modal__panel python-binding-modal__panel--left`},vs={class:`python-binding-modal__toolbar`},ys={key:0,class:`python-binding-modal__error`},bs={key:1,class:`python-binding-modal__summary`},xs={class:`python-binding-modal__file`},Ss={class:`python-binding-modal__meta`},Cs={class:`python-binding-modal__desc`},ws={key:2,class:`python-binding-modal__groups`},Ts={class:`python-binding-group`},Es=[`value`,`onInput`],Ds={class:`python-binding-row__type`},Os={class:`python-binding-row__note`},ks={class:`python-binding-group`},As=[`value`,`onInput`],js={class:`python-binding-row__type`},Ms={class:`python-binding-row__note`},Ns={class:`python-binding-group`},Ps=[`value`,`onInput`],Fs={class:`python-binding-row__type`},Is={class:`python-binding-row__note`},Ls={class:`python-binding-modal__panel python-binding-modal__panel--right`},Rs={class:`python-binding-modal__code`},zs={class:`mfoot`},Bs=[`disabled`],Vs=ds({__name:`PythonBindingDialog`,props:{open:{type:Boolean,default:void 0},targetNode:{type:Object,default:void 0},parsedInterface:{type:Object,default:void 0}},emits:[`close`,`confirm`,`unbind`,`pick-file`],setup(e,{emit:t}){let n=e,r=t,{dialogsState:i,closePythonBindingDialog:a,openPythonBindingDialog:o,setPythonBindingError:s,setPythonBindingPreview:c}=Lo(),l=Wt(null),u=Wt(null),d=da(()=>n.open??i.pythonBinding.open),f=da(()=>n.targetNode??i.pythonBinding.targetNode),p=da(()=>n.parsedInterface??i.pythonBinding.parsedInterface),m=da(()=>i.pythonBinding.parseError);function h(e){if(!e){u.value=null;return}u.value={...e,inputs:(e.inputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),outputs:(e.outputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),middleVars:(e.middleVars??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name}))}}function g(){a(),r(`close`)}function _(){l.value?.click(),r(`pick-file`)}async function v(e){let t=e.target.files?.[0];if(t)try{let e=await t.text(),n=us({fileName:t.name,source:e});c(n),h(n)}catch(e){s(e?.message??`解析 Python 文件失败`)}finally{e.target.value=``}}function y(e,t,n){u.value&&(u.value[e][t].displayName=n)}function b(){if(!u.value||!f.value?.id)return;let e={nodeId:f.value.id,binding:Jo(u.value)};window.dispatchEvent(new CustomEvent(`gz:python-binding-confirm`,{detail:e})),r(`confirm`,e),g()}function x(){if(!f.value?.id)return;let e={nodeId:f.value.id};window.dispatchEvent(new CustomEvent(`gz:python-binding-unbind`,{detail:e})),r(`unbind`,e),g()}function S(e){o(e.detail??{}),h(e.detail?.parsedInterface??e.detail?.boundSnapshot?.parsedInterface??null)}return Mn(p,e=>{h(e)},{immediate:!0}),er(()=>{window.addEventListener(`gz:open-python-binding`,S)}),rr(()=>{window.removeEventListener(`gz:open-python-binding`,S)}),(e,t)=>d.value?(H(),U(`div`,fs,[W(`div`,ps,[W(`div`,ms,[W(`div`,null,[t[0]||=W(`div`,{class:`mtitle python-binding-modal__title`},`绑定 Python 文件`,-1),W(`div`,hs,k(f.value?.label??f.value?.props?.name??`未选择仿真块`),1)]),W(`button`,{class:`mclose`,onClick:g},`×`)]),W(`div`,gs,[W(`section`,_s,[W(`div`,vs,[W(`button`,{class:`btn-ok btn-ok-b`,type:`button`,onClick:_},`选择 .py 文件`),W(`input`,{ref_key:`fileInput`,ref:l,class:`python-binding-modal__input`,type:`file`,accept:`.py`,onChange:v},null,544)]),m.value?(H(),U(`div`,ys,k(m.value),1)):zi(``,!0),u.value?(H(),U(`div`,bs,[W(`div`,xs,k(u.value.fileName),1),W(`div`,Ss,k(u.value.moduleName)+` · `+k(u.value.entryFunction),1),W(`div`,Cs,k(u.value.description||`未提供模块说明。`),1)])):zi(``,!0),u.value?(H(),U(`div`,ws,[W(`div`,Ts,[t[1]||=W(`div`,{class:`python-binding-group__head`},`输入变量`,-1),(H(!0),U(B,null,ur(u.value.inputs,(e,t)=>(H(),U(`div`,{key:`input-${e.name}`,class:`python-binding-row`},[W(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`inputs`,t,e.target.value)},null,40,Es),W(`span`,Ds,k(e.type),1),W(`span`,Os,k(e.name)+` · `+k(e.comment||`无注释`),1)]))),128))]),W(`div`,ks,[t[2]||=W(`div`,{class:`python-binding-group__head`},`输出变量`,-1),(H(!0),U(B,null,ur(u.value.outputs,(e,t)=>(H(),U(`div`,{key:`output-${e.name}`,class:`python-binding-row`},[W(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`outputs`,t,e.target.value)},null,40,As),W(`span`,js,k(e.type),1),W(`span`,Ms,k(e.name)+` · `+k(e.comment||`无注释`),1)]))),128))]),W(`div`,Ns,[t[3]||=W(`div`,{class:`python-binding-group__head`},`中间变量`,-1),(H(!0),U(B,null,ur(u.value.middleVars,(e,t)=>(H(),U(`div`,{key:`middle-${e.name}`,class:`python-binding-row`},[W(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`middleVars`,t,e.target.value)},null,40,Ps),W(`span`,Fs,k(e.type),1),W(`span`,Is,k(e.name)+` · `+k(e.comment||`无注释`),1)]))),128))])])):zi(``,!0)]),W(`section`,Ls,[t[4]||=W(`div`,{class:`python-binding-group__head python-binding-modal__code-head`},`源码预览`,-1),W(`pre`,Rs,k(u.value?.rawSource??`尚未选择 Python 文件。`),1)])]),W(`div`,zs,[W(`button`,{class:`btn-cancel`,type:`button`,onClick:g},`取消`),W(`button`,{class:`btn-ok btn-ok-r`,type:`button`,onClick:x},`解除绑定`),W(`button`,{class:`btn-ok btn-ok-b`,type:`button`,disabled:!u.value,onClick:b},`确认绑定`,8,Bs)])])])):zi(``,!0)}},[[`__scopeId`,`data-v-1e025653`]]),Hs=`<div class="toast" id="toast"><span id="ti"></span><span id="tm"></span></div>`,Us=[`innerHTML`],Ws={__name:`ToastHost`,setup(e){return(e,t)=>(H(),U(`div`,{class:`gz-shell-fragment`,"data-testid":`toast-host`,innerHTML:I(Hs)},null,8,Us))}},Gs=`// --- 状态 ---\r
+`,mc=[`innerHTML`],hc={__name:`ConfigDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`config-dialog`,innerHTML:N(pc)},null,8,mc))}},gc=`<div class="scope-dialog-stub" id="ov-scope" hidden data-scope-dialog-stub="true"></div>
+`,_c=[`innerHTML`],vc={__name:`ScopeDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:N(gc)},null,8,_c))}};function yc(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function bc(e){return e.replace(/\r\n/g,`
+`)}function xc(e,t){let n=e.match(/("""|''')([\s\S]*?)\1/)?.[2]??``;return{moduleName:n.match(/Module:\s*([A-Za-z0-9_]+)/)?.[1]??t.replace(/\.py$/i,``),description:n.match(/Description:\s*(.+)/)?.[1]?.trim()??``}}function Sc(e){let t=/(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g,n=[],r;for(;r=t.exec(e);){if((r[4]??``).length!==0)continue;let t=r.index+r[1].length,i=e.slice(0,t).split(`
+`).length;n.push({startIndex:t,line:i,isEntry:!!r[3],name:r[5],paramsSource:r[6],returnAnnotation:r[7]?.trim()??``,headerComment:r[8]?.trim()??``})}return n.sort((e,t)=>e.startIndex-t.startIndex).map((t,n,r)=>({...t,endIndex:r[n+1]?.startIndex??e.length}))}function Cc(e){if(e.length===0)throw yc(`未找到可识别的入口函数`);let t=e.find(e=>e.isEntry);if(t)return t;let n=e.find(e=>e.name===`process`);if(n)return n;if(e.length===1)return e[0];throw yc(`找到多个顶层函数，但没有 @entry 或 process 入口`)}function wc(e){let t=[],n=``,r=0;for(let i of e){if((i===`(`||i===`[`||i===`{`)&&(r+=1),(i===`)`||i===`]`||i===`}`)&&(r=Math.max(0,r-1)),i===`,`&&r===0){n.trim()&&t.push(n.trim()),n=``;continue}n+=i}return n.trim()&&t.push(n.trim()),t}function Tc(e){return String(e??``).trim().replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u,``).trim()}function Ec({name:e,comment:t}){return Tc(t)||e}function Dc(e){let t=Tc(e);return t?wc(t):[]}function Oc(e){let t=e.indexOf(`#`);return t<0?{signature:e.trim().replace(/,$/,``),comment:``}:{signature:e.slice(0,t).trim().replace(/,$/,``),comment:e.slice(t+1).trim()}}function kc(e,t,n=``){let r=Dc(n),i=[];return e.includes(`#`)?e.split(`
+`).map(e=>e.trim()).filter(Boolean).forEach(e=>{let{signature:t,comment:n}=Oc(e),r=wc(t.replace(/,$/,``)).filter(Boolean),a=Dc(n);r.forEach((e,t)=>{i.push({signature:e,comment:a[t]??(r.length===1?Tc(n):``)})})}):wc(e).filter(Boolean).forEach((e,t)=>{i.push({signature:e,comment:r[t]??``})}),i.map((e,n)=>{let{signature:i,comment:a}=typeof e==`string`?Oc(e):e,o=i.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);if(!o)throw yc(`无法解析参数定义: ${i}`,t+n);let s=Tc(a||r[n]||``);return{name:o[1],displayName:Ec({name:o[1],comment:s}),type:o[2]?.trim()??`any`,default:o[3]?.trim()??null,comment:s}})}function Ac(e,t){let n=e.slice(t.startIndex,t.endIndex),r=n.indexOf(`
+`);return r===-1?``:n.slice(r+1)}function jc(e,t){let n=[...e.split(`
+`)].reverse().find(e=>e.trim().startsWith(`return `))?.match(/return\s+(.+?)(?:\s*#\s*(.+))?$/),r=Dc(n?.[2]??``),i=1;return n?.[1]?i=wc(n[1]).length:/Tuple?\[/.test(t)&&(i=wc(t.replace(/^Tuple?\[/,``).replace(/\]$/,``)).length),Array.from({length:Math.max(1,i)},(e,t)=>{let n=`output_${t}`,i=Tc(r[t]??``);return{name:n,displayName:Ec({name:n,comment:i}),type:`float`,comment:i}})}function Mc(e){let t=e.split(`
+`),n=[];for(let e=0;e<t.length;e+=1)if(t[e].includes(`@observable`))for(let r=e+1;r<t.length;r+=1){let e=t[r].trim();if(!e)continue;let i=e.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=.*?(?:#\s*(.+))?$/);if(i){let e=Tc(i[2]??``);n.push({name:i[1],displayName:Ec({name:i[1],comment:e}),type:`float`,comment:e})}break}return n}function Nc({fileName:e,source:t}){let n=bc(t),{moduleName:r,description:i}=xc(n,e),a=Cc(Sc(n)),o=Ac(n,a);return{fileName:e,moduleName:r,description:i,entryFunction:a.name,inputs:kc(a.paramsSource,a.line,a.headerComment),outputs:jc(o,a.returnAnnotation),middleVars:Mc(o),rawSource:n}}var Pc=(e,t)=>{let n=e.__vccOpts||e;for(let[e,r]of t)n[e]=r;return n},Fc={key:0,class:`overlay overlay--vue open`,"data-testid":`python-binding-dialog`},Ic={class:`modal python-binding-modal`},Lc={class:`mhead`},Rc={class:`python-binding-modal__sub`},zc={class:`mbody python-binding-modal__body`},Bc={class:`python-binding-modal__panel python-binding-modal__panel--left`},Vc={class:`python-binding-modal__toolbar`},Hc={key:0,class:`python-binding-modal__error`},Uc={key:1,class:`python-binding-modal__summary`},Wc={class:`python-binding-modal__file`},Gc={class:`python-binding-modal__meta`},Kc={class:`python-binding-modal__desc`},qc={key:2,class:`python-binding-modal__groups`},Jc={class:`python-binding-group`},Yc=[`value`,`onInput`],Xc={class:`python-binding-row__type`},Zc={class:`python-binding-row__note`},Qc={class:`python-binding-group`},$c=[`value`,`onInput`],el={class:`python-binding-row__type`},tl={class:`python-binding-row__note`},nl={class:`python-binding-group`},rl=[`value`,`onInput`],il={class:`python-binding-row__type`},al={class:`python-binding-row__note`},ol={class:`python-binding-modal__panel python-binding-modal__panel--right`},sl={class:`python-binding-modal__code`},cl={class:`mfoot`},ll=[`disabled`],ul=Pc({__name:`PythonBindingDialog`,props:{open:{type:Boolean,default:void 0},targetNode:{type:Object,default:void 0},parsedInterface:{type:Object,default:void 0}},emits:[`close`,`confirm`,`unbind`,`pick-file`],setup(e,{emit:t}){let n=e,r=t,{dialogsState:i,closePythonBindingDialog:a,openPythonBindingDialog:o,setPythonBindingError:s,setPythonBindingPreview:c}=Ao(),l=Jt(null),u=Jt(null),d=ga(()=>n.open??i.pythonBinding.open),f=ga(()=>n.targetNode??i.pythonBinding.targetNode),p=ga(()=>n.parsedInterface??i.pythonBinding.parsedInterface),m=ga(()=>i.pythonBinding.parseError);function h(e){if(!e){u.value=null;return}u.value={...e,inputs:(e.inputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),outputs:(e.outputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),middleVars:(e.middleVars??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name}))}}function g(){a(),r(`close`)}function _(){l.value?.click(),r(`pick-file`)}async function v(e){let t=e.target.files?.[0];if(t)try{let e=await t.text(),n=Nc({fileName:t.name,source:e});c(n),h(n)}catch(e){s(e?.message??`解析 Python 文件失败`)}finally{e.target.value=``}}function y(e,t,n){u.value&&(u.value[e][t].displayName=n)}function b(){if(!u.value||!f.value?.id)return;let e={nodeId:f.value.id,binding:Jo(u.value)};window.dispatchEvent(new CustomEvent(`gz:python-binding-confirm`,{detail:e})),r(`confirm`,e),g()}function x(){if(!f.value?.id)return;let e={nodeId:f.value.id};window.dispatchEvent(new CustomEvent(`gz:python-binding-unbind`,{detail:e})),r(`unbind`,e),g()}function ee(e){o(e.detail??{}),h(e.detail?.parsedInterface??e.detail?.boundSnapshot?.parsedInterface??null)}return In(p,e=>{h(e)},{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-python-binding`,ee)}),sr(()=>{window.removeEventListener(`gz:open-python-binding`,ee)}),(e,t)=>d.value?(B(),V(`div`,Fc,[H(`div`,Ic,[H(`div`,Lc,[H(`div`,null,[t[0]||=H(`div`,{class:`mtitle python-binding-modal__title`},`绑定 Python 文件`,-1),H(`div`,Rc,D(f.value?.label??f.value?.props?.name??`未选择仿真块`),1)]),H(`button`,{class:`mclose`,onClick:g},`×`)]),H(`div`,zc,[H(`section`,Bc,[H(`div`,Vc,[H(`button`,{class:`btn-ok btn-ok-b`,type:`button`,onClick:_},`选择 .py 文件`),H(`input`,{ref_key:`fileInput`,ref:l,class:`python-binding-modal__input`,type:`file`,accept:`.py`,onChange:v},null,544)]),m.value?(B(),V(`div`,Hc,D(m.value),1)):Wi(``,!0),u.value?(B(),V(`div`,Uc,[H(`div`,Wc,D(u.value.fileName),1),H(`div`,Gc,D(u.value.moduleName)+` · `+D(u.value.entryFunction),1),H(`div`,Kc,D(u.value.description||`未提供模块说明。`),1)])):Wi(``,!0),u.value?(B(),V(`div`,qc,[H(`div`,Jc,[t[1]||=H(`div`,{class:`python-binding-group__head`},`输入变量`,-1),(B(!0),V(R,null,mr(u.value.inputs,(e,t)=>(B(),V(`div`,{key:`input-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`inputs`,t,e.target.value)},null,40,Yc),H(`span`,Xc,D(e.type),1),H(`span`,Zc,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))]),H(`div`,Qc,[t[2]||=H(`div`,{class:`python-binding-group__head`},`输出变量`,-1),(B(!0),V(R,null,mr(u.value.outputs,(e,t)=>(B(),V(`div`,{key:`output-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`outputs`,t,e.target.value)},null,40,$c),H(`span`,el,D(e.type),1),H(`span`,tl,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))]),H(`div`,nl,[t[3]||=H(`div`,{class:`python-binding-group__head`},`中间变量`,-1),(B(!0),V(R,null,mr(u.value.middleVars,(e,t)=>(B(),V(`div`,{key:`middle-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`middleVars`,t,e.target.value)},null,40,rl),H(`span`,il,D(e.type),1),H(`span`,al,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))])])):Wi(``,!0)]),H(`section`,ol,[t[4]||=H(`div`,{class:`python-binding-group__head python-binding-modal__code-head`},`源码预览`,-1),H(`pre`,sl,D(u.value?.rawSource??`尚未选择 Python 文件。`),1)])]),H(`div`,cl,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:g},`取消`),H(`button`,{class:`btn-ok btn-ok-r`,type:`button`,onClick:x},`解除绑定`),H(`button`,{class:`btn-ok btn-ok-b`,type:`button`,disabled:!u.value,onClick:b},`确认绑定`,8,ll)])])])):Wi(``,!0)}},[[`__scopeId`,`data-v-1e025653`]]),dl={key:0,class:`overlay overlay--vue open`,"data-testid":`component-authoring-dialog`},fl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`component-authoring-title`},pl={class:`mhead`},ml={class:`authoring-modal__sub`},hl={class:`mbody authoring-modal__body`},gl={class:`authoring-card authoring-form`},_l={class:`authoring-form__row`},vl={class:`authoring-form__row`},yl={class:`authoring-form__row`},bl={class:`authoring-card`},xl={class:`authoring-meta`},Sl={class:`authoring-card`},Cl={key:0,class:`authoring-list`},wl={key:1,class:`authoring-empty`},Tl={class:`authoring-card`},El={key:0,class:`authoring-list`},Dl={key:1,class:`authoring-empty`},Ol={class:`authoring-card authoring-form`},kl={class:`authoring-form__row`},Al={class:`authoring-form__row`},jl={class:`mfoot`},Ml={__name:`ComponentAuthoringDialog`,setup(e){let{dialogsState:t}=Ao(),n=ga(()=>t.componentAuthoring.parsedInterface),r=ga(()=>n.value?.inputs??[]),i=ga(()=>n.value?.outputs??[]),a=Lt({displayName:``,category:`仿真模块`,geometry:`rect`,slotName:``,slotKind:`output_signal`});function o(e){return e?.displayName||e?.comment||e?.name||`未命名`}function s(e){let t=e?.outputs?.[0];return t?.displayName||t?.comment||t?.name||`输出信号`}function c(e){a.displayName=e?.description||e?.moduleName||`自定义仿真组件`,a.category=`仿真模块`,a.geometry=`rect`,a.slotName=`${s(e)}故障位`,a.slotKind=`output_signal`}function l(e){Eo(e.detail??{})}function u(){Ls({parsedInterface:n.value,displayName:a.displayName,category:a.category,geometry:a.geometry,slotName:a.slotName,slotKind:a.slotKind}).ok!==!1&&Do()}return In(n,c,{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-component-authoring`,l)}),sr(()=>{window.removeEventListener(`gz:open-component-authoring`,l)}),(e,s)=>N(t).componentAuthoring.open?(B(),V(`div`,dl,[H(`div`,fl,[H(`div`,pl,[H(`div`,null,[s[7]||=H(`div`,{id:`component-authoring-title`,class:`mtitle`},`新增仿真组件`,-1),H(`div`,ml,D(n.value?.fileName||`尚未选择 Python 接口`),1)]),H(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:s[0]||=(...e)=>N(Do)&&N(Do)(...e)},`×`)]),H(`div`,hl,[H(`section`,gl,[s[13]||=H(`div`,{class:`authoring-card__eyebrow`},`基础信息`,-1),H(`label`,_l,[s[8]||=H(`span`,null,`中文名称`,-1),F(H(`input`,{"onUpdate:modelValue":s[1]||=e=>a.displayName=e,"data-authoring-component-name":``,type:`text`},null,512),[[so,a.displayName]])]),H(`label`,vl,[s[10]||=H(`span`,null,`组件类别`,-1),F(H(`select`,{"onUpdate:modelValue":s[2]||=e=>a.category=e,"data-authoring-component-category":``},[...s[9]||=[Ui(`<option value="信号源">信号源</option><option value="仿真模块">仿真模块</option><option value="求和模块">求和模块</option><option value="仪器模块">仪器模块</option><option value="自定义模块">自定义模块</option>`,5)]],512),[[co,a.category]])]),H(`label`,yl,[s[12]||=H(`span`,null,`几何形状`,-1),F(H(`select`,{"onUpdate:modelValue":s[3]||=e=>a.geometry=e,"data-authoring-component-geometry":``},[...s[11]||=[H(`option`,{value:`rect`},`矩形模块`,-1),H(`option`,{value:`pill`},`胶囊模块`,-1),H(`option`,{value:`circle`},`圆形模块`,-1),H(`option`,{value:`instrument`},`仪表模块`,-1)]],512),[[co,a.geometry]])])]),H(`section`,bl,[s[14]||=H(`div`,{class:`authoring-card__eyebrow`},`Python 接口`,-1),H(`h3`,null,D(n.value?.description||`未命名组件`),1),H(`div`,xl,[H(`span`,null,D(n.value?.moduleName||`unknown_module`),1),H(`span`,null,D(n.value?.entryFunction||`process`),1)])]),H(`section`,Sl,[s[15]||=H(`div`,{class:`authoring-card__eyebrow`},`输入`,-1),r.value.length?(B(),V(`div`,Cl,[(B(!0),V(R,null,mr(r.value,e=>(B(),V(`div`,{key:`input-${e.name}`,class:`authoring-list__row`},[H(`strong`,null,D(o(e)),1),H(`span`,null,D(e.name),1),H(`code`,null,D(e.type||`any`),1)]))),128))])):(B(),V(`div`,wl,`暂无输入变量`))]),H(`section`,Tl,[s[16]||=H(`div`,{class:`authoring-card__eyebrow`},`输出`,-1),i.value.length?(B(),V(`div`,El,[(B(!0),V(R,null,mr(i.value,e=>(B(),V(`div`,{key:`output-${e.name}`,class:`authoring-list__row`},[H(`strong`,null,D(o(e)),1),H(`span`,null,D(e.name),1),H(`code`,null,D(e.type||`any`),1)]))),128))])):(B(),V(`div`,Dl,`暂无输出变量`))]),H(`section`,Ol,[s[20]||=H(`div`,{class:`authoring-card__eyebrow`},`默认故障槽位`,-1),H(`label`,kl,[s[17]||=H(`span`,null,`槽位名称`,-1),F(H(`input`,{"onUpdate:modelValue":s[4]||=e=>a.slotName=e,"data-authoring-slot-name":``,type:`text`},null,512),[[so,a.slotName]])]),H(`label`,Al,[s[19]||=H(`span`,null,`槽位类型`,-1),F(H(`select`,{"onUpdate:modelValue":s[5]||=e=>a.slotKind=e,"data-authoring-slot-kind":``},[...s[18]||=[H(`option`,{value:`output_signal`},`输出信号`,-1),H(`option`,{value:`input_signal`},`输入信号`,-1),H(`option`,{value:`state_variable`},`内部状态`,-1),H(`option`,{value:`parameter`},`参数`,-1)]],512),[[co,a.slotKind]])])])]),H(`div`,jl,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:s[6]||=(...e)=>N(Do)&&N(Do)(...e)},`取消`),H(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-component":``,onClick:u},`保存组件`)])])])):Wi(``,!0)}},Nl={key:0,class:`overlay overlay--vue open`,"data-testid":`fault-authoring-dialog`},Pl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`fault-authoring-title`},Fl={class:`mhead`},Il={class:`authoring-modal__sub`},Ll={class:`mbody authoring-modal__body`},Rl={class:`authoring-card`},zl={class:`authoring-meta`},Bl={class:`authoring-card authoring-form`},Vl={class:`authoring-form__row`},Hl={class:`authoring-form__row`},Ul={class:`authoring-form__row`},Wl=[`value`],Gl={class:`authoring-form__row`},Kl={class:`authoring-form__row`},ql=[`value`],Jl={class:`authoring-card authoring-form`},Yl={class:`authoring-form__row`},Xl={class:`authoring-form__row`},Zl={class:`authoring-form__row`},Ql={class:`mfoot`},$l={__name:`FaultAuthoringDialog`,setup(e){let{dialogsState:t}=Ao(),n=ga(()=>t.faultAuthoring.target),r=[{value:`bias`,label:`Bias 固定偏置`},{value:`drift`,label:`Drift 缓慢漂移`},{value:`intermittent`,label:`Intermittent 间歇故障`},{value:`noise`,label:`Noise 噪声扰动`},{value:`lock`,label:`Lock 锁定输出`},{value:`tamper`,label:`Tamper 篡改信号`}],i=[{value:`electrical`,label:`电气层`},{value:`physical`,label:`物理层`},{value:`protocol`,label:`协议层`},{value:`local_state`,label:`本地状态故障`}],a=Lt({faultId:``,displayName:``,layer:`electrical`,faultClass:`偏差故障`,runtimeBehavior:`bias`,parameters:{bias:.1,start:0,duration:``}});function o(e){return String(e||``).trim().toLowerCase().replace(/[^a-z0-9]+/g,`_`).replace(/^_+|_+$/g,``)}function s(e){a.displayName=`${e?.targetName||e?.targetId||`目标对象`}自定义偏置`,a.faultId=o(`${e?.targetId||`target`}_${e?.slotId||`slot`}_bias`)||`custom_fault_bias`,a.layer=`electrical`,a.faultClass=`偏差故障`,a.runtimeBehavior=`bias`,a.parameters.bias=.1,a.parameters.start=0,a.parameters.duration=``}function c(e){Oo(e.detail??{})}function l(){Bs({target:n.value,faultId:a.faultId,displayName:a.displayName,layer:a.layer,faultClass:a.faultClass,runtimeBehavior:a.runtimeBehavior,parameters:a.parameters}).ok!==!1&&ko()}return In(n,s,{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-fault-authoring`,c)}),sr(()=>{window.removeEventListener(`gz:open-fault-authoring`,c)}),(e,o)=>N(t).faultAuthoring.open?(B(),V(`div`,Nl,[H(`div`,Pl,[H(`div`,Fl,[H(`div`,null,[o[10]||=H(`div`,{id:`fault-authoring-title`,class:`mtitle`},`新增故障模型`,-1),H(`div`,Il,D(n.value?.targetKind||`target`)+` · `+D(n.value?.targetId||`未选择目标`),1)]),H(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:o[0]||=(...e)=>N(ko)&&N(ko)(...e)},`×`)]),H(`div`,Ll,[H(`section`,Rl,[o[11]||=H(`div`,{class:`authoring-card__eyebrow`},`目标槽位`,-1),H(`h3`,null,D(n.value?.targetName||`未命名目标`),1),H(`div`,zl,[H(`span`,null,D(n.value?.slotName||`未选择槽位`),1),H(`span`,null,D(n.value?.slotId||`slot`),1)])]),H(`section`,Bl,[o[17]||=H(`div`,{class:`authoring-card__eyebrow`},`故障信息`,-1),H(`label`,Vl,[o[12]||=H(`span`,null,`故障 ID`,-1),F(H(`input`,{"onUpdate:modelValue":o[1]||=e=>a.faultId=e,"data-authoring-fault-id":``,type:`text`},null,512),[[so,a.faultId]])]),H(`label`,Hl,[o[13]||=H(`span`,null,`故障名称`,-1),F(H(`input`,{"onUpdate:modelValue":o[2]||=e=>a.displayName=e,"data-authoring-fault-name":``,type:`text`,placeholder:`例如：陀螺仪固定偏置`},null,512),[[so,a.displayName]])]),H(`label`,Ul,[o[14]||=H(`span`,null,`故障层级`,-1),F(H(`select`,{"onUpdate:modelValue":o[3]||=e=>a.layer=e,"data-authoring-fault-layer":``},[(B(),V(R,null,mr(i,e=>H(`option`,{key:e.value,value:e.value},D(e.label),9,Wl)),64))],512),[[co,a.layer]])]),H(`label`,Gl,[o[15]||=H(`span`,null,`故障类别`,-1),F(H(`input`,{"onUpdate:modelValue":o[4]||=e=>a.faultClass=e,"data-authoring-fault-class":``,type:`text`},null,512),[[so,a.faultClass]])]),H(`label`,Kl,[o[16]||=H(`span`,null,`运行行为`,-1),F(H(`select`,{"onUpdate:modelValue":o[5]||=e=>a.runtimeBehavior=e,"data-authoring-fault-behavior":``},[(B(),V(R,null,mr(r,e=>H(`option`,{key:e.value,value:e.value},D(e.label),9,ql)),64))],512),[[co,a.runtimeBehavior]])])]),H(`section`,Jl,[o[21]||=H(`div`,{class:`authoring-card__eyebrow`},`默认参数`,-1),H(`label`,Yl,[o[18]||=H(`span`,null,`bias`,-1),F(H(`input`,{"onUpdate:modelValue":o[6]||=e=>a.parameters.bias=e,"data-authoring-param-name":`bias`,type:`number`,step:`0.01`},null,512),[[so,a.parameters.bias]])]),H(`label`,Xl,[o[19]||=H(`span`,null,`start`,-1),F(H(`input`,{"onUpdate:modelValue":o[7]||=e=>a.parameters.start=e,"data-authoring-param-name":`start`,type:`number`,step:`1`},null,512),[[so,a.parameters.start]])]),H(`label`,Zl,[o[20]||=H(`span`,null,`duration`,-1),F(H(`input`,{"onUpdate:modelValue":o[8]||=e=>a.parameters.duration=e,"data-authoring-param-name":`duration`,type:`number`,step:`1`},null,512),[[so,a.parameters.duration]])])])]),H(`div`,Ql,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:o[9]||=(...e)=>N(ko)&&N(ko)(...e)},`取消`),H(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-fault":``,onClick:l},`保存故障`)])])])):Wi(``,!0)}},eu=`<div class="toast" id="toast"><span id="ti"></span><span id="tm"></span></div>`,tu=[`innerHTML`],nu={__name:`ToastHost`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`toast-host`,innerHTML:N(eu)},null,8,tu))}},ru=`// --- 状态 ---\r
 const S={\r
   step:1,\r
   sysLoaded:false,\r
@@ -730,12 +775,20 @@ const COMPONENT_LIBRARY={\r
     defaults:{name:'噪声注入块',faultType:'随机噪声',layer:'物理层',trigger:'持续'}\r
   },
   fault_tag:{
-    label:'故障组件',
+    label:'故障注入',
     badge:'故障',
     className:'b-fault',
     width:196,
     height:78,
-    defaults:{name:'故障组件',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
+    defaults:{name:'故障注入',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
+  },
+  edge_fault_tag:{
+    label:'连线故障注入',
+    badge:'故障',
+    className:'b-fault',
+    width:196,
+    height:78,
+    defaults:{name:'连线故障注入',faultType:'连线故障标签',layer:'飞控故障库',trigger:'按连线绑定'}
   },
   instrument_scope:{
     label:'示波器',\r
@@ -2029,7 +2082,7 @@ function getNodePorts(node){\r
       }))
     };
   }
-  if(node.type==='fault_tag'){
+  if(node.type==='fault_tag'||node.type==='edge_fault_tag'){
     return {inputs:[],outputs:[]};
   }
   if(node.type.startsWith('fault_')){
@@ -2255,9 +2308,10 @@ function buildNodeSubtitle(node){\r
     case 'simulation_block':\r
       normalizeSimulationInterfaces(props);\r
       return \`\${props.inputs.length}输入 · \${props.outputs.length}输出 · \${props.middleVars.length}中间量 · \${props.moduleType}\${faultNote}\`;\r
-    case 'fault_bias':\r
+    case 'fault_bias':
     case 'fault_noise':
     case 'fault_tag':
+    case 'edge_fault_tag':
       return \`\${props.faultType} · \${props.layer}\`;
     case 'instrument_scope':\r
       return \`\${props.instrumentType} · 双击查看波形\`;\r
@@ -2730,8 +2784,13 @@ function markFaultTarget(targetId){\r
 function createNode(type,rawX,rawY){
   const meta=COMPONENT_LIBRARY[type];
   if(!meta){return;}
-  if(type==='fault_tag'&&window.createManualFaultTag){
-    window.createManualFaultTag({x:rawX,y:rawY});
+  if(type==='fault_tag'||type==='edge_fault_tag'){
+    const handler=type==='edge_fault_tag'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
+    if(handler){
+      handler({x:rawX,y:rawY});
+    }else{
+      toast(type==='edge_fault_tag'?'请将连线故障组件拖到可注入故障的连线上':'请将故障组件拖到可注入故障的目标对象上','w');
+    }
     return;
   }
   const props=cloneDefaults(meta.defaults);
@@ -2772,34 +2831,44 @@ function createNode(type,rawX,rawY){
 \r
 function initPaletteDrag(){\r
   document.querySelectorAll('.citem-draggable').forEach(item=>{\r
-    item.addEventListener('dragstart',event=>{\r
-      const type=item.dataset.component||'';\r
-      S.dragType=type;\r
-      item.classList.add('citem-dragging');\r
-      event.dataTransfer.effectAllowed='copy';\r
-      event.dataTransfer.setData('text/plain',type);\r
-    });\r
-    item.addEventListener('dragend',()=>{\r
-      S.dragType=null;\r
-      item.classList.remove('citem-dragging');\r
-      document.getElementById('diagram').classList.remove('dragover');\r
-    });\r
-  });\r
-}\r
+    item.addEventListener('dragstart',event=>{
+      const type=item.dataset.component||'';
+      S.dragType=type;
+      item.classList.add('citem-dragging');
+      if((type==='fault_tag'||type==='edge_fault_tag')&&window.showCompatibleFaultDropTargets){
+        window.showCompatibleFaultDropTargets({targetKind:type==='edge_fault_tag'?'edge':'node'});
+      }
+      event.dataTransfer.effectAllowed='copy';
+      event.dataTransfer.setData('text/plain',type);
+    });
+    item.addEventListener('dragend',()=>{
+      S.dragType=null;
+      item.classList.remove('citem-dragging');
+      document.getElementById('diagram').classList.remove('dragover');
+      if(window.clearCompatibleFaultDropTargets){
+        window.clearCompatibleFaultDropTargets();
+      }
+    });
+  });
+}
 \r
 function initCanvasDrop(){\r
   const diagram=document.getElementById('diagram');\r
   const viewport=getCanvasViewport();\r
   if(!viewport){return;}\r
-  viewport.addEventListener('dragover',event=>{\r
-    if(!S.sysLoaded){return;}\r
-    event.preventDefault();\r
-    diagram.classList.add('dragover');\r
-    event.dataTransfer.dropEffect='copy';\r
-  });\r
-  viewport.addEventListener('dragleave',event=>{\r
-    if(event.target===viewport){diagram.classList.remove('dragover');}\r
-  });\r
+  viewport.addEventListener('dragover',event=>{
+    if(!S.sysLoaded){return;}
+    event.preventDefault();
+    diagram.classList.add('dragover');
+    const dragType=S.dragType||event.dataTransfer?.getData?.('text/plain');
+    if((dragType==='fault_tag'||dragType==='edge_fault_tag')&&window.showCompatibleFaultDropTargets){
+      window.showCompatibleFaultDropTargets({targetKind:dragType==='edge_fault_tag'?'edge':'node'});
+    }
+    event.dataTransfer.dropEffect='copy';
+  });
+  viewport.addEventListener('dragleave',event=>{
+    if(event.target===viewport){diagram.classList.remove('dragover');}
+  });
   viewport.addEventListener('drop',event=>{\r
     event.preventDefault();\r
     diagram.classList.remove('dragover');\r
@@ -2807,11 +2876,12 @@ function initCanvasDrop(){\r
     const type=event.dataTransfer.getData('text/plain')||S.dragType;
     if(!COMPONENT_LIBRARY[type]){return;}
     const point=clientToStagePoint(event.clientX,event.clientY);
-    if(type==='fault_tag'&&window.createManualFaultTag){
-      const targetEl=document.elementFromPoint(event.clientX,event.clientY)?.closest?.('.blk');
-      const targetId=targetEl?.id?.replace(/^b-/,'')||'';
-      const target=targetId?getNode(targetId):null;
-      window.createManualFaultTag({x:point.x,y:point.y,target});
+    if((type==='fault_tag'||type==='edge_fault_tag')&&(window.handleFaultComponentDrop||window.handleLineFaultComponentDrop)){
+      const target=window.getFaultComponentDropTargetFromClientPoint
+        ?window.getFaultComponentDropTargetFromClientPoint(event.clientX,event.clientY,{targetKind:type==='edge_fault_tag'?'edge':'node'})
+        :null;
+      const handler=type==='edge_fault_tag'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
+      handler?.({x:point.x,y:point.y,target,clientX:event.clientX,clientY:event.clientY});
       return;
     }
     createNode(type,point.x,point.y);
@@ -5802,9 +5872,10 @@ buildNodeSubtitle = function(node){\r
     case 'simulation_block':\r
       normalizeSimulationInterfaces(props);\r
       return \`\${props.inputs.length}输入 · \${props.outputs.length}输出 · \${props.middleVars.length}中间变量 · \${props.moduleType||'一阶函数'}\${faultNote}\`;\r
-    case 'fault_bias':\r
+    case 'fault_bias':
     case 'fault_noise':
     case 'fault_tag':
+    case 'edge_fault_tag':
       return \`\${props.faultType||'故障'} · \${props.layer||'物理层'}\`;
     case 'instrument_scope':\r
       return \`\${props.instrumentType||'示波器'} · 双击查看波形\`;\r
@@ -12464,17 +12535,19 @@ function ensureDiagnosticTestPointState(points=null){\r
     .join('|');\r
   const shouldApplyDiagnosticDefaults=S.diagnosticTestPointModelSignature!==diagnosticModelSignature;\r
   S.diagnosticTestPointModelSignature=diagnosticModelSignature;\r
-  if(!Array.isArray(S.installedDiagnosticTestPointIds)){\r
-    S.installedDiagnosticTestPointIds=[];\r
-  }\r
-  S.installedDiagnosticTestPointIds=S.installedDiagnosticTestPointIds.filter(pointId=>validDiagnosticPointIds.has(pointId));\r
-  if(shouldApplyDiagnosticDefaults&&S.installedDiagnosticTestPointIds.length===0&&semanticPointsForState.length>0){\r
-    S.installedDiagnosticTestPointIds=getDiagnosticPointDefaults(semanticPointsForState);\r
-  }\r
-  if(S.selectedDiagnosticTestPointId&&!validDiagnosticPointIds.has(S.selectedDiagnosticTestPointId)){\r
-    S.selectedDiagnosticTestPointId=null;\r
-  }\r
-  return S.installedDiagnosticTestPointIds;\r
+  if(!Array.isArray(S.installedDiagnosticTestPointIds)){
+    S.installedDiagnosticTestPointIds=[];
+  }
+  S.installedDiagnosticTestPointIds=Array.from(new Set(S.installedDiagnosticTestPointIds.filter(Boolean)));
+  let scopedInstalledDiagnosticPointIds=S.installedDiagnosticTestPointIds.filter(pointId=>validDiagnosticPointIds.has(pointId));
+  if(shouldApplyDiagnosticDefaults&&scopedInstalledDiagnosticPointIds.length===0&&semanticPointsForState.length>0&&!S.diagnosticTestPointManualCleared){
+    scopedInstalledDiagnosticPointIds=getDiagnosticPointDefaults(semanticPointsForState);
+    S.installedDiagnosticTestPointIds=Array.from(new Set(S.installedDiagnosticTestPointIds.concat(scopedInstalledDiagnosticPointIds)));
+  }
+  if(S.selectedDiagnosticTestPointId&&!validDiagnosticPointIds.has(S.selectedDiagnosticTestPointId)){
+    S.selectedDiagnosticTestPointId=null;
+  }
+  return scopedInstalledDiagnosticPointIds;
     const semanticPoints=points||buildDataflowSemanticModel().measurementPoints||[];\r
     if(!Array.isArray(S.installedDiagnosticTestPointIds)){\r
       S.installedDiagnosticTestPointIds=[];\r
@@ -15747,10 +15820,14 @@ function decorateDataflowEdges(){\r
       window.renderDataflowPanel?.();\r
       window.decorateDataflowEdges?.();\r
     }\r
-    if(nextView==='dmatrix'){\r
-      window.renderDetectionMatrixPanel?.();\r
-    }\r
-    if(!options.silent){\r
+    if(nextView==='dmatrix'){
+      window.renderDetectionMatrixPanel?.();
+    }
+    window.renderFaultViewTestpointToggle?.();
+    if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
+      window.renderCanvasDiagnosticTestPointMarkers();
+    }
+    if(!options.silent){
       pushCommandStatus('info',\`已切换到\${labels[nextView]}\`);\r
     }\r
     return {ok:true,view:nextView};\r
@@ -16912,7 +16989,7 @@ function decorateDataflowEdges(){\r
 
   function getFaultTagsForNode(nodeId){
     if(!nodeId){return [];}
-    return ensureFaultTags().filter(tag=>getFaultTagHostNodeId(tag)===nodeId);
+    return ensureFaultTags().filter(tag=>tag.targetKind!=='edge'&&getFaultTagHostNodeId(tag)===nodeId);
   }
 
   function toggleFaultTagsForNode(nodeId){
@@ -17026,6 +17103,7 @@ function decorateDataflowEdges(){\r
     const targetId=target?.id||model?.visualInjection?.targetId||'';
     const hostNodeId=getFaultTagHostNodeIdFromTarget(target);
     const hostAlreadyExpanded=hostNodeId?getFaultTagsForNode(hostNodeId).some(tag=>tag.expanded):false;
+    const expandedByDefault=targetKind==='edge'||hostAlreadyExpanded;
     const box=getFaultTagPosition(model,target);
     const tag={
       id:\`fault-tag-\${safeFaultTagId(model.id)}\`,
@@ -17042,8 +17120,8 @@ function decorateDataflowEdges(){\r
       targetName:getFaultTagTargetName(model,target),
       active:true,
       positionMode:'manual',
-      expanded:hostAlreadyExpanded,
-      collapsed:!hostAlreadyExpanded,
+      expanded:expandedByDefault,
+      collapsed:!expandedByDefault,
       parameters:cloneBridgeValue(payload?.parameters||model.defaultParameters||{}),
       injectedFault:cloneBridgeValue(payload),
       x:box.x,
@@ -17052,7 +17130,7 @@ function decorateDataflowEdges(){\r
       h:box.h
     };
     ensureFaultTags().push(tag);
-    if(hostNodeId&&!S.faultedBlks.includes(hostNodeId)){
+    if(targetKind!=='edge'&&hostNodeId&&!S.faultedBlks.includes(hostNodeId)){
       S.faultedBlks.push(hostNodeId);
     }
     ensureFaultInjectionLinks().push({
@@ -17082,8 +17160,8 @@ function decorateDataflowEdges(){\r
       id,
       type:'fault_tag',
       faultModelId:id,
-      faultModelName:'故障组件',
-      name:'故障组件',
+      faultModelName:'故障注入',
+      name:'故障注入',
       layer:'飞控故障库',
       modelClass:'故障标签',
       runtimeBehavior:'manual',
@@ -17093,8 +17171,8 @@ function decorateDataflowEdges(){\r
       targetName:target?getFaultTagTargetName({visualInjection:{}},target):'未绑定目标',
       active:false,
       positionMode:'manual',
-      expanded:false,
-      collapsed:true,
+      expanded:instance.targetKind==='edge',
+      collapsed:instance.targetKind!=='edge',
       parameters:{},
       injectedFault:null,
       x:box.x,
@@ -17124,6 +17202,57 @@ function decorateDataflowEdges(){\r
     return tag?.expanded?{x:Math.round((tag.x||0)+(tag.w||204)/2),y:Math.round((tag.y||0)+(tag.h||76))}:null;
   }
 
+  function faultTagRefMatches(value,faultId){
+    if(!value||!faultId){return false;}
+    return value.id===faultId
+      || value.modelId===faultId
+      || value.faultModelId===faultId
+      || value.faultTypeId===faultId
+      || value.injectedFault?.modelId===faultId
+      || value.injectedFault?.faultModelId===faultId;
+  }
+
+  function syncFaultTagParametersToRuntimeTarget(tag,nextParameters){
+    if(!tag){return;}
+    const parameters=cloneBridgeValue(nextParameters||{});
+    tag.parameters=cloneBridgeValue(parameters);
+    if(tag.injectedFault){
+      tag.injectedFault={...tag.injectedFault,parameters:cloneBridgeValue(parameters)};
+    }
+    const runtimeTarget=getFaultTagTarget(tag);
+    if(runtimeTarget?.injectedFault&&faultTagRefMatches(runtimeTarget.injectedFault,tag.faultModelId)){
+      runtimeTarget.injectedFault.parameters=cloneBridgeValue(parameters);
+    }
+    if(Array.isArray(runtimeTarget?.faultBindings)){
+      runtimeTarget.faultBindings=runtimeTarget.faultBindings.map(binding=>{
+        if(!faultTagRefMatches(binding,tag.faultModelId)){return binding;}
+        const nextBinding={...binding,parameters:cloneBridgeValue(parameters)};
+        if(binding.injectedFault){
+          nextBinding.injectedFault={...binding.injectedFault,parameters:cloneBridgeValue(parameters)};
+        }
+        return nextBinding;
+      });
+    }
+    ['injectedFaults','activeFaults','faultInstances','selectedFaults','appliedFaults'].forEach(key=>{
+      if(!Array.isArray(S[key])){return;}
+      S[key]=S[key].map(item=>{
+        if(!faultTagRefMatches(item,tag.faultModelId)){return item;}
+        const nextItem={...item,parameters:cloneBridgeValue(parameters)};
+        if(item.injectedFault){
+          nextItem.injectedFault={...item.injectedFault,parameters:cloneBridgeValue(parameters)};
+        }
+        return nextItem;
+      });
+    });
+    if(S.injectedFaultMap&&typeof S.injectedFaultMap==='object'&&S.injectedFaultMap[tag.faultModelId]){
+      S.injectedFaultMap[tag.faultModelId]={
+        ...S.injectedFaultMap[tag.faultModelId],
+        parameters:cloneBridgeValue(parameters)
+      };
+    }
+    markTopologyDirty('fault');
+  }
+
   function renderFaultTagPropertyPanel(tag){
     const pe=document.getElementById('pe');
     const pd=document.getElementById('pd');
@@ -17151,7 +17280,7 @@ function decorateDataflowEdges(){\r
         <div class="prow"><span class="pk">目标类型</span><span class="pv">\${tag.targetKind==='edge'?'连线':'模块'}</span></div>
         <div class="prow"><span class="pk">运行行为</span><span class="pv">\${escapeHtml(tag.runtimeBehavior||'按故障库定义')}</span></div>
       </div>
-      <div class="pgroup fault-tag-param-panel">
+      <div class="pgroup fault-tag-param-panel" data-fault-tag-param-panel="\${escapeHtml(tag.id)}">
         <div class="pglbl">故障参数</div>
         \${params.length?params.map(([key,value])=>\`
           <label class="fault-tag-param-row">
@@ -17159,20 +17288,62 @@ function decorateDataflowEdges(){\r
             <input value="\${escapeHtml(value)}" data-fault-tag-param="\${escapeHtml(key)}">
           </label>
         \`).join(''):'<div class="props-empty-inline">该故障没有额外参数。</div>'}
+        \${params.length?\`
+          <div class="fault-tag-param-actions">
+            <span data-fault-tag-param-status>参数未修改</span>
+            <div>
+              <button type="button" class="props-secondary fault-tag-param-reset" data-fault-tag-reset disabled>取消修改</button>
+              <button type="button" class="props-save fault-tag-param-apply" data-fault-tag-apply disabled>应用修改</button>
+            </div>
+          </div>
+        \`:''}
       </div>
     \`;
-    pd.querySelectorAll('[data-fault-tag-param]').forEach(input=>{
-      input.addEventListener('change',()=>{
+    const inputs=Array.from(pd.querySelectorAll('[data-fault-tag-param]'));
+    const applyButton=pd.querySelector('[data-fault-tag-apply]');
+    const resetButton=pd.querySelector('[data-fault-tag-reset]');
+    const statusText=pd.querySelector('[data-fault-tag-param-status]');
+    let committed=cloneBridgeValue(tag.parameters||{});
+    const readDraft=()=>{
+      const draft={};
+      inputs.forEach(input=>{
         const key=input.getAttribute('data-fault-tag-param');
-        if(!key){return;}
-        tag.parameters=tag.parameters||{};
-        tag.parameters[key]=input.value;
-        const runtimeTarget=getFaultTagTarget(tag);
-        if(runtimeTarget?.injectedFault){
-          runtimeTarget.injectedFault.parameters={...(runtimeTarget.injectedFault.parameters||{}),[key]:input.value};
-        }
+        if(key){draft[key]=input.value;}
       });
+      return draft;
+    };
+    const isDirty=()=>inputs.some(input=>{
+      const key=input.getAttribute('data-fault-tag-param');
+      return key&&String(committed?.[key]??'')!==input.value;
     });
+    const setDirtyState=()=>{
+      const dirty=isDirty();
+      if(applyButton){applyButton.disabled=!dirty;}
+      if(resetButton){resetButton.disabled=!dirty;}
+      if(statusText){statusText.textContent=dirty?'有未应用修改':'参数未修改';}
+    };
+    inputs.forEach(input=>{
+      input.addEventListener('input',setDirtyState);
+    });
+    applyButton?.addEventListener('click',()=>{
+      if(applyButton.disabled){return;}
+      const draft=readDraft();
+      syncFaultTagParametersToRuntimeTarget(tag,draft);
+      committed=cloneBridgeValue(draft);
+      setDirtyState();
+      renderModelNodes();
+      renderEdges();
+      updateUI();
+      toast('故障参数修改已应用','s');
+    });
+    resetButton?.addEventListener('click',()=>{
+      inputs.forEach(input=>{
+        const key=input.getAttribute('data-fault-tag-param');
+        if(key){input.value=String(committed?.[key]??'');}
+      });
+      setDirtyState();
+    });
+    setDirtyState();
     if(typeof syncPropertyTabs==='function'){syncPropertyTabs();}
   }
 
@@ -18062,10 +18233,781 @@ function decorateDataflowEdges(){\r
       return result;\r
     };\r
   }\r
-})();\r
-\r
-;(function installCompactFaultDiagnosisConsole(){\r
-  if(typeof window==='undefined') return;\r
+})();
+
+;(function installComponentFaultCapabilityModel(){
+  if(typeof window==='undefined') return;
+
+  function cloneCapabilityValue(value){
+    try{
+      return JSON.parse(JSON.stringify(value==null?null:value));
+    }catch(error){
+      return value;
+    }
+  }
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function getActiveFaultCapabilityMap(){
+    const state=getState();
+    const pkg=state.activeModelPackage||{};
+    return arr(pkg.faultCapabilityMap);
+  }
+
+  function inferFaultTargetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function getFaultCapabilityForTarget(target){
+    if(!target?.id) return null;
+    const kind=inferFaultTargetKind(target);
+    return getActiveFaultCapabilityMap().find(entry=>(
+      entry?.targetId===target.id&&(entry.targetKind||kind)===kind
+    ))||null;
+  }
+
+  function getCapabilitySlots(entry){
+    if(!entry) return [];
+    if(arr(entry.faultSlots).length) return arr(entry.faultSlots);
+    if(entry.slotId||arr(entry.allowedFaultIds).length||arr(entry.allowedFaultTypeIds).length){
+      return [entry];
+    }
+    return [];
+  }
+
+  function getAllowedFaultIds(slot){
+    return arr(slot?.allowedFaultIds).length
+      ?arr(slot.allowedFaultIds)
+      :arr(slot?.allowedFaultTypeIds);
+  }
+
+  function getActiveFaultTypeCatalog(){
+    const state=getState();
+    const pkg=state.activeModelPackage||{};
+    if(arr(pkg.faultTypeCatalog).length) return arr(pkg.faultTypeCatalog);
+    return arr(state.availableFaultModels);
+  }
+
+  function defaultsFromParameterSchema(parameters){
+    return Object.fromEntries(Object.entries(parameters||{}).map(([key,value])=>[
+      key,
+      value&&typeof value==='object'&&Object.prototype.hasOwnProperty.call(value,'default')?value.default:value
+    ]));
+  }
+
+  function normalizeCapabilityFaultModel(model){
+    if(!model) return null;
+    const id=model.id||model.faultTypeId||'';
+    const defaultParameters=Object.keys(model.defaultParameters||{}).length
+      ?model.defaultParameters
+      :defaultsFromParameterSchema(model.parameters);
+    return {
+      ...model,
+      id,
+      name:model.name||model.displayName||id,
+      displayName:model.displayName||model.name||id,
+      defaultParameters:cloneCapabilityValue(defaultParameters||{})
+    };
+  }
+
+  function getCompatibleFaultModelsForTarget(target){
+    const capability=getFaultCapabilityForTarget(target);
+    if(!capability) return [];
+    const allowedIds=new Set(getCapabilitySlots(capability).flatMap(getAllowedFaultIds));
+    return getActiveFaultTypeCatalog()
+      .filter(model=>allowedIds.has(model?.id||model?.faultTypeId))
+      .map(normalizeCapabilityFaultModel)
+      .filter(Boolean);
+  }
+
+  function ensureFaultInstances(){
+    const state=getState();
+    if(!Array.isArray(state.faultInstances)) state.faultInstances=[];
+    return state.faultInstances;
+  }
+
+  function getFirstCompatibleSlotForFault(target,faultTypeId){
+    const capability=getFaultCapabilityForTarget(target);
+    return getCapabilitySlots(capability).find(slot=>getAllowedFaultIds(slot).includes(faultTypeId))||null;
+  }
+
+  function getCapabilityFaultModel(faultTypeId){
+    return getActiveFaultTypeCatalog()
+      .map(normalizeCapabilityFaultModel)
+      .find(model=>model?.id===faultTypeId)||null;
+  }
+
+  function findExistingFaultInstanceForTarget(target,faultTypeId,slot=null){
+    if(!target?.id||!faultTypeId) return null;
+    const targetKind=inferFaultTargetKind(target);
+    const slotId=slot?.slotId||getFirstCompatibleSlotForFault(target,faultTypeId)?.slotId||'';
+    return ensureFaultInstances().find(instance=>(
+      instance?.active!==false
+      && instance.targetKind===targetKind
+      && instance.targetId===target.id
+      && instance.faultTypeId===faultTypeId
+      && (!slotId||instance.slotId===slotId)
+    ))||null;
+  }
+
+  function createFaultInstanceForTarget(target,faultTypeId,parameterOverrides={}){
+    const model=getCapabilityFaultModel(faultTypeId);
+    const slot=getFirstCompatibleSlotForFault(target,faultTypeId);
+    if(!target||!model||!slot){
+      return {ok:false,error:'incompatible-target'};
+    }
+    const targetKind=inferFaultTargetKind(target);
+    const duplicate=findExistingFaultInstanceForTarget(target,model.id,slot);
+    if(duplicate){
+      return {ok:false,error:'duplicate-fault-instance',instance:duplicate,model,slot};
+    }
+    const parameters={
+      ...(model.defaultParameters||{}),
+      ...(parameterOverrides||{})
+    };
+    const instance={
+      instanceId:\`fault-inst-\${Date.now()}-\${Math.random().toString(16).slice(2,8)}\`,
+      faultTypeId:model.id,
+      targetKind,
+      targetId:target.id,
+      slotId:slot.slotId,
+      displayName:model.displayName||model.name||model.id,
+      parameters:cloneCapabilityValue(parameters),
+      active:true,
+      visual:{expanded:false}
+    };
+    ensureFaultInstances().push(instance);
+    const state=getState();
+    if(state.activeModelPackage){
+      state.activeModelPackage.faultInstances=cloneCapabilityValue(state.faultInstances);
+    }
+    return {ok:true,instance,model,slot};
+  }
+
+  function pushFaultRuntimeRecord(key,payload){
+    const state=getState();
+    if(!Array.isArray(state[key])) state[key]=[];
+    state[key]=state[key].filter(item=>(
+      item?.instanceId!==payload.instanceId
+      && item?.modelId!==payload.modelId
+      && item?.faultModelId!==payload.modelId
+      && item?.faultTypeId!==payload.modelId
+    ));
+    state[key].push({...cloneCapabilityValue(payload),faultId:payload.modelId,faultTypeId:payload.modelId,status:'active'});
+  }
+
+  function createCapabilityRuntimePayload(model,parameters={}){
+    const api=window.__GZ_FAULT_INJECTION_RUNTIME__||null;
+    if(api?.createInjectedFaultPayload){
+      const payload=api.createInjectedFaultPayload(model,parameters);
+      return {
+        ...payload,
+        parameters:cloneCapabilityValue(parameters)
+      };
+    }
+    return {
+      modelId:model?.id||'',
+      faultTypeId:model?.id||'',
+      name:model?.displayName||model?.name||model?.id||'故障模型',
+      layer:model?.layer||'electrical',
+      runtimeBehavior:model?.runtimeBehavior||'',
+      faultKind:model?.faultClass||model?.modelClass||'',
+      modelClass:model?.modelClass||model?.faultClass||'',
+      parameters:cloneCapabilityValue(parameters)
+    };
+  }
+
+  function appendCapabilityRuntimeBinding(target,model,payload,targetKind){
+    const api=window.__GZ_FAULT_INJECTION_RUNTIME__||null;
+    if(api?.createFaultBinding&&api?.appendFaultBinding){
+      const binding=api.createFaultBinding(model||payload,payload,{
+        targetId:target.id||'',
+        targetKind
+      });
+      api.appendFaultBinding(target,binding);
+      return;
+    }
+    const propagationMode=payload.layer==='protocol'?'protocolEdge':'signalTransform';
+    const binding={
+      bindingId:\`\${payload.instanceId||payload.modelId||payload.name||'fault'}::\${target.id||''}\`,
+      faultModelId:payload.modelId||'',
+      faultTypeId:payload.faultTypeId||payload.modelId||'',
+      name:payload.name||'故障模型',
+      layer:payload.layer||model?.layer||'electrical',
+      runtimeBehavior:payload.runtimeBehavior||'',
+      parameters:cloneCapabilityValue(payload.parameters||{}),
+      targetKind,
+      targetId:target.id||'',
+      visualRole:'fault-source',
+      propagationMode,
+      canPropagate:propagationMode!=='localOnly',
+      active:true,
+      injectedFault:payload
+    };
+    target.faultBindings=Array.isArray(target.faultBindings)?target.faultBindings:[];
+    const index=target.faultBindings.findIndex(item=>item.bindingId===binding.bindingId||item.faultModelId===binding.faultModelId);
+    if(index>=0) target.faultBindings[index]=binding;
+    else target.faultBindings.push(binding);
+  }
+
+  function ensureCapabilityFaultTags(){
+    const state=getState();
+    if(!Array.isArray(state.faultTags)) state.faultTags=[];
+    return state.faultTags;
+  }
+
+  function safeCapabilityId(value){
+    return String(value||'fault').replace(/[^A-Za-z0-9_-]/g,'-');
+  }
+
+  function getCapabilityHostNodeId(target){
+    if(!target) return '';
+    if(target.sourceNodeId&&target.targetNodeId) return target.sourceNodeId||target.targetNodeId||'';
+    return target.id||'';
+  }
+
+  function getCapabilityTargetName(target){
+    if(!target) return '目标对象';
+    if(target.sourceNodeId&&target.targetNodeId){
+      const source=typeof getNode==='function'?getNode(target.sourceNodeId):null;
+      const destination=typeof getNode==='function'?getNode(target.targetNodeId):null;
+      return \`\${source?.props?.name||target.sourceNodeId} -> \${destination?.props?.name||target.targetNodeId}\`;
+    }
+    return target.props?.name||target.name||target.id||'目标对象';
+  }
+
+  function getCapabilityTagPosition(target){
+    const width=204;
+    const height=76;
+    if(target?.sourceNodeId&&target?.targetNodeId&&typeof getNode==='function'&&typeof getPortInfo==='function'){
+      const source=getNode(target.sourceNodeId);
+      const destination=getNode(target.targetNodeId);
+      const sourcePort=getPortInfo(source,'output',target.sourcePortIndex||0);
+      const targetPort=getPortInfo(destination,'input',target.targetPortIndex||0);
+      if(sourcePort&&targetPort){
+        return {
+          x:Math.round((sourcePort.x+targetPort.x)/2-width/2),
+          y:Math.round((sourcePort.y+targetPort.y)/2-height-72),
+          w:width,
+          h:height
+        };
+      }
+    }
+    return {
+      x:Math.round((target?.x||0)+(target?.w||160)+30),
+      y:Math.round((target?.y||0)-height/2),
+      w:width,
+      h:height
+    };
+  }
+
+  function createCapabilityFaultTag(instance,model,target,payload){
+    const state=getState();
+    const tags=ensureCapabilityFaultTags();
+    const faultModelId=instance.faultTypeId;
+    state.faultTags=tags.filter(tag=>tag.faultModelId!==faultModelId);
+    const box=getCapabilityTagPosition(target);
+    const hostNodeId=getCapabilityHostNodeId(target);
+    const tag={
+      id:\`fault-tag-\${safeCapabilityId(faultModelId)}\`,
+      type:'fault_tag',
+      faultModelId,
+      faultModelName:instance.displayName||model.displayName||model.name||faultModelId,
+      name:instance.displayName||model.displayName||model.name||faultModelId,
+      layer:typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer,
+      modelClass:model.modelClass||model.faultClass||'故障',
+      runtimeBehavior:model.runtimeBehavior||payload?.runtimeBehavior||'',
+      targetKind:instance.targetKind,
+      targetId:instance.targetId,
+      hostNodeId,
+      targetName:getCapabilityTargetName(target),
+      active:true,
+      positionMode:'manual',
+      expanded:false,
+      collapsed:true,
+      parameters:cloneCapabilityValue(instance.parameters||{}),
+      injectedFault:cloneCapabilityValue(payload),
+      x:box.x,
+      y:box.y,
+      w:box.w,
+      h:box.h
+    };
+    state.faultTags.push(tag);
+    if(!Array.isArray(state.faultInjectionLinks)) state.faultInjectionLinks=[];
+    state.faultInjectionLinks=state.faultInjectionLinks.filter(link=>link.faultModelId!==faultModelId);
+    state.faultInjectionLinks.push({
+      id:\`fault-link-\${safeCapabilityId(faultModelId)}-target\`,
+      faultModelId,
+      sourceTagId:tag.id,
+      targetNodeId:instance.targetKind==='edge'?null:instance.targetId,
+      targetEdgeId:instance.targetKind==='edge'?instance.targetId:null,
+      role:'fault-tag-attachment',
+      label:'故障注入'
+    });
+    if(instance.targetKind!=='edge'&&hostNodeId&&!state.faultedBlks.includes(hostNodeId)){
+      state.faultedBlks.push(hostNodeId);
+    }
+    return tag;
+  }
+
+  function mirrorFaultInstanceToRuntimeTarget(instance,model,target){
+    if(!instance||!model||!target) return null;
+    const payload=createCapabilityRuntimePayload(model,instance.parameters||{});
+    payload.modelId=instance.faultTypeId;
+    payload.faultTypeId=instance.faultTypeId;
+    payload.instanceId=instance.instanceId;
+    payload.name=instance.displayName||model.displayName||model.name||model.id;
+    payload.parameters=cloneCapabilityValue(instance.parameters||{});
+    target.injectedFault=payload;
+    appendCapabilityRuntimeBinding(target,model,payload,instance.targetKind);
+    if(instance.targetKind==='node'&&!S.faultedBlks.includes(target.id)){
+      S.faultedBlks.push(target.id);
+    }
+    pushFaultRuntimeRecord('injectedFaults',payload);
+    pushFaultRuntimeRecord('activeFaults',payload);
+    pushFaultRuntimeRecord('appliedFaults',payload);
+    const state=getState();
+    if(!state.injectedFaultMap||typeof state.injectedFaultMap!=='object') state.injectedFaultMap={};
+    state.injectedFaultMap[payload.modelId]={...cloneCapabilityValue(payload),status:'active'};
+    createCapabilityFaultTag(instance,model,target,payload);
+    return payload;
+  }
+
+  function activateFaultForTarget(target,faultTypeId,parameterOverrides={}){
+    const created=createFaultInstanceForTarget(target,faultTypeId,parameterOverrides);
+    if(!created.ok) return created;
+    mirrorFaultInstanceToRuntimeTarget(created.instance,created.model,target);
+    markTopologyDirty('fault');
+    renderModelNodes();
+    renderEdges();
+    updateUI();
+    return created;
+  }
+
+  function capabilityHtml(value){
+    const raw=value==null?'':String(value);
+    if(typeof escapeHtml==='function') return escapeHtml(raw);
+    return raw.replace(/[&<>"']/g,match=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[match]));
+  }
+
+  function getSelectedFaultActivationTarget(){
+    const state=getState();
+    if(state.selBlk&&typeof getNode==='function') return getNode(state.selBlk);
+    if(state.selEdge&&typeof getEdge==='function') return getEdge(state.selEdge);
+    return null;
+  }
+
+  function renderTargetFaultParameterInputs(model){
+    const entries=Object.entries(model?.defaultParameters||{});
+    if(!entries.length){
+      return '<div class="target-fault-param-empty">该故障没有额外参数，可直接确认注入。</div>';
+    }
+    return entries.map(([key,value])=>\`
+      <label class="target-fault-param-row">
+        <span>\${capabilityHtml(key)}</span>
+        <input data-target-fault-param="\${capabilityHtml(key)}" value="\${capabilityHtml(value)}">
+      </label>
+    \`).join('');
+  }
+
+  function readTargetFaultParameterDraft(panel){
+    const draft={};
+    panel?.querySelectorAll?.('[data-target-fault-param]')?.forEach(input=>{
+      const key=input.getAttribute('data-target-fault-param');
+      if(key) draft[key]=input.value;
+    });
+    return draft;
+  }
+
+  function markSelectedTargetFaultChoice(box,modelId){
+    box.querySelectorAll('.target-fault-choice.is-selected').forEach(choice=>choice.classList.remove('is-selected'));
+    box.querySelectorAll('[data-activate-compatible-fault]').forEach(choice=>{
+      if(choice.getAttribute('data-activate-compatible-fault')===modelId){
+        choice.classList.add('is-selected');
+      }
+    });
+  }
+
+  function showTargetFaultParameterPanel(box,target,model){
+    if(!box||!target||!model) return;
+    markSelectedTargetFaultChoice(box,model.id);
+    box.querySelector('[data-target-fault-parameters]')?.remove();
+    const panel=document.createElement('form');
+    panel.className='target-fault-parameters';
+    panel.dataset.targetFaultParameters='true';
+    panel.innerHTML=\`
+      <div class="target-fault-parameters__head">
+        <span>参数确认</span>
+        <strong>\${capabilityHtml(model.displayName||model.name||model.id)}</strong>
+        <small>\${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · \${capabilityHtml(model.runtimeBehavior||model.faultClass||model.modelClass||'故障')}</small>
+      </div>
+      <div class="target-fault-parameters__grid">
+        \${renderTargetFaultParameterInputs(model)}
+      </div>
+      <div class="target-fault-parameters__actions">
+        <button type="button" data-cancel-target-fault>取消</button>
+        <button type="submit" data-confirm-target-fault>确认注入</button>
+      </div>
+    \`;
+    panel.addEventListener('submit',event=>{
+      event.preventDefault();
+      const result=activateFaultForTarget(target,model.id,readTargetFaultParameterDraft(panel));
+      if(result?.ok){
+        box.remove();
+      }else if(result?.error==='duplicate-fault-instance'){
+        toast('该目标已经注入过这个具体故障','w');
+      }else{
+        toast('该目标无法注入所选故障','w');
+      }
+    });
+    panel.querySelector('[data-cancel-target-fault]')?.addEventListener('click',()=>panel.remove());
+    box.querySelector('.target-fault-dialog__body')?.appendChild(panel);
+  }
+
+  function renderTargetFaultActivationDialog(target){
+    document.querySelector('[data-target-fault-dialog]')?.remove();
+    const models=getCompatibleFaultModelsForTarget(target);
+    const box=document.createElement('div');
+    box.className='target-fault-dialog';
+    box.dataset.targetFaultDialog='true';
+    box.innerHTML=\`
+      <div class="target-fault-dialog__head">
+        <strong>\${capabilityHtml(getCapabilityTargetName(target))}</strong>
+        <button type="button" data-close-target-fault-dialog>关闭</button>
+      </div>
+      <div class="target-fault-dialog__body">
+        \${models.length?models.map(model=>{
+          const injected=Boolean(findExistingFaultInstanceForTarget(target,model.id));
+          return \`
+          <button type="button" class="target-fault-choice\${injected?' is-injected':''}" data-activate-compatible-fault="\${capabilityHtml(model.id)}" \${injected?'disabled aria-disabled="true"':''}>
+            <span>\${capabilityHtml(model.displayName||model.name)}</span>
+            <small>\${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · \${capabilityHtml(model.faultClass||model.modelClass||model.runtimeBehavior||'故障')}</small>
+            \${injected?'<em>已注入</em>':''}
+          </button>
+        \`;}).join(''):'<div class="target-fault-empty">该对象没有可添加的故障</div>'}
+      </div>\`;
+    document.body.appendChild(box);
+    box.querySelector('[data-close-target-fault-dialog]')?.addEventListener('click',()=>box.remove());
+    box.querySelectorAll('[data-activate-compatible-fault]').forEach(button=>{
+      button.addEventListener('click',()=>{
+        const faultId=button.dataset.activateCompatibleFault||'';
+        const model=models.find(item=>item.id===faultId);
+        if(model) showTargetFaultParameterPanel(box,target,model);
+      });
+    });
+    return box;
+  }
+
+  function openTargetFaultActivationDialog(){
+    const target=getSelectedFaultActivationTarget();
+    if(!target){
+      toast('请先选择可添加故障的组件或连线','w');
+      return false;
+    }
+    renderTargetFaultActivationDialog(target);
+    return true;
+  }
+
+  function hasAuthoredSystemModel(pkg){
+    return arr(pkg?.systemModel?.nodes).length>0||arr(pkg?.systemModel?.edges).length>0;
+  }
+
+  function getAuthoredModelId(pkg,prepared){
+    return pkg?.modelInfo?.modelId??pkg?.modelId??prepared?.descriptor?.modelId??null;
+  }
+
+  function getAuthoredModelName(pkg,prepared){
+    return pkg?.modelInfo?.modelName??pkg?.modelName??prepared?.descriptor?.modelName??null;
+  }
+
+  function normalizeAuthoredNode(node){
+    const props={...(node?.props||{})};
+    props.name=props.name||node?.name||node?.label||node?.id||'组件';
+    props.inputs=arr(props.inputs).length?props.inputs:arr(node?.inputs);
+    props.outputs=arr(props.outputs).length?props.outputs:arr(node?.outputs);
+    props.middleVars=arr(props.middleVars).length?props.middleVars:arr(node?.middleVars);
+    return {
+      ...cloneCapabilityValue(node),
+      type:node?.type||node?.nodeType||'simulation_block',
+      x:Number.isFinite(node?.x)?node.x:0,
+      y:Number.isFinite(node?.y)?node.y:0,
+      props
+    };
+  }
+
+  function normalizeAuthoredEdge(edge){
+    return {
+      ...cloneCapabilityValue(edge),
+      sourceNodeId:edge?.sourceNodeId||edge?.source||edge?.from||'',
+      targetNodeId:edge?.targetNodeId||edge?.target||edge?.to||'',
+      sourcePortIndex:Number.isFinite(edge?.sourcePortIndex)?edge.sourcePortIndex:0,
+      targetPortIndex:Number.isFinite(edge?.targetPortIndex)?edge.targetPortIndex:0,
+      lineType:edge?.lineType||edge?.type||'normal'
+    };
+  }
+
+  function applyAuthoredSystemModelToRuntime(pkg){
+    if(!hasAuthoredSystemModel(pkg)) return false;
+    const state=getState();
+    const nodes=arr(pkg.systemModel.nodes).map(normalizeAuthoredNode);
+    const edges=arr(pkg.systemModel.edges).map(normalizeAuthoredEdge);
+    state.modelNodes=cloneCapabilityValue(nodes);
+    state.modelEdges=cloneCapabilityValue(edges);
+    state.nodes=state.modelNodes;
+    state.edges=state.modelEdges;
+    state.nodeSeq=Math.max(Number(state.nodeSeq)||0,nodes.length);
+    state.edgeSeq=Math.max(Number(state.edgeSeq)||0,edges.length);
+    state.selBlk=null;
+    state.selEdge=null;
+    state.sysLoaded=true;
+    state.systemSaved=true;
+    state.step=nodes.length?2:1;
+    state.faultedBlks=[];
+    state.faultTags=[];
+    state.faultInjectionLinks=[];
+    state.injectedFaults=[];
+    state.activeFaults=[];
+    state.appliedFaults=[];
+    state.injectedFaultMap={};
+    if(typeof renderModelNodes==='function') renderModelNodes();
+    if(typeof renderEdges==='function') renderEdges();
+    if(typeof updateUI==='function') updateUI();
+    return true;
+  }
+
+  function buildAuthoredActiveModelPackage(pkg,prepared,current={}){
+    const modelInfo=cloneCapabilityValue(pkg?.modelInfo||{
+      modelId:getAuthoredModelId(pkg,prepared),
+      modelName:getAuthoredModelName(pkg,prepared)
+    });
+    return {
+      ...current,
+      schemaVersion:pkg?.schemaVersion,
+      modelInfo,
+      modelId:modelInfo?.modelId??getAuthoredModelId(pkg,prepared),
+      modelName:modelInfo?.modelName??getAuthoredModelName(pkg,prepared),
+      componentTemplates:cloneCapabilityValue(arr(pkg?.componentTemplates)),
+      systemModel:cloneCapabilityValue(pkg?.systemModel||{nodes:[],edges:[]}),
+      faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
+      faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
+      faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances)),
+      diagnosticModel:cloneCapabilityValue(pkg?.diagnosticModel||null),
+      pythonModules:cloneCapabilityValue(arr(pkg?.pythonModules))
+    };
+  }
+
+  const previousApply=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
+  if(typeof previousApply==='function'){
+    window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
+      const result=previousApply(pkg,prepared);
+      if(result?.ok===false) return result;
+      const state=getState();
+      const authoredSystemApplied=applyAuthoredSystemModelToRuntime(pkg);
+      const hasAuthoredPackage=authoredSystemApplied||String(pkg?.schemaVersion||'')==='3.0';
+      if(hasAuthoredPackage){
+        state.faultInstances=cloneCapabilityValue(arr(pkg?.faultInstances));
+      }
+      if(state.activeModelPackage){
+        state.activeModelPackage=hasAuthoredPackage
+          ?buildAuthoredActiveModelPackage(pkg,prepared,state.activeModelPackage)
+          :{
+            ...state.activeModelPackage,
+            faultTypeCatalog:cloneCapabilityValue(arr(pkg?.faultTypeCatalog)),
+            faultCapabilityMap:cloneCapabilityValue(arr(pkg?.faultCapabilityMap)),
+            faultInstances:cloneCapabilityValue(arr(pkg?.faultInstances))
+          };
+      }
+      return result;
+    };
+  }
+
+  Object.assign(window,{
+    getFaultCapabilityForTarget,
+    getCompatibleFaultModelsForTarget,
+    activateFaultForTarget,
+    openTargetFaultActivationDialog
+  });
+})();
+
+;(function installFaultComponentDropTargets(){
+  if(typeof window==='undefined') return;
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function getRuntimeNodes(){
+    const state=getState();
+    return arr(state.modelNodes).length?arr(state.modelNodes):arr(state.nodes);
+  }
+
+  function getRuntimeEdges(){
+    const state=getState();
+    return arr(state.modelEdges).length?arr(state.modelEdges):arr(state.edges);
+  }
+
+  function targetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function normalizeFaultDropTargetKind(value){
+    const raw=typeof value==='string'
+      ?value
+      :(value?.targetKind||value?.kind||value?.targetKindFilter||'any');
+    if(raw==='edge'||raw==='line') return 'edge';
+    if(raw==='node'||raw==='module'||raw==='component') return 'node';
+    return 'any';
+  }
+
+  function targetAcceptsFaultComponent(target,expectedKind='any'){
+    if(!target?.id||typeof window.getCompatibleFaultModelsForTarget!=='function') return false;
+    const normalized=normalizeFaultDropTargetKind(expectedKind);
+    if(normalized!=='any'&&targetKind(target)!==normalized) return false;
+    return window.getCompatibleFaultModelsForTarget(target).length>0;
+  }
+
+  function clearCompatibleFaultDropTargets(){
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.remove('fault-drop-preview','fault-drop-preview--node','fault-drop-preview--edge');
+    document.querySelectorAll('.fault-drop-compatible,.fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('fault-drop-compatible','fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+    document.querySelectorAll('.is-fault-drop-compatible,.is-fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('is-fault-drop-compatible','is-fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+  }
+
+  function showCompatibleFaultDropTargets(options={targetKind:'node'}){
+    const expectedKind=normalizeFaultDropTargetKind(options);
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.add('fault-drop-preview');
+    diagram?.classList.toggle('fault-drop-preview--node',expectedKind==='node');
+    diagram?.classList.toggle('fault-drop-preview--edge',expectedKind==='edge');
+    getRuntimeNodes().forEach(node=>{
+      const el=document.getElementById(\`b-\${node.id}\`);
+      if(!el) return;
+      const compatible=expectedKind!=='edge'&&targetAcceptsFaultComponent(node,expectedKind);
+      el.classList.toggle('fault-drop-compatible',compatible);
+      el.classList.toggle('fault-drop-incompatible',!compatible);
+      el.dataset.faultDropState=compatible?'compatible':'incompatible';
+    });
+    getRuntimeEdges().forEach(edge=>{
+      const compatible=expectedKind!=='node'&&targetAcceptsFaultComponent(edge,expectedKind);
+      document.querySelectorAll(\`[data-edge-id="\${edge.id}"]\`).forEach(el=>{
+        el.classList.toggle('is-fault-drop-compatible',compatible);
+        el.classList.toggle('is-fault-drop-incompatible',!compatible);
+        el.dataset.faultDropState=compatible?'compatible':'incompatible';
+      });
+    });
+  }
+
+  function getFaultComponentDropTargetFromElement(element){
+    const nodeEl=element?.closest?.('.blk');
+    if(nodeEl?.id){
+      const nodeId=nodeEl.id.replace(/^b-/,'');
+      const node=(typeof getNode==='function'?getNode(nodeId):null)||getRuntimeNodes().find(item=>item.id===nodeId);
+      if(node) return node;
+    }
+    const edgeEl=element?.closest?.('.edge-hit,.edge-path,.edge-label,[data-edge-id]');
+    const edgeId=edgeEl?.dataset?.edgeId||edgeEl?.getAttribute?.('data-edge-id')||'';
+    if(edgeId){
+      const edge=(typeof getEdge==='function'?getEdge(edgeId):null)||getRuntimeEdges().find(item=>item.id===edgeId);
+      if(edge) return edge;
+    }
+    return null;
+  }
+
+  function getFaultComponentDropTargetFromClientPoint(clientX,clientY,options={}){
+    const expectedKind=normalizeFaultDropTargetKind(options);
+    const element=document.elementFromPoint?.(clientX,clientY);
+    if(expectedKind==='edge'){
+      const edgeElementTarget=getFaultComponentDropTargetFromElement(element);
+      if(edgeElementTarget&&targetKind(edgeElementTarget)==='edge') return edgeElementTarget;
+      const edgeId=typeof findNearestEdgeIdByClientPoint==='function'
+        ?findNearestEdgeIdByClientPoint(clientX,clientY)
+        :'';
+      return edgeId?((typeof getEdge==='function'?getEdge(edgeId):null)||getRuntimeEdges().find(item=>item.id===edgeId)||null):null;
+    }
+    const target=getFaultComponentDropTargetFromElement(element);
+    if(target) return target;
+    const edgeId=typeof findNearestEdgeIdByClientPoint==='function'
+      ?findNearestEdgeIdByClientPoint(clientX,clientY)
+      :'';
+    return edgeId?((typeof getEdge==='function'?getEdge(edgeId):null)||getRuntimeEdges().find(item=>item.id===edgeId)||null):null;
+  }
+
+  function selectFaultDropTarget(target){
+    if(!target?.id) return;
+    if(targetKind(target)==='edge'){
+      if(typeof selectEdge==='function') selectEdge(target.id);
+      return;
+    }
+    if(typeof selectNode==='function') selectNode(target.id);
+  }
+
+  function handleFaultDropForKind(options={},expectedKind='node'){
+    const target=options.target||(
+      Number.isFinite(options.clientX)&&Number.isFinite(options.clientY)
+        ?getFaultComponentDropTargetFromClientPoint(options.clientX,options.clientY,{targetKind:expectedKind})
+        :null
+    );
+    clearCompatibleFaultDropTargets();
+    if(!target){
+      toast(expectedKind==='edge'?'请将连线故障组件拖到高亮的可注入连线上':'请将故障组件拖到高亮的可注入模块上','w');
+      return {ok:false,reason:'missing-target'};
+    }
+    const kind=targetKind(target);
+    if(expectedKind!=='any'&&kind!==expectedKind){
+      toast(expectedKind==='edge'?'该对象不是可注入故障的连线':'该对象不是可注入故障的模块','w');
+      return {ok:false,reason:'incompatible-target-kind',targetId:target.id,targetKind:kind,expectedKind};
+    }
+    if(!targetAcceptsFaultComponent(target,expectedKind)){
+      toast('该对象没有匹配的故障形式','w');
+      return {ok:false,reason:'incompatible-target',targetId:target.id};
+    }
+    selectFaultDropTarget(target);
+    const opened=typeof window.openTargetFaultActivationDialog==='function'
+      ?window.openTargetFaultActivationDialog()
+      :false;
+    return {
+      ok:opened!==false,
+      mode:'target-fault-dialog',
+      targetId:target.id,
+      targetKind:kind
+    };
+  }
+
+  function handleFaultComponentDrop(options={}){
+    return handleFaultDropForKind(options,'node');
+  }
+
+  function handleLineFaultComponentDrop(options={}){
+    return handleFaultDropForKind(options,'edge');
+  }
+
+  Object.assign(window,{
+    showCompatibleFaultDropTargets,
+    clearCompatibleFaultDropTargets,
+    getFaultComponentDropTargetFromClientPoint,
+    handleFaultComponentDrop,
+    handleLineFaultComponentDrop
+  });
+})();
+
+;(function installCompactFaultDiagnosisConsole(){
+  if(typeof window==='undefined') return;
 \r
   function getState(){\r
     return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});\r
@@ -18090,10 +19032,60 @@ function decorateDataflowEdges(){\r
     return arr(state.nodes).length?arr(state.nodes):arr(state.modelNodes);\r
   }\r
 \r
-  function getRuntimeEdges(){\r
-    const state=getState();\r
-    return arr(state.edges).length?arr(state.edges):arr(state.modelEdges);\r
-  }\r
+  function getRuntimeEdges(){
+    const state=getState();
+    return arr(state.edges).length?arr(state.edges):arr(state.modelEdges);
+  }
+
+  function getRootDiagnosticCanvasId(){
+    const state=getState();
+    return state.rootCanvasId||'canvas-root';
+  }
+
+  function getActiveDiagnosticCanvasId(){
+    const state=getState();
+    return state.activeCanvasId||getRootDiagnosticCanvasId();
+  }
+
+  function getDiagnosticCanvasRecord(canvasId=getActiveDiagnosticCanvasId()){
+    const state=getState();
+    return state.canvases?.[canvasId]||null;
+  }
+
+  function getActiveDiagnosticEdges(){
+    const canvas=getDiagnosticCanvasRecord();
+    return canvas?arr(canvas.edges):getRuntimeEdges();
+  }
+
+  function getActiveDiagnosticNodes(){
+    const canvas=getDiagnosticCanvasRecord();
+    return canvas?arr(canvas.nodes):getRuntimeNodes();
+  }
+
+  function findDiagnosticPointCanvasId(point){
+    const state=getState();
+    const explicit=point?.canvasId||point?.scopeCanvasId||point?.targetCanvasId||point?.workbenchCanvasId;
+    if(explicit) return explicit;
+    const edgeId=point?.edgeId||point?.edgeID||point?.targetEdgeId;
+    const nodeId=point?.nodeId||point?.targetNodeId;
+    const canvases=state.canvases&&typeof state.canvases==='object'?state.canvases:{};
+    for(const [canvasId,canvas] of Object.entries(canvases)){
+      if(edgeId&&arr(canvas.edges).some(edge=>edge.id===edgeId)) return canvasId;
+      if(nodeId&&arr(canvas.nodes).some(node=>node.id===nodeId)) return canvasId;
+    }
+    return '';
+  }
+
+  function diagnosticPointBelongsToActiveCanvas(point,activeEdges=getActiveDiagnosticEdges(),activeNodes=getActiveDiagnosticNodes()){
+    const activeCanvasId=getActiveDiagnosticCanvasId();
+    const pointCanvasId=findDiagnosticPointCanvasId(point);
+    if(pointCanvasId) return pointCanvasId===activeCanvasId;
+    const edgeId=point?.edgeId||point?.edgeID||point?.targetEdgeId;
+    if(edgeId) return activeEdges.some(edge=>edge.id===edgeId);
+    const nodeId=point?.nodeId||point?.targetNodeId;
+    if(nodeId) return activeNodes.some(node=>node.id===nodeId);
+    return activeCanvasId===getRootDiagnosticCanvasId();
+  }
 \r
   const NODE_NAME_ZH={\r
     'node-command':'姿态指令',\r
@@ -18289,13 +19281,15 @@ function decorateDataflowEdges(){\r
     return affected;\r
   }\r
 \r
-  function getConfiguredPoints(){\r
-    const state=getState();\r
-    const runtimeEdges=getRuntimeEdges();\r
-    const edgeSignature=runtimeEdges.map(edge=>edge.id).join('|');\r
-    if(Array.isArray(state.compactDiagnosticFixedPoints)&&state.compactDiagnosticFixedPointSignature===edgeSignature){\r
-      return state.compactDiagnosticFixedPoints;\r
-    }\r
+  function getConfiguredPoints(){
+    const state=getState();
+    const runtimeEdges=getActiveDiagnosticEdges();
+    const runtimeNodes=getActiveDiagnosticNodes();
+    const activeCanvasId=getActiveDiagnosticCanvasId();
+    const edgeSignature=[activeCanvasId,runtimeEdges.map(edge=>edge.id).join('|'),runtimeNodes.map(node=>node.id).join('|')].join('::');
+    if(Array.isArray(state.compactDiagnosticFixedPoints)&&state.compactDiagnosticFixedPointSignature===edgeSignature){
+      return state.compactDiagnosticFixedPoints;
+    }
     const configured=arr(state.diagnosticTestPoints).length?arr(state.diagnosticTestPoints):arr(state.testPoints);\r
     let points;\r
     if(configured.length){\r
@@ -18307,28 +19301,30 @@ function decorateDataflowEdges(){\r
         edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',\r
         detects:arr(point.detects)\r
       }));\r
-    }else{\r
-      const existing=typeof window.getSemanticTestPoints==='function'?arr(window.getSemanticTestPoints()):[];\r
-      points=existing.length?existing.map((point,index)=>({\r
+    }else{
+      const existing=typeof window.getSemanticTestPoints==='function'?arr(window.getSemanticTestPoints()):[];
+      points=existing.length?existing.map((point,index)=>({
         ...point,\r
         pointId:point.pointId||point.id||\`tp-semantic-\${index}\`,\r
         shortName:point.shortName||point.code||\`M\${index+1}\`,\r
         name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId||point.edgeID||point.targetEdgeId]||point.name||point.label||point.position||\`测点 \${index+1}\`,\r
         edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',\r
-        detects:arr(point.detects)\r
-      })):runtimeEdges.map(pointForEdge);\r
-    }\r
-    const faultLibrary=getRuntimeFaultLibrary();\r
-    points=points.map((point,index)=>{\r
-      const edge=runtimeEdges.find(item=>item.id===point.edgeId);\r
+        detects:arr(point.detects)
+      })):runtimeEdges.map(pointForEdge);
+    }
+    points=points.filter(point=>diagnosticPointBelongsToActiveCanvas(point,runtimeEdges,runtimeNodes));
+    const faultLibrary=getRuntimeFaultLibrary();
+    points=points.map((point,index)=>{
+      const edge=runtimeEdges.find(item=>item.id===point.edgeId);
       const sourceName=point.sourceName||edgeEndpointName(edge||{},'source');\r
       const targetName=point.targetName||edgeEndpointName(edge||{},'target');\r
       return {\r
-        ...point,\r
-        pointId:point.pointId||\`tp-\${point.edgeId||index}\`,\r
-        shortName:point.shortName||\`M\${index+1}\`,\r
-        sourceName,\r
-        targetName,\r
+        ...point,
+        pointId:point.pointId||\`tp-\${point.edgeId||index}\`,
+        canvasId:point.canvasId||findDiagnosticPointCanvasId(point)||activeCanvasId,
+        shortName:point.shortName||\`M\${index+1}\`,
+        sourceName,
+        targetName,
         name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId]||point.name||point.label||\`\${sourceName} -> \${targetName}\`,\r
         detects:Array.from(new Set(arr(point.detects).concat(faultLibrary.filter(fault=>getFaultAffectedEdges(fault).has(point.edgeId)).map(fault=>fault.id))))\r
       };\r
@@ -18340,19 +19336,19 @@ function decorateDataflowEdges(){\r
     return points;\r
   }\r
 \r
-  function getInstalledPointIds(points=getConfiguredPoints()){\r
-    const state=getState();\r
-    if(!Array.isArray(state.installedDiagnosticTestPointIds)){\r
-      state.installedDiagnosticTestPointIds=[];\r
-    }\r
-    const signature=points.map(point=>point.pointId).join('|');\r
-    if(state.compactDiagnosticPointSignature!==signature){\r
-      state.compactDiagnosticPointSignature=signature;\r
-    }\r
-    const valid=new Set(points.map(point=>point.pointId));\r
-    state.installedDiagnosticTestPointIds=Array.from(new Set(state.installedDiagnosticTestPointIds.filter(id=>valid.has(id))));\r
-    return state.installedDiagnosticTestPointIds;\r
-  }\r
+  function getInstalledPointIds(points=getConfiguredPoints()){
+    const state=getState();
+    if(!Array.isArray(state.installedDiagnosticTestPointIds)){
+      state.installedDiagnosticTestPointIds=[];
+    }
+    const signature=points.map(point=>point.pointId).join('|');
+    if(state.compactDiagnosticPointSignature!==signature){
+      state.compactDiagnosticPointSignature=signature;
+    }
+    const valid=new Set(points.map(point=>point.pointId));
+    state.installedDiagnosticTestPointIds=Array.from(new Set(state.installedDiagnosticTestPointIds.filter(Boolean)));
+    return state.installedDiagnosticTestPointIds.filter(id=>valid.has(id));
+  }
 \r
   function clearDiagnosticScanState(state=getState()){\r
     state.diagnosticScanResults=[];\r
@@ -18395,11 +19391,13 @@ function decorateDataflowEdges(){\r
     }));\r
   }\r
 \r
-  function pointDetectsFault(point,fault){\r
-    if(!point||!fault) return false;\r
-    const id=getFaultKey(fault);\r
-    if(arr(point.detects).includes(id)) return true;\r
-    const configuredModel=getRuntimeFaultLibrary().find(item=>item.id===id);\r
+  function pointDetectsFault(point,fault){
+    if(!point||!fault) return false;
+    const explicitCell=getExplicitDetectionMatrixCell(point,fault);
+    if(explicitCell) return explicitCell.detectable;
+    const id=getFaultKey(fault);
+    if(arr(point.detects).includes(id)) return true;
+    const configuredModel=getRuntimeFaultLibrary().find(item=>item.id===id);
     if(!configuredModel&&!arr(fault.affectedEdges).length&&!arr(fault.affectedTestPointEdges).length){\r
       return false;\r
     }\r
@@ -18407,21 +19405,21 @@ function decorateDataflowEdges(){\r
     return getFaultAffectedEdges(model).has(point.edgeId);\r
   }\r
 \r
-  function renderPointCard(point,installed,scanResult){\r
-    const abnormal=scanResult?.status==='abnormal';\r
-    return \`\r
-      <button class="tp-console-point\${installed?' is-installed':''}\${abnormal?' is-abnormal':''}" type="button" data-install-testpoint="\${html(point.pointId)}" data-fixed-testpoint-position="\${html(point.pointId)}">\r
-        <span class="tp-console-point__code">\${html(point.shortName)}</span>\r
-        <span class="tp-console-point__main">\r
-          <strong>\${html(point.name)}</strong>\r
-          <small>\${html(point.sourceName||point.signalId||point.edgeId)}\${point.targetName?\` -> \${html(point.targetName)}\`:''}</small>\r
-        </span>\r
-        <span class="tp-console-point__state">\${abnormal?'异常':(installed?'已安装':'安装')}</span>\r
-      </button>\r
-    \`;\r
-  }\r
-\r
-  function renderInstalledPoint(point,scanResult){\r
+  function renderPointCard(point,installed,scanResult){
+    const abnormal=scanResult?.status==='abnormal';
+    return \`
+      <button class="tp-console-point\${installed?' is-installed':''}\${abnormal?' is-abnormal':''}" type="button" data-install-testpoint="\${html(point.pointId)}" data-fixed-testpoint-position="\${html(point.pointId)}">
+        <span class="tp-console-point__code">\${html(point.shortName)}</span>
+        <span class="tp-console-point__main">
+          <strong>\${html(point.name)}</strong>
+          <small>\${html(point.sourceName||point.signalId||point.edgeId)}\${point.targetName?\` -> \${html(point.targetName)}\`:''}</small>
+        </span>
+        <span class="tp-console-point__state">\${abnormal?'异常':(installed?'已安装':'安装')}</span>
+      </button>
+    \`;
+  }
+
+  function renderInstalledPoint(point,scanResult){
     const abnormal=scanResult?.status==='abnormal';\r
     const checked=Array.isArray(scanResult?.candidates)?scanResult.candidates.length:0;\r
     return \`\r
@@ -18513,10 +19511,10 @@ function decorateDataflowEdges(){\r
             <select class="tp-hidden-select" data-testpoint-position-select aria-hidden="true" tabindex="-1">\r
               \${points.map(point=>\`<option value="\${html(point.pointId)}">\${html(point.name)}</option>\`).join('')}\r
             </select>\r
-            <div class="tp-point-grid">\r
-              \${points.map(point=>renderPointCard(point,installedIds.has(point.pointId),scanByPoint.get(point.pointId))).join('')}\r
-            </div>\r
-          </section>\r
+            <div class="tp-point-grid">
+              \${points.map(point=>renderPointCard(point,installedIds.has(point.pointId),scanByPoint.get(point.pointId))).join('')}
+            </div>
+          </section>
           <section class="tp-console-panel">\r
             <div class="tp-panel-head">\r
               <strong>检测</strong>\r
@@ -18553,9 +19551,9 @@ function decorateDataflowEdges(){\r
     }\r
   }\r
 \r
-  window.buildDiagnosticTestPointModel=function(){\r
-    const points=getConfiguredPoints();\r
-    const installedIds=new Set(getInstalledPointIds(points));\r
+  window.buildDiagnosticTestPointModel=function(){
+    const points=getConfiguredPoints();
+    const installedIds=new Set(getInstalledPointIds(points));
     const positions=points.map((point,index)=>({\r
       ...point,\r
       positionIndex:index+1,\r
@@ -18570,11 +19568,11 @@ function decorateDataflowEdges(){\r
       available:positions.filter(point=>!point.installed),\r
       installed:positions.filter(point=>point.installed),\r
       injectedFaults:getInjectedFaults(),\r
-      faultLibrary:getRuntimeFaultLibrary()\r
-    };\r
-  };\r
-\r
-  function getFaultTargetText(fault){\r
+      faultLibrary:getRuntimeFaultLibrary()
+    };
+  };
+
+  function getFaultTargetText(fault){
     if(fault?.targetModuleName||fault?.targetName||fault?.moduleName){\r
       return fault.targetModuleName||fault.targetName||fault.moduleName;\r
     }\r
@@ -18598,12 +19596,79 @@ function decorateDataflowEdges(){\r
     return '未绑定';\r
   }\r
 \r
-  function getDetectionCellReason(point,fault,affectedEdges){\r
-    const id=getFaultKey(fault);\r
-    if(arr(point.detects).includes(id)) return '测点直接配置为可观测';\r
-    if(affectedEdges.has(point.edgeId)) return '故障传播路径覆盖该测点';\r
-    return '不覆盖该测点';\r
-  }\r
+  function getActiveDiagnosticMatrixRows(){
+    const state=getState();
+    const matrix=state?.diagnosticModel?.dMatrix||state?.activeModelPackage?.diagnosticModel?.dMatrix||null;
+    return arr(matrix?.rows);
+  }
+
+  function normalizeDetectionMatrixCell(value){
+    if(value==null) return null;
+    if(typeof value==='boolean'||typeof value==='number'){
+      const detectable=Boolean(value);
+      return {
+        detectable,
+        value:detectable?1:0,
+        reason:detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测'
+      };
+    }
+    if(typeof value==='string'){
+      const token=value.trim().toLowerCase();
+      const detectable=token==='1'||token==='true'||token==='yes'||token==='detectable'||token==='可检测';
+      return {
+        detectable,
+        value:detectable?1:0,
+        reason:detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测'
+      };
+    }
+    const raw=value.detectable??value.detect??value.d??value.value;
+    const detectable=typeof raw==='string'
+      ?['1','true','yes','detectable','可检测'].includes(raw.trim().toLowerCase())
+      :Boolean(raw);
+    return {
+      detectable,
+      value:detectable?1:0,
+      reason:value.signature||value.reason||value.note||(detectable?'D 矩阵显式标记为可检测':'D 矩阵显式标记为不可检测')
+    };
+  }
+
+  function getExplicitDetectionMatrixCell(point,fault){
+    const faultId=getFaultKey(fault);
+    if(!faultId||!point) return null;
+    const row=getActiveDiagnosticMatrixRows().find(item=>[
+      item?.faultId,
+      item?.faultTypeId,
+      item?.caseId,
+      item?.id
+    ].filter(Boolean).includes(faultId));
+    if(!row) return null;
+    const values=row.points||row.cells||row.pointValues||{};
+    if(Array.isArray(values)){
+      const match=values.find(cell=>[
+        cell?.pointId,
+        cell?.pointCode,
+        cell?.shortName,
+        cell?.id,
+        cell?.edgeId
+      ].filter(Boolean).some(key=>key===point.pointId||key===point.shortName||key===point.edgeId));
+      return normalizeDetectionMatrixCell(match);
+    }
+    const keys=[point.pointId,point.id,point.shortName,point.code,point.edgeId].filter(Boolean);
+    for(const key of keys){
+      if(Object.prototype.hasOwnProperty.call(values,key)){
+        return normalizeDetectionMatrixCell(values[key]);
+      }
+    }
+    return null;
+  }
+
+  function getDetectionCellReason(point,fault,affectedEdges,explicitCell=null){
+    if(explicitCell) return explicitCell.reason;
+    const id=getFaultKey(fault);
+    if(arr(point.detects).includes(id)) return '测点直接配置为可观测';
+    if(affectedEdges.has(point.edgeId)) return '故障传播路径覆盖该测点';
+    return '不覆盖该测点';
+  }
 \r
   function getFaultLayerText(fault){\r
     const value=String(fault?.layer||fault?.category||fault?.type||'').toLowerCase();\r
@@ -18614,23 +19679,24 @@ function decorateDataflowEdges(){\r
     return fault?.category||fault?.layer||'故障';\r
   }\r
 \r
-  window.buildDetectionMatrixModel=function(){\r
-    const points=getConfiguredPoints();\r
-    const faults=getRuntimeFaultLibrary();\r
-    const rows=faults.map(fault=>{\r
-      const affectedEdges=getFaultAffectedEdges(fault);\r
-      const cells=points.map(point=>{\r
-        const detectable=arr(point.detects).includes(getFaultKey(fault))||affectedEdges.has(point.edgeId);\r
-        return {\r
-          pointId:point.pointId,\r
-          pointCode:point.shortName,\r
-          pointName:point.name,\r
-          edgeId:point.edgeId,\r
-          detectable,\r
-          value:detectable?1:0,\r
-          reason:getDetectionCellReason(point,fault,affectedEdges)\r
-        };\r
-      });\r
+  window.buildDetectionMatrixModel=function(){
+    const points=getConfiguredPoints();
+    const faults=getRuntimeFaultLibrary();
+    const rows=faults.map(fault=>{
+      const affectedEdges=getFaultAffectedEdges(fault);
+      const cells=points.map(point=>{
+        const explicitCell=getExplicitDetectionMatrixCell(point,fault);
+        const detectable=explicitCell?explicitCell.detectable:(arr(point.detects).includes(getFaultKey(fault))||affectedEdges.has(point.edgeId));
+        return {
+          pointId:point.pointId,
+          pointCode:point.shortName,
+          pointName:point.name,
+          edgeId:point.edgeId,
+          detectable,
+          value:detectable?1:0,
+          reason:getDetectionCellReason(point,fault,affectedEdges,explicitCell)
+        };
+      });
       return {\r
         faultId:getFaultKey(fault),\r
         faultName:fault.name||getFaultKey(fault),\r
@@ -18650,11 +19716,131 @@ function decorateDataflowEdges(){\r
         faultCount:faults.length,\r
         detectableCells:rows.reduce((sum,row)=>sum+row.detectableCount,0)\r
       },\r
-      generatedAt:new Date().toISOString()\r
-    };\r
-  };\r
-\r
-  function renderDetectionMatrixTable(model){\r
+      generatedAt:new Date().toISOString()
+    };
+  };
+
+  function getMatrixCellForPoint(row,pointCode){
+    return arr(row?.cells).find(cell=>cell.pointCode===pointCode||cell.pointId===pointCode)||null;
+  }
+
+  function compactDiagnosticPointName(name){
+    return text(name,'测点').replace(/测点$/,'');
+  }
+
+  function getPointPriorityBonus(point,cell){
+    const name=\`\${point?.name||''} \${cell?.pointName||''} \${point?.role||''}\`;
+    let bonus=0;
+    if(/残差|诊断|residual|diagnostic/i.test(name)) bonus+=120;
+    if(/频谱|spectrum/i.test(name)) bonus+=80;
+    if(/误差|反馈|IMU|控制/i.test(name)) bonus+=24;
+    const index=Number(String(cell?.pointCode||point?.shortName||'').replace(/^\\D+/,''))||99;
+    bonus+=Math.max(0,18-index);
+    return bonus;
+  }
+
+  function rankTroubleshootingCells(model,targetRow,remainingRows,usedPointCodes){
+    const pointsByCode=new Map(arr(model.points).map(point=>[point.shortName,point]));
+    return arr(targetRow.cells)
+      .filter(cell=>cell.detectable&&!usedPointCodes.has(cell.pointCode))
+      .map(cell=>{
+        const otherDetectingRows=arr(model.rows).filter(row=>row.faultId!==targetRow.faultId&&getMatrixCellForPoint(row,cell.pointCode)?.detectable);
+        const separatesRemaining=remainingRows.filter(row=>Boolean(getMatrixCellForPoint(row,cell.pointCode)?.detectable)!==Boolean(cell.detectable)).length;
+        const point=pointsByCode.get(cell.pointCode);
+        return {
+          cell,
+          score:getPointPriorityBonus(point,cell)+(separatesRemaining*10)-otherDetectingRows.length
+        };
+      })
+      .sort((a,b)=>b.score-a.score||String(a.cell.pointCode).localeCompare(String(b.cell.pointCode),'zh-Hans-CN'));
+  }
+
+  window.buildTroubleshootingPathForFault=function(faultId,options={}){
+    const model=window.buildDetectionMatrixModel();
+    const targetRow=arr(model.rows).find(row=>row.faultId===faultId);
+    if(!targetRow){
+      return {ok:false,error:'unknown-fault',faultId,steps:[],summary:'未找到该故障的 D 矩阵行。'};
+    }
+    const maxSteps=Number.isFinite(options.maxSteps)?options.maxSteps:4;
+    const usedPointCodes=new Set();
+    let remainingRows=arr(model.rows);
+    const steps=[];
+    while(steps.length<maxSteps){
+      const ranked=rankTroubleshootingCells(model,targetRow,remainingRows,usedPointCodes);
+      if(!ranked.length) break;
+      const {cell}=ranked[0];
+      usedPointCodes.add(cell.pointCode);
+      remainingRows=remainingRows.filter(row=>Boolean(getMatrixCellForPoint(row,cell.pointCode)?.detectable)===Boolean(cell.detectable));
+      steps.push({
+        index:steps.length+1,
+        pointId:cell.pointId,
+        pointCode:cell.pointCode,
+        pointName:compactDiagnosticPointName(cell.pointName),
+        expected:cell.reason||'该测点应显示可检测异常',
+        remainingFaultIds:remainingRows.map(row=>row.faultId),
+        remainingFaultNames:remainingRows.map(row=>row.faultName),
+        reason:\`该测点对 \${targetRow.faultName} 为可检测，可排除 \${Math.max(0,model.rows.length-remainingRows.length)} 类不匹配故障。\`
+      });
+      if(remainingRows.length<=1) break;
+    }
+    return {
+      ok:true,
+      faultId:targetRow.faultId,
+      faultName:targetRow.faultName,
+      targetLabel:targetRow.targetLabel,
+      layer:targetRow.layer,
+      steps,
+      summary:steps.length
+        ?\`优先检查 \${steps[0].pointCode} \${steps[0].pointName}，再按剩余候选继续确认。\`
+        :'该故障暂无可检测测点，需补充 D 矩阵或安装测点。'
+    };
+  };
+
+  function renderTroubleshootingPath(path){
+    if(!path?.ok){
+      return \`<div class="troubleshooting-path__empty">\${html(path?.summary||'无法生成排故路径。')}</div>\`;
+    }
+    return \`
+      <div class="troubleshooting-path__title">
+        <div>
+          <span>最优排故路径</span>
+          <strong>\${html(path.faultName)}</strong>
+        </div>
+        <button type="button" data-close-troubleshooting-path>关闭</button>
+      </div>
+      <div class="troubleshooting-path__meta">
+        <span>\${html(path.layer||'故障层级')}</span>
+        <span>\${html(path.targetLabel||'目标对象')}</span>
+      </div>
+      <p>\${html(path.summary)}</p>
+      <ol class="troubleshooting-path__steps">
+        \${arr(path.steps).map(step=>\`
+          <li>
+            <b>\${html(step.pointCode)}</b>
+            <div>
+              <strong>\${html(step.pointName)}</strong>
+              <span>\${html(step.expected)}</span>
+              <small>剩余候选：\${html(step.remainingFaultNames.join('、')||'无')}</small>
+            </div>
+          </li>
+        \`).join('')}
+      </ol>
+    \`;
+  }
+
+  window.openTroubleshootingPathPanel=function(faultId){
+    document.querySelector('[data-troubleshooting-path-panel]')?.remove();
+    const host=document.querySelector('[data-d-matrix-view]')||document.getElementById('d-matrix-panel')||document.body;
+    const panel=document.createElement('aside');
+    panel.className='troubleshooting-path';
+    panel.dataset.troubleshootingPathPanel='true';
+    panel.innerHTML=renderTroubleshootingPath(window.buildTroubleshootingPathForFault(faultId));
+    host.appendChild(panel);
+    panel.querySelector('[data-close-troubleshooting-path]')?.addEventListener('click',()=>panel.remove());
+    return panel;
+  };
+
+  function renderDetectionMatrixTable(model){
     const points=arr(model?.points);\r
     const rows=arr(model?.rows);\r
     return \`\r
@@ -18663,10 +19849,11 @@ function decorateDataflowEdges(){\r
           <thead>\r
             <tr>\r
               <th class="d-matrix-sticky">故障类型</th>\r
-              <th>目标模块/连线</th>\r
-              <th>层级</th>\r
-              <th>可测点</th>\r
-              \${points.map(point=>\`<th title="\${html(point.name)}">\${html(point.shortName)}</th>\`).join('')}\r
+              <th>目标模块/连线</th>
+              <th>层级</th>
+              <th>可测点</th>
+              <th>排故路径</th>
+              \${points.map(point=>\`<th title="\${html(point.name)}">\${html(point.shortName)}</th>\`).join('')}
             </tr>\r
           </thead>\r
           <tbody>\r
@@ -18676,10 +19863,11 @@ function decorateDataflowEdges(){\r
                   <strong>\${html(row.faultName)}</strong>\r
                   <small>\${html(row.faultId)}</small>\r
                 </td>\r
-                <td>\${html(row.targetLabel)}</td>\r
-                <td>\${html(row.layer)}</td>\r
-                <td>\${row.detectableCount}/\${points.length}</td>\r
-                \${row.cells.map(cell=>\`\r
+                <td>\${html(row.targetLabel)}</td>
+                <td>\${html(row.layer)}</td>
+                <td>\${row.detectableCount}/\${points.length}</td>
+                <td><button type="button" class="d-matrix-path-action" data-build-troubleshooting-path="\${html(row.faultId)}">生成</button></td>
+                \${row.cells.map(cell=>\`
                   <td class="d-matrix-cell\${cell.detectable?' is-detectable':' is-empty'}" title="\${html(cell.pointCode)} · \${html(cell.pointName)} · \${html(cell.reason)}">\${cell.detectable?'1':'0'}</td>\r
                 \`).join('')}\r
               </tr>\r
@@ -18749,16 +19937,18 @@ function decorateDataflowEdges(){\r
     return csv;\r
   };\r
 \r
-  window.addDiagnosticTestPoint=function(pointId){\r
-    const points=getConfiguredPoints();\r
-    const point=points.find(item=>item.pointId===pointId);\r
-    if(!point) return false;\r
-    const state=getState();\r
-    const installed=getInstalledPointIds(points);\r
-    if(!installed.includes(point.pointId)) installed.push(point.pointId);\r
-    state.selectedDiagnosticTestPointId=point.pointId;\r
-    clearDiagnosticScanState(state);\r
-    refreshDiagnosisViews();\r
+  window.addDiagnosticTestPoint=function(pointId){
+    const points=getConfiguredPoints();
+    const point=points.find(item=>item.pointId===pointId);
+    if(!point) return false;
+    const state=getState();
+    const installed=getInstalledPointIds(points);
+    if(!installed.includes(point.pointId)&&!state.installedDiagnosticTestPointIds.includes(point.pointId)){
+      state.installedDiagnosticTestPointIds.push(point.pointId);
+    }
+    state.selectedDiagnosticTestPointId=point.pointId;
+    clearDiagnosticScanState(state);
+    refreshDiagnosisViews();
     return true;\r
   };\r
   window.installDiagnosticTestPoint=window.addDiagnosticTestPoint;\r
@@ -19121,12 +20311,37 @@ function decorateDataflowEdges(){\r
     return state.diagnosticAnnotationVisibility;\r
   }\r
 \r
-  function isAnnotationVisible(kind){\r
-    const visibility=getAnnotationVisibility();\r
-    return visibility[kind]!==false;\r
-  }\r
-\r
-  function findCanvasPathForEdge(edgeId){\r
+  function isAnnotationVisible(kind){
+    const visibility=getAnnotationVisibility();
+    return visibility[kind]!==false;
+  }
+
+  function isFaultViewTestpointsVisible(){
+    return getAnnotationVisibility().faultViewTestpoints===true;
+  }
+
+  function renderFaultViewTestpointToggle(){
+    if(typeof document==='undefined') return;
+    const button=document.querySelector('[data-toggle-fault-view-testpoints]');
+    if(!button) return;
+    const visible=isFaultViewTestpointsVisible();
+    button.textContent=visible?'隐藏测点':'显示测点';
+    button.setAttribute('aria-pressed',visible?'true':'false');
+    button.classList.toggle('is-active',visible);
+  }
+  window.renderFaultViewTestpointToggle=renderFaultViewTestpointToggle;
+
+  window.toggleFaultViewTestpoints=function(next){
+    const visibility=getAnnotationVisibility();
+    visibility.faultViewTestpoints=typeof next==='boolean'?next:!isFaultViewTestpointsVisible();
+    renderFaultViewTestpointToggle();
+    if(typeof window.renderCanvasDiagnosticTestPointMarkers==='function'){
+      window.renderCanvasDiagnosticTestPointMarkers();
+    }
+    return visibility.faultViewTestpoints;
+  };
+
+  function findCanvasPathForEdge(edgeId){
     if(!edgeId||typeof document==='undefined') return null;\r
     return Array.from(document.querySelectorAll('.edge-path[data-edge-id],path[data-edge-id]')).find(item=>{\r
       return item.dataset?.edgeId===edgeId||item.getAttribute('data-edge-id')===edgeId||item.id===edgeId;\r
@@ -19323,10 +20538,13 @@ function decorateDataflowEdges(){\r
       layer=document.createElementNS('http://www.w3.org/2000/svg','g');\r
       layer.id='diagnostic-fault-marker-layer';\r
       host.appendChild(layer);\r
-    }\r
-    layer.innerHTML='';\r
-    if(!isAnnotationVisible('faults')) return;\r
-    window.buildFaultInjectionAnnotationModel().forEach(annotation=>{\r
+    }
+    layer.innerHTML='';
+    // Fault targets are now expressed by drag-compatible highlights and injected fault tags.
+    // Keep the legacy numbered F-marker layer empty so it does not compete with test points.
+    return;
+    if(!isAnnotationVisible('faults')) return;
+    window.buildFaultInjectionAnnotationModel().forEach(annotation=>{
       const marker=document.createElementNS('http://www.w3.org/2000/svg','g');\r
       marker.setAttribute('class',\`canvas-fault-marker\${annotation.active?' is-active':''}\${getState().selectedFaultAnnotationId&&annotation.models.some(model=>model.id===getState().selectedFaultAnnotationId)?' is-selected':''}\`);\r
       marker.setAttribute('data-canvas-fault-marker','true');\r
@@ -19390,13 +20608,20 @@ function decorateDataflowEdges(){\r
     }\r
     layer.innerHTML='';\r
     const model=window.buildDiagnosticTestPointModel();\r
-    if(!isAnnotationVisible('testpoints')) return;\r
-    const installedIds=new Set(model.installed.map(point=>point.pointId));\r
-    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));\r
-    model.positions.forEach((point,index)=>{\r
-      const installed=installedIds.has(point.pointId);\r
-      const abnormal=scanByPoint.get(point.pointId)?.status==='abnormal';\r
-      const pt=point.edgeId?getEdgeCanvasPoint(point.edgeId,0.52,index):getNodeCanvasCenter(point.nodeId,index);\r
+    if(!isAnnotationVisible('testpoints')) return;
+    const installedIds=new Set(model.installed.map(point=>point.pointId));
+    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));
+    const canvasView=document.getElementById('cw')?.dataset.view||'canvas';
+    const selectedPointId=canvasView!=='dataflow'?(getState().selectedDiagnosticTestPointId||''):'';
+    model.positions
+      .filter(point=>{
+        if(canvasView==='components') return isFaultViewTestpointsVisible();
+        return installedIds.has(point.pointId)||point.pointId===selectedPointId;
+      })
+      .forEach((point,index)=>{
+      const installed=installedIds.has(point.pointId);
+      const abnormal=scanByPoint.get(point.pointId)?.status==='abnormal';
+      const pt=point.edgeId?getEdgeCanvasPoint(point.edgeId,0.52,index):getNodeCanvasCenter(point.nodeId,index);
       const marker=document.createElementNS('http://www.w3.org/2000/svg','g');\r
       marker.setAttribute('class',\`canvas-testpoint-marker\${installed?' is-installed':' is-uninstalled'}\${abnormal?' is-abnormal':''}\${getState().selectedDiagnosticTestPointId===point.pointId?' is-selected':''}\`);\r
       marker.setAttribute('data-canvas-testpoint-marker','true');\r
@@ -19428,10 +20653,10 @@ function decorateDataflowEdges(){\r
         }else{\r
           window.addDiagnosticTestPoint(point.pointId);\r
         }\r
-      });\r
-      layer.appendChild(marker);\r
-    });\r
-  };\r
+      });
+      layer.appendChild(marker);
+    });
+  };
   if(typeof renderCanvasDiagnosticTestPointMarkers!=='undefined') renderCanvasDiagnosticTestPointMarkers=window.renderCanvasDiagnosticTestPointMarkers;\r
 \r
   window.renderCanvasDiagnosticAnnotations=function(){\r
@@ -19471,11 +20696,11 @@ function decorateDataflowEdges(){\r
     if(typeof renderEdges!=='undefined') renderEdges=window.renderEdges;\r
   }\r
 \r
-  if(typeof document!=='undefined'&&!window.__compactDiagnosisConsoleEvents){\r
-    window.__compactDiagnosisConsoleEvents=true;\r
-    document.addEventListener('click',event=>{\r
-      const locateFault=event.target.closest?.('[data-locate-fault-injection]');\r
-      if(locateFault){\r
+  if(typeof document!=='undefined'&&!window.__compactDiagnosisConsoleEvents){
+    window.__compactDiagnosisConsoleEvents=true;
+    document.addEventListener('click',event=>{
+      const locateFault=event.target.closest?.('[data-locate-fault-injection]');
+      if(locateFault){
         event.preventDefault();\r
         const located=window.locateFaultCatalogInjectionTarget?.(locateFault.getAttribute('data-locate-fault-injection'));\r
         if(located&&typeof toast==='function') toast('已在画布中标出注入位置','s');\r
@@ -19514,21 +20739,33 @@ function decorateDataflowEdges(){\r
       }\r
       if(event.target.closest?.('[data-run-fault-detection]')){\r
         event.preventDefault();\r
-        window.runAllDiagnosticTestPointDetections();\r
-        return;\r
-      }\r
-      if(event.target.closest?.('[data-clear-diagnostic-result]')){\r
+        window.runAllDiagnosticTestPointDetections();
+        return;
+      }
+      const toggleFaultViewPoints=event.target.closest?.('[data-toggle-fault-view-testpoints]');
+      if(toggleFaultViewPoints){
+        event.preventDefault();
+        window.toggleFaultViewTestpoints?.();
+        return;
+      }
+      if(event.target.closest?.('[data-clear-diagnostic-result]')){
         event.preventDefault();\r
         clearDiagnosticScanState(getState());\r
         refreshDiagnosisViews();\r
         return;\r
       }\r
-      if(event.target.closest?.('[data-d-matrix-export]')){\r
-        event.preventDefault();\r
-        window.exportDetectionMatrixCsv?.();\r
-        return;\r
-      }\r
-      const confirm=event.target.closest?.('[data-confirm-diagnostic-fault]');\r
+      if(event.target.closest?.('[data-d-matrix-export]')){
+        event.preventDefault();
+        window.exportDetectionMatrixCsv?.();
+        return;
+      }
+      const pathTrigger=event.target.closest?.('[data-build-troubleshooting-path]');
+      if(pathTrigger){
+        event.preventDefault();
+        window.openTroubleshootingPathPanel?.(pathTrigger.getAttribute('data-build-troubleshooting-path'));
+        return;
+      }
+      const confirm=event.target.closest?.('[data-confirm-diagnostic-fault]');
       if(confirm){\r
         const state=getState();\r
         const id=confirm.getAttribute('data-confirm-diagnostic-fault');\r
@@ -19654,6 +20891,6 @@ function decorateDataflowEdges(){\r
   window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;\r
   setTimeout(decorateCanvasNodes,0);\r
 })();\r
-`,Ks=`canvas-root`,qs=`顶层`;function J(e){return JSON.parse(JSON.stringify(e))}function Js(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Y(e){return Array.isArray(e)?e:[]}function Ys(e){let t=J(e??{});return{inputs:Array.isArray(t.inputs)?J(t.inputs):[],outputs:Array.isArray(t.outputs)?J(t.outputs):[],middleVars:Array.isArray(t.middleVars)?J(t.middleVars):[]}}function Xs(e){let t=J(e??{});return{...qo().executionConfig,...t}}function Zs(e){if(!e||typeof e!=`object`)return qo();let t={...qo(),...J(e)};return t.executionConfig=Xs(e.executionConfig),t.portMapping={...qo().portMapping,...Ys(e.portMapping)},t}function Qs(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function $s(e,t){return Object.values(Js(e)?e:{}).flatMap(e=>Js(e)?Y(e[t]):[])}function ec(e,t,n){return Qs($s(e,t),n)}function tc(e){let t=Js(e)?J(e):{};return{...t,pythonBinding:t.type===`simulation_block`?Zs(t.pythonBinding):t.pythonBinding??null}}function nc(e){return Js(e)?J(e):{}}function rc(e=Ks,t=qs){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function ic(e,t=Ks){let n=Js(e)?J(e):{};return{id:n.id??t,name:n.name??(t===Ks?qs:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:Y(n.nodes).map(tc),edges:Y(n.edges).map(nc)}}function ac(e){let t=Js(e)?e:{},n=Js(t.canvases)?t.canvases:null;if(!n){let e=rc();return e.nodes=Y(t.modelNodes).map(tc),e.edges=Y(t.modelEdges).map(nc),{rootCanvasId:Ks,activeCanvasId:Ks,canvasTrail:[Ks],canvases:{[Ks]:e}}}let r=t.rootCanvasId??Ks,i={};Object.entries(n).forEach(([e,t])=>{i[e]=ic(t,e)}),i[r]||(i[r]=rc(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=Y(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function oc(e){let t=Js(e)?J(e):{},n=ac(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??rc(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),a=i.nodes,o=i.edges;return J({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??ec(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??ec(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}function sc(e){let t=Js(e)?J(e):{},n=ac(t),r=n.canvases[n.activeCanvasId]??rc(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?qs:`未命名画布`),i=r.nodes,a=r.edges;return J({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??ec(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??ec(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}var cc=`flight-control-model`;function X(e){return JSON.parse(JSON.stringify(e))}function lc(e){let t=X(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function uc(e){let t=new Map;return e.forEach(e=>{let n=lc(e);Z(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),Z(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function dc(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Q(e)){t.push(e);return}let r=Z(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Q(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function fc(e,t){let n=X(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Q(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Q(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function pc(e){return!!(e?.bound&&Z(e.entryFunction)&&Z(e.rawSource??e.source)&&Q(e.parsedInterface))}function mc(e,t){if(!e?.bound||!t||!Q(t.parsedInterface)||pc(e))return e;let n=Jo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...X(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??X(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Q(e.executionConfig)?e.executionConfig:n.executionConfig}}function hc(e,t){let n=uc(t),r=[];return{snapshot:fc(e,e=>{if(!Q(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!pc(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=mc(t,i);if(!pc(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function gc(e){if(!Q(e))return e;if(e?.type!==`simulation_block`)return X(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...X(e),pythonBinding:t?X(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=Z(n)&&Z(r)&&Z(i)&&Z(a);return{...X(e),pythonBinding:o?X(t):null}}function _c(e){return dc(e).reduce((e,t)=>{if(!Q(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!Z(r)||!Z(i)||!Z(a)||!Z(o)||e.has(r)||e.set(r,lc({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function Z(e){return typeof e==`string`&&e.trim().length>0}function Q(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function vc(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Q(t)||e.push(`${n}[${r}] must be an object.`)})}function yc(e){let t=[],n=new Set,r=new Set;if(!Q(e))return{ok:!1,errors:[`Package must be an object.`]};if(e.schemaVersion!==1&&t.push(`schemaVersion must be 1.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${cc}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Q(e)){t.push(`pythonModules[${i}] must be an object.`);return}Z(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),Z(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),Z(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),Z(e.source)||t.push(`pythonModules[${i}].source is required.`),Z(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),Z(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Q(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Q(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?vc(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?vc(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Q(e)&&Z(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Q(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&vc(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&vc(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),dc(e.workbenchSnapshot).forEach((e,n)=>{if(!Q(e)||!Q(e.injectedFault))return;let r=Z(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!Z(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function bc(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function xc(e){let t=yc(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=X(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=hc(sc(e.workbenchSnapshot),n);return r.errors.length>0?{ok:!1,errors:r.errors}:{ok:!0,snapshot:r.snapshot,descriptor:bc(e),faultLibrary:X(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Q(e.diagnosticModel)?X(e.diagnosticModel):null,pythonModules:n}}function Sc({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=oc(t),i=fc(r,gc),a=_c(r);return{schemaVersion:1,packageType:cc,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},source:X(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:X(n??[]),workbenchSnapshot:i}}function Cc({meta:e={},state:t={},faultLibrary:n=[]}={}){return Sc({meta:e,snapshot:t,faultLibrary:n})}var wc={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},Tc=!1,Ec=`model-packages/evtol_closed_loop_fault_demo.json`,Dc=`gz-workbench-system-model`;function Oc(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function kc(){let e=Oc(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function Ac(){return new URL(Ec,kc()).toString()}function jc(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Mc(){return jc()?{publicDemo:!0}:{}}function Nc(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(Dc)}catch{}}function Pc({force:e=!1}={}){if(e)return!1;if(!window.__GZ_AUTO_LOAD_DEFAULT_MODEL__||window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Fc(e={}){if(Pc(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,Nc(e);try{let n=e.packageObject??await Ic(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??Ac(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??Ac(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Ic(e=Ac()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function Lc(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function Rc(e={}){return oc(e)}function zc(){Tc||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:oc,restoreWorkbenchSnapshot:sc},window.__GZ_FAULT_TYPE_CATALOG__=wc,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return yc(e)},importObject(e){let t=xc(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return Cc({meta:Lc(e),state:Rc(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Fc,window.eval(`${Gs}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Mc();Fc(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:Ac(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,Tc=!0)}var Bc=[`all`,`info`,`ok`,`warn`,`error`],Vc={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},Hc={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},Uc={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},Wc=null,Gc=null,Kc=null,qc=!1;function Jc(){return document.querySelector(`.sbar`)}function Yc(e=Jc()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function Xc(e=Jc()){return e?.querySelector(`.sbar-log-table`)||null}function Zc(e=Jc()){return e?.querySelector(`[data-status-empty]`)||null}function Qc(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function $c(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function el(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(Qc(t)),e.append(n)}function tl(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function nl(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function rl(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`组件`),nl(e),el(e,n),tl(e,`连线`))}function il(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),el(e,t),tl(e,`故障`))}function al(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function ol(){let e=$c(document.getElementById(`sblk`)?.textContent||``),t=$c(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function sl(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function cl(e={}){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=ol(),r={components:Qc(e.components,n.components),links:Qc(e.links,n.links),faults:Qc(e.faults,n.faults),state:e.state,time:e.time};rl(document.getElementById(`sblk`),r.components,r.links),il(document.getElementById(`sflt`),r.faults),al(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function ll(){qc||(qc=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{qc=!1,sl()&&cl(ol())}))}function ul(e){if(Kc?.disconnect(),Kc=null,cl(ol()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){Kc=new MutationObserver(ll);for(let e of t)Kc.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function dl(e,t,n){let r=Zc(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function fl(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=Vc[t]||Vc.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function pl(e=Jc()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of Yc(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:Uc[t]||Uc.log;return dl(e,i===0,a),fl(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function ml(e=`all`){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=Bc.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...pl(t)}}function hl(){let e=Jc();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return ml(Bc[(Bc.indexOf(t)+1)%Bc.length]||`all`)}function gl(e=`log`){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...pl(t)}}function _l(){let e=Jc();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...pl(e)}}function vl(e={}){let t=Jc();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of Yc(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
-`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function yl(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function bl(e={}){let t=Jc(),n=Xc(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=Vc[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||yl();let s=document.createElement(`span`);s.className=`sbar-badge ${Hc[r]||Hc.info}`,s.textContent=Vc[r]||Vc.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=Zc(t);n.insertBefore(a,u||null);let d=Yc(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,pl(t),{ok:!0,row:a}}function xl(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Sl(e={}){let t=xl(e.duration,2),n=xl(e.elapsedSeconds??e.time??0,2),r=xl(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:Qc(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:Qc(e.stepIndex,0),stepSize:r}}function Cl(e={}){let t=Sl(e),n=bl({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=bl({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function wl(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){gl(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?_l():n.dataset.statusAction===`level`?hl():n.dataset.statusAction===`export`&&vl())}function Tl(){let e=Jc();!e||e===Wc||(El(),Wc=e,Gc=wl,Wc.addEventListener(`click`,Gc),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,ul(e),pl(e),window.__GZ_STATUS_BAR__={applyLevelFilter:ml,bind:Tl,clear:_l,cycleLevelFilter:hl,exportLog:vl,formatMetrics:cl,pushEntry:bl,publishSimulationSummary:Cl,refresh:pl,selectView:gl,unbind:El})}function El(){Wc&&Gc&&Wc.removeEventListener(`click`,Gc),Kc?.disconnect(),Kc=null,Wc=null,Gc=null}function Dl(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function Ol({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Dl(t)}async function kl({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Dl(n)}function Al(e){return String(e??`any`).trim().toLowerCase()}function jl(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Ml(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function Nl(e){let t=Al(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Ml(n)}function Pl({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=Ol,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?Nl(e):Ml(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Ml(jl(h.outputs,e,t))),_=f.map((e,t)=>Ml(jl(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Ml(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Fl=Pl;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var Il=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Ll=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Rl=new Set(Object.values(Ll)),zl=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),Bl=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),Vl=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function Hl(e){return JSON.parse(JSON.stringify(e??null))}function Ul(e){return typeof e==`string`&&e.trim().length>0}function Wl(e){return String(e??``).trim().toLowerCase()}function $(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function Gl(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function Kl(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function ql(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function Jl(e=1,t=0,n=0){return ql(e,t,n)*2-1}function Yl(e){return Array.isArray(e)?e:[]}function Xl(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function Zl(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function Ql(e={}){if(Ul(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return e.runtimeBehavior;if(Ul(e.id)&&Il[e.id])return Il[e.id];if(Ul(e.faultTypeId)&&Il[e.faultTypeId])return Il[e.faultTypeId];if(Ul(e.faultCode)&&Bl[e.faultCode])return Bl[e.faultCode];let t=[e.name,e.modelClass,e.faultKind,...Yl(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function $l(e){return Rl.has(e)?e:``}function eu(e={},t={}){let n=$l(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=Ql(e)||Ql(t);if(yu(r)||i===`protocol_edge_fault`)return Ll.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Ll.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Ll.signalTransform:Ll.localOnly}function tu(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function nu(e={},t=0){let n=$(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+$(r,1/0)}function ru(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??tu(n,r),a=t.behavior||Ql(n)||Ql(r),o=t.state??{},s=$(t.time,0),c=Math.max($(t.dt,.1),1e-4),l=$(t.seed,1),u=$(t.stepIndex,0),d=$(e,0);if(!a||!nu(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+$(Zl(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*$(i.scale,1);if(a===`parameter_drift`){let e=$(i.rate,0),t=i.max_delta===void 0?null:Math.abs($(i.max_delta,0)),n=Math.max(s-$(i.start,0),0)*e;return t!==null&&(n=Kl(n,-t,t)),d+n}if(a===`parameter_step`)return d+$(i.step_value,$(i.jump,0));if(a===`lock`)return $(i.lock_value,0);if(a===`saturation`)return Kl(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:$(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:$(i.upper,1/0));if(a===`noise`){let e=Wl(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&ql(l,u,s)>1-$(i.probability,.03))return d+Math.sign(Jl(l+17,u,s)||1)*$(i.amplitude,.2);let t=e.includes(`white`)?$(i.amplitude,.2):$(i.std,.08);return d+Jl(l,u,s)*t}if(a===`colored_noise`){let e=Kl($(i.alpha,.92),0,.999),t=$(i.std,.03);return o.previousNoise=e*$(o.previousNoise,0)+Jl(l,u,s)*t,d+o.previousNoise}if(a===`freeze`)return o.hasHoldValue||=(o.holdValue=d,!0),$(o.holdValue,d);if(a===`jump_or_invert`)return(Gl(i.invert,!0)?-d:d)+$(i.jump,0);if(a===`intermittent`){let e=Math.max($(i.period,4),c),n=Kl($(i.duty,.25),0,1);if((s-$(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return ru(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round($(Zl(i,`delay_steps`,$(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return $(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,$(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round($(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs($(i.jitter_steps,1))),0),r=Math.round(ql(l,u,s)*n);return ru(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=Kl($(Zl(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return ql(l,u,s)<=e?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round($(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:$(o.previousValue,0);let e=Kl($(i.start_probability,.02),0,1);return ql(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round($(i.burst_length,5))-1,0),i.strategy===`zero`?0:$(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*$(i.scale,1)+$(i.bias,0);return Gl(i.invert,!1)?-e:e}if(a===`interrupt`)return Gl(i.enable,!0)?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round($(i.replay_depth,6)),1),t=Math.max(Math.round($(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,$(n,d)}return d}function iu(e={},t={}){let n=tu(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:Hl(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:Ql(e),parameters:n}}function au(e){return Xl(e)&&(Ul(e.modelId)||Ul(e.faultModelId)||Ul(e.runtimeBehavior)||Xl(e.parameters))}function ou(e={},t={}){return au(t)?{...iu(e,t.parameters??{}),...t,parameters:tu(e,t)}:iu(e,t)}function su(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function cu(e={},t={},n={}){let r=ou(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(yu(r.layer)?`edge`:`node`),o=$l(n.propagationMode)||eu(e,r);return{bindingId:n.bindingId||su(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||Ql(e),parameters:Hl(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Ll.localOnly,active:n.active??!0,injectedFault:r}}function lu(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function uu(e={},t={}){let n=lu(e),r=lu(t);return n&&r&&n===r?!0:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function du(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:Hl(e.parameters??{})},i=$l(e.propagationMode)||eu(e,r),a={...e,bindingId:e.bindingId||su(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:Hl(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Ll.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,parameters:Hl(a.parameters)},a}function fu(e={},t={}){if(!e||!Xl(e))return[];let n=du(t,e),r=Yl(e.faultBindings).map(t=>du(t,e)),i=r.findIndex(e=>uu(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function pu(e={},t={}){let n=Yl(e.faultBindings).map(t=>du(t,e));return n.length===0&&e.injectedFault&&n.push(du({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function mu(e={}){return pu(e,{activeOnly:!0}).length>0}function hu(e,t={}){let n=pu(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=Xl(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||Ql(o)||Ql(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=Xl(r.bindingStates[c])?r.bindingStates[c]:{},ru(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:$(t.seed,1)+a})},e)}function gu(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(Ul).map(Wl)}function _u(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function vu(e={}){let t=e.id??e.faultTypeId,n=Yl(e.moduleTargets),r=t?zl[t]??[]:[];return[...new Set([...n,...r].map(Wl).filter(Boolean))]}function yu(e){return e===`protocol`||e===`communication`}function bu(e,t){if(!_u(e))return!1;let n=vu(t);if(n.length===0)return!0;let r=gu(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function xu(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...Yl(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(Ul).map(Wl)}function Su(e,t){if(e?.lineType!==`can`)return!1;let n=vu(t);if(n.length===0)return!1;let r=xu(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Cu(e={},t={}){let n=Yl(t.nodes),r=Yl(t.edges);if(yu(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=r.find(t=>Su(t,e));if(i)return{kind:`edge`,id:i.id,reason:`module-target-can-edge`};let a=r.find(e=>e.lineType===`can`);return a?{kind:`edge`,id:a.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&bu(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let a=n.find(t=>bu(t,e));return a?{kind:`node`,id:a.id,reason:`module-target`}:null}function wu(e={}){let t=Ql(e)||`additive_bias`,n=Vl[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=tu(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
-`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var Tu=`uav-flight-control`,Eu=`uav-flight-control-faults`,Du=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Ou(e){return typeof e==`string`&&e.trim().length>0}function ku(e){return Ou(e)?e.trim():``}function Au(e){return Array.isArray(e)?Array.from(new Set(e.map(ku).filter(Boolean))):[]}function ju(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Ou).join(` `).toLowerCase()}function Mu(e={}){let t=ju(e);return Du.some(e=>t.includes(e.toLowerCase()))}function Nu(e={}){let t=ku(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Eu:``}function Pu(e={}){let t=ku(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Ou).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Tu:``}function Fu(e={}){return ku(e.systemFamily??e.modelFamily)||(Mu(e)?Tu:``)}function Iu(e={}){return Array.isArray(e.supportedFaultLibraries)?Au(e.supportedFaultLibraries):Fu(e)===`uav-flight-control`?[Eu]:[]}function Lu(e={},t=null){return ku(e.libraryId)||Nu(t??e)}function Ru(e={},t=null){return ku(e.systemFamily??e.modelFamily)||Pu(t??e)}function zu(e,t={}){let n=typeof e==`string`?ku(e):Lu(e),r=typeof e==`string`?``:Ru(e),i=Iu(t),a=Fu(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function Bu(e,t={},n=null){let r=Lu(e,n),i=Ru(e,n),a=Iu(t),o=Fu(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function Vu(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>Bu(e,t,r)):[]}function Hu(e={},t=null){let n=Iu(e),r=Fu(e),i=t?Vu(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:kl,executePythonBindingSync:Ol,executeFlowBlockPythonBindingSync:Pl,executeSimulationBlockPythonBindingSync:Fl,getPythonBindingDefaultValue:Nl},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:ru,applyScalarFaultBindings:hu,appendFaultBinding:fu,buildFaultPythonModuleSpec:wu,createFaultBinding:cu,createInjectedFaultPayload:iu,findCompatibleFaultTarget:Cu,getFaultBindings:pu,getFaultRuntimeBehavior:Ql,hasActiveFaultBinding:mu,inferFaultPropagationMode:eu,isFaultActive:nu,resolveFaultParameters:tu,compatibility:{describeModelFaultCompatibility:Hu,filterCompatibleFaultTypes:Vu,getModelFaultLibraryIds:Iu,getModelSystemFamily:Fu,isFaultCompatibleWithModel:Bu,isFaultLibraryCompatibleWithModel:zu}});var Uu=[`data-runtime-ready`],Wu={class:`workbench-main`},Gu=`gz.layoutSizes`;eo({__name:`App`,setup(e){let t=Yo(),n=Wt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(Gu)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(Gu,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return er(async()=>{u(s(),{persist:!1}),await mn(),zc(),Tl(),t.markReady()}),rr(()=>{f(),El()}),(e,r)=>(H(),U(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":I(t).runtimeReady?`true`:`false`},[G(ao),W(`main`,Wu,[G(co),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),G(fo),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),G(ho),W(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),G(vo)]),G(xo),G(wo),G(Do),G(Ao),G(No),G(Io),G(Vs),G(Ws)],8,Uu))}}).mount(`#app`);
+`,iu=`canvas-root`,au=`顶层`;function ou(e){return JSON.parse(JSON.stringify(e))}function su(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Y(e){return Array.isArray(e)?e:[]}function cu(e){let t=ou(e??{});return{inputs:Array.isArray(t.inputs)?ou(t.inputs):[],outputs:Array.isArray(t.outputs)?ou(t.outputs):[],middleVars:Array.isArray(t.middleVars)?ou(t.middleVars):[]}}function lu(e){let t=ou(e??{});return{...qo().executionConfig,...t}}function uu(e){if(!e||typeof e!=`object`)return qo();let t={...qo(),...ou(e)};return t.executionConfig=lu(e.executionConfig),t.portMapping={...qo().portMapping,...cu(e.portMapping)},t}function du(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function fu(e,t){return Object.values(su(e)?e:{}).flatMap(e=>su(e)?Y(e[t]):[])}function pu(e,t,n){return du(fu(e,t),n)}function mu(e){let t=su(e)?ou(e):{};return{...t,pythonBinding:t.type===`simulation_block`?uu(t.pythonBinding):t.pythonBinding??null}}function hu(e){return su(e)?ou(e):{}}function gu(e=iu,t=au){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function _u(e,t=iu){let n=su(e)?ou(e):{};return{id:n.id??t,name:n.name??(t===iu?au:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:Y(n.nodes).map(mu),edges:Y(n.edges).map(hu)}}function vu(e){let t=su(e)?e:{},n=su(t.canvases)?t.canvases:null;if(!n){let e=gu();return e.nodes=Y(t.modelNodes).map(mu),e.edges=Y(t.modelEdges).map(hu),{rootCanvasId:iu,activeCanvasId:iu,canvasTrail:[iu],canvases:{[iu]:e}}}let r=t.rootCanvasId??iu,i={};Object.entries(n).forEach(([e,t])=>{i[e]=_u(t,e)}),i[r]||(i[r]=gu(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=Y(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function yu(e){let t=su(e)?ou(e):{},n=vu(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??gu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?au:`未命名画布`),a=i.nodes,o=i.edges;return ou({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??pu(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??pu(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}function bu(e){let t=su(e)?ou(e):{},n=vu(t),r=n.canvases[n.activeCanvasId]??gu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?au:`未命名画布`),i=r.nodes,a=r.edges;return ou({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??pu(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??pu(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}var xu=new Set([1,`2.0`]),Su=`flight-control-model`;function X(e){return JSON.parse(JSON.stringify(e))}function Cu(e){let t=X(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function wu(e){let t=new Map;return e.forEach(e=>{let n=Cu(e);Z(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),Z(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function Tu(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Q(e)){t.push(e);return}let r=Z(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Q(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function Eu(e,t){let n=X(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Q(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Q(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function Du(e){return!!(e?.bound&&Z(e.entryFunction)&&Z(e.rawSource??e.source)&&Q(e.parsedInterface))}function Ou(e,t){if(!e?.bound||!t||!Q(t.parsedInterface)||Du(e))return e;let n=Jo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...X(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??X(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Q(e.executionConfig)?e.executionConfig:n.executionConfig}}function ku(e,t){let n=wu(t),r=[];return{snapshot:Eu(e,e=>{if(!Q(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!Du(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=Ou(t,i);if(!Du(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function Au(e){if(!Q(e))return e;if(e?.type!==`simulation_block`)return X(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...X(e),pythonBinding:t?X(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=Z(n)&&Z(r)&&Z(i)&&Z(a);return{...X(e),pythonBinding:o?X(t):null}}function ju(e){return Tu(e).reduce((e,t)=>{if(!Q(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!Z(r)||!Z(i)||!Z(a)||!Z(o)||e.has(r)||e.set(r,Cu({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function Z(e){return typeof e==`string`&&e.trim().length>0}function Q(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Mu(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Q(t)||e.push(`${n}[${r}] must be an object.`)})}function Nu(e){let t=[],n=new Set,r=new Set;if(!Q(e))return{ok:!1,errors:[`Package must be an object.`]};if(xu.has(e.schemaVersion)||t.push(`schemaVersion must be 1 or 2.0.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${Su}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Q(e)){t.push(`pythonModules[${i}] must be an object.`);return}Z(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),Z(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),Z(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),Z(e.source)||t.push(`pythonModules[${i}].source is required.`),Z(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),Z(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Q(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Q(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?Mu(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?Mu(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Q(e)&&Z(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Q(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&Mu(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&Mu(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),Tu(e.workbenchSnapshot).forEach((e,n)=>{if(!Q(e)||!Q(e.injectedFault))return;let r=Z(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!Z(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function Pu(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function Fu(e){let t=Nu(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=X(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=ku(bu(e.workbenchSnapshot),n);return r.errors.length>0?{ok:!1,errors:r.errors}:{ok:!0,snapshot:r.snapshot,descriptor:Pu(e),faultLibrary:X(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Q(e.diagnosticModel)?X(e.diagnosticModel):null,pythonModules:n}}function Iu({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=yu(t),i=Eu(r,Au),a=ju(r);return{schemaVersion:1,packageType:Su,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},source:X(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:X(n??[]),workbenchSnapshot:i}}function Lu({meta:e={},state:t={},faultLibrary:n=[]}={}){return Iu({meta:e,snapshot:t,faultLibrary:n})}var Ru={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},zu=!1,Bu=`model-packages/evtol_closed_loop_fault_demo.json`,Vu=`gz-workbench-system-model`;function Hu(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function Uu(){let e=Hu(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function Wu(){return new URL(Bu,Uu()).toString()}function Gu(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Ku(){return Gu()?{publicDemo:!0}:{}}function qu(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(Vu)}catch{}}function Ju({force:e=!1}={}){if(e)return!1;if(!window.__GZ_AUTO_LOAD_DEFAULT_MODEL__||window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Yu(e={}){if(Ju(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,qu(e);try{let n=e.packageObject??await Xu(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??Wu(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??Wu(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Xu(e=Wu()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function Zu(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function Qu(e={}){return yu(e)}function $u(){zu||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:yu,restoreWorkbenchSnapshot:bu},window.__GZ_FAULT_TYPE_CATALOG__=Ru,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return Nu(e)},importObject(e){let t=Fu(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return Lu({meta:Zu(e),state:Qu(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Yu,window.eval(`${ru}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Ku();Yu(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:Wu(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,zu=!0)}var ed=[`all`,`info`,`ok`,`warn`,`error`],td={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},nd={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},rd={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},id=null,ad=null,od=null,sd=!1;function cd(){return document.querySelector(`.sbar`)}function ld(e=cd()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function ud(e=cd()){return e?.querySelector(`.sbar-log-table`)||null}function dd(e=cd()){return e?.querySelector(`[data-status-empty]`)||null}function fd(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function pd(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function md(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(fd(t)),e.append(n)}function hd(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function gd(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function _d(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),md(e,t),hd(e,`组件`),gd(e),md(e,n),hd(e,`连线`))}function vd(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),md(e,t),hd(e,`故障`))}function yd(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function bd(){let e=pd(document.getElementById(`sblk`)?.textContent||``),t=pd(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function xd(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function Sd(e={}){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=bd(),r={components:fd(e.components,n.components),links:fd(e.links,n.links),faults:fd(e.faults,n.faults),state:e.state,time:e.time};_d(document.getElementById(`sblk`),r.components,r.links),vd(document.getElementById(`sflt`),r.faults),yd(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function Cd(){sd||(sd=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{sd=!1,xd()&&Sd(bd())}))}function wd(e){if(od?.disconnect(),od=null,Sd(bd()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){od=new MutationObserver(Cd);for(let e of t)od.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function Td(e,t,n){let r=dd(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function Ed(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=td[t]||td.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function Dd(e=cd()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of ld(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:rd[t]||rd.log;return Td(e,i===0,a),Ed(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function Od(e=`all`){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=ed.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...Dd(t)}}function kd(){let e=cd();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return Od(ed[(ed.indexOf(t)+1)%ed.length]||`all`)}function Ad(e=`log`){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...Dd(t)}}function jd(){let e=cd();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...Dd(e)}}function Md(e={}){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of ld(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
+`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function Nd(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function Pd(e={}){let t=cd(),n=ud(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=td[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||Nd();let s=document.createElement(`span`);s.className=`sbar-badge ${nd[r]||nd.info}`,s.textContent=td[r]||td.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=dd(t);n.insertBefore(a,u||null);let d=ld(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,Dd(t),{ok:!0,row:a}}function Fd(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Id(e={}){let t=Fd(e.duration,2),n=Fd(e.elapsedSeconds??e.time??0,2),r=Fd(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:fd(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:fd(e.stepIndex,0),stepSize:r}}function Ld(e={}){let t=Id(e),n=Pd({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=Pd({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function Rd(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){Ad(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?jd():n.dataset.statusAction===`level`?kd():n.dataset.statusAction===`export`&&Md())}function zd(){let e=cd();!e||e===id||(Bd(),id=e,ad=Rd,id.addEventListener(`click`,ad),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,wd(e),Dd(e),window.__GZ_STATUS_BAR__={applyLevelFilter:Od,bind:zd,clear:jd,cycleLevelFilter:kd,exportLog:Md,formatMetrics:Sd,pushEntry:Pd,publishSimulationSummary:Ld,refresh:Dd,selectView:Ad,unbind:Bd})}function Bd(){id&&ad&&id.removeEventListener(`click`,ad),od?.disconnect(),od=null,id=null,ad=null}function Vd(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function Hd({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Vd(t)}async function Ud({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Vd(n)}function Wd(e){return String(e??`any`).trim().toLowerCase()}function Gd(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Kd(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function qd(e){let t=Wd(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Kd(n)}function Jd({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=Hd,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?qd(e):Kd(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Kd(Gd(h.outputs,e,t))),_=f.map((e,t)=>Kd(Gd(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Kd(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Yd=Jd;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var Xd=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Zd=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Qd=new Set(Object.values(Zd)),$d=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),ef=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),tf=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function nf(e){return JSON.parse(JSON.stringify(e??null))}function rf(e){return typeof e==`string`&&e.trim().length>0}function af(e){return String(e??``).trim().toLowerCase()}function $(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function of(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function sf(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function cf(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function lf(e=1,t=0,n=0){return cf(e,t,n)*2-1}function uf(e){return Array.isArray(e)?e:[]}function df(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function ff(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function pf(e={}){if(rf(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return e.runtimeBehavior;if(rf(e.id)&&Xd[e.id])return Xd[e.id];if(rf(e.faultTypeId)&&Xd[e.faultTypeId])return Xd[e.faultTypeId];if(rf(e.faultCode)&&ef[e.faultCode])return ef[e.faultCode];let t=[e.name,e.modelClass,e.faultKind,...uf(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function mf(e){return Qd.has(e)?e:``}function hf(e={},t={}){let n=mf(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=pf(e)||pf(t);if(Pf(r)||i===`protocol_edge_fault`)return Zd.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Zd.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Zd.signalTransform:Zd.localOnly}function gf(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function _f(e={},t=0){let n=$(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+$(r,1/0)}function vf(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??gf(n,r),a=t.behavior||pf(n)||pf(r),o=t.state??{},s=$(t.time,0),c=Math.max($(t.dt,.1),1e-4),l=$(t.seed,1),u=$(t.stepIndex,0),d=$(e,0);if(!a||!_f(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+$(ff(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*$(i.scale,1);if(a===`parameter_drift`){let e=$(i.rate,0),t=i.max_delta===void 0?null:Math.abs($(i.max_delta,0)),n=Math.max(s-$(i.start,0),0)*e;return t!==null&&(n=sf(n,-t,t)),d+n}if(a===`parameter_step`)return d+$(i.step_value,$(i.jump,0));if(a===`lock`)return $(i.lock_value,0);if(a===`saturation`)return sf(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:$(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:$(i.upper,1/0));if(a===`noise`){let e=af(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&cf(l,u,s)>1-$(i.probability,.03))return d+Math.sign(lf(l+17,u,s)||1)*$(i.amplitude,.2);let t=e.includes(`white`)?$(i.amplitude,.2):$(i.std,.08);return d+lf(l,u,s)*t}if(a===`colored_noise`){let e=sf($(i.alpha,.92),0,.999),t=$(i.std,.03);return o.previousNoise=e*$(o.previousNoise,0)+lf(l,u,s)*t,d+o.previousNoise}if(a===`freeze`)return o.hasHoldValue||=(o.holdValue=d,!0),$(o.holdValue,d);if(a===`jump_or_invert`)return(of(i.invert,!0)?-d:d)+$(i.jump,0);if(a===`intermittent`){let e=Math.max($(i.period,4),c),n=sf($(i.duty,.25),0,1);if((s-$(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return vf(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round($(ff(i,`delay_steps`,$(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return $(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,$(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round($(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs($(i.jitter_steps,1))),0),r=Math.round(cf(l,u,s)*n);return vf(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=sf($(ff(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return cf(l,u,s)<=e?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round($(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:$(o.previousValue,0);let e=sf($(i.start_probability,.02),0,1);return cf(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round($(i.burst_length,5))-1,0),i.strategy===`zero`?0:$(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*$(i.scale,1)+$(i.bias,0);return of(i.invert,!1)?-e:e}if(a===`interrupt`)return of(i.enable,!0)?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round($(i.replay_depth,6)),1),t=Math.max(Math.round($(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,$(n,d)}return d}function yf(e={},t={}){let n=gf(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:nf(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:pf(e),parameters:n}}function bf(e){return df(e)&&(rf(e.modelId)||rf(e.faultModelId)||rf(e.runtimeBehavior)||df(e.parameters))}function xf(e={},t={}){return bf(t)?{...yf(e,t.parameters??{}),...t,parameters:gf(e,t)}:yf(e,t)}function Sf(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function Cf(e={},t={},n={}){let r=xf(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(Pf(r.layer)?`edge`:`node`),o=mf(n.propagationMode)||hf(e,r);return{bindingId:n.bindingId||Sf(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||pf(e),parameters:nf(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Zd.localOnly,active:n.active??!0,injectedFault:r}}function wf(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function Tf(e={},t={}){let n=wf(e),r=wf(t);return n&&r&&n===r?!0:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function Ef(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:nf(e.parameters??{})},i=mf(e.propagationMode)||hf(e,r),a={...e,bindingId:e.bindingId||Sf(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:nf(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Zd.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,parameters:nf(a.parameters)},a}function Df(e={},t={}){if(!e||!df(e))return[];let n=Ef(t,e),r=uf(e.faultBindings).map(t=>Ef(t,e)),i=r.findIndex(e=>Tf(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function Of(e={},t={}){let n=uf(e.faultBindings).map(t=>Ef(t,e));return n.length===0&&e.injectedFault&&n.push(Ef({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function kf(e={}){return Of(e,{activeOnly:!0}).length>0}function Af(e,t={}){let n=Of(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=df(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||pf(o)||pf(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=df(r.bindingStates[c])?r.bindingStates[c]:{},vf(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:$(t.seed,1)+a})},e)}function jf(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(rf).map(af)}function Mf(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function Nf(e={}){let t=e.id??e.faultTypeId,n=uf(e.moduleTargets),r=t?$d[t]??[]:[];return[...new Set([...n,...r].map(af).filter(Boolean))]}function Pf(e){return e===`protocol`||e===`communication`}function Ff(e,t){if(!Mf(e))return!1;let n=Nf(t);if(n.length===0)return!0;let r=jf(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function If(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...uf(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(rf).map(af)}function Lf(e,t){if(e?.lineType!==`can`)return!1;let n=Nf(t);if(n.length===0)return!1;let r=If(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Rf(e={},t={}){let n=uf(t.nodes),r=uf(t.edges);if(Pf(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=r.find(t=>Lf(t,e));if(i)return{kind:`edge`,id:i.id,reason:`module-target-can-edge`};let a=r.find(e=>e.lineType===`can`);return a?{kind:`edge`,id:a.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&Ff(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let a=n.find(t=>Ff(t,e));return a?{kind:`node`,id:a.id,reason:`module-target`}:null}function zf(e={}){let t=pf(e)||`additive_bias`,n=tf[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=gf(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
+`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var Bf=`uav-flight-control`,Vf=`uav-flight-control-faults`,Hf=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Uf(e){return typeof e==`string`&&e.trim().length>0}function Wf(e){return Uf(e)?e.trim():``}function Gf(e){return Array.isArray(e)?Array.from(new Set(e.map(Wf).filter(Boolean))):[]}function Kf(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Uf).join(` `).toLowerCase()}function qf(e={}){let t=Kf(e);return Hf.some(e=>t.includes(e.toLowerCase()))}function Jf(e={}){let t=Wf(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Uf).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Vf:``}function Yf(e={}){let t=Wf(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Uf).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Bf:``}function Xf(e={}){return Wf(e.systemFamily??e.modelFamily)||(qf(e)?Bf:``)}function Zf(e={}){return Array.isArray(e.supportedFaultLibraries)?Gf(e.supportedFaultLibraries):Xf(e)===`uav-flight-control`?[Vf]:[]}function Qf(e={},t=null){return Wf(e.libraryId)||Jf(t??e)}function $f(e={},t=null){return Wf(e.systemFamily??e.modelFamily)||Yf(t??e)}function ep(e,t={}){let n=typeof e==`string`?Wf(e):Qf(e),r=typeof e==`string`?``:$f(e),i=Zf(t),a=Xf(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function tp(e,t={},n=null){let r=Qf(e,n),i=$f(e,n),a=Zf(t),o=Xf(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function np(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>tp(e,t,r)):[]}function rp(e={},t=null){let n=Zf(e),r=Xf(e),i=t?np(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:Ud,executePythonBindingSync:Hd,executeFlowBlockPythonBindingSync:Jd,executeSimulationBlockPythonBindingSync:Yd,getPythonBindingDefaultValue:qd},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:vf,applyScalarFaultBindings:Af,appendFaultBinding:Df,buildFaultPythonModuleSpec:zf,createFaultBinding:Cf,createInjectedFaultPayload:yf,findCompatibleFaultTarget:Rf,getFaultBindings:Of,getFaultRuntimeBehavior:pf,hasActiveFaultBinding:kf,inferFaultPropagationMode:hf,isFaultActive:_f,resolveFaultParameters:gf,compatibility:{describeModelFaultCompatibility:rp,filterCompatibleFaultTypes:np,getModelFaultLibraryIds:Zf,getModelSystemFamily:Xf,isFaultCompatibleWithModel:tp,isFaultLibraryCompatibleWithModel:ep}});var ip=[`data-runtime-ready`],ap={class:`workbench-main`},op=`gz.layoutSizes`;ho({__name:`App`,setup(e){let t=Yo(),n=Jt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(op)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(op,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return ir(async()=>{u(s(),{persist:!1}),await vn(),$u(),zd(),t.markReady()}),sr(()=>{f(),Bd()}),(e,r)=>(B(),V(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":N(t).runtimeReady?`true`:`false`},[U(bo),H(`main`,ap,[U(Gs),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),U(Js),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),U(Zs),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),U(ec)]),U(rc),U(oc),U(lc),U(fc),U(hc),U(vc),U(ul),U(Ml),U($l),U(nu)],8,ip))}}).mount(`#app`);
