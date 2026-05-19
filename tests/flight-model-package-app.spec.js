@@ -237,6 +237,25 @@ async function flushRuntime() {
   await Promise.resolve();
 }
 
+async function importDefaultClosedLoopPackage() {
+  const wrapper = mount(App, { attachTo: document.body });
+  await flushRuntime();
+
+  const defaultPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+  const importResult = await window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__({
+    force: true,
+    packageObject: defaultPackage
+  });
+  await flushRuntime();
+
+  expect(importResult).toMatchObject({ ok: true });
+  return {
+    wrapper,
+    defaultPackage,
+    state: window.__GZ_STATE__
+  };
+}
+
 function getScopePeak(samples = []) {
   if (!samples.length) {
     return 0;
@@ -361,6 +380,609 @@ describe('Flight model package app integration', () => {
       modelName: defaultPackage.modelName,
       source: 'provided-object'
     });
+
+    wrapper.unmount();
+  });
+
+  it('resolves compatible fault choices from target fault capability slots', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const motor = state.modelNodes.find((node) => node.id === 'node-motor-1');
+    const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
+    const imuFeedbackEdge = state.modelEdges.find((edge) => edge.id === 'edge-imu-error');
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+
+    expect(window.getFaultCapabilityForTarget(imu)).toMatchObject({
+      targetId: 'node-imu',
+      targetKind: 'node'
+    });
+    expect(window.getCompatibleFaultModelsForTarget(imu).map((fault) => fault.id)).toEqual([
+      'gyro_zero_bias_offset',
+      'gyro_zero_bias_drift',
+      'gyro_zero_bias_intermittent'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(motor).map((fault) => fault.id)).toEqual([
+      'motor_1_stuck_position'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(canEdge).map((fault) => fault.id)).toEqual([
+      'control_command_tamper'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(imuFeedbackEdge).map((fault) => fault.id)).toEqual([
+      'can_bus_delay'
+    ]);
+    expect(window.getCompatibleFaultModelsForTarget(controller)).toEqual([]);
+
+    wrapper.unmount();
+  });
+
+  it('uses authored fault slots to offer only target-compatible faults', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = {
+      schemaVersion: '3.0',
+      modelInfo: {
+        modelId: 'authoring-runtime',
+        modelName: '人工扩展运行模型'
+      },
+      systemModel: {
+        nodes: [
+          {
+            id: 'node-imu',
+            type: 'simulation_block',
+            x: 240,
+            y: 180,
+            props: {
+              name: 'IMU 陀螺仪反馈',
+              inputs: [],
+              outputs: [{ name: '角速度反馈', type: 'scalar' }],
+              middleVars: []
+            },
+            faultSlots: [
+              {
+                slotId: 'gyro-feedback',
+                signalName: '角速度反馈',
+                allowedFaultTypeIds: ['gyro_zero_bias_drift']
+              }
+            ]
+          },
+          {
+            id: 'node-controller',
+            type: 'simulation_block',
+            x: 520,
+            y: 180,
+            props: {
+              name: '姿态控制器',
+              inputs: [],
+              outputs: [],
+              middleVars: []
+            },
+            faultSlots: []
+          }
+        ],
+        edges: []
+      },
+      faultTypeCatalog: [
+        {
+          id: 'gyro_zero_bias_drift',
+          displayName: 'Gyro 零偏 - 缓慢漂移',
+          layer: 'sensor',
+          runtimeBehavior: 'drift',
+          defaultParameters: {}
+        },
+        {
+          id: 'motor1_stuck',
+          displayName: '1号电机卡死',
+          layer: 'actuator',
+          runtimeBehavior: 'stuck',
+          defaultParameters: {}
+        }
+      ],
+      faultCapabilityMap: [
+        {
+          targetKind: 'node',
+          targetId: 'node-imu',
+          slotId: 'gyro-feedback',
+          allowedFaultTypeIds: ['gyro_zero_bias_drift']
+        }
+      ],
+      faultInstances: [],
+      diagnosticModel: {
+        testPoints: [],
+        detectabilityMatrix: []
+      },
+      componentTemplates: [],
+      pythonModules: []
+    };
+
+    const result = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(pkg);
+    await flushRuntime();
+
+    expect(result?.ok).not.toBe(false);
+    window.selectNode('node-imu');
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const choices = [...document.querySelectorAll('[data-activate-compatible-fault]')];
+    expect(choices).toHaveLength(1);
+    expect(choices[0].textContent).toContain('Gyro 零偏 - 缓慢漂移');
+    expect(choices[0].textContent).not.toContain('1号电机卡死');
+
+    wrapper.unmount();
+  });
+
+  it('creates edge-targeted authored fault instances from compatible edge slots', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = {
+      schemaVersion: '3.0',
+      modelInfo: {
+        modelId: 'authoring-edge-runtime',
+        modelName: '边故障运行模型'
+      },
+      systemModel: {
+        nodes: [
+          {
+            id: 'node-motor',
+            type: 'simulation_block',
+            x: 240,
+            y: 180,
+            props: {
+              name: '电机控制器',
+              inputs: [],
+              outputs: [{ name: '电机指令', type: 'scalar' }],
+              middleVars: []
+            }
+          },
+          {
+            id: 'node-motor-1',
+            type: 'simulation_block',
+            x: 560,
+            y: 180,
+            props: {
+              name: '1号电机',
+              inputs: [{ name: '电机指令', type: 'scalar' }],
+              outputs: [],
+              middleVars: []
+            }
+          }
+        ],
+        edges: [
+          {
+            id: 'edge-motor-motor1',
+            sourceNodeId: 'node-motor',
+            targetNodeId: 'node-motor-1',
+            sourcePortIndex: 0,
+            targetPortIndex: 0,
+            lineType: 'can',
+            signalId: 'motor1.command'
+          }
+        ]
+      },
+      faultTypeCatalog: [
+        {
+          id: 'motor1_can_command_tamper',
+          displayName: '1号电机 CAN 指令篡改',
+          layer: 'protocol',
+          runtimeBehavior: 'tamper',
+          defaultParameters: { scale: 0.5 }
+        }
+      ],
+      faultCapabilityMap: [
+        {
+          targetKind: 'edge',
+          targetId: 'edge-motor-motor1',
+          slotId: 'motor1-can-command',
+          allowedFaultTypeIds: ['motor1_can_command_tamper']
+        }
+      ],
+      faultInstances: [],
+      diagnosticModel: {
+        testPoints: [],
+        detectabilityMatrix: []
+      },
+      componentTemplates: [],
+      pythonModules: []
+    };
+
+    const applyResult = window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(pkg);
+    await flushRuntime();
+
+    expect(applyResult?.ok).not.toBe(false);
+    const edge = window.__GZ_STATE__.modelEdges.find((item) => item.id === 'edge-motor-motor1');
+    expect(edge).toBeTruthy();
+
+    expect(typeof window.handleLineFaultComponentDrop).toBe('function');
+    const dropResult = window.handleLineFaultComponentDrop({ target: edge });
+    await flushRuntime();
+
+    expect(dropResult).toMatchObject({ ok: true });
+    document.querySelector('[data-activate-compatible-fault="motor1_can_command_tamper"]').click();
+    await flushRuntime();
+    document.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(window.__GZ_STATE__.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'motor1_can_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1',
+      slotId: 'motor1-can-command'
+    }));
+
+    wrapper.unmount();
+  });
+
+  it('activates a compatible fault as a target-owned fault instance', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    const result = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift', {
+      rate: '0.01',
+      start: '5'
+    });
+    await flushRuntime();
+
+    expect(result.ok).toBe(true);
+    expect(state.faultInstances).toHaveLength(1);
+    expect(state.faultInstances[0]).toMatchObject({
+      faultTypeId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu',
+      slotId: 'imu-gyro-feedback',
+      active: true
+    });
+    expect(state.faultInstances[0].parameters).toMatchObject({ rate: '0.01', start: '5' });
+    expect(imu.injectedFault).toMatchObject({ modelId: 'gyro_zero_bias_drift' });
+    expect(imu.faultBindings.some((binding) => binding.faultModelId === 'gyro_zero_bias_drift')).toBe(true);
+    expect(state.faultTags.some((tag) => tag.faultModelId === 'gyro_zero_bias_drift' && tag.targetId === 'node-imu')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-imu-error"]')?.classList.contains('is-faulted')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('rejects fault activation on targets without compatible capability slots', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+
+    const result = window.activateFaultForTarget(controller, 'gyro_zero_bias_drift');
+    await flushRuntime();
+
+    expect(result).toMatchObject({ ok: false, error: 'incompatible-target' });
+    expect(state.faultInstances || []).toHaveLength(0);
+    expect(controller.injectedFault).toBeUndefined();
+
+    wrapper.unmount();
+  });
+
+  it('opens compatible fault choices for a selected target instead of importing arbitrary catalog faults', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    window.selectNode(imu.id);
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-target-fault-dialog]');
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 固定偏差');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 间歇故障');
+    expect(dialog.textContent).not.toContain('单电机卡死');
+
+    wrapper.unmount();
+  });
+
+  it('prevents choosing the same concrete fault twice on the same target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+
+    const first = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift');
+    const second = window.activateFaultForTarget(imu, 'gyro_zero_bias_drift');
+    await flushRuntime();
+
+    expect(first.ok).toBe(true);
+    expect(second).toMatchObject({ ok: false, error: 'duplicate-fault-instance' });
+    expect(state.faultInstances.filter((instance) => (
+      instance.targetId === 'node-imu' && instance.faultTypeId === 'gyro_zero_bias_drift'
+    ))).toHaveLength(1);
+
+    window.selectNode(imu.id);
+    window.openTargetFaultActivationDialog();
+    await flushRuntime();
+
+    const injectedChoice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_drift"]');
+    const otherChoice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_offset"]');
+    expect(injectedChoice).not.toBeNull();
+    expect(injectedChoice.disabled).toBe(true);
+    expect(injectedChoice.classList.contains('is-injected')).toBe(true);
+    expect(injectedChoice.textContent).toContain('已注入');
+    expect(otherChoice).not.toBeNull();
+    expect(otherChoice.disabled).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('requires parameter confirmation before activating a compatible fault choice', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const initialTagCount = (state.faultTags || []).length;
+
+    window.handleFaultComponentDrop({ target: imu, x: imu.x + 20, y: imu.y + 20 });
+    await flushRuntime();
+
+    const choice = document.querySelector('[data-activate-compatible-fault="gyro_zero_bias_drift"]');
+    expect(choice).not.toBeNull();
+    choice.click();
+    await flushRuntime();
+
+    expect(state.faultInstances || []).toHaveLength(0);
+    expect((state.faultTags || []).length).toBe(initialTagCount);
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    expect(panel.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(panel.querySelector('[data-target-fault-param="rate"]')).not.toBeNull();
+
+    const rate = panel.querySelector('[data-target-fault-param="rate"]');
+    rate.value = '0.009';
+    rate.dispatchEvent(new Event('input', { bubbles: true }));
+    panel.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu',
+      parameters: expect.objectContaining({ rate: '0.009' })
+    }));
+    expect(state.faultTags).toContainEqual(expect.objectContaining({
+      faultModelId: 'gyro_zero_bias_drift',
+      targetKind: 'node',
+      targetId: 'node-imu'
+    }));
+
+    wrapper.unmount();
+  });
+
+  it('uses explicit diagnostic matrix signatures for multiple fault forms on the same target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    const matrix = window.buildDetectionMatrixModel();
+    const residual = matrix.points.find((point) => point.shortName === 'M10');
+    const spectrum = matrix.points.find((point) => point.shortName === 'M11');
+    const byFault = new Map(matrix.rows.map((row) => [row.faultId, row]));
+
+    const fixed = byFault.get('gyro_zero_bias_offset');
+    const drift = byFault.get('gyro_zero_bias_drift');
+    const intermittent = byFault.get('gyro_zero_bias_intermittent');
+
+    expect(fixed.cells.find((cell) => cell.pointId === residual.pointId).detectable).toBe(false);
+    expect(drift.cells.find((cell) => cell.pointId === residual.pointId).detectable).toBe(true);
+    expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).detectable).toBe(true);
+    expect(intermittent.cells.find((cell) => cell.pointId === spectrum.pointId).reason).toContain('间歇');
+
+    wrapper.unmount();
+  });
+
+  it('builds an ordered troubleshooting path for a concrete fault from the D matrix', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.buildTroubleshootingPathForFault).toBe('function');
+    const path = window.buildTroubleshootingPathForFault('gyro_zero_bias_drift');
+
+    expect(path).toMatchObject({
+      faultId: 'gyro_zero_bias_drift',
+      faultName: 'Gyro 陀螺仪零偏 - 缓慢漂移'
+    });
+    expect(path.steps.length).toBeGreaterThanOrEqual(2);
+    expect(path.steps[0]).toMatchObject({
+      pointCode: 'M10',
+      pointName: '残差诊断',
+      expected: expect.stringContaining('残差趋势项持续上升')
+    });
+    expect(path.steps[0].remainingFaultIds).toContain('gyro_zero_bias_drift');
+    expect(path.steps[0].remainingFaultIds).not.toContain('gyro_zero_bias_offset');
+    expect(path.steps.some((step) => step.pointCode === 'M3')).toBe(true);
+    expect(path.summary).toContain('优先检查');
+
+    wrapper.unmount();
+  });
+
+  it('opens the troubleshooting path panel from a D matrix fault row', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    window.renderDetectionMatrixPanel();
+    await flushRuntime();
+
+    const action = document.querySelector('[data-build-troubleshooting-path="gyro_zero_bias_drift"]');
+    expect(action).not.toBeNull();
+    action.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-troubleshooting-path-panel]');
+    expect(panel).not.toBeNull();
+    expect(panel.textContent).toContain('Gyro 陀螺仪零偏 - 缓慢漂移');
+    expect(panel.textContent).toContain('M10');
+    expect(panel.textContent).toContain('残差趋势项持续上升');
+
+    wrapper.unmount();
+  });
+
+  it('injects a compatible fault into a model edge from the fault component drop flow', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const canEdge = state.modelEdges.find((edge) => edge.id === 'edge-motor-motor1');
+
+    expect(typeof window.handleLineFaultComponentDrop).toBe('function');
+
+    const moduleFaultResult = window.handleFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
+    expect(moduleFaultResult).toMatchObject({
+      ok: false,
+      reason: 'incompatible-target-kind',
+      targetKind: 'edge'
+    });
+
+    const result = window.handleLineFaultComponentDrop({ target: canEdge, x: 0, y: 0 });
+    await flushRuntime();
+
+    expect(result).toMatchObject({
+      ok: true,
+      mode: 'target-fault-dialog',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1'
+    });
+
+    const choice = document.querySelector('[data-activate-compatible-fault="control_command_tamper"]');
+    expect(choice).not.toBeNull();
+    choice.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    panel.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'control_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1',
+      slotId: 'motor1-can-command'
+    }));
+    expect(canEdge.injectedFault).toMatchObject({ modelId: 'control_command_tamper' });
+    expect(canEdge.faultBindings.some((binding) => binding.faultModelId === 'control_command_tamper')).toBe(true);
+    expect(state.faultTags).toContainEqual(expect.objectContaining({
+      faultModelId: 'control_command_tamper',
+      targetKind: 'edge',
+      targetId: 'edge-motor-motor1'
+    }));
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-faulted')).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('offers a concrete selectable fault on the IMU feedback line', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imuFeedbackEdge = state.modelEdges.find((edge) => edge.id === 'edge-imu-error');
+
+    const result = window.handleLineFaultComponentDrop({ target: imuFeedbackEdge, x: 0, y: 0 });
+    await flushRuntime();
+
+    expect(result).toMatchObject({
+      ok: true,
+      mode: 'target-fault-dialog',
+      targetKind: 'edge',
+      targetId: 'edge-imu-error'
+    });
+
+    const choice = document.querySelector('[data-activate-compatible-fault="can_bus_delay"]');
+    expect(choice).not.toBeNull();
+    expect(choice.textContent).toContain('CAN 反馈延迟');
+    choice.click();
+    await flushRuntime();
+
+    const panel = document.querySelector('[data-target-fault-parameters]');
+    expect(panel).not.toBeNull();
+    expect(panel.querySelector('[data-target-fault-param="delay_seconds"]')).not.toBeNull();
+    panel.querySelector('[data-confirm-target-fault]').click();
+    await flushRuntime();
+
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      faultTypeId: 'can_bus_delay',
+      targetKind: 'edge',
+      targetId: 'edge-imu-error',
+      slotId: 'imu-feedback-can'
+    }));
+    expect(imuFeedbackEdge.injectedFault).toMatchObject({ modelId: 'can_bus_delay' });
+    expect(document.querySelector('.edge-path[data-edge-id="edge-imu-error"]')?.classList.contains('is-faulted')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('faulted')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('highlights only compatible modules while dragging the module fault component template', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.showCompatibleFaultDropTargets).toBe('function');
+    expect(typeof window.clearCompatibleFaultDropTargets).toBe('function');
+
+    window.showCompatibleFaultDropTargets({ targetKind: 'node' });
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--node')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.getElementById('b-node-motor-1')?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.getElementById('b-node-controller')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-shaper-error"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    window.clearCompatibleFaultDropTargets();
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(false);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('highlights only compatible lines while dragging the line fault component template', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+
+    expect(typeof window.showCompatibleFaultDropTargets).toBe('function');
+
+    window.showCompatibleFaultDropTargets({ targetKind: 'edge' });
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--edge')).toBe(true);
+    expect(document.getElementById('b-node-imu')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.getElementById('b-node-motor-1')?.classList.contains('fault-drop-compatible')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(true);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-shaper-error"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    window.clearCompatibleFaultDropTargets();
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--edge')).toBe(false);
+    expect(document.querySelector('.edge-path[data-edge-id="edge-motor-motor1"]')?.classList.contains('is-fault-drop-compatible')).toBe(false);
+
+    wrapper.unmount();
+  });
+
+  it('opens target-specific choices when the fault component is dropped on a compatible target', async () => {
+    const { wrapper } = await importDefaultClosedLoopPackage();
+    const state = window.__GZ_STATE__;
+    const imu = state.modelNodes.find((node) => node.id === 'node-imu');
+    const controller = state.modelNodes.find((node) => node.id === 'node-controller');
+    const initialTagCount = (state.faultTags || []).length;
+
+    expect(typeof window.handleFaultComponentDrop).toBe('function');
+    const compatibleResult = window.handleFaultComponentDrop({ target: imu, x: imu.x + 20, y: imu.y + 20 });
+    await flushRuntime();
+
+    expect(compatibleResult).toMatchObject({ ok: true, mode: 'target-fault-dialog' });
+    const dialog = document.querySelector('[data-target-fault-dialog]');
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog.textContent).toContain('Gyro 陀螺仪零偏 - 固定偏差');
+    expect((state.faultTags || []).length).toBe(initialTagCount);
+
+    const incompatibleResult = window.handleFaultComponentDrop({ target: controller, x: controller.x + 20, y: controller.y + 20 });
+    await flushRuntime();
+
+    expect(incompatibleResult).toMatchObject({ ok: false, reason: 'incompatible-target' });
+    expect((state.faultTags || []).length).toBe(initialTagCount);
 
     wrapper.unmount();
   });
@@ -652,6 +1274,88 @@ describe('Flight model package app integration', () => {
 
     expect(tag.expanded).toBe(false);
     expect(document.querySelector(`.fault-tag-card[data-fault-model-id="${faultId}"]`)).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('requires explicit apply before fault tag parameter edits affect the runtime target', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+    expect(importResult).toMatchObject({ ok: true });
+
+    const faultId = 'gyro_zero_bias_offset';
+    window.doImportFault();
+    await flushRuntime();
+    window.selectFaultCatalogModel(faultId);
+    await flushRuntime();
+    window.confirmImportFault();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const tag = state.faultTags.find((item) => item.faultModelId === faultId);
+    expect(tag).toBeTruthy();
+    window.selectFaultTag(tag.id);
+    await flushRuntime();
+
+    const allTargets = [
+      ...state.modelNodes,
+      ...state.modelEdges,
+      ...(state.nodes || []),
+      ...(state.edges || [])
+    ];
+    const target = allTargets.find((item) => targetHasFaultRef(item, faultId));
+    const getTargetBinding = () => target?.faultBindings?.find((binding) => targetHasFaultRef(binding, faultId));
+    const getTargetFault = () => (
+      target?.injectedFault?.modelId === faultId
+        ? target.injectedFault
+        : getTargetBinding()?.injectedFault
+    );
+    expect(target).toBeTruthy();
+    expect(getTargetFault()?.parameters?.bias).toBe(0.04);
+    expect(getTargetBinding()?.parameters?.bias).toBe(0.04);
+
+    const input = document.querySelector('[data-fault-tag-param="bias"]');
+    const applyButton = document.querySelector('[data-fault-tag-apply]');
+    const resetButton = document.querySelector('[data-fault-tag-reset]');
+    expect(input).not.toBeNull();
+    expect(applyButton).not.toBeNull();
+    expect(resetButton).not.toBeNull();
+    expect(applyButton.disabled).toBe(true);
+
+    input.value = '0.12';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await flushRuntime();
+
+    expect(applyButton.disabled).toBe(false);
+    expect(resetButton.disabled).toBe(false);
+    expect(tag.parameters.bias).toBe(0.04);
+    expect(getTargetFault().parameters.bias).toBe(0.04);
+    expect(getTargetBinding().parameters.bias).toBe(0.04);
+
+    applyButton.click();
+    await flushRuntime();
+
+    expect(applyButton.disabled).toBe(true);
+    expect(tag.parameters.bias).toBe('0.12');
+    expect(tag.injectedFault.parameters.bias).toBe('0.12');
+    expect(getTargetFault().parameters.bias).toBe('0.12');
+    expect(getTargetBinding().parameters.bias).toBe('0.12');
+    expect(getTargetBinding().injectedFault.parameters.bias).toBe('0.12');
+
+    input.value = '0.20';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(applyButton.disabled).toBe(false);
+    resetButton.click();
+    await flushRuntime();
+
+    expect(input.value).toBe('0.12');
+    expect(applyButton.disabled).toBe(true);
+    expect(tag.parameters.bias).toBe('0.12');
+    expect(getTargetFault().parameters.bias).toBe('0.12');
 
     wrapper.unmount();
   });

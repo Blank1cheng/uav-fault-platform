@@ -12,6 +12,8 @@ import ProtocolFaultDialog from './components/dialogs/ProtocolFaultDialog.vue';
 import ConfigDialog from './components/dialogs/ConfigDialog.vue';
 import ScopeDialog from './components/dialogs/ScopeDialog.vue';
 import PythonBindingDialog from './components/dialogs/PythonBindingDialog.vue';
+import ComponentAuthoringDialog from './components/dialogs/ComponentAuthoringDialog.vue';
+import FaultAuthoringDialog from './components/dialogs/FaultAuthoringDialog.vue';
 import ToastHost from './components/dialogs/ToastHost.vue';
 import { useWorkbenchState } from './composables/useWorkbenchState.js';
 import { mountLegacyRuntime } from './services/legacyRuntimeBootstrap.js';
@@ -216,6 +218,8 @@ onBeforeUnmount(() => {
     <ConfigDialog />
     <ScopeDialog />
     <PythonBindingDialog />
+    <ComponentAuthoringDialog />
+    <FaultAuthoringDialog />
     <ToastHost />
   </div>
 </template>

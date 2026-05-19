@@ -24,6 +24,13 @@ async function mountWorkbench() {
   return wrapper;
 }
 
+function setFieldValue(selector, value, eventName = 'input') {
+  const field = document.querySelector(selector);
+  expect(field).not.toBeNull();
+  field.value = value;
+  field.dispatchEvent(new Event(eventName, { bubbles: true }));
+}
+
 describe('property panel interaction', () => {
   afterEach(() => {
     window.localStorage.clear();
@@ -485,6 +492,234 @@ describe('property panel interaction', () => {
     ['涓', '鎸', '娴嬬', '浼犳', '鈫'].forEach((marker) => {
       expect(panelText).not.toContain(marker);
     });
+
+    wrapper.unmount();
+  });
+
+  it('opens component authoring dialog from a custom event and displays parsed interfaces', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.dispatchEvent(new CustomEvent('gz:open-component-authoring', {
+      detail: {
+        parsedInterface: {
+          fileName: 'attitude_controller.py',
+          moduleName: 'attitude_controller',
+          description: '姿态控制器',
+          entryFunction: 'process',
+          inputs: [
+            { name: 'attitude_error', displayName: '姿态误差', type: 'float' }
+          ],
+          outputs: [
+            { name: 'output_0', displayName: '力矩指令', type: 'float' }
+          ],
+          middleVars: [],
+          rawSource: 'def process(attitude_error): return attitude_error'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-testid="component-authoring-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('姿态控制器');
+    expect(dialog?.textContent).toContain('姿态误差');
+    expect(dialog?.textContent).toContain('力矩指令');
+
+    wrapper.unmount();
+  });
+
+  it('opens fault authoring dialog for a selected target slot', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.dispatchEvent(new CustomEvent('gz:open-fault-authoring', {
+      detail: {
+        target: {
+          targetKind: 'node',
+          targetId: 'node-imu',
+          targetName: 'IMU 陀螺仪反馈',
+          slotId: 'gyro-feedback',
+          slotName: '陀螺仪反馈信号'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-testid="fault-authoring-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('IMU 陀螺仪反馈');
+    expect(dialog?.textContent).toContain('陀螺仪反馈信号');
+    expect(dialog?.textContent).toContain('故障名称');
+
+    wrapper.unmount();
+  });
+
+  it('saves a newly authored component into the canvas and active model package', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    await flushRuntime();
+
+    window.dispatchEvent(new CustomEvent('gz:open-component-authoring', {
+      detail: {
+        parsedInterface: {
+          fileName: 'custom_attitude.py',
+          moduleName: 'custom_attitude',
+          description: '自定义姿态模块',
+          entryFunction: 'process',
+          inputs: [
+            { name: 'pitch_error', displayName: '俯仰误差', type: 'float' }
+          ],
+          outputs: [
+            { name: 'torque_cmd', displayName: '力矩指令', type: 'float' }
+          ],
+          middleVars: [
+            { name: 'controller_state', displayName: '控制状态', type: 'float' }
+          ],
+          rawSource: 'def process(pitch_error): return pitch_error'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    setFieldValue('[data-authoring-component-name]', '自定义姿态控制器');
+    setFieldValue('[data-authoring-slot-name]', '控制输出故障位');
+    document.querySelector('[data-save-authored-component]').click();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const node = state.modelNodes.find((item) => item.props?.name === '自定义姿态控制器');
+
+    expect(node).toMatchObject({
+      type: 'simulation_block',
+      props: expect.objectContaining({
+        name: '自定义姿态控制器'
+      })
+    });
+    expect(node.faultSlots).toEqual([
+      expect.objectContaining({
+        slotName: '控制输出故障位',
+        signalId: 'custom_attitude.torque_cmd',
+        allowedFaultTypeIds: []
+      })
+    ]);
+    expect(state.activeModelPackage.systemModel.nodes.some((item) => item.id === node.id)).toBe(true);
+    expect(state.activeModelPackage.componentTemplates.some((item) => item.templateId === node.templateId)).toBe(true);
+    expect(state.activeModelPackage.faultCapabilityMap).toContainEqual(expect.objectContaining({
+      targetKind: 'node',
+      targetId: node.id,
+      faultSlots: [
+        expect.objectContaining({
+          slotId: node.faultSlots[0].slotId,
+          allowedFaultTypeIds: []
+        })
+      ]
+    }));
+    expect(document.querySelector('[data-testid="component-authoring-dialog"]')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('saves a newly authored fault and exposes it as a compatible target fault', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    await flushRuntime();
+
+    window.dispatchEvent(new CustomEvent('gz:open-component-authoring', {
+      detail: {
+        parsedInterface: {
+          fileName: 'custom_imu.py',
+          moduleName: 'custom_imu',
+          description: '自定义 IMU 模块',
+          entryFunction: 'process',
+          inputs: [],
+          outputs: [
+            { name: 'pitch_rate', displayName: '俯仰角速度', type: 'float' }
+          ],
+          middleVars: [],
+          rawSource: 'def process(): return 0'
+        }
+      }
+    }));
+    await flushRuntime();
+
+    setFieldValue('[data-authoring-component-name]', '自定义 IMU');
+    setFieldValue('[data-authoring-slot-name]', '陀螺仪反馈故障位');
+    document.querySelector('[data-save-authored-component]').click();
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const node = state.modelNodes.find((item) => item.props?.name === '自定义 IMU');
+    const slot = node.faultSlots[0];
+
+    window.dispatchEvent(new CustomEvent('gz:open-fault-authoring', {
+      detail: {
+        target: {
+          targetKind: 'node',
+          targetId: node.id,
+          targetName: node.props.name,
+          slotId: slot.slotId,
+          slotName: slot.slotName
+        }
+      }
+    }));
+    await flushRuntime();
+
+    setFieldValue('[data-authoring-fault-id]', 'custom_gyro_bias');
+    setFieldValue('[data-authoring-fault-name]', '自定义陀螺仪偏置');
+    setFieldValue('[data-authoring-fault-layer]', 'electrical', 'change');
+    setFieldValue('[data-authoring-fault-behavior]', 'bias', 'change');
+    setFieldValue('[data-authoring-param-name="bias"]', '0.18');
+    document.querySelector('[data-save-authored-fault]').click();
+    await flushRuntime();
+
+    expect(state.activeModelPackage.faultTypeCatalog).toContainEqual(expect.objectContaining({
+      id: 'custom_gyro_bias',
+      displayName: '自定义陀螺仪偏置',
+      runtimeBehavior: 'bias'
+    }));
+    expect(state.activeModelPackage.faultCapabilityMap.find((entry) => entry.targetId === node.id).faultSlots[0].allowedFaultTypeIds).toContain('custom_gyro_bias');
+
+    const compatible = window.getCompatibleFaultModelsForTarget(node);
+    expect(compatible.map((item) => item.id)).toContain('custom_gyro_bias');
+
+    const dropResult = window.handleFaultComponentDrop({ target: node });
+    await flushRuntime();
+
+    expect(dropResult).toMatchObject({ ok: true, targetId: node.id, targetKind: 'node' });
+    expect(document.querySelector('[data-activate-compatible-fault="custom_gyro_bias"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="fault-authoring-dialog"]')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('opens authoring dialogs from visible palette actions', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    await flushRuntime();
+
+    document.querySelector('[data-open-component-authoring]').click();
+    await flushRuntime();
+
+    expect(document.querySelector('[data-testid="component-authoring-dialog"]')).not.toBeNull();
+
+    setFieldValue('[data-authoring-component-name]', '入口测试模块');
+    setFieldValue('[data-authoring-slot-name]', '入口测试故障位');
+    document.querySelector('[data-save-authored-component]').click();
+    await flushRuntime();
+
+    const node = window.__GZ_STATE__.modelNodes.find((item) => item.props?.name === '入口测试模块');
+    window.selectNode(node.id);
+    await flushRuntime();
+
+    document.querySelector('[data-open-fault-authoring-for-selected]').click();
+    await flushRuntime();
+
+    const dialog = document.querySelector('[data-testid="fault-authoring-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('入口测试模块');
+    expect(dialog?.textContent).toContain('入口测试故障位');
 
     wrapper.unmount();
   });
