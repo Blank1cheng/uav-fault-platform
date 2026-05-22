@@ -23,7 +23,7 @@ import './services/simulationRuntime.js';
 const workbench = useWorkbenchState();
 const rootEl = ref(null);
 
-const LAYOUT_STORAGE_KEY = 'gz.layoutSizes';
+const LAYOUT_STORAGE_KEY = 'gz.layoutSizes.v3';
 const DEFAULT_LAYOUT_SIZES = Object.freeze({
   left: 192,
   right: 320,

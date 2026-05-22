@@ -31,8 +31,9 @@
         <span class="lgroup-arrow open" id="arr-g2">▸</span>
       </div>
       <div class="lgroup-body" id="g2">
-        <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag"><span>F</span> 故障注入</div>
-        <div class="citem citem-fault citem-draggable" draggable="true" data-component="edge_fault_tag"><span>线</span> 连线故障注入</div>
+        <div class="citem citem-fault citem-draggable" draggable="true" data-component="physical_fault_injector"><span>F</span> 物理层注入</div>
+        <div class="citem citem-fault citem-draggable" draggable="true" data-component="electrical_fault_injector"><span>E</span> 电气层注入</div>
+        <div class="citem citem-fault citem-draggable" draggable="true" data-component="protocol_fault_injector"><span>P</span> 协议层注入</div>
       </div>
 
       <!-- 3. 测量仪器组件 -->
@@ -154,7 +155,7 @@
       <div class="canvas-viewport" id="canvas-viewport">
         <div class="canvas-stage" id="canvas-stage">
           <div class="canvas-stage-grid"></div>
-          <svg class="edge-layer" id="edge-layer" viewBox="0 0 1600 980" preserveAspectRatio="none">
+          <svg class="edge-layer" id="edge-layer" viewBox="0 0 2400 1500" preserveAspectRatio="none">
             <defs>
               <marker id="edge-arrow-normal" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
                 <path d="M1 1L8 5L1 9" fill="none" stroke="#84aee0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>

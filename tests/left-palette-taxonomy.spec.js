@@ -44,9 +44,10 @@ describe('left palette taxonomy', () => {
     expect(groupBody('simulation')).toContain('data-component="simulation_block"');
     expect(groupBody('simulation')).toContain('data-open-component-authoring');
     expect(groupBody('subsystem')).toContain('data-component="subsystem_block"');
-    expect(groupBody('faults')).toContain('data-component="fault_tag"');
-    expect(groupBody('faults')).toContain('data-component="edge_fault_tag"');
-    expect(groupBody('faults')).toContain('故障注入');
+    expect(groupBody('faults')).toContain('data-component="physical_fault_injector"');
+    expect(groupBody('faults')).toContain('data-component="electrical_fault_injector"');
+    expect(groupBody('faults')).toContain('data-component="protocol_fault_injector"');
+    expect(groupBody('faults')).toContain('物理层注入');
     expect(groupBody('faults')).toContain('data-open-fault-authoring-for-selected');
     expect(groupBody('faults')).toContain('新增故障');
     expect(groupBody('instruments')).toContain('data-component="instrument_scope"');

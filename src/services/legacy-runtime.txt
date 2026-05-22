@@ -50,7 +50,7 @@ S.activeCanvasId='canvas-root';
 S.canvasTrail=['canvas-root'];
 S.canvases={};
 
-const CANVAS_STAGE={width:1600,height:980,minScale:0.6,maxScale:1.8,nodePadding:24,nodeMinY:118};
+const CANVAS_STAGE={width:2400,height:1500,minScale:0.6,maxScale:1.8,nodePadding:24,nodeMinY:118};
 const POINTER_DRAG_THRESHOLD=6;
 const SCOPE_WINDOW_LAYOUT={defaultWidth:560,estimatedHeight:356,gutter:16,reservedTop:96,cascadeX:36,cascadeY:32};
 const NODE_DRAG={active:false,engaged:false,pointerId:null,nodeId:'',startX:0,startY:0,originX:0,originY:0,clickSuppressUntil:0};
@@ -116,7 +116,7 @@ const COMPONENT_LIBRARY={
     badge:'故障',
     className:'b-fault',
     width:196,
-    height:78,
+    height:96,
     defaults:{name:'故障注入',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
   },
   edge_fault_tag:{
@@ -124,7 +124,7 @@ const COMPONENT_LIBRARY={
     badge:'故障',
     className:'b-fault',
     width:196,
-    height:78,
+    height:96,
     defaults:{name:'连线故障注入',faultType:'连线故障标签',layer:'飞控故障库',trigger:'按连线绑定'}
   },
   instrument_scope:{
@@ -20227,4 +20227,957 @@ function decorateDataflowEdges(){
 
   window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;
   setTimeout(decorateCanvasNodes,0);
+})();
+
+;(function installLayeredFaultInjectionRuntime(){
+  if(typeof window==='undefined') return;
+
+  const LAYERED_FAULT_INJECTOR_TYPES={
+    physical_fault_injector:{
+      layer:'physical',
+      layerLabel:'物理层',
+      label:'物理层注入',
+      faultType:'模型参数故障',
+      defaultModel:'bias'
+    },
+    electrical_fault_injector:{
+      layer:'electrical',
+      layerLabel:'电气层',
+      label:'电气层注入',
+      faultType:'连续信号故障',
+      defaultModel:'noise'
+    },
+    protocol_fault_injector:{
+      layer:'protocol',
+      layerLabel:'协议层',
+      label:'协议层注入',
+      faultType:'数字协议故障',
+      defaultModel:'tamper'
+    }
+  };
+
+  Object.entries(LAYERED_FAULT_INJECTOR_TYPES).forEach(([type,config])=>{
+    COMPONENT_LIBRARY[type]={
+      label:config.label,
+      badge:'故障',
+      className:'b-fault',
+      width:196,
+      height:96,
+      defaults:{
+        name:config.label,
+        faultType:config.faultType,
+        layer:config.layerLabel,
+        layerKey:config.layer,
+        trigger:'先放置后绑定'
+      }
+    };
+  });
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function cloneValue(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function isLayeredFaultInjectorType(type){
+    return Object.prototype.hasOwnProperty.call(LAYERED_FAULT_INJECTOR_TYPES,type);
+  }
+
+  function getLayeredFaultInjectorConfig(type){
+    return LAYERED_FAULT_INJECTOR_TYPES[type]||null;
+  }
+
+  function getTargetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function getRuntimeNode(id){
+    return getState().modelNodes?.find(node=>node.id===id)||null;
+  }
+
+  function getRuntimeEdge(id){
+    return getState().modelEdges?.find(edge=>edge.id===id)||null;
+  }
+
+  function getTargetByRef(ref={}){
+    if(ref.targetKind==='edge'||ref.kind==='edge'){
+      return getRuntimeEdge(ref.targetId||ref.id);
+    }
+    if(ref.targetKind==='node'||ref.kind==='node'){
+      return getRuntimeNode(ref.targetId||ref.id);
+    }
+    return getRuntimeNode(ref.targetId||ref.id)||getRuntimeEdge(ref.targetId||ref.id)||null;
+  }
+
+  function stableSlotKey(value,index){
+    return String(value?.key||value?.id||value?.name||value?.varName||`slot-${index}`).replace(/\s+/g,'_');
+  }
+
+  function makeSlot(layer,id,name,target,extra={}){
+    return {
+      id,
+      layer,
+      name,
+      targetKind:getTargetKind(target),
+      targetId:target?.id||'',
+      ...extra
+    };
+  }
+
+  function getNodePhysicalSlots(node){
+    return [
+      ...arr(node?.props?.modelParameters),
+      ...arr(node?.props?.physicalParameters),
+      ...arr(node?.physicalParameters)
+    ].map((param,index)=>makeSlot(
+      'physical',
+      `physical:${stableSlotKey(param,index)}`,
+      param?.name||param?.label||param?.key||`模型参数 ${index+1}`,
+      node,
+      {parameterKey:param?.key||param?.id||param?.name||'', unit:param?.unit||''}
+    ));
+  }
+
+  function getNodeElectricalSlots(node){
+    if(!node||isLayeredFaultInjectorType(node.type)) return [];
+    const groups=[
+      ['input',arr(node.props?.inputs)],
+      ['output',arr(node.props?.outputs)],
+      ['middle',arr(node.props?.middleVars)]
+    ];
+    const slots=[];
+    groups.forEach(([role,items])=>{
+      items.forEach((item,index)=>{
+        slots.push(makeSlot(
+          'electrical',
+          `electrical:${role}:${stableSlotKey(item,index)}`,
+          item?.name||item?.label||`${role} ${index+1}`,
+          node,
+          {signalRole:role, signalType:item?.type||item?.format||''}
+        ));
+      });
+    });
+    if(!slots.length&&typeof getNodePorts==='function'){
+      const ports=getNodePorts(node);
+      arr(ports.inputs).forEach((port,index)=>slots.push(makeSlot(
+        'electrical',
+        `electrical:input:${stableSlotKey(port,index)}`,
+        port.label||`输入 ${index+1}`,
+        node,
+        {signalRole:'input'}
+      )));
+      arr(ports.outputs).forEach((port,index)=>slots.push(makeSlot(
+        'electrical',
+        `electrical:output:${stableSlotKey(port,index)}`,
+        port.label||`输出 ${index+1}`,
+        node,
+        {signalRole:'output'}
+      )));
+    }
+    return slots;
+  }
+
+  function getNodeProtocolSlots(node){
+    return [
+      ...arr(node?.props?.protocolParameters),
+      ...arr(node?.protocolParameters)
+    ].map((param,index)=>makeSlot(
+      'protocol',
+      `protocol:${stableSlotKey(param,index)}`,
+      param?.name||param?.label||param?.key||`协议字段 ${index+1}`,
+      node,
+      {parameterKey:param?.key||param?.id||param?.name||''}
+    ));
+  }
+
+  function getEdgeElectricalSlots(edge){
+    if(!edge?.id) return [];
+    return [makeSlot(
+      'electrical',
+      `electrical:${edge.id}:signal`,
+      edge.label||edge.signalName||edge.signalId||'连接信号',
+      edge,
+      {signalId:edge.signalId||'', signalRole:edge.signalRole||''}
+    )];
+  }
+
+  function edgeHasProtocolCapability(edge){
+    return edge?.lineType==='can'
+      || !!edge?.canMessageId
+      || !!edge?.messageId
+      || !!edge?.channelId
+      || !!edge?.protocol
+      || edge?.bus==='CAN';
+  }
+
+  function getEdgeProtocolSlots(edge){
+    if(!edgeHasProtocolCapability(edge)) return [];
+    return [makeSlot(
+      'protocol',
+      `protocol:${edge.id}:can`,
+      edge.canMessageId||edge.messageId||edge.channelId||'CAN 报文',
+      edge,
+      {
+        channelId:edge.channelId||'',
+        messageId:edge.canMessageId||edge.messageId||'',
+        signalId:edge.signalId||''
+      }
+    )];
+  }
+
+  function getDeclaredFaultSlots(target){
+    const state=getState();
+    const targetKind=getTargetKind(target);
+    const pkg=state.activeModelPackage||{};
+    const capability=arr(pkg.faultCapabilityMap).find(entry=>
+      entry?.targetId===target?.id&&(entry.targetKind||targetKind)===targetKind
+    );
+    const slots=[
+      ...arr(target?.faultSlots),
+      ...arr(capability?.faultSlots)
+    ];
+    const seen=new Set();
+    return slots
+      .map((slot,index)=>{
+        const layer=inferCapabilitySlotLayer(slot,target);
+        const slotKey=slot.slotId||slot.id||`${layer}:${stableSlotKey(slot,index)}`;
+        return makeSlot(
+          layer,
+          slotKey.includes(':')?slotKey:`${layer}:${slotKey}`,
+          slot.slotName||slot.name||slot.label||slot.id||slot.slotId||`故障槽位 ${index+1}`,
+          target,
+          slot
+        );
+      })
+      .filter(slot=>{
+        const key=`${slot.layer}:${slot.id}`;
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
+  function getActiveFaultModels(){
+    const state=getState();
+    return [
+      ...arr(state.activeModelPackage?.faultLibrary),
+      ...arr(state.activeModelPackage?.faultTypeCatalog),
+      ...arr(state.availableFaultModels),
+      ...arr(window.__GZ_FAULT_TYPE_CATALOG__)
+    ];
+  }
+
+  function inferCapabilitySlotLayer(slot,target){
+    if(slot?.layer||slot?.layerKey) return slot.layer||slot.layerKey;
+    const allowedIds=[
+      ...arr(slot?.allowedFaultIds),
+      ...arr(slot?.allowedFaultTypeIds)
+    ];
+    if(allowedIds.length){
+      const models=getActiveFaultModels();
+      const layers=allowedIds
+        .map(id=>models.find(model=>(model?.id||model?.faultTypeId)===id)?.layer)
+        .filter(Boolean);
+      const unique=[...new Set(layers)];
+      if(unique.length===1) return unique[0];
+      if(unique.includes('protocol')) return 'protocol';
+      if(unique.includes('electrical')) return 'electrical';
+      if(unique.includes('physical')) return 'physical';
+    }
+    if(getTargetKind(target)==='edge'&&edgeHasProtocolCapability(target)) return 'protocol';
+    return 'electrical';
+  }
+
+  function getLayeredFaultSlotsForTarget(target){
+    if(!target?.id) return [];
+    const declared=getDeclaredFaultSlots(target);
+    if(getTargetKind(target)==='edge'){
+      return [
+        ...declared,
+        ...getEdgeElectricalSlots(target),
+        ...getEdgeProtocolSlots(target)
+      ];
+    }
+    return [
+      ...declared,
+      ...getNodePhysicalSlots(target),
+      ...getNodeElectricalSlots(target),
+      ...getNodeProtocolSlots(target)
+    ];
+  }
+
+  function resolveInjectorLayer(injector){
+    if(typeof injector==='string') return getLayeredFaultInjectorConfig(injector)?.layer||'';
+    return injector?.faultInjector?.layer
+      || injector?.props?.layerKey
+      || getLayeredFaultInjectorConfig(injector?.type)?.layer
+      || '';
+  }
+
+  function canBindLayeredFaultInjectorToTarget(injector,target){
+    const layer=resolveInjectorLayer(injector);
+    if(!layer||!target?.id) return false;
+    return getLayeredFaultSlotsForTarget(target).some(slot=>slot.layer===layer);
+  }
+
+  function defaultLayeredFaultParameters(layer,mathModel){
+    if(mathModel==='noise'||layer==='electrical'){
+      return {std:0.08,start:0,duration:'',noise_type:'gaussian'};
+    }
+    if(mathModel==='tamper'||layer==='protocol'){
+      return {value:1,start:0,duration:'',mode:'overwrite'};
+    }
+    if(mathModel==='drift'){
+      return {rate:0.006,start:0,duration:''};
+    }
+    return {bias:0.1,start:0,duration:''};
+  }
+
+  function buildLayeredFaultPayload({model,layer,slot,target,parameters,mathModel}){
+    return {
+      modelId:model.id,
+      name:model.name,
+      layer,
+      layerKey:layer,
+      modelClass:model.modelClass,
+      runtimeBehavior:mathModel,
+      slotId:slot?.id||'',
+      slotName:slot?.name||'',
+      targetKind:getTargetKind(target),
+      targetId:target?.id||'',
+      parameters:cloneValue(parameters||defaultLayeredFaultParameters(layer,mathModel))
+    };
+  }
+
+  function appendLayeredFaultRuntimeBinding(target,payload){
+    if(!target||!payload) return;
+    target.injectedFault=cloneValue(payload);
+    target.faultBindings=arr(target.faultBindings);
+    const binding={
+      bindingId:`${payload.modelId}::${target.id}`,
+      faultModelId:payload.modelId,
+      name:payload.name,
+      layer:payload.layer,
+      layerKey:payload.layerKey,
+      runtimeBehavior:payload.runtimeBehavior,
+      parameters:cloneValue(payload.parameters||{}),
+      targetKind:payload.targetKind,
+      targetId:target.id,
+      slotId:payload.slotId,
+      slotName:payload.slotName,
+      visualRole:'fault-source',
+      propagationMode:payload.layer==='physical'?'localParameter':payload.layer==='protocol'?'protocolEdge':'signalTransform',
+      canPropagate:payload.layer!=='physical',
+      active:true,
+      injectedFault:cloneValue(payload)
+    };
+    const existingIndex=target.faultBindings.findIndex(item=>item.bindingId===binding.bindingId||item.faultModelId===binding.faultModelId);
+    if(existingIndex>=0) target.faultBindings[existingIndex]=binding;
+    else target.faultBindings.push(binding);
+    if(payload.targetKind==='node'&&Array.isArray(S.faultedBlks)&&!S.faultedBlks.includes(target.id)){
+      S.faultedBlks.push(target.id);
+    }
+    if(payload.targetKind==='edge'){
+      target.status='faulted';
+      target.faultSource=payload.name;
+    }
+  }
+
+  function ensureLayeredFaultTags(){
+    const state=getState();
+    if(!Array.isArray(state.faultTags)) state.faultTags=[];
+    return state.faultTags;
+  }
+
+  function ensureLayeredFaultLinks(){
+    const state=getState();
+    if(!Array.isArray(state.faultInjectionLinks)) state.faultInjectionLinks=[];
+    return state.faultInjectionLinks;
+  }
+
+  function getLayeredFaultTagPosition(target){
+    if(getTargetKind(target)==='edge'){
+      return {x:Math.round((target.x||420)-102),y:Math.round((target.y||240)-38),w:204,h:76};
+    }
+    return {
+      x:Math.round((target.x||420)+(target.w||174)+28),
+      y:Math.round(target.y||240),
+      w:204,
+      h:76
+    };
+  }
+
+  function createLayeredFaultTagFallback(model,target,payload,slot){
+    const state=getState();
+    const targetKind=getTargetKind(target);
+    const box=getLayeredFaultTagPosition(target);
+    const tag={
+      id:`fault-tag-${model.id}`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      type:'fault_tag',
+      faultModelId:model.id,
+      faultModelName:model.name,
+      name:model.name,
+      layer:model.layer,
+      layerKey:model.layerKey||model.layer,
+      modelClass:model.modelClass,
+      runtimeBehavior:model.runtimeBehavior,
+      targetKind,
+      targetId:target.id,
+      hostNodeId:targetKind==='node'?target.id:(target.sourceNodeId||''),
+      targetName:target.props?.name||target.label||target.id,
+      active:true,
+      positionMode:'manual',
+      expanded:targetKind==='edge',
+      collapsed:targetKind!=='edge',
+      slotId:slot?.id||'',
+      slotName:slot?.name||'',
+      parameters:cloneValue(payload.parameters||{}),
+      injectedFault:cloneValue(payload),
+      ...box
+    };
+    const tags=ensureLayeredFaultTags();
+    const tagIndex=tags.findIndex(item=>item.id===tag.id||item.faultModelId===tag.faultModelId);
+    if(tagIndex>=0) tags[tagIndex]=tag;
+    else tags.push(tag);
+    const links=ensureLayeredFaultLinks();
+    const link={
+      id:`fault-link-${model.id}-target`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      faultModelId:model.id,
+      sourceTagId:tag.id,
+      targetNodeId:targetKind==='node'?target.id:null,
+      targetEdgeId:targetKind==='edge'?target.id:null,
+      role:'fault-tag-attachment',
+      label:'故障注入'
+    };
+    const linkIndex=links.findIndex(item=>item.id===link.id);
+    if(linkIndex>=0) links[linkIndex]=link;
+    else links.push(link);
+    if(targetKind==='node'&&Array.isArray(state.faultedBlks)&&!state.faultedBlks.includes(target.id)){
+      state.faultedBlks.push(target.id);
+    }
+    return tag;
+  }
+
+  function bindLayeredFaultInjectorToTarget(injectorId,options={}){
+    const state=getState();
+    const injector=arr(state.modelNodes).find(node=>node.id===injectorId);
+    if(!injector||!isLayeredFaultInjectorType(injector.type)){
+      return {ok:false,reason:'injector-not-found'};
+    }
+    const config=getLayeredFaultInjectorConfig(injector.type);
+    const layer=config.layer;
+    const target=getTargetByRef(options);
+    if(!target){
+      return {ok:false,reason:'target-not-found'};
+    }
+    const compatibleSlots=getLayeredFaultSlotsForTarget(target).filter(slot=>slot.layer===layer);
+    if(!compatibleSlots.length){
+      return {ok:false,reason:'incompatible-layer',layer,targetId:target.id};
+    }
+    const slot=compatibleSlots.find(item=>item.id===options.slotId)||compatibleSlots[0];
+    const mathModel=options.mathModel||config.defaultModel;
+    const model={
+      id:options.modelId||`layered-${injector.id}-${target.id}-${slot.id}`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      name:options.name||`${config.label} - ${target.props?.name||target.label||target.id}`,
+      layer,
+      layerKey:layer,
+      modelClass:options.modelClass||config.faultType,
+      runtimeBehavior:mathModel,
+      defaultParameters:cloneValue(options.parameters||defaultLayeredFaultParameters(layer,mathModel)),
+      visualInjection:{targetId:target.id,targetKind:getTargetKind(target)}
+    };
+    const payload=buildLayeredFaultPayload({
+      model,
+      layer,
+      slot,
+      target,
+      parameters:options.parameters,
+      mathModel
+    });
+    appendLayeredFaultRuntimeBinding(target,payload);
+    state.modelNodes=arr(state.modelNodes).filter(node=>node.id!==injector.id);
+    if(S.selBlk===injector.id) S.selBlk=null;
+    let tag=null;
+    if(typeof createVisualFaultInjection==='function'){
+      tag=createVisualFaultInjection(model,target,payload);
+      if(tag){
+        tag.layerKey=layer;
+        tag.slotId=slot.id;
+        tag.slotName=slot.name;
+        tag.runtimeBehavior=mathModel;
+        tag.parameters=cloneValue(payload.parameters||{});
+        tag.injectedFault=cloneValue(payload);
+      }
+    }
+    if(!tag){
+      tag=createLayeredFaultTagFallback(model,target,payload,slot);
+    }
+    if(typeof markTopologyDirty==='function') markTopologyDirty('fault');
+    if(typeof renderModelNodes==='function') renderModelNodes();
+    if(typeof renderEdges==='function') renderEdges();
+    if(typeof syncConfigTargets==='function') syncConfigTargets();
+    if(tag&&typeof selectFaultTag==='function') selectFaultTag(tag.id);
+    else if(typeof updateUI==='function') updateUI();
+    return {ok:true,targetId:target.id,targetKind:getTargetKind(target),layer,slotId:slot.id,tagId:tag?.id||''};
+  }
+
+  const previousGetNodePorts=window.getNodePorts||(typeof getNodePorts!=='undefined'?getNodePorts:null);
+  if(previousGetNodePorts&&!window.__layeredFaultGetNodePortsWrapped){
+    window.__layeredFaultGetNodePortsWrapped=true;
+    window.getNodePorts=function(node){
+      if(isLayeredFaultInjectorType(node?.type)){
+        return {
+          inputs:[],
+          outputs:[{key:'fault-output',label:'故障绑定',kind:'fault',side:'right'}]
+        };
+      }
+      return previousGetNodePorts.apply(this,arguments);
+    };
+    if(typeof getNodePorts!=='undefined') getNodePorts=window.getNodePorts;
+  }
+
+  const previousBuildNodeSubtitle=window.buildNodeSubtitle||(typeof buildNodeSubtitle!=='undefined'?buildNodeSubtitle:null);
+  if(previousBuildNodeSubtitle&&!window.__layeredFaultSubtitleWrapped){
+    window.__layeredFaultSubtitleWrapped=true;
+    window.buildNodeSubtitle=function(node){
+      if(isLayeredFaultInjectorType(node?.type)){
+        const config=getLayeredFaultInjectorConfig(node.type);
+        return `${config.layerLabel} / ${node.faultInjector?.bound?'已绑定':'未绑定'} / ${node.props?.trigger||'先放置后绑定'}`;
+      }
+      return previousBuildNodeSubtitle.apply(this,arguments);
+    };
+    if(typeof buildNodeSubtitle!=='undefined') buildNodeSubtitle=window.buildNodeSubtitle;
+  }
+
+  const previousCreateNode=window.createNode||(typeof createNode!=='undefined'?createNode:null);
+  if(previousCreateNode&&!window.__layeredFaultCreateNodeWrapped){
+    window.__layeredFaultCreateNodeWrapped=true;
+    window.createNode=function(type,rawX,rawY){
+      const beforeCount=arr(S.modelNodes).length;
+      const result=previousCreateNode.apply(this,arguments);
+      const nodes=arr(S.modelNodes);
+      const node=result||nodes[nodes.length-1]||[...nodes].reverse().find(item=>item.type===type);
+      if(isLayeredFaultInjectorType(type)&&node){
+        const config=getLayeredFaultInjectorConfig(type);
+        node.faultInjector={
+          layer:config.layer,
+          layerLabel:config.layerLabel,
+          bound:false,
+          targetId:'',
+          slotId:'',
+          mathModel:config.defaultModel
+        };
+        node.props={...(node.props||{}),layerKey:config.layer,layer:config.layerLabel,faultType:config.faultType};
+        if(typeof renderModelNodes==='function') renderModelNodes();
+        if(S.selBlk===node.id&&typeof renderPropertyPanel==='function') renderPropertyPanel(node);
+        if(typeof updateUI==='function') updateUI();
+        return node;
+      }
+      return result||node;
+    };
+    if(typeof createNode!=='undefined') createNode=window.createNode;
+  }
+
+  function clearLayeredFaultBindingTargets(){
+    arr(window.__layeredFaultTargetCleanups).forEach(cleanup=>{
+      try{ cleanup(); }catch{}
+    });
+    window.__layeredFaultTargetCleanups=[];
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.remove('fault-drop-preview','fault-drop-preview--node','fault-drop-preview--edge');
+    document.querySelectorAll('.fault-drop-compatible,.fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('fault-drop-compatible','fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+    document.querySelectorAll('.is-fault-drop-compatible,.is-fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('is-fault-drop-compatible','is-fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+  }
+
+  function getPendingLayeredFaultInjector(){
+    const pendingId=S.pendingLayeredFaultInjectorId||'';
+    return getRuntimeNode(pendingId);
+  }
+
+  function openLayeredFaultBindingTarget(event,target){
+    const injector=getPendingLayeredFaultInjector();
+    if(!injector||!target||target.id===injector.id) return;
+    if(event.target?.closest?.('[data-layered-fault-binding-dialog],[data-layered-fault-bind]')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(!canBindLayeredFaultInjectorToTarget(injector,target)){
+      if(typeof toast==='function') toast('该故障层与目标对象能力不匹配','w');
+      showLayeredFaultBindingTargets(injector);
+      return;
+    }
+    openLayeredFaultBindingDialog(injector,target);
+  }
+
+  function attachLayeredFaultTargetHandlers(el,target){
+    if(!el||!target) return;
+    const stopTargetDrag=event=>{
+      if(!getPendingLayeredFaultInjector()) return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    const selectTarget=event=>openLayeredFaultBindingTarget(event,target);
+    el.addEventListener('pointerdown',stopTargetDrag,true);
+    el.addEventListener('pointerup',selectTarget,true);
+    window.__layeredFaultTargetCleanups=window.__layeredFaultTargetCleanups||[];
+    window.__layeredFaultTargetCleanups.push(()=>{
+      el.removeEventListener('pointerdown',stopTargetDrag,true);
+      el.removeEventListener('pointerup',selectTarget,true);
+    });
+  }
+
+  function showLayeredFaultBindingTargets(injector){
+    clearLayeredFaultBindingTargets();
+    if(!injector||!isLayeredFaultInjectorType(injector.type)) return;
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.add('fault-drop-preview');
+    arr(S.modelNodes).forEach(node=>{
+      if(node.id===injector.id) return;
+      const el=document.getElementById(`b-${node.id}`);
+      if(!el) return;
+      const compatible=canBindLayeredFaultInjectorToTarget(injector,node);
+      if(compatible){
+        el.classList.add('fault-drop-compatible');
+        el.dataset.faultDropState='compatible';
+        attachLayeredFaultTargetHandlers(el,node);
+      }
+    });
+    arr(S.modelEdges).forEach(edge=>{
+      const compatible=canBindLayeredFaultInjectorToTarget(injector,edge);
+      if(!compatible) return;
+      document.querySelectorAll(`[data-edge-id="${edge.id}"]`).forEach(el=>{
+        el.classList.add('is-fault-drop-compatible');
+        el.dataset.faultDropState='compatible';
+        attachLayeredFaultTargetHandlers(el,edge);
+      });
+    });
+  }
+
+  function beginLayeredFaultBinding(injectorId){
+    const injector=getRuntimeNode(injectorId);
+    if(!injector||!isLayeredFaultInjectorType(injector.type)) return false;
+    S.pendingLayeredFaultInjectorId=injector.id;
+    closeLayeredFaultBindingDialog();
+    showLayeredFaultBindingTargets(injector);
+    renderLayeredFaultInjectorControls();
+    return true;
+  }
+
+  function cancelLayeredFaultBinding(){
+    S.pendingLayeredFaultInjectorId='';
+    clearLayeredFaultBindingTargets();
+    renderLayeredFaultInjectorControls();
+  }
+
+  function targetFromLayeredBindingEvent(event){
+    const nodeEl=event.target?.closest?.('.blk');
+    if(nodeEl?.id){
+      const nodeId=nodeEl.id.replace(/^b-/,'');
+      return getRuntimeNode(nodeId);
+    }
+    const edgeEl=event.target?.closest?.('[data-edge-id]');
+    if(edgeEl?.dataset?.edgeId){
+      return getRuntimeEdge(edgeEl.dataset.edgeId);
+    }
+    return null;
+  }
+
+  function handleLayeredFaultBindingClick(event){
+    const injector=getPendingLayeredFaultInjector();
+    if(!injector) return;
+    if(event.target?.closest?.('[data-layered-fault-binding-dialog],[data-layered-fault-bind]')) return;
+    const target=targetFromLayeredBindingEvent(event);
+    if(!target||target.id===injector.id) return;
+    openLayeredFaultBindingTarget(event,target);
+  }
+
+  function removeLayeredFaultBindingDialog(){
+    document.querySelectorAll('[data-layered-fault-binding-dialog]').forEach(el=>el.remove());
+  }
+
+  function closeLayeredFaultBindingDialog(){
+    removeLayeredFaultBindingDialog();
+  }
+
+  function getTargetDisplayName(target){
+    return target?.props?.name||target?.label||target?.id||'目标对象';
+  }
+
+  function getLayeredMathModels(layer){
+    if(layer==='physical'){
+      return [
+        {value:'bias',label:'偏置模型'},
+        {value:'drift',label:'漂移模型'},
+        {value:'step',label:'突变模型'}
+      ];
+    }
+    if(layer==='protocol'){
+      return [
+        {value:'tamper',label:'篡改模型'},
+        {value:'dropout',label:'丢包模型'},
+        {value:'delay',label:'延迟模型'}
+      ];
+    }
+    return [
+      {value:'noise',label:'随机噪声'},
+      {value:'bias',label:'偏置叠加'},
+      {value:'freeze',label:'卡死保持'}
+    ];
+  }
+
+  function getDialogParameters(layer,mathModel){
+    return defaultLayeredFaultParameters(layer,mathModel);
+  }
+
+  function renderDialogParameterFields(host,layer,mathModel){
+    const params=getDialogParameters(layer,mathModel);
+    const fields=Object.entries(params).map(([key,value])=>`
+      <label class="layered-fault-dialog__field">
+        <span>${escapeHtml(key)}</span>
+        <input data-layered-fault-param="${escapeHtml(key)}" value="${escapeHtml(value)}">
+      </label>
+    `).join('');
+    host.innerHTML=fields;
+  }
+
+  function readLayeredDialogParameters(host){
+    const params={};
+    host.querySelectorAll('[data-layered-fault-param]').forEach(input=>{
+      const key=input.dataset.layeredFaultParam||'';
+      if(!key) return;
+      const raw=input.value;
+      const numeric=Number(raw);
+      params[key]=raw!==''&&Number.isFinite(numeric)?numeric:raw;
+    });
+    return params;
+  }
+
+  function openLayeredFaultBindingDialog(injector,target){
+    const config=getLayeredFaultInjectorConfig(injector.type);
+    if(!config) return;
+    const slots=getLayeredFaultSlotsForTarget(target).filter(slot=>slot.layer===config.layer);
+    if(!slots.length) return;
+    removeLayeredFaultBindingDialog();
+    const dialog=document.createElement('div');
+    dialog.className='layered-fault-dialog';
+    dialog.dataset.layeredFaultBindingDialog='true';
+    const models=getLayeredMathModels(config.layer);
+    dialog.innerHTML=`
+      <div class="layered-fault-dialog__head">
+        <div>
+          <div class="layered-fault-dialog__eyebrow">${escapeHtml(config.layerLabel)}注入</div>
+          <strong>确认绑定目标</strong>
+        </div>
+        <button type="button" data-layered-fault-cancel aria-label="取消绑定">×</button>
+      </div>
+      <div class="layered-fault-dialog__body">
+        <div class="layered-fault-dialog__target">
+          <span>目标对象</span>
+          <b>${escapeHtml(getTargetDisplayName(target))}</b>
+        </div>
+        <label class="layered-fault-dialog__field">
+          <span>关联参数/信号</span>
+          <select data-layered-fault-slot>
+            ${slots.map(slot=>`<option value="${escapeHtml(slot.id)}">${escapeHtml(slot.name||slot.id)}</option>`).join('')}
+          </select>
+        </label>
+        <label class="layered-fault-dialog__field">
+          <span>数学模型</span>
+          <select data-layered-fault-model>
+            ${models.map(model=>`<option value="${escapeHtml(model.value)}">${escapeHtml(model.label)}</option>`).join('')}
+          </select>
+        </label>
+        <div class="layered-fault-dialog__params" data-layered-fault-params></div>
+      </div>
+      <div class="layered-fault-dialog__actions">
+        <button type="button" data-layered-fault-cancel>取消</button>
+        <button type="button" class="primary" data-layered-fault-confirm>确认绑定</button>
+      </div>
+    `;
+    const paramsHost=dialog.querySelector('[data-layered-fault-params]');
+    const modelSelect=dialog.querySelector('[data-layered-fault-model]');
+    renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel);
+    modelSelect.addEventListener('change',()=>renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel));
+    dialog.querySelectorAll('[data-layered-fault-cancel]').forEach(button=>{
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+      });
+    });
+    dialog.querySelector('[data-layered-fault-confirm]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const slotId=dialog.querySelector('[data-layered-fault-slot]')?.value||slots[0].id;
+      const mathModel=modelSelect.value||config.defaultModel;
+      const result=bindLayeredFaultInjectorToTarget(injector.id,{
+        targetKind:getTargetKind(target),
+        targetId:target.id,
+        slotId,
+        mathModel,
+        parameters:readLayeredDialogParameters(paramsHost)
+      });
+      if(result?.ok){
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+        if(typeof toast==='function') toast('故障已绑定到目标对象','s');
+      }
+    });
+    document.body.appendChild(dialog);
+  }
+
+  function renderLayeredFaultInjectorControls(){
+    arr(S.modelNodes).forEach(node=>{
+      if(!isLayeredFaultInjectorType(node.type)) return;
+      const el=document.getElementById(`b-${node.id}`);
+      if(!el) return;
+      const existingButton=el.querySelector('[data-layered-fault-bind]');
+      if(existingButton){
+        existingButton.textContent=S.pendingLayeredFaultInjectorId===node.id?'取消选择':'绑定目标';
+        existingButton.classList.toggle('is-active',S.pendingLayeredFaultInjectorId===node.id);
+        return;
+      }
+      const actions=document.createElement('div');
+      actions.className='layered-fault-node-actions';
+      const button=document.createElement('button');
+      button.type='button';
+      button.dataset.layeredFaultBind=node.id;
+      button.textContent=S.pendingLayeredFaultInjectorId===node.id?'取消选择':'绑定目标';
+      button.classList.toggle('is-active',S.pendingLayeredFaultInjectorId===node.id);
+      button.addEventListener('pointerdown',event=>event.stopPropagation());
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        if(S.pendingLayeredFaultInjectorId===node.id){
+          cancelLayeredFaultBinding();
+          closeLayeredFaultBindingDialog();
+          return;
+        }
+        if(typeof selectNode==='function') selectNode(node.id);
+        beginLayeredFaultBinding(node.id);
+      });
+      actions.appendChild(button);
+      el.appendChild(actions);
+    });
+  }
+
+  function renderLayeredFaultInjectorPropertyPanel(node){
+    const pd=document.getElementById('pd');
+    const pe=document.getElementById('pe');
+    if(!pd||!pe) return;
+    const config=getLayeredFaultInjectorConfig(node.type);
+    if(!config) return;
+    pe.style.display='none';
+    pd.style.display='block';
+    const active=S.pendingLayeredFaultInjectorId===node.id;
+    pd.innerHTML=`
+      <div class="pgroup">
+        <div class="props-title">${escapeHtml(node.props?.name||config.label)}</div>
+        <div class="props-sub">未绑定故障块 · ${escapeHtml(config.layerLabel)}</div>
+      </div>
+      <div class="pgroup">
+        <div class="pglbl">绑定状态</div>
+        <div class="prow"><span class="pk">故障层级</span><span class="pv">${escapeHtml(config.layerLabel)}</span></div>
+        <div class="prow"><span class="pk">作用对象</span><span class="pv">尚未绑定</span></div>
+        <div class="prow"><span class="pk">匹配规则</span><span class="pv">${escapeHtml(config.faultType)}</span></div>
+      </div>
+      <div class="pgroup">
+        <button type="button" class="props-primary-action" data-layered-fault-bind="${escapeHtml(node.id)}">${active?'取消选择目标':'绑定目标'}</button>
+        <div class="props-help">${active?'请选择画布中高亮的兼容对象。':'点击后只高亮可兼容的模块或连线，确认后才会生成故障标签。'}</div>
+      </div>
+    `;
+    pd.querySelector('[data-layered-fault-bind]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      if(S.pendingLayeredFaultInjectorId===node.id){
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+        renderLayeredFaultInjectorPropertyPanel(node);
+        return;
+      }
+      beginLayeredFaultBinding(node.id);
+      renderLayeredFaultInjectorPropertyPanel(node);
+    });
+  }
+
+  const previousSelectNode=window.selectNode||(typeof selectNode!=='undefined'?selectNode:null);
+  if(previousSelectNode&&!window.__layeredFaultSelectNodeWrapped){
+    window.__layeredFaultSelectNodeWrapped=true;
+    window.selectNode=function(id){
+      const result=previousSelectNode.apply(this,arguments);
+      const node=getRuntimeNode(id);
+      if(isLayeredFaultInjectorType(node?.type)){
+        renderLayeredFaultInjectorPropertyPanel(node);
+        renderLayeredFaultInjectorControls();
+      }
+      else if(!S.pendingLayeredFaultInjectorId) clearLayeredFaultBindingTargets();
+      return result;
+    };
+    if(typeof selectNode!=='undefined') selectNode=window.selectNode;
+  }
+
+  const previousRenderModelNodes=window.renderModelNodes||(typeof renderModelNodes!=='undefined'?renderModelNodes:null);
+  if(previousRenderModelNodes&&!window.__layeredFaultRenderModelNodesWrapped){
+    window.__layeredFaultRenderModelNodesWrapped=true;
+    window.renderModelNodes=function(){
+      const result=previousRenderModelNodes.apply(this,arguments);
+      renderLayeredFaultInjectorControls();
+      const injector=getPendingLayeredFaultInjector();
+      if(injector) showLayeredFaultBindingTargets(injector);
+      return result;
+    };
+    if(typeof renderModelNodes!=='undefined') renderModelNodes=window.renderModelNodes;
+  }
+
+  const previousRenderEdges=window.renderEdges||(typeof renderEdges!=='undefined'?renderEdges:null);
+  if(previousRenderEdges&&!window.__layeredFaultRenderEdgesWrapped){
+    window.__layeredFaultRenderEdgesWrapped=true;
+    window.renderEdges=function(){
+      const result=previousRenderEdges.apply(this,arguments);
+      return result;
+    };
+    if(typeof renderEdges!=='undefined') renderEdges=window.renderEdges;
+  }
+
+  const previousHandlePortClick=window.handlePortClick||(typeof handlePortClick!=='undefined'?handlePortClick:null);
+  if(previousHandlePortClick&&!window.__layeredFaultPortClickWrapped){
+    window.__layeredFaultPortClickWrapped=true;
+    window.handlePortClick=function(event,nodeId,direction,index){
+      const node=getRuntimeNode(nodeId);
+      if(direction==='output'&&isLayeredFaultInjectorType(node?.type)){
+        event?.stopPropagation?.();
+        beginLayeredFaultBinding(nodeId);
+        if(typeof toast==='function') toast('请选择可注入该层故障的目标对象','i');
+        return;
+      }
+      return previousHandlePortClick.apply(this,arguments);
+    };
+    if(typeof handlePortClick!=='undefined') handlePortClick=window.handlePortClick;
+  }
+
+  if(!window.__layeredFaultBindingClickHandler){
+    window.__layeredFaultBindingClickHandler=handleLayeredFaultBindingClick;
+    document.addEventListener('click',handleLayeredFaultBindingClick,true);
+  }
+
+  Object.assign(window,{
+    isLayeredFaultInjectorType,
+    getLayeredFaultInjectorConfig,
+    getLayeredFaultSlotsForTarget,
+    canBindLayeredFaultInjectorToTarget,
+    bindLayeredFaultInjectorToTarget,
+    beginLayeredFaultBinding,
+    cancelLayeredFaultBinding,
+    showLayeredFaultBindingTargets,
+    clearLayeredFaultBindingTargets
+  });
 })();

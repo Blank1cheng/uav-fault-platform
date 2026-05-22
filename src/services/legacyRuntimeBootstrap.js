@@ -284,4 +284,25 @@ export function __resetLegacyRuntimeForTests() {
   delete window.__GZ_RUNTIME_LISTENERS__;
   delete window.__visualInjectionRemoveWrapped;
   delete window.__visualInjectionRenderModelNodesWrapped;
+  delete window.__layeredFaultGetNodePortsWrapped;
+  delete window.__layeredFaultSubtitleWrapped;
+  delete window.__layeredFaultCreateNodeWrapped;
+  delete window.__layeredFaultSelectNodeWrapped;
+  delete window.__layeredFaultRenderModelNodesWrapped;
+  delete window.__layeredFaultRenderEdgesWrapped;
+  delete window.__layeredFaultPortClickWrapped;
+  if (window.__layeredFaultTargetCleanups) {
+    window.__layeredFaultTargetCleanups.forEach((cleanup) => {
+      try {
+        cleanup();
+      } catch {
+        // Ignore stale DOM listener cleanup during test reset.
+      }
+    });
+  }
+  delete window.__layeredFaultTargetCleanups;
+  if (window.__layeredFaultBindingClickHandler) {
+    document.removeEventListener('click', window.__layeredFaultBindingClickHandler, true);
+  }
+  delete window.__layeredFaultBindingClickHandler;
 }

@@ -9,8 +9,9 @@ export const systemModelingComponents = [
 ];
 
 export const faultInjectionComponents = [
-  { type: 'fault_tag', label: '故障注入' },
-  { type: 'edge_fault_tag', label: '连线故障注入' }
+  { type: 'physical_fault_injector', label: '物理层注入' },
+  { type: 'electrical_fault_injector', label: '电气层注入' },
+  { type: 'protocol_fault_injector', label: '协议层注入' }
 ];
 
 export const instrumentComponents = [

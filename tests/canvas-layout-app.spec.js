@@ -48,6 +48,13 @@ function readComponentsCss() {
   );
 }
 
+function readIbmWorkbenchCss() {
+  return readFileSync(
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'styles', 'ibm-workbench.css'),
+    'utf8'
+  );
+}
+
 function findCssRule(css, selector) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return css.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] ?? '';
@@ -178,9 +185,19 @@ describe('canvas layout cleanup', () => {
     expect(consoleCss).toContain('@media (max-width:1120px)');
     expect(consoleCss).toContain('grid-template-rows:156px minmax(0,1fr)');
     expect(consoleCss).toContain('top:140px');
-    expect(ibmCss).toContain('@media (min-width:1121px) and (max-width:1900px)');
+    expect(ibmCss).toContain('@media (min-width:1281px) and (max-width:1900px)');
+    expect(ibmCss).toContain('@media (min-width:1121px) and (max-width:1280px)');
+    expect(ibmCss).toContain('grid-template-rows:56px minmax(0,1fr)');
     expect(ibmCss).toContain('grid-template-rows:104px minmax(0,1fr)');
     expect(ibmCss).toContain('grid-column:1 / 4;');
+    expect(ibmCss).toContain('minmax(520px,max-content)');
+    expect(ibmCss).toContain('grid-template-rows:52px 48px');
+    expect(ibmCss).toContain('top:100px');
+    expect(ibmCss).toContain('top:112px');
+    expect(componentsCss).toContain('width:2400px;height:1500px');
+    expect(document.getElementById('edge-layer')?.getAttribute('viewBox')).toBe('0 0 2400 1500');
+    expect(readFileSync(path.resolve(testDir, '..', 'src', 'fragments', 'canvas.html'), 'utf8')).not.toContain('viewBox="0 0 1600 980"');
+    expect(ibmCss).not.toContain('--canvas-chrome-h:84px');
     expect(ibmCss).toContain('.tbtn-imp-flt');
     expect(ibmCss).toContain('.fault-tag-param-actions');
     expect(findCssRule(ibmCss, '.fault-tag-param-actions div')).toMatch(/flex-wrap\s*:\s*nowrap/);
@@ -248,9 +265,9 @@ describe('canvas layout cleanup', () => {
     await flushRuntime();
     expect(root.style.getPropertyValue('--workbench-status-h')).toBe('150px');
 
-    expect(window.localStorage.getItem('gz.layoutSizes')).toContain('"left":292');
-    expect(window.localStorage.getItem('gz.layoutSizes')).toContain('"right":352');
-    expect(window.localStorage.getItem('gz.layoutSizes')).toContain('"status":150');
+    expect(window.localStorage.getItem('gz.layoutSizes.v3')).toContain('"left":292');
+    expect(window.localStorage.getItem('gz.layoutSizes.v3')).toContain('"right":352');
+    expect(window.localStorage.getItem('gz.layoutSizes.v3')).toContain('"status":150');
 
     wrapper.unmount();
   });
@@ -1151,6 +1168,273 @@ describe('canvas layout cleanup', () => {
     } else {
       expect(window.__GZ_STATE__.selBlk).toBe(located.targetId);
     }
+
+    wrapper.unmount();
+  });
+
+  it('places layered fault injector blocks without injecting immediately', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.createNode).toBe('function');
+
+    const created = window.createNode('physical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const injector = created ?? state.modelNodes.find((node) => node.type === 'physical_fault_injector');
+    expect(injector).toMatchObject({
+      type: 'physical_fault_injector',
+      faultInjector: {
+        layer: 'physical',
+        bound: false
+      }
+    });
+    expect(state.faultTags || []).toHaveLength(0);
+    expect(state.faultInjectionLinks || []).toHaveLength(0);
+    expect(document.getElementById(`b-${injector.id}`)).not.toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('keeps layered fault injector cards visually complete on the canvas', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    window.createNode('electrical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    const injector = window.__GZ_STATE__.modelNodes.find((node) => node.type === 'electrical_fault_injector');
+    const el = document.getElementById(`b-${injector.id}`);
+    const ibmCss = readIbmWorkbenchCss();
+
+    expect(injector.h).toBeGreaterThanOrEqual(92);
+    expect(el).not.toBeNull();
+    expect(el?.classList.contains('b-fault')).toBe(true);
+    expect(el?.querySelector('.blk-lbl')?.textContent?.trim().length).toBeGreaterThan(0);
+    expect(el?.querySelector('.blk-sub')?.textContent?.trim().length).toBeGreaterThan(0);
+    expect(findCssRule(ibmCss, '.canvas-wrap[data-view="canvas"] .b-fault::before')).toMatch(/clip-path\s*:\s*none!important/);
+    expect(findCssRule(ibmCss, '.canvas-wrap[data-view="canvas"] .b-fault::before')).toMatch(/border-radius\s*:\s*6px!important/);
+    expect(ibmCss).toMatch(/\.canvas-wrap\[data-view="canvas"\]\s+\.b-fault\s+\.blk-sub\s*\{[\s\S]*?display\s*:\s*block/);
+    expect(findCssRule(ibmCss, '.canvas-wrap[data-view="canvas"] .b-fault .node-port__label')).toMatch(/display\s*:\s*none!important/);
+
+    wrapper.unmount();
+  });
+
+  it('matches layered fault injectors by component capability and converts a valid binding into a fault tag', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+    expect(typeof window.getLayeredFaultSlotsForTarget).toBe('function');
+    expect(typeof window.canBindLayeredFaultInjectorToTarget).toBe('function');
+    expect(typeof window.bindLayeredFaultInjectorToTarget).toBe('function');
+
+    const state = window.__GZ_STATE__;
+    const physicalTarget = state.modelNodes.find((node) => node.type === 'simulation_block');
+    const signalOnlyTarget = state.modelNodes.find((node) => node.type === 'signal_source');
+    physicalTarget.props.modelParameters = [
+      { key: 'gyro_bias', name: '陀螺仪零偏', unit: 'rad/s' }
+    ];
+
+    const physicalInjector = window.createNode('physical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    expect(window.getLayeredFaultSlotsForTarget(physicalTarget).some((slot) => slot.layer === 'physical')).toBe(true);
+    expect(window.getLayeredFaultSlotsForTarget(signalOnlyTarget).some((slot) => slot.layer === 'physical')).toBe(false);
+    expect(window.canBindLayeredFaultInjectorToTarget(physicalInjector, signalOnlyTarget)).toBe(false);
+    expect(window.canBindLayeredFaultInjectorToTarget(physicalInjector, physicalTarget)).toBe(true);
+
+    const result = window.bindLayeredFaultInjectorToTarget(physicalInjector.id, {
+      targetKind: 'node',
+      targetId: physicalTarget.id,
+      slotId: 'physical:gyro_bias',
+      mathModel: 'bias',
+      parameters: { bias: 0.1, start: 2, duration: 8 }
+    });
+    await flushRuntime();
+
+    expect(result).toMatchObject({ ok: true, targetId: physicalTarget.id, layer: 'physical' });
+    expect(state.modelNodes.some((node) => node.id === physicalInjector.id)).toBe(false);
+    const tag = state.faultTags.find((item) => item.targetId === physicalTarget.id);
+    expect(tag).toMatchObject({
+      targetKind: 'node',
+      targetId: physicalTarget.id,
+      layerKey: 'physical',
+      runtimeBehavior: 'bias'
+    });
+    expect(tag.parameters).toMatchObject({ bias: 0.1, start: 2, duration: 8 });
+    expect(state.faultedBlks).toContain(physicalTarget.id);
+
+    wrapper.unmount();
+  });
+
+  it('allows protocol injectors to bind to CAN edges but rejects normal signal edges', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const canEdge = state.modelEdges.find((edge) => edge.lineType === 'can');
+    const normalEdge = state.modelEdges.find((edge) => edge.lineType !== 'can');
+    const protocolInjector = window.createNode('protocol_fault_injector', 420, 260);
+    await flushRuntime();
+
+    expect(window.getLayeredFaultSlotsForTarget(canEdge).some((slot) => slot.layer === 'protocol')).toBe(true);
+    expect(window.getLayeredFaultSlotsForTarget(normalEdge).some((slot) => slot.layer === 'protocol')).toBe(false);
+    expect(window.canBindLayeredFaultInjectorToTarget(protocolInjector, normalEdge)).toBe(false);
+    expect(window.canBindLayeredFaultInjectorToTarget(protocolInjector, canEdge)).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('binds a layered injector only after explicit bind and confirmation', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const physicalTarget = state.modelNodes.find((node) => node.type === 'simulation_block');
+    const signalOnlyTarget = state.modelNodes.find((node) => node.type === 'signal_source');
+    physicalTarget.props.modelParameters = [
+      { key: 'gyro_bias', name: '陀螺仪零偏', unit: 'rad/s' }
+    ];
+
+    const injector = window.createNode('physical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    expect(injector.faultInjector).toMatchObject({ layer: 'physical', bound: false });
+    expect(document.getElementById(`b-${physicalTarget.id}`)?.classList.contains('fault-drop-compatible')).toBe(false);
+
+    const bindButton = document.querySelector(`[data-layered-fault-bind="${injector.id}"]`);
+    expect(bindButton).not.toBeNull();
+    bindButton?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(document.getElementById(`b-${physicalTarget.id}`)?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.getElementById(`b-${signalOnlyTarget.id}`)?.classList.contains('fault-drop-compatible')).toBe(false);
+
+    document.getElementById(`b-${physicalTarget.id}`)?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(state.modelNodes.some((node) => node.id === injector.id)).toBe(true);
+    expect(document.querySelector('[data-layered-fault-binding-dialog]')).not.toBeNull();
+    expect(state.faultTags?.some((tag) => tag.targetId === physicalTarget.id && tag.layerKey === 'physical')).not.toBe(true);
+
+    document.querySelector('[data-layered-fault-confirm]')?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(state.modelNodes.some((node) => node.id === injector.id)).toBe(false);
+    expect(state.faultTags.some((tag) => tag.targetId === physicalTarget.id && tag.layerKey === 'physical')).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it('opens the layered binding dialog from a real pointer selection on a compatible block', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const imuTarget = state.modelNodes.find((node) => node.id === 'node-imu');
+    expect(imuTarget).toBeTruthy();
+
+    const injector = window.createNode('electrical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    document.querySelector(`[data-layered-fault-bind="${injector.id}"]`)?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    const targetEl = document.getElementById(`b-${imuTarget.id}`);
+    expect(targetEl?.classList.contains('fault-drop-compatible')).toBe(true);
+
+    dispatchPointer(targetEl, 'pointerdown', { pointerId: 42, clientX: 720, clientY: 320 });
+    dispatchPointer(targetEl, 'pointerup', { pointerId: 42, clientX: 720, clientY: 320 });
+    await flushRuntime();
+
+    expect(document.querySelector('[data-layered-fault-binding-dialog]')).not.toBeNull();
+    expect(document.querySelector('[data-layered-fault-binding-dialog]')?.textContent).toContain('IMU');
+
+    wrapper.unmount();
+  });
+
+  it('opens the binding dialog for demo capability-map targets without dimming every other element', async () => {
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const imuTarget = state.modelNodes.find((node) => node.id === 'node-imu');
+    expect(imuTarget).toBeTruthy();
+
+    const injector = window.createNode('electrical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    document.querySelector(`[data-layered-fault-bind="${injector.id}"]`)?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview')).toBe(true);
+    expect(document.getElementById(`b-${imuTarget.id}`)?.classList.contains('fault-drop-compatible')).toBe(true);
+    expect(document.querySelectorAll('.fault-drop-incompatible,.is-fault-drop-incompatible')).toHaveLength(0);
+
+    document.getElementById(`b-${imuTarget.id}`)?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(document.querySelector('[data-layered-fault-binding-dialog]')).not.toBeNull();
+    expect(document.querySelector('[data-layered-fault-binding-dialog]')?.textContent).toContain('IMU');
 
     wrapper.unmount();
   });

@@ -79,13 +79,17 @@
       <span class="lgroup-arrow open" id="arr-g-faults">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g-faults" data-palette-body="faults">
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="physical_fault_injector">
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
-        <span class="citem-label">故障注入</span>
+        <span class="citem-label">物理层注入</span>
       </div>
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="edge_fault_tag">
-        <span class="citem-icon-badge citem-icon-badge--fault">线</span>
-        <span class="citem-label">连线故障注入</span>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="electrical_fault_injector">
+        <span class="citem-icon-badge citem-icon-badge--fault">E</span>
+        <span class="citem-label">电气层注入</span>
+      </div>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="protocol_fault_injector">
+        <span class="citem-icon-badge citem-icon-badge--fault">P</span>
+        <span class="citem-label">协议层注入</span>
       </div>
       <button
         type="button"

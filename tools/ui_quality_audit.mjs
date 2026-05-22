@@ -179,11 +179,21 @@ function makeAudit() {
   check(
     'layout-resizers-persist',
     'Resizable layout persists user sizing preferences',
-    files.app.includes("const LAYOUT_STORAGE_KEY = 'gz.layoutSizes'") &&
+    files.app.includes("const LAYOUT_STORAGE_KEY = 'gz.layoutSizes.v3'") &&
       files.app.includes('window.localStorage.setItem(LAYOUT_STORAGE_KEY') &&
       hasAll(files.app, ['left: 192', 'right: 320', 'status: 100']),
     'Makes panel tuning survive reloads and gives the layout a clear reset baseline.',
     'src/App.vue'
+  );
+
+  check(
+    'canvas-stage-edge-viewbox-match',
+    'Canvas stage and edge SVG use the same coordinate space',
+    files.componentsCss.includes('width:2400px;height:1500px') &&
+      files.canvas.includes('viewBox="0 0 2400 1500"') &&
+      !files.canvas.includes('viewBox="0 0 1600 980"'),
+    'Prevents enlarged internal canvas coordinates from stretching or offsetting rendered connections.',
+    'src/fragments/canvas.html, src/styles/components.css'
   );
 
   check(
