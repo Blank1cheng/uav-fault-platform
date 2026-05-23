@@ -632,7 +632,7 @@ describe('Flight model package app integration', () => {
       faultTypeId: 'gyro_zero_bias_drift',
       targetKind: 'node',
       targetId: 'node-imu',
-      slotId: 'imu-gyro-feedback',
+      slotId: 'physical:imu_zero_bias',
       active: true
     });
     expect(state.faultInstances[0].parameters).toMatchObject({ rate: '0.01', start: '5' });

@@ -93,6 +93,12 @@ export const FAULT_MATH_MODEL_DEFINITIONS = Object.freeze({
 
 const EDGE_ELECTRICAL_MODELS = Object.freeze(['bias', 'noise', 'freeze', 'intermittent']);
 const EDGE_PROTOCOL_MODELS = Object.freeze(['delay', 'dropout', 'tamper', 'stale']);
+const FAULT_LAYERS = Object.freeze(['physical', 'electrical', 'protocol']);
+const NODE_LAYER_MODELS = Object.freeze({
+  physical: FAULT_MATH_MODEL_DEFINITIONS.physical.map((model) => model.id),
+  electrical: EDGE_ELECTRICAL_MODELS.slice(),
+  protocol: EDGE_PROTOCOL_MODELS.slice()
+});
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value ?? null));
@@ -110,6 +116,12 @@ function text(value, fallback = '') {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
+function valueText(value, fallback = '') {
+  const raw = value === undefined || value === null || value === '' ? fallback : value;
+  const stringValue = String(raw ?? '').trim();
+  return stringValue || fallback;
+}
+
 function lowerText(value) {
   return text(value).toLowerCase();
 }
@@ -120,7 +132,7 @@ function uniqueTextArray(value) {
 
 function normalizeSlotLayer(slot = {}, fallback = 'electrical') {
   const layer = text(slot.layer ?? slot.layerKey, fallback);
-  return ['physical', 'electrical', 'protocol'].includes(layer) ? layer : fallback;
+  return FAULT_LAYERS.includes(layer) ? layer : fallback;
 }
 
 function normalizeFaultSlot(slot = {}, target = {}, fallback = {}) {
@@ -160,6 +172,209 @@ function createPortSlot(layer, role, item = {}, index = 0) {
     parameterKey: text(item.key ?? item.id ?? item.name ?? item.varName),
     unit: text(item.unit)
   };
+}
+
+function normalizeVariableKey(value, fallback = '') {
+  return valueText(value, fallback).replace(/\s+/g, '_');
+}
+
+function defaultVariableTargetField(role, key) {
+  if (role === 'parameter') {
+    return `params.${key}`;
+  }
+  if (role === 'input') {
+    return `inputs.${key}`;
+  }
+  if (role === 'output') {
+    return `outputs.${key}`;
+  }
+  if (role === 'middle') {
+    return `middleVars.${key}`;
+  }
+  if (role === 'protocol') {
+    return `protocol.${key}`;
+  }
+  return key;
+}
+
+function createComponentFaultVariable(role, item = {}, index = 0) {
+  const source = isPlainObject(item) ? item : {};
+  const key = normalizeVariableKey(
+    source.key ?? source.id ?? source.varName ?? source.name,
+    `${role}_${index + 1}`
+  );
+  const name = text(
+    source.displayName ?? source.name ?? source.label ?? source.varName ?? source.key ?? source.id,
+    key
+  );
+
+  return {
+    key,
+    name,
+    role,
+    targetField: text(source.targetField, defaultVariableTargetField(role, key)),
+    signalId: text(source.signalId),
+    unit: text(source.unit),
+    type: text(source.type ?? source.format),
+    parameterKey: role === 'parameter' ? key : ''
+  };
+}
+
+function pushUniqueVariable(list, seen, role, item, index) {
+  if (!isPlainObject(item)) {
+    return;
+  }
+  const variable = createComponentFaultVariable(role, item, index);
+  const identity = `${role}:${variable.key}`;
+  if (!variable.key || seen.has(identity)) {
+    return;
+  }
+  seen.add(identity);
+  list.push(variable);
+}
+
+export function getComponentFaultVariables(node = {}) {
+  const props = isPlainObject(node.props) ? node.props : {};
+  const variables = [];
+  const seen = new Set();
+  [
+    ['parameter', arrayOrEmpty(props.parameters)],
+    ['parameter', arrayOrEmpty(props.modelParameters)],
+    ['parameter', arrayOrEmpty(props.physicalParameters)],
+    ['parameter', arrayOrEmpty(node.parameters)],
+    ['parameter', arrayOrEmpty(node.physicalParameters)],
+    ['input', arrayOrEmpty(props.inputs)],
+    ['output', arrayOrEmpty(props.outputs)],
+    ['middle', arrayOrEmpty(props.middleVars)],
+    ['protocol', arrayOrEmpty(props.protocolParameters)],
+    ['protocol', arrayOrEmpty(node.protocolParameters)]
+  ].forEach(([role, items]) => {
+    items.forEach((item, index) => pushUniqueVariable(variables, seen, role, item, index));
+  });
+  return variables;
+}
+
+function getComponentFaultDeclaration(node = {}) {
+  const props = isPlainObject(node.props) ? node.props : {};
+  const declaration = props.faultInjection ?? node.faultInjection ?? props.injectableFaultVariables ?? node.injectableFaultVariables;
+  return isPlainObject(declaration) ? declaration : null;
+}
+
+function hasComponentFaultDeclaration(node = {}) {
+  const declaration = getComponentFaultDeclaration(node);
+  return Boolean(declaration && FAULT_LAYERS.some((layer) => Object.prototype.hasOwnProperty.call(declaration, layer)));
+}
+
+function declarationVariableKey(item, index = 0) {
+  if (isPlainObject(item)) {
+    return normalizeVariableKey(item.variableKey ?? item.key ?? item.id ?? item.varName ?? item.name, `slot_${index + 1}`);
+  }
+  return normalizeVariableKey(item, `slot_${index + 1}`);
+}
+
+function declarationItemsForLayer(declaration = {}, layer = 'electrical') {
+  const value = declaration[layer];
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return [value];
+  }
+  if (isPlainObject(value)) {
+    return Object.entries(value)
+      .filter(([, enabled]) => Boolean(enabled))
+      .map(([key]) => key);
+  }
+  return [];
+}
+
+function createDeclaredComponentSlot(layer, item, variable, index) {
+  const extra = isPlainObject(item) ? clone(item) : {};
+  const variableKey = variable?.key || declarationVariableKey(item, index);
+  const variableRole = variable?.role || text(extra.variableRole ?? extra.role ?? extra.kind, '');
+  const fallbackRole = variableRole || layer;
+  const allowedModels = uniqueTextArray(extra.allowedModels).length
+    ? uniqueTextArray(extra.allowedModels)
+    : NODE_LAYER_MODELS[layer].slice();
+
+  return {
+    ...extra,
+    slotId: text(extra.slotId ?? extra.id, `${layer}:${variableKey}`),
+    slotName: text(extra.slotName ?? extra.displayName ?? extra.name ?? extra.label, variable?.name || variableKey),
+    layer,
+    targetField: text(extra.targetField, variable?.targetField || defaultVariableTargetField(fallbackRole, variableKey)),
+    allowedModels,
+    variableKey,
+    variableRole,
+    signalId: text(extra.signalId, variable?.signalId || ''),
+    unit: text(extra.unit, variable?.unit || ''),
+    parameterKey: text(extra.parameterKey, variable?.parameterKey || '')
+  };
+}
+
+function findDeclaredVariable(variables = [], item, variableKey) {
+  const role = isPlainObject(item) ? text(item.variableRole ?? item.role ?? item.kind, '') : '';
+  if (role) {
+    const roleMatch = variables.find((variable) => variable.key === variableKey && variable.role === role);
+    if (roleMatch) {
+      return roleMatch;
+    }
+  }
+  const matches = variables.filter((variable) => variable.key === variableKey);
+  return matches.length === 1 ? matches[0] : matches[0] || null;
+}
+
+export function buildComponentFaultSlotsFromDeclaration(node = {}) {
+  const declaration = getComponentFaultDeclaration(node);
+  if (!declaration) {
+    return [];
+  }
+  const variables = getComponentFaultVariables(node);
+  return FAULT_LAYERS.flatMap((layer) => (
+    declarationItemsForLayer(declaration, layer)
+      .map((item, index) => {
+        const variableKey = declarationVariableKey(item, index);
+        const variable = findDeclaredVariable(variables, item, variableKey);
+        if (!variable && !isPlainObject(item)) {
+          return null;
+        }
+        return createDeclaredComponentSlot(layer, item, variable, index);
+      })
+      .filter(Boolean)
+  ));
+}
+
+function faultSlotIdentity(slot = {}) {
+  return `${slot.layer || ''}:${slot.slotId || slot.id || ''}`;
+}
+
+function mergeDeclaredFaultSlotMetadata(slots = [], extraSlots = [], target = {}) {
+  const extraByIdentity = new Map();
+  extraSlots.forEach((slot, index) => {
+    if (!isPlainObject(slot)) {
+      return;
+    }
+    const normalized = normalizeFaultSlot(slot, target, { index });
+    extraByIdentity.set(faultSlotIdentity(normalized), normalized);
+  });
+
+  return slots.map((slot, index) => {
+    const normalized = normalizeFaultSlot(slot, target, { index });
+    const extra = extraByIdentity.get(faultSlotIdentity(normalized));
+    if (!extra) {
+      return normalized;
+    }
+    return normalizeFaultSlot({
+      ...extra,
+      ...normalized,
+      allowedFaultIds: uniqueTextArray(normalized.allowedFaultIds).length
+        ? normalized.allowedFaultIds
+        : extra.allowedFaultIds,
+      allowedFaultTypeIds: uniqueTextArray(normalized.allowedFaultTypeIds).length
+        ? normalized.allowedFaultTypeIds
+        : extra.allowedFaultTypeIds
+    }, target, { index });
+  });
 }
 
 export function isProtocolEdge(edge = {}) {
@@ -254,6 +469,20 @@ function capabilitySlotsForTarget(target = {}, targetKind = 'node', capabilityMa
 
 export function normalizeModelNode(node = {}, { faultCapabilityMap = [] } = {}) {
   const safeNode = isPlainObject(node) ? clone(node) : {};
+  if (hasComponentFaultDeclaration(safeNode)) {
+    return {
+      ...safeNode,
+      faultSlots: mergeDeclaredFaultSlotMetadata(
+        buildComponentFaultSlotsFromDeclaration(safeNode),
+        [
+          ...arrayOrEmpty(safeNode.faultSlots),
+          ...capabilitySlotsForTarget(safeNode, 'node', faultCapabilityMap)
+        ],
+        safeNode
+      )
+    };
+  }
+
   const hasDeclaredPhysical = arrayOrEmpty(safeNode.faultSlots)
     .some((slot) => normalizeSlotLayer(slot) === 'physical');
   const defaults = [

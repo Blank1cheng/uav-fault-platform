@@ -1252,12 +1252,8 @@ describe('canvas layout cleanup', () => {
     expect(typeof window.bindLayeredFaultInjectorToTarget).toBe('function');
 
     const state = window.__GZ_STATE__;
-    const physicalTarget = state.modelNodes.find((node) => node.type === 'simulation_block');
+    const physicalTarget = state.modelNodes.find((node) => node.id === 'node-imu');
     const signalOnlyTarget = state.modelNodes.find((node) => node.type === 'signal_source');
-    physicalTarget.props.modelParameters = [
-      { key: 'gyro_bias', name: '陀螺仪零偏', unit: 'rad/s' }
-    ];
-
     const physicalInjector = window.createNode('physical_fault_injector', 420, 260);
     await flushRuntime();
 
@@ -1269,7 +1265,7 @@ describe('canvas layout cleanup', () => {
     const result = window.bindLayeredFaultInjectorToTarget(physicalInjector.id, {
       targetKind: 'node',
       targetId: physicalTarget.id,
-      slotId: 'physical:gyro_bias',
+      slotId: 'physical:imu_zero_bias',
       mathModel: 'bias',
       parameters: { bias: 0.1, start: 2, duration: 8 }
     });
@@ -1335,12 +1331,8 @@ describe('canvas layout cleanup', () => {
     expect(importResult).toMatchObject({ ok: true });
 
     const state = window.__GZ_STATE__;
-    const physicalTarget = state.modelNodes.find((node) => node.type === 'simulation_block');
+    const physicalTarget = state.modelNodes.find((node) => node.id === 'node-imu');
     const signalOnlyTarget = state.modelNodes.find((node) => node.type === 'signal_source');
-    physicalTarget.props.modelParameters = [
-      { key: 'gyro_bias', name: '陀螺仪零偏', unit: 'rad/s' }
-    ];
-
     const injector = window.createNode('physical_fault_injector', 420, 260);
     await flushRuntime();
 

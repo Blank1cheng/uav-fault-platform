@@ -31,6 +31,13 @@ function setFieldValue(selector, value, eventName = 'input') {
   field.dispatchEvent(new Event(eventName, { bubbles: true }));
 }
 
+function setCheckboxValue(selector, checked) {
+  const field = document.querySelector(selector);
+  expect(field).not.toBeNull();
+  field.checked = checked;
+  field.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
 describe('property panel interaction', () => {
   afterEach(() => {
     window.localStorage.clear();
@@ -111,6 +118,140 @@ describe('property panel interaction', () => {
     expect(state.faultedBlks).not.toContain(block.id);
     expect(document.getElementById(`b-${block.id}`)?.classList.contains('faulted')).toBe(false);
     expect(document.getElementById('pd')?.textContent).toContain('No active faults');
+
+    wrapper.unmount();
+  });
+
+  it('edits component-owned injectable variables from the fault settings tab', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    window.createNode('simulation_block', 300, 240);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const block = state.modelNodes.find((node) => node.type === 'simulation_block');
+    block.props.name = 'Attitude controller';
+    block.props.modelParameters = [
+      { key: 'A', name: 'Gain A', targetField: 'params.A' }
+    ];
+    block.props.inputs = [
+      { varName: 'B', name: 'Pitch error', signalId: 'attitude.pitch_error' }
+    ];
+    block.props.middleVars = [
+      { varName: 'C', name: 'Integrator state', targetField: 'state.integrator' }
+    ];
+    block.props.faultInjection = {
+      physical: ['A'],
+      electrical: [],
+      protocol: []
+    };
+    block.faultSlots = [];
+    state.activeModelPackage = {
+      modelId: 'test-package',
+      modelName: 'Test package',
+      systemModel: { nodes: [block], edges: [] },
+      workbenchSnapshot: { modelNodes: [block], modelEdges: [] },
+      faultCapabilityMap: []
+    };
+
+    window.selectNode(block.id);
+    await flushRuntime();
+    window.setPropertyPanelTab('faults');
+    await flushRuntime();
+
+    expect(document.querySelector('[data-fault-slot-editor]')).not.toBeNull();
+    expect(document.querySelector('[data-fault-slot-variable="A"]')?.textContent).toContain('Gain A');
+    expect(document.querySelector('[data-fault-slot-variable="B"]')?.textContent).toContain('Pitch error');
+    expect(document.querySelector('[data-fault-slot-variable="C"]')?.textContent).toContain('Integrator state');
+    expect(document.querySelector('[data-fault-slot-layer="physical"][data-fault-slot-var="A"]').checked).toBe(true);
+    expect(document.querySelector('[data-fault-slot-layer="electrical"][data-fault-slot-var="B"]').checked).toBe(false);
+
+    setCheckboxValue('[data-fault-slot-layer="physical"][data-fault-slot-var="B"]', true);
+    setCheckboxValue('[data-fault-slot-layer="physical"][data-fault-slot-var="C"]', true);
+    setCheckboxValue('[data-fault-slot-layer="electrical"][data-fault-slot-var="B"]', true);
+    setCheckboxValue('[data-fault-slot-layer="protocol"][data-fault-slot-var="C"]', true);
+    document.querySelector('[data-save-fault-slots]').click();
+    await flushRuntime();
+
+    expect(block.props.faultInjection).toEqual({
+      physical: ['A', 'B', 'C'],
+      electrical: ['B'],
+      protocol: ['C']
+    });
+    expect(block.faultSlots.map((slot) => slot.slotId)).toEqual([
+      'physical:A',
+      'physical:B',
+      'physical:C',
+      'electrical:B',
+      'protocol:C'
+    ]);
+    expect(block.faultSlots.find((slot) => slot.slotId === 'physical:A')).toMatchObject({
+      slotName: 'Gain A',
+      targetField: 'params.A'
+    });
+    expect(block.faultSlots.find((slot) => slot.slotId === 'electrical:B')).toMatchObject({
+      slotName: 'Pitch error',
+      signalId: 'attitude.pitch_error'
+    });
+    expect(state.activeModelPackage.faultCapabilityMap.find((entry) => entry.targetId === block.id)).toMatchObject({
+      targetKind: 'node',
+      targetId: block.id,
+      faultSlots: expect.arrayContaining([
+        expect.objectContaining({ slotId: 'protocol:C', slotName: 'Integrator state' })
+      ])
+    });
+
+    wrapper.unmount();
+  });
+
+  it('keeps declaration-only injectable variables visible in the fault settings tab', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    window.createNode('simulation_block', 300, 240);
+    await flushRuntime();
+
+    const state = window.__GZ_STATE__;
+    const block = state.modelNodes.find((node) => node.type === 'simulation_block');
+    block.props.name = 'CAN adapter';
+    block.props.inputs = [];
+    block.props.outputs = [];
+    block.props.middleVars = [];
+    block.props.faultInjection = {
+      physical: [],
+      electrical: [],
+      protocol: [
+        {
+          key: 'frame_counter',
+          slotName: 'Frame counter',
+          variableRole: 'protocol',
+          targetField: 'protocol.frameCounter'
+        }
+      ]
+    };
+    block.faultSlots = [];
+
+    window.selectNode(block.id);
+    await flushRuntime();
+    window.setPropertyPanelTab('faults');
+    await flushRuntime();
+
+    expect(document.querySelector('[data-fault-slot-variable="frame_counter"]')?.textContent).toContain('Frame counter');
+    expect(document.querySelector('[data-fault-slot-layer="protocol"][data-fault-slot-var="frame_counter"]').checked).toBe(true);
+
+    document.querySelector('[data-save-fault-slots]').click();
+    await flushRuntime();
+
+    expect(block.props.faultInjection.protocol).toEqual(['frame_counter']);
+    expect(block.faultSlots).toEqual([
+      expect.objectContaining({
+        slotId: 'protocol:frame_counter',
+        slotName: 'Frame counter',
+        variableRole: 'protocol',
+        targetField: 'protocol.frameCounter'
+      })
+    ]);
 
     wrapper.unmount();
   });

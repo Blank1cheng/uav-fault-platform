@@ -16,7 +16,8 @@ import {
   restoreWorkbenchSnapshot
 } from '../src/services/workbenchSnapshotService.js';
 import {
-  FAULT_MATH_MODEL_DEFINITIONS
+  FAULT_MATH_MODEL_DEFINITIONS,
+  normalizeModelNode
 } from '../src/services/modelStore.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -1002,6 +1003,191 @@ describe('flightModelPackageService', () => {
         allowedModels: expect.arrayContaining(['step'])
       })
     ]));
+  });
+
+  it('declares component-owned injectable variables in the closed-loop demo package', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const nodes = closedLoopPackage.workbenchSnapshot.modelNodes
+      .filter((node) => node.type === 'simulation_block');
+
+    expect(nodes.length).toBeGreaterThan(0);
+    nodes.forEach((node) => {
+      expect(node.props?.faultInjection, node.id).toEqual(expect.objectContaining({
+        physical: expect.any(Array),
+        electrical: expect.any(Array),
+        protocol: expect.any(Array)
+      }));
+
+      const declared = new Set(
+        Object.entries(node.props.faultInjection)
+          .flatMap(([layer, keys]) => keys.map((key) => `${layer}:${String(key).replace(/\s+/g, '_')}`))
+      );
+      expect(node.faultSlots.map((slot) => slot.slotId), node.id).toEqual(
+        expect.arrayContaining([...declared])
+      );
+      node.faultSlots.forEach((slot) => {
+        expect(declared.has(slot.slotId), `${node.id}:${slot.slotId}`).toBe(true);
+      });
+    });
+
+    const imu = nodes.find((node) => node.id === 'node-imu');
+    const motorMixer = nodes.find((node) => node.id === 'node-motor');
+    expect(imu.props.faultInjection).toEqual(expect.objectContaining({
+      physical: expect.arrayContaining(['imu_zero_bias', 'imu_scale_factor', 'imu_noise_std']),
+      electrical: expect.arrayContaining(['机体角速度', '测量角速度', '陀螺仪零偏状态']),
+      protocol: expect.arrayContaining(['imu_feedback_payload'])
+    }));
+    expect(motorMixer.props.faultInjection.protocol).toEqual(expect.arrayContaining(['motor_command_payload']));
+  });
+
+  it('derives component-owned fault slots from layer variable declarations', () => {
+    const node = normalizeModelNode({
+      id: 'node-controller',
+      type: 'simulation_block',
+      props: {
+        name: 'Attitude controller',
+        modelParameters: [
+          { key: 'A', name: 'gain A', targetField: 'params.A', unit: 'N' }
+        ],
+        inputs: [
+          { varName: 'B', name: 'pitch error', signalId: 'attitude.pitch_error', type: 'float' }
+        ],
+        middleVars: [
+          { varName: 'C', name: 'integrator state', targetField: 'state.integrator', type: 'float' }
+        ],
+        faultInjection: {
+          physical: ['A', 'B', 'C'],
+          electrical: ['B'],
+          protocol: ['C']
+        }
+      }
+    });
+
+    expect(node.faultSlots).toEqual([
+      expect.objectContaining({
+        slotId: 'physical:A',
+        slotName: 'gain A',
+        layer: 'physical',
+        variableKey: 'A',
+        variableRole: 'parameter',
+        targetField: 'params.A'
+      }),
+      expect.objectContaining({
+        slotId: 'physical:B',
+        slotName: 'pitch error',
+        layer: 'physical',
+        variableKey: 'B',
+        variableRole: 'input',
+        targetField: 'inputs.B'
+      }),
+      expect.objectContaining({
+        slotId: 'physical:C',
+        slotName: 'integrator state',
+        layer: 'physical',
+        variableKey: 'C',
+        variableRole: 'middle',
+        targetField: 'state.integrator'
+      }),
+      expect.objectContaining({
+        slotId: 'electrical:B',
+        slotName: 'pitch error',
+        layer: 'electrical',
+        variableKey: 'B',
+        variableRole: 'input',
+        signalId: 'attitude.pitch_error'
+      }),
+      expect.objectContaining({
+        slotId: 'protocol:C',
+        slotName: 'integrator state',
+        layer: 'protocol',
+        variableKey: 'C',
+        variableRole: 'middle'
+      })
+    ]);
+  });
+
+  it('does not infer undeclared component variables once a layer declaration exists', () => {
+    const node = normalizeModelNode({
+      id: 'node-controller',
+      type: 'simulation_block',
+      props: {
+        modelParameters: [
+          { key: 'A', name: 'gain A' },
+          { key: 'unused_gain', name: 'Unused gain' }
+        ],
+        inputs: [
+          { varName: 'B', name: 'pitch error' },
+          { varName: 'unused_input', name: 'Unused input' }
+        ],
+        faultInjection: {
+          physical: ['A'],
+          electrical: ['B'],
+          protocol: []
+        }
+      }
+    });
+
+    expect(node.faultSlots.map((slot) => slot.slotId)).toEqual(['physical:A', 'electrical:B']);
+  });
+
+  it('maps declared protocol fields without defaulting them to parameter slots', () => {
+    const node = normalizeModelNode({
+      id: 'node-can-adapter',
+      type: 'simulation_block',
+      props: {
+        protocolParameters: [
+          { key: 'can_payload', name: 'CAN payload', targetField: 'protocol.payload' }
+        ],
+        faultInjection: {
+          physical: [],
+          electrical: [],
+          protocol: ['can_payload']
+        }
+      }
+    });
+
+    expect(node.faultSlots).toEqual([
+      expect.objectContaining({
+        slotId: 'protocol:can_payload',
+        slotName: 'CAN payload',
+        layer: 'protocol',
+        variableKey: 'can_payload',
+        variableRole: 'protocol',
+        targetField: 'protocol.payload'
+      })
+    ]);
+  });
+
+  it('supports object-style declared variables and ignores unknown string declarations', () => {
+    const node = normalizeModelNode({
+      id: 'node-can-adapter',
+      type: 'simulation_block',
+      props: {
+        faultInjection: {
+          physical: ['missing_gain'],
+          electrical: [],
+          protocol: [
+            {
+              key: 'frame_counter',
+              slotName: 'Frame counter',
+              variableRole: 'protocol'
+            }
+          ]
+        }
+      }
+    });
+
+    expect(node.faultSlots).toEqual([
+      expect.objectContaining({
+        slotId: 'protocol:frame_counter',
+        slotName: 'Frame counter',
+        layer: 'protocol',
+        variableKey: 'frame_counter',
+        variableRole: 'protocol',
+        targetField: 'protocol.frame_counter'
+      })
+    ]);
+    expect(node.faultSlots.some((slot) => slot.slotId === 'physical:missing_gain')).toBe(false);
   });
 
   it('defines distinct physical-layer math models for slot selection', () => {

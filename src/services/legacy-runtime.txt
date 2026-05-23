@@ -618,10 +618,14 @@ function clampInterfaceCount(value,[min,max]){
 function normalizeSimulationInterfaceList(items,prefix,fallbackType,minCount=0){
   const base=Array.isArray(items)?items:[];
   const normalized=base
-    .map((item,index)=>({
-      name:String(item?.name||`${prefix} ${index+1}`).trim()||`${prefix} ${index+1}`,
-      type:PORT_FORMATS.includes(item?.type)?item.type:(fallbackType||'标量')
-    }))
+    .map((item,index)=>{
+      const source=item&&typeof item==='object'?item:{};
+      return {
+        ...source,
+        name:String(source.name||source.displayName||source.varName||source.key||`${prefix} ${index+1}`).trim()||`${prefix} ${index+1}`,
+        type:PORT_FORMATS.includes(source.type)?source.type:(fallbackType||'标量')
+      };
+    })
     .filter(Boolean);
   while(normalized.length<minCount){
     normalized.push({
@@ -10865,6 +10869,301 @@ Object.assign(window,{
       </div>`;
   }
 
+  const FAULT_SLOT_CONFIG_LAYERS=['physical','electrical','protocol'];
+  const FAULT_SLOT_CONFIG_LABELS={physical:'物理层',electrical:'电气层',protocol:'协议层'};
+  const FAULT_SLOT_CONFIG_MODELS={
+    physical:['bias','drift','step','degradation','freeze','random'],
+    electrical:['bias','noise','freeze','intermittent'],
+    protocol:['delay','dropout','tamper','stale']
+  };
+
+  function list(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function plainValue(value,fallback=''){
+    const raw=value===undefined||value===null||value===''?fallback:value;
+    const result=String(raw??'').trim();
+    return result||fallback;
+  }
+
+  function stableFaultVariableKey(value,fallback='slot'){
+    return plainValue(value,fallback).replace(/\s+/g,'_');
+  }
+
+  function defaultFaultVariableField(role,key){
+    if(role==='parameter') return `params.${key}`;
+    if(role==='input') return `inputs.${key}`;
+    if(role==='output') return `outputs.${key}`;
+    if(role==='middle') return `middleVars.${key}`;
+    if(role==='protocol') return `protocol.${key}`;
+    return key;
+  }
+
+  function pushFaultConfigVariable(result,seen,role,item,index){
+    if(!item||typeof item!=='object') return;
+    const key=stableFaultVariableKey(item.key||item.id||item.varName||item.name,`${role}_${index+1}`);
+    const identity=`${role}:${key}`;
+    if(!key||seen.has(identity)) return;
+    seen.add(identity);
+    result.push({
+      key,
+      role,
+      name:plainValue(item.displayName||item.name||item.label||item.varName||item.key||item.id,key),
+      targetField:plainValue(item.targetField,defaultFaultVariableField(role,key)),
+      signalId:plainValue(item.signalId,''),
+      unit:plainValue(item.unit,''),
+      type:plainValue(item.type||item.format,''),
+      parameterKey:role==='parameter'?key:''
+    });
+  }
+
+  function pushFaultConfigDeclaredVariable(result,seen,node,layer,item,index){
+    const existingSlot=list(node?.faultSlots).find(slot=>slotLayer(slot)===layer&&slotVariableKey(slot,index)===stableFaultVariableKey(item&&typeof item==='object'?(item.variableKey||item.key||item.id||item.varName||item.name):item,`slot_${index+1}`));
+    const source=item&&typeof item==='object'?item:(existingSlot||{key:item});
+    const role=plainValue(source.variableRole||source.role||source.kind,layer);
+    const key=stableFaultVariableKey(source.variableKey||source.key||source.id||source.varName||source.name,`slot_${index+1}`);
+    if(result.some(variable=>variable.key===key)) return;
+    pushFaultConfigVariable(result,seen,role,{
+      key,
+      name:source.slotName||source.displayName||source.name||source.label,
+      targetField:source.targetField||defaultFaultVariableField(role,key),
+      signalId:source.signalId,
+      unit:source.unit,
+      type:source.type||source.format
+    },index);
+  }
+
+  function pushFaultConfigDeclarationVariables(result,seen,node){
+    const source=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    if(!source||typeof source!=='object'||Array.isArray(source)) return;
+    FAULT_SLOT_CONFIG_LAYERS.forEach(layer=>{
+      const value=source[layer];
+      if(Array.isArray(value)){
+        value.forEach((item,index)=>pushFaultConfigDeclaredVariable(result,seen,node,layer,item,index));
+      }else if(typeof value==='string'){
+        pushFaultConfigDeclaredVariable(result,seen,node,layer,value,0);
+      }else if(value&&typeof value==='object'){
+        Object.entries(value)
+          .filter(([,enabled])=>!!enabled)
+          .forEach(([key],index)=>pushFaultConfigDeclaredVariable(result,seen,node,layer,key,index));
+      }
+    });
+  }
+
+  function getFaultConfigVariables(node){
+    const props=node?.props||{};
+    const result=[];
+    const seen=new Set();
+    [
+      ['parameter',list(props.parameters)],
+      ['parameter',list(props.modelParameters)],
+      ['parameter',list(props.physicalParameters)],
+      ['parameter',list(node?.parameters)],
+      ['parameter',list(node?.physicalParameters)],
+      ['input',list(props.inputs)],
+      ['output',list(props.outputs)],
+      ['middle',list(props.middleVars)],
+      ['protocol',list(props.protocolParameters)],
+      ['protocol',list(node?.protocolParameters)]
+    ].forEach(([role,items])=>items.forEach((item,index)=>pushFaultConfigVariable(result,seen,role,item,index)));
+    pushFaultConfigDeclarationVariables(result,seen,node);
+    return result;
+  }
+
+  function slotLayer(slot){
+    const layer=plainValue(slot?.layer||slot?.layerKey,'electrical');
+    return FAULT_SLOT_CONFIG_LAYERS.includes(layer)?layer:'electrical';
+  }
+
+  function slotVariableKey(slot,index=0){
+    const direct=slot?.variableKey||slot?.parameterKey;
+    if(direct) return stableFaultVariableKey(direct,`slot_${index+1}`);
+    const slotId=plainValue(slot?.slotId||slot?.id,'');
+    if(slotId.includes(':')) return stableFaultVariableKey(slotId.split(':').pop(),`slot_${index+1}`);
+    return stableFaultVariableKey(slotId||slot?.name||slot?.slotName,`slot_${index+1}`);
+  }
+
+  function normalizeFaultInjectionDeclaration(node){
+    const source=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    const declaration={physical:[],electrical:[],protocol:[]};
+    if(source&&typeof source==='object'&&!Array.isArray(source)){
+      FAULT_SLOT_CONFIG_LAYERS.forEach(layer=>{
+        const value=source[layer];
+        if(Array.isArray(value)){
+          declaration[layer]=value.map((item,index)=>stableFaultVariableKey(
+            item&&typeof item==='object'?(item.variableKey||item.key||item.id||item.varName||item.name):item,
+            `slot_${index+1}`
+          ));
+        }else if(typeof value==='string'){
+          declaration[layer]=[stableFaultVariableKey(value,'slot')];
+        }else if(value&&typeof value==='object'){
+          declaration[layer]=Object.entries(value)
+            .filter(([,enabled])=>!!enabled)
+            .map(([key])=>stableFaultVariableKey(key,'slot'));
+        }
+      });
+      return declaration;
+    }
+    list(node?.faultSlots).forEach((slot,index)=>{
+      const layer=slotLayer(slot);
+      const key=slotVariableKey(slot,index);
+      if(key&&!declaration[layer].includes(key)) declaration[layer].push(key);
+    });
+    return declaration;
+  }
+
+  function buildFaultSlotsFromPanelDeclaration(node,declaration){
+    const variablesByKey=new Map(getFaultConfigVariables(node).map(variable=>[variable.key,variable]));
+    return FAULT_SLOT_CONFIG_LAYERS.flatMap(layer=>list(declaration[layer]).map(key=>{
+      const variable=variablesByKey.get(key)||{};
+      return {
+        slotId:`${layer}:${key}`,
+        slotName:variable.name||key,
+        layer,
+        targetField:variable.targetField||defaultFaultVariableField(variable.role||layer,key),
+        allowedModels:FAULT_SLOT_CONFIG_MODELS[layer].slice(),
+        variableKey:key,
+        variableRole:variable.role||layer,
+        signalId:variable.signalId||'',
+        unit:variable.unit||'',
+        parameterKey:variable.parameterKey||''
+      };
+    }));
+  }
+
+  function renderFaultSlotEditor(target){
+    if(isEdgeTarget(target)||target?.type?.startsWith('fault_')||target?.type?.startsWith('instrument_')){
+      return '';
+    }
+    const variables=getFaultConfigVariables(target);
+    const declaration=normalizeFaultInjectionDeclaration(target);
+    const rows=variables.map(variable=>{
+      const layerChecks=FAULT_SLOT_CONFIG_LAYERS.map(layer=>{
+        const checked=declaration[layer].includes(variable.key)?'checked':'';
+        return `
+          <label class="props-check">
+            <input type="checkbox" data-fault-slot-layer="${text(layer)}" data-fault-slot-var="${text(variable.key)}" ${checked}>
+            <span>${text(FAULT_SLOT_CONFIG_LABELS[layer]||layer)}</span>
+          </label>`;
+      }).join('');
+      return `
+        <div class="props-fault-slot-row" data-fault-slot-variable="${text(variable.key)}">
+          <div>
+            <strong>${text(variable.name)}</strong>
+            <span>${text(variable.role)} / ${text(variable.key)}</span>
+          </div>
+          <div class="props-fault-slot-layers">${layerChecks}</div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="pgroup" data-fault-slot-editor>
+        <div class="pglbl">可注入变量声明</div>
+        ${rows||'<div class="props-empty-state">No component variables</div>'}
+        <div class="props-help">组件自己声明哪些参数、输入、输出或中间变量允许被物理层、电气层、协议层故障关联。</div>
+      </div>`;
+  }
+
+  function cloneFaultPanelData(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function syncFaultSlotPackageState(node){
+    const pkg=S.activeModelPackage;
+    if(!pkg||typeof pkg!=='object') return;
+    if(!Array.isArray(pkg.faultCapabilityMap)) pkg.faultCapabilityMap=[];
+    const index=pkg.faultCapabilityMap.findIndex(entry=>entry?.targetKind==='node'&&entry?.targetId===node.id);
+    const previous=index>=0?pkg.faultCapabilityMap[index]:null;
+    const previousSlots=list(previous?.faultSlots);
+    const slots=list(node.faultSlots).map(slot=>{
+      const existing=previousSlots.find(item=>(item?.slotId||item?.id)===slot.slotId&&slotLayer(item)===slot.layer)||{};
+      return {
+        ...existing,
+        ...slot,
+        allowedFaultIds:list(existing.allowedFaultIds),
+        allowedFaultTypeIds:list(existing.allowedFaultTypeIds)
+      };
+    });
+    const entry={
+      ...(previous||{}),
+      targetKind:'node',
+      targetId:node.id,
+      targetName:node.props?.name||node.id,
+      faultSlots:slots
+    };
+    if(index>=0) pkg.faultCapabilityMap.splice(index,1,entry);
+    else pkg.faultCapabilityMap.push(entry);
+
+    [
+      pkg.systemModel?.nodes,
+      pkg.workbenchSnapshot?.modelNodes
+    ].forEach(nodes=>{
+      const packageNode=list(nodes).find(item=>item?.id===node.id);
+      if(!packageNode) return;
+      packageNode.props={...(packageNode.props||{}),faultInjection:cloneFaultPanelData(node.props.faultInjection)};
+      packageNode.faultSlots=cloneFaultPanelData(node.faultSlots);
+    });
+  }
+
+  function pruneFaultBindingsForSlots(node){
+    const validSlotIds=new Set(list(node.faultSlots).map(slot=>slot.slotId));
+    const isInvalidSlotRef=(slotId)=>slotId&&validSlotIds.size&&!validSlotIds.has(slotId);
+    let changed=false;
+    if(Array.isArray(node.faultBindings)){
+      node.faultBindings=node.faultBindings.map(binding=>{
+        const slotId=binding?.slotId||binding?.targetSlotId||binding?.injectedFault?.slotId||binding?.target?.slotId||'';
+        if(!isInvalidSlotRef(slotId)||binding.active===false) return binding;
+        changed=true;
+        return {...binding,active:false,disabledAt:new Date().toISOString(),disabledReason:'fault-slot-removed'};
+      });
+    }
+    const injectedSlotId=node.injectedFault?.slotId||node.injectedFault?.targetSlotId||'';
+    if(isInvalidSlotRef(injectedSlotId)){
+      delete node.injectedFault;
+      changed=true;
+    }
+    const pkg=S.activeModelPackage;
+    if(Array.isArray(pkg?.faultInstances)){
+      pkg.faultInstances=pkg.faultInstances.map(instance=>{
+        const targetId=instance?.targetId||instance?.target?.targetId||instance?.target?.id;
+        const targetKind=instance?.targetKind||instance?.target?.kind||instance?.target?.targetKind||'node';
+        if(targetKind!=='node'||targetId!==node.id||!isInvalidSlotRef(instance?.slotId)) return instance;
+        changed=true;
+        return {...instance,enabled:false,active:false,disabledAt:new Date().toISOString(),disabledReason:'fault-slot-removed'};
+      });
+    }
+    return changed;
+  }
+
+  function savePropertyPanelFaultSlots(){
+    const node=getSelectedPropertyTarget();
+    if(!node||isEdgeTarget(node)) return false;
+    const editor=document.querySelector('[data-fault-slot-editor]');
+    if(!editor) return false;
+    const declaration={physical:[],electrical:[],protocol:[]};
+    editor.querySelectorAll('[data-fault-slot-layer][data-fault-slot-var]').forEach(input=>{
+      if(!input.checked) return;
+      const layer=input.dataset.faultSlotLayer;
+      const key=input.dataset.faultSlotVar;
+      if(!declaration[layer]||!key||declaration[layer].includes(key)) return;
+      declaration[layer].push(key);
+    });
+    node.props=node.props||{};
+    const nextFaultSlots=buildFaultSlotsFromPanelDeclaration(node,declaration);
+    node.props.faultInjection=declaration;
+    node.faultSlots=nextFaultSlots;
+    pruneFaultBindingsForSlots(node);
+    syncFaultSlotPackageState(node);
+    markTopologyDirty('fault');
+    renderModelNodes();
+    renderEdges();
+    renderTypedPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    toast('故障槽位已保存','s');
+    return true;
+  }
+
   function renderFaults(target){
     const targetKind=isEdgeTarget(target)?'edge':'node';
     const bindings=activeFaultBindingsForPanel(target);
@@ -10874,14 +11173,17 @@ Object.assign(window,{
     const body=bindings.length
       ?bindings.map((binding,index)=>renderFaultBinding(binding,targetKind,target.id,index)).join('')
       :'<div class="props-empty-state">No active faults</div>';
+    window.savePropertyPanelFaultSlots=savePropertyPanelFaultSlots;
     return `
       ${renderTargetHeader(target)}
+      ${renderFaultSlotEditor(target)}
       <div class="pgroup">
         <div class="pglbl">故障实例</div>
         <div class="props-fault-stack">${body}</div>
         <div class="props-help">一个组件或一条 CAN 边可以挂载多个故障实例；取消后会清除红色故障态，并重新渲染多信号流图。</div>
       </div>
       <div class="props-actions">
+        ${!isEdgeTarget(target)?'<button type="button" class="props-save" data-save-fault-slots>保存槽位</button>':''}
         ${injectButton}
         ${bindings.length?`<button type="button" class="props-danger" data-fault-clear onclick="clearFaultBindings('${targetKind}','${jsString(target.id)}')">清空故障</button>`:''}
         ${isEdgeTarget(target)?'<button type="button" class="props-danger" onclick="deleteSelectedEdge()">删除连线</button>':'<button type="button" class="props-danger" onclick="deleteSelectedNode()">删除模块</button>'}
@@ -11008,6 +11310,16 @@ Object.assign(window,{
     });
   }
 
+  function bindFaultSlotEditorActions(host){
+    const saveButton=host?.querySelector?.('[data-save-fault-slots]');
+    if(!saveButton||saveButton.dataset.saveFaultSlotsBound){return;}
+    saveButton.addEventListener('click',event=>{
+      event.preventDefault();
+      savePropertyPanelFaultSlots();
+    });
+    saveButton.dataset.saveFaultSlotsBound='true';
+  }
+
   function renderTypedPropertyPanel(target){
     const pe=document.getElementById('pe');
     const pd=document.getElementById('pd');
@@ -11027,12 +11339,14 @@ Object.assign(window,{
       else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}
       else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderEdgeOutputs(target);}
       else{pd.innerHTML=renderEdgeOverview(target);}
+      bindFaultSlotEditorActions(pd);
       return;
     }
     if(S.propertyPanelTab==='parameters'){pd.innerHTML=renderNodeParameters(target);}
     else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}
     else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderNodeOutputs(target);}
     else{pd.innerHTML=renderNodeOverview(target);}
+    bindFaultSlotEditorActions(pd);
     bindLegacyOverviewActions(target,pd);
     if(target.type==='simulation_block'){
       updateModelPackageStatus(target);
@@ -11199,6 +11513,7 @@ Object.assign(window,{
     clearFaultBindings,
     removeFaultBinding,
     renderPropertyPanel,
+    savePropertyPanelFaultSlots,
     savePropertyPanelTarget,
     saveSelectedEdgeMetadata,
     setPropertyPanelTab
@@ -20319,6 +20634,139 @@ function decorateDataflowEdges(){
     return String(value?.key||value?.id||value?.name||value?.varName||`slot-${index}`).replace(/\s+/g,'_');
   }
 
+  const COMPONENT_FAULT_LAYERS=['physical','electrical','protocol'];
+  const COMPONENT_LAYER_MODELS={
+    physical:['bias','drift','step','degradation','freeze','random'],
+    electrical:['bias','noise','freeze','intermittent'],
+    protocol:['delay','dropout','tamper','stale']
+  };
+
+  function plainText(value,fallback=''){
+    const raw=value===undefined||value===null||value===''?fallback:value;
+    const result=String(raw??'').trim();
+    return result||fallback;
+  }
+
+  function stableVariableKey(value,fallback='slot'){
+    return plainText(value,fallback).replace(/\s+/g,'_');
+  }
+
+  function defaultComponentVariableField(role,key){
+    if(role==='parameter') return `params.${key}`;
+    if(role==='input') return `inputs.${key}`;
+    if(role==='output') return `outputs.${key}`;
+    if(role==='middle') return `middleVars.${key}`;
+    if(role==='protocol') return `protocol.${key}`;
+    return key;
+  }
+
+  function getComponentFaultDeclaration(node){
+    const declaration=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    return declaration&&typeof declaration==='object'&&!Array.isArray(declaration)?declaration:null;
+  }
+
+  function hasComponentFaultDeclaration(node){
+    const declaration=getComponentFaultDeclaration(node);
+    return !!declaration&&COMPONENT_FAULT_LAYERS.some(layer=>Object.prototype.hasOwnProperty.call(declaration,layer));
+  }
+
+  function pushComponentFaultVariable(result,seen,role,item,index){
+    if(!item||typeof item!=='object') return;
+    const key=stableVariableKey(item.key||item.id||item.varName||item.name,`${role}_${index+1}`);
+    if(!key||seen.has(key)) return;
+    seen.add(key);
+    result.push({
+      key,
+      role,
+      name:plainText(item.displayName||item.name||item.label||item.varName||item.key||item.id,key),
+      targetField:plainText(item.targetField,defaultComponentVariableField(role,key)),
+      signalId:plainText(item.signalId,''),
+      unit:plainText(item.unit,''),
+      type:plainText(item.type||item.format,''),
+      parameterKey:role==='parameter'?key:''
+    });
+  }
+
+  function getComponentFaultVariables(node){
+    const props=node?.props||{};
+    const result=[];
+    const seen=new Set();
+    [
+      ['parameter',arr(props.parameters)],
+      ['parameter',arr(props.modelParameters)],
+      ['parameter',arr(props.physicalParameters)],
+      ['parameter',arr(node?.parameters)],
+      ['parameter',arr(node?.physicalParameters)],
+      ['input',arr(props.inputs)],
+      ['output',arr(props.outputs)],
+      ['middle',arr(props.middleVars)],
+      ['protocol',arr(props.protocolParameters)],
+      ['protocol',arr(node?.protocolParameters)]
+    ].forEach(([role,items])=>items.forEach((item,index)=>pushComponentFaultVariable(result,seen,role,item,index)));
+    return result;
+  }
+
+  function declarationVariableKey(item,index){
+    if(item&&typeof item==='object'){
+      return stableVariableKey(item.variableKey||item.key||item.id||item.varName||item.name,`slot_${index+1}`);
+    }
+    return stableVariableKey(item,`slot_${index+1}`);
+  }
+
+  function declarationItemsForLayer(declaration,layer){
+    const value=declaration?.[layer];
+    if(Array.isArray(value)) return value;
+    if(typeof value==='string') return [value];
+    if(value&&typeof value==='object'){
+      return Object.entries(value).filter(([,enabled])=>!!enabled).map(([key])=>key);
+    }
+    return [];
+  }
+
+  function getComponentDeclaredFaultSlots(node){
+    const declaration=getComponentFaultDeclaration(node);
+    if(!declaration) return [];
+    const variables=new Map(getComponentFaultVariables(node).map(variable=>[variable.key,variable]));
+    return COMPONENT_FAULT_LAYERS.flatMap(layer=>declarationItemsForLayer(declaration,layer).map((item,index)=>{
+      const extra=item&&typeof item==='object'?item:{};
+      const key=declarationVariableKey(item,index);
+      const variable=variables.get(key)||{};
+      const id=plainText(extra.slotId||extra.id,`${layer}:${key}`);
+      return makeSlot(
+        layer,
+        id,
+        plainText(extra.slotName||extra.displayName,variable.name||key),
+        node,
+        {
+          ...extra,
+          slotId:id,
+          slotName:plainText(extra.slotName||extra.displayName,variable.name||key),
+          targetField:plainText(extra.targetField,variable.targetField||defaultComponentVariableField(variable.role||'parameter',key)),
+          allowedModels:arr(extra.allowedModels).length?arr(extra.allowedModels):COMPONENT_LAYER_MODELS[layer].slice(),
+          variableKey:key,
+          variableRole:variable.role||extra.variableRole||'',
+          signalId:plainText(extra.signalId,variable.signalId||''),
+          unit:plainText(extra.unit,variable.unit||''),
+          parameterKey:plainText(extra.parameterKey,variable.parameterKey||'')
+        }
+      );
+    }));
+  }
+
+  function mergeComponentDeclaredSlots(componentSlots,target){
+    const declared=getDeclaredFaultSlots(target);
+    return componentSlots.map(slot=>{
+      const match=declared.find(item=>item.layer===slot.layer&&(item.id===slot.id||item.slotId===slot.id));
+      if(!match) return slot;
+      return {
+        ...match,
+        ...slot,
+        allowedFaultIds:match.allowedFaultIds||slot.allowedFaultIds,
+        allowedFaultTypeIds:match.allowedFaultTypeIds||slot.allowedFaultTypeIds
+      };
+    });
+  }
+
   function makeSlot(layer,id,name,target,extra={}){
     return {
       id,
@@ -20516,6 +20964,9 @@ function decorateDataflowEdges(){
       if(!hasLayeredFaultSlot(declared,'electrical')) inferred.push(...getEdgeElectricalSlots(target));
       if(!hasLayeredFaultSlot(declared,'protocol')) inferred.push(...getEdgeProtocolSlots(target));
       return mergeLayeredFaultSlots([...declared,...inferred]);
+    }
+    if(hasComponentFaultDeclaration(target)){
+      return mergeLayeredFaultSlots(mergeComponentDeclaredSlots(getComponentDeclaredFaultSlots(target),target));
     }
     const inferred=[];
     if(!hasLayeredFaultSlot(declared,'physical')) inferred.push(...getNodePhysicalSlots(target));
