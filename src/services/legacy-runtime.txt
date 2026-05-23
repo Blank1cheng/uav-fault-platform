@@ -20463,6 +20463,20 @@ function decorateDataflowEdges(){
       });
   }
 
+  function mergeLayeredFaultSlots(slots){
+    const seen=new Set();
+    return arr(slots).filter(slot=>{
+      const key=`${slot.layer||''}:${slot.id||slot.slotId||''}:${slot.targetField||''}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function hasLayeredFaultSlot(slots,layer){
+    return arr(slots).some(slot=>slot.layer===layer);
+  }
+
   function getActiveFaultModels(){
     const state=getState();
     return [
@@ -20498,18 +20512,16 @@ function decorateDataflowEdges(){
     if(!target?.id) return [];
     const declared=getDeclaredFaultSlots(target);
     if(getTargetKind(target)==='edge'){
-      return [
-        ...declared,
-        ...getEdgeElectricalSlots(target),
-        ...getEdgeProtocolSlots(target)
-      ];
+      const inferred=[];
+      if(!hasLayeredFaultSlot(declared,'electrical')) inferred.push(...getEdgeElectricalSlots(target));
+      if(!hasLayeredFaultSlot(declared,'protocol')) inferred.push(...getEdgeProtocolSlots(target));
+      return mergeLayeredFaultSlots([...declared,...inferred]);
     }
-    return [
-      ...declared,
-      ...getNodePhysicalSlots(target),
-      ...getNodeElectricalSlots(target),
-      ...getNodeProtocolSlots(target)
-    ];
+    const inferred=[];
+    if(!hasLayeredFaultSlot(declared,'physical')) inferred.push(...getNodePhysicalSlots(target));
+    if(!hasLayeredFaultSlot(declared,'electrical')) inferred.push(...getNodeElectricalSlots(target));
+    if(!hasLayeredFaultSlot(declared,'protocol')) inferred.push(...getNodeProtocolSlots(target));
+    return mergeLayeredFaultSlots([...declared,...inferred]);
   }
 
   function resolveInjectorLayer(injector){
@@ -20527,6 +20539,24 @@ function decorateDataflowEdges(){
   }
 
   function defaultLayeredFaultParameters(layer,mathModel){
+    if(mathModel==='degradation'){
+      return {scale:0.85,start:0,duration:''};
+    }
+    if(mathModel==='random'){
+      return {std:0.08,seed:1,start:0,duration:''};
+    }
+    if(mathModel==='step'){
+      return {step:0.1,start:0,duration:''};
+    }
+    if(mathModel==='freeze'||mathModel==='stale'){
+      return {start:0,duration:''};
+    }
+    if(mathModel==='delay'){
+      return {delay_steps:3,start:0,duration:''};
+    }
+    if(mathModel==='dropout'){
+      return {drop_rate:0.08,seed:1,start:0,duration:''};
+    }
     if(mathModel==='noise'||layer==='electrical'){
       return {std:0.08,start:0,duration:'',noise_type:'gaussian'};
     }
@@ -20988,21 +21018,43 @@ function decorateDataflowEdges(){
       return [
         {value:'bias',label:'偏置模型'},
         {value:'drift',label:'漂移模型'},
-        {value:'step',label:'突变模型'}
+        {value:'step',label:'突变模型'},
+        {value:'degradation',label:'衰减模型'},
+        {value:'freeze',label:'卡死模型'},
+        {value:'random',label:'随机模型'}
       ];
     }
     if(layer==='protocol'){
       return [
         {value:'tamper',label:'篡改模型'},
         {value:'dropout',label:'丢包模型'},
-        {value:'delay',label:'延迟模型'}
+        {value:'delay',label:'延迟模型'},
+        {value:'stale',label:'陈旧模型'}
       ];
     }
     return [
       {value:'noise',label:'随机噪声'},
       {value:'bias',label:'偏置叠加'},
-      {value:'freeze',label:'卡死保持'}
+      {value:'freeze',label:'卡死保持'},
+      {value:'intermittent',label:'间歇异常'}
     ];
+  }
+
+  function getLayeredMathModelsForSlot(layer,slot){
+    const models=getLayeredMathModels(layer);
+    const allowed=arr(slot?.allowedModels);
+    if(!allowed.length) return models;
+    const filtered=models.filter(model=>allowed.includes(model.value));
+    return filtered.length?filtered:models;
+  }
+
+  function findLayeredSlot(slots,slotId){
+    return arr(slots).find(slot=>slot.id===slotId||slot.slotId===slotId)||arr(slots)[0]||null;
+  }
+
+  function renderLayeredMathModelOptions(select,models){
+    if(!select) return;
+    select.innerHTML=arr(models).map(model=>`<option value="${escapeHtml(model.value)}">${escapeHtml(model.label)}</option>`).join('');
   }
 
   function getDialogParameters(layer,mathModel){
@@ -21041,7 +21093,8 @@ function decorateDataflowEdges(){
     const dialog=document.createElement('div');
     dialog.className='layered-fault-dialog';
     dialog.dataset.layeredFaultBindingDialog='true';
-    const models=getLayeredMathModels(config.layer);
+    const initialSlot=slots[0];
+    const models=getLayeredMathModelsForSlot(config.layer,initialSlot);
     dialog.innerHTML=`
       <div class="layered-fault-dialog__head" data-layered-fault-dialog-handle>
         <div>
@@ -21076,7 +21129,15 @@ function decorateDataflowEdges(){
     `;
     const paramsHost=dialog.querySelector('[data-layered-fault-params]');
     const modelSelect=dialog.querySelector('[data-layered-fault-model]');
-    renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel);
+    const slotSelect=dialog.querySelector('[data-layered-fault-slot]');
+    const refreshModelOptions=()=>{
+      const slot=findLayeredSlot(slots,slotSelect?.value);
+      const nextModels=getLayeredMathModelsForSlot(config.layer,slot);
+      renderLayeredMathModelOptions(modelSelect,nextModels);
+      renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||nextModels[0]?.value||config.defaultModel);
+    };
+    renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||models[0]?.value||config.defaultModel);
+    slotSelect?.addEventListener('change',refreshModelOptions);
     modelSelect.addEventListener('change',()=>renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel));
     makeLayeredFaultBindingDialogDraggable(dialog);
     dialog.querySelectorAll('[data-layered-fault-cancel]').forEach(button=>{
@@ -21089,7 +21150,9 @@ function decorateDataflowEdges(){
     dialog.querySelector('[data-layered-fault-confirm]')?.addEventListener('click',event=>{
       event.preventDefault();
       const slotId=dialog.querySelector('[data-layered-fault-slot]')?.value||slots[0].id;
-      const mathModel=modelSelect.value||config.defaultModel;
+      const selectedSlot=findLayeredSlot(slots,slotId);
+      const availableModels=getLayeredMathModelsForSlot(config.layer,selectedSlot);
+      const mathModel=modelSelect.value||availableModels[0]?.value||config.defaultModel;
       const result=bindLayeredFaultInjectorToTarget(injector.id,{
         targetKind:getTargetKind(target),
         targetId:target.id,

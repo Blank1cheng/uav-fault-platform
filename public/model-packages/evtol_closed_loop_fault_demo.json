@@ -1399,7 +1399,8 @@
           "frequency": "0.35",
           "outputFormat": "scalar"
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": []
       },
       {
         "id": "node-command-shaper",
@@ -1431,7 +1432,51 @@
           ],
           "ffunctionNote": "限制指令变化率，保证正常闭环不发散。"
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "electrical:input:俯仰指令",
+            "slotName": "俯仰指令",
+            "layer": "electrical",
+            "targetField": "input.俯仰指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "俯仰指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:整形指令",
+            "slotName": "整形指令",
+            "layer": "electrical",
+            "targetField": "output.整形指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "整形指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:滤波指令",
+            "slotName": "滤波指令",
+            "layer": "electrical",
+            "targetField": "middle.滤波指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "滤波指令",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-error-sum",
@@ -1449,7 +1494,8 @@
           ],
           "outputFormat": "scalar"
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": []
       },
       {
         "id": "node-controller",
@@ -1479,9 +1525,99 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "温和 PID 控制器，用于演示故障前后的差异。"
+          "ffunctionNote": "温和 PID 控制器，用于演示故障前后的差异。",
+          "modelParameters": [
+            {
+              "key": "controller_gain",
+              "name": "姿态控制增益",
+              "targetField": "params.kp",
+              "unit": "gain",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "controller_integrator_limit",
+              "name": "积分限幅",
+              "targetField": "params.integratorLimit",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:controller_gain",
+            "slotName": "姿态控制增益",
+            "layer": "physical",
+            "targetField": "params.kp",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "gain"
+          },
+          {
+            "slotId": "physical:controller_integrator_limit",
+            "slotName": "积分限幅",
+            "layer": "physical",
+            "targetField": "params.integratorLimit",
+            "allowedModels": [
+              "step",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:姿态误差",
+            "slotName": "姿态误差",
+            "layer": "electrical",
+            "targetField": "input.姿态误差",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "姿态误差",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:力矩需求",
+            "slotName": "力矩需求",
+            "layer": "electrical",
+            "targetField": "output.力矩需求",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "力矩需求",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:积分状态",
+            "slotName": "积分状态",
+            "layer": "electrical",
+            "targetField": "middle.积分状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "积分状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-allocator",
@@ -1511,9 +1647,120 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "将姿态控制量分配到四个电机通道。"
+          "ffunctionNote": "将姿态控制量分配到四个电机通道。",
+          "modelParameters": [
+            {
+              "key": "allocation_matrix",
+              "name": "控制分配矩阵",
+              "targetField": "params.allocationMatrix",
+              "unit": "matrix",
+              "allowedModels": [
+                "step",
+                "bias"
+              ]
+            },
+            {
+              "key": "allocation_weight",
+              "name": "分配权重",
+              "targetField": "params.allocationWeight",
+              "unit": "ratio",
+              "allowedModels": [
+                "bias",
+                "drift"
+              ]
+            },
+            {
+              "key": "actuator_limit",
+              "name": "执行器限制",
+              "targetField": "params.actuatorLimit",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "degradation",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:allocation_matrix",
+            "slotName": "控制分配矩阵",
+            "layer": "physical",
+            "targetField": "params.allocationMatrix",
+            "allowedModels": [
+              "step",
+              "bias"
+            ],
+            "unit": "matrix"
+          },
+          {
+            "slotId": "physical:allocation_weight",
+            "slotName": "分配权重",
+            "layer": "physical",
+            "targetField": "params.allocationWeight",
+            "allowedModels": [
+              "bias",
+              "drift"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "physical:actuator_limit",
+            "slotName": "执行器限制",
+            "layer": "physical",
+            "targetField": "params.actuatorLimit",
+            "allowedModels": [
+              "step",
+              "degradation",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:力矩需求",
+            "slotName": "力矩需求",
+            "layer": "electrical",
+            "targetField": "input.力矩需求",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "力矩需求",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:电机总指令",
+            "slotName": "电机总指令",
+            "layer": "electrical",
+            "targetField": "output.电机总指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "电机总指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:分配状态",
+            "slotName": "分配状态",
+            "layer": "electrical",
+            "targetField": "middle.分配状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "分配状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-motor",
@@ -1555,9 +1802,141 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "生成四路电机 CAN 指令。"
+          "ffunctionNote": "生成四路电机 CAN 指令。",
+          "modelParameters": [
+            {
+              "key": "motor_mix_gain",
+              "name": "电机混控增益",
+              "targetField": "params.mixGain",
+              "unit": "ratio",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "motor_command_limit",
+              "name": "电机指令限幅",
+              "targetField": "params.commandLimit",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:motor_mix_gain",
+            "slotName": "电机混控增益",
+            "layer": "physical",
+            "targetField": "params.mixGain",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "physical:motor_command_limit",
+            "slotName": "电机指令限幅",
+            "layer": "physical",
+            "targetField": "params.commandLimit",
+            "allowedModels": [
+              "step",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:电机总指令",
+            "slotName": "电机总指令",
+            "layer": "electrical",
+            "targetField": "input.电机总指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "电机总指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M1_指令",
+            "slotName": "M1 指令",
+            "layer": "electrical",
+            "targetField": "output.M1_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M1 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M2_指令",
+            "slotName": "M2 指令",
+            "layer": "electrical",
+            "targetField": "output.M2_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M2 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M3_指令",
+            "slotName": "M3 指令",
+            "layer": "electrical",
+            "targetField": "output.M3_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M3 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M4_指令",
+            "slotName": "M4 指令",
+            "layer": "electrical",
+            "targetField": "output.M4_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M4 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:混控状态",
+            "slotName": "混控状态",
+            "layer": "electrical",
+            "targetField": "middle.混控状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "混控状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-motor-1",
@@ -1587,9 +1966,135 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "单电机卡位故障的展示对象。"
+          "ffunctionNote": "单电机卡位故障的展示对象。",
+          "modelParameters": [
+            {
+              "key": "motor_thrust_coefficient",
+              "name": "1号电机推力系数",
+              "targetField": "params.thrustCoefficient",
+              "unit": "N/(rad/s)^2",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "degradation"
+              ]
+            },
+            {
+              "key": "motor_response_time_constant",
+              "name": "1号电机响应时间常数",
+              "targetField": "params.responseTimeConstant",
+              "unit": "s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "motor_max_output",
+              "name": "1号电机最大输出",
+              "targetField": "params.maxOutput",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "degradation",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:motor_thrust_coefficient",
+            "slotName": "1号电机推力系数",
+            "layer": "physical",
+            "targetField": "params.thrustCoefficient",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "degradation"
+            ],
+            "unit": "N/(rad/s)^2"
+          },
+          {
+            "slotId": "physical:motor_response_time_constant",
+            "slotName": "1号电机响应时间常数",
+            "layer": "physical",
+            "targetField": "params.responseTimeConstant",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "s"
+          },
+          {
+            "slotId": "physical:motor_max_output",
+            "slotName": "1号电机最大输出",
+            "layer": "physical",
+            "targetField": "params.maxOutput",
+            "allowedModels": [
+              "step",
+              "degradation",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "motor1-output",
+            "slotName": "1号电机执行输出",
+            "signalId": "motor.thrust.m1",
+            "allowedFaultIds": [
+              "motor_1_stuck_position"
+            ],
+            "layer": "electrical",
+            "targetField": "",
+            "allowedModels": []
+          },
+          {
+            "slotId": "electrical:input:M1_指令",
+            "slotName": "M1 指令",
+            "layer": "electrical",
+            "targetField": "input.M1_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M1 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M1_推力",
+            "slotName": "M1 推力",
+            "layer": "electrical",
+            "targetField": "output.M1_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M1 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:1号电机状态",
+            "slotName": "1号电机状态",
+            "layer": "electrical",
+            "targetField": "middle.1号电机状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "1号电机状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-motor-2",
@@ -1619,9 +2124,124 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "正常电机通道，用于 CAN 状态测点对照。"
+          "ffunctionNote": "正常电机通道，用于 CAN 状态测点对照。",
+          "modelParameters": [
+            {
+              "key": "motor_thrust_coefficient",
+              "name": "2号电机推力系数",
+              "targetField": "params.thrustCoefficient",
+              "unit": "N/(rad/s)^2",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "degradation"
+              ]
+            },
+            {
+              "key": "motor_response_time_constant",
+              "name": "2号电机响应时间常数",
+              "targetField": "params.responseTimeConstant",
+              "unit": "s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "motor_max_output",
+              "name": "2号电机最大输出",
+              "targetField": "params.maxOutput",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "degradation",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:motor_thrust_coefficient",
+            "slotName": "2号电机推力系数",
+            "layer": "physical",
+            "targetField": "params.thrustCoefficient",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "degradation"
+            ],
+            "unit": "N/(rad/s)^2"
+          },
+          {
+            "slotId": "physical:motor_response_time_constant",
+            "slotName": "2号电机响应时间常数",
+            "layer": "physical",
+            "targetField": "params.responseTimeConstant",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "s"
+          },
+          {
+            "slotId": "physical:motor_max_output",
+            "slotName": "2号电机最大输出",
+            "layer": "physical",
+            "targetField": "params.maxOutput",
+            "allowedModels": [
+              "step",
+              "degradation",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:M2_指令",
+            "slotName": "M2 指令",
+            "layer": "electrical",
+            "targetField": "input.M2_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M2 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M2_推力",
+            "slotName": "M2 推力",
+            "layer": "electrical",
+            "targetField": "output.M2_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M2 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:2号电机状态",
+            "slotName": "2号电机状态",
+            "layer": "electrical",
+            "targetField": "middle.2号电机状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "2号电机状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-motor-3",
@@ -1651,9 +2271,124 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "正常电机通道。"
+          "ffunctionNote": "正常电机通道。",
+          "modelParameters": [
+            {
+              "key": "motor_thrust_coefficient",
+              "name": "3号电机推力系数",
+              "targetField": "params.thrustCoefficient",
+              "unit": "N/(rad/s)^2",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "degradation"
+              ]
+            },
+            {
+              "key": "motor_response_time_constant",
+              "name": "3号电机响应时间常数",
+              "targetField": "params.responseTimeConstant",
+              "unit": "s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "motor_max_output",
+              "name": "3号电机最大输出",
+              "targetField": "params.maxOutput",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "degradation",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:motor_thrust_coefficient",
+            "slotName": "3号电机推力系数",
+            "layer": "physical",
+            "targetField": "params.thrustCoefficient",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "degradation"
+            ],
+            "unit": "N/(rad/s)^2"
+          },
+          {
+            "slotId": "physical:motor_response_time_constant",
+            "slotName": "3号电机响应时间常数",
+            "layer": "physical",
+            "targetField": "params.responseTimeConstant",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "s"
+          },
+          {
+            "slotId": "physical:motor_max_output",
+            "slotName": "3号电机最大输出",
+            "layer": "physical",
+            "targetField": "params.maxOutput",
+            "allowedModels": [
+              "step",
+              "degradation",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:M3_指令",
+            "slotName": "M3 指令",
+            "layer": "electrical",
+            "targetField": "input.M3_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M3 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M3_推力",
+            "slotName": "M3 推力",
+            "layer": "electrical",
+            "targetField": "output.M3_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M3 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:3号电机状态",
+            "slotName": "3号电机状态",
+            "layer": "electrical",
+            "targetField": "middle.3号电机状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "3号电机状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-motor-4",
@@ -1683,9 +2418,124 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "正常电机通道。"
+          "ffunctionNote": "正常电机通道。",
+          "modelParameters": [
+            {
+              "key": "motor_thrust_coefficient",
+              "name": "4号电机推力系数",
+              "targetField": "params.thrustCoefficient",
+              "unit": "N/(rad/s)^2",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "degradation"
+              ]
+            },
+            {
+              "key": "motor_response_time_constant",
+              "name": "4号电机响应时间常数",
+              "targetField": "params.responseTimeConstant",
+              "unit": "s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "motor_max_output",
+              "name": "4号电机最大输出",
+              "targetField": "params.maxOutput",
+              "unit": "ratio",
+              "allowedModels": [
+                "step",
+                "degradation",
+                "freeze"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:motor_thrust_coefficient",
+            "slotName": "4号电机推力系数",
+            "layer": "physical",
+            "targetField": "params.thrustCoefficient",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "degradation"
+            ],
+            "unit": "N/(rad/s)^2"
+          },
+          {
+            "slotId": "physical:motor_response_time_constant",
+            "slotName": "4号电机响应时间常数",
+            "layer": "physical",
+            "targetField": "params.responseTimeConstant",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "s"
+          },
+          {
+            "slotId": "physical:motor_max_output",
+            "slotName": "4号电机最大输出",
+            "layer": "physical",
+            "targetField": "params.maxOutput",
+            "allowedModels": [
+              "step",
+              "degradation",
+              "freeze"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "electrical:input:M4_指令",
+            "slotName": "M4 指令",
+            "layer": "electrical",
+            "targetField": "input.M4_指令",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M4 指令",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:M4_推力",
+            "slotName": "M4 推力",
+            "layer": "electrical",
+            "targetField": "output.M4_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M4 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:4号电机状态",
+            "slotName": "4号电机状态",
+            "layer": "electrical",
+            "targetField": "middle.4号电机状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "4号电机状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-dynamics",
@@ -1727,9 +2577,166 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "四电机推力汇总后的俯仰动力学响应。"
+          "ffunctionNote": "四电机推力汇总后的俯仰动力学响应。",
+          "modelParameters": [
+            {
+              "key": "airframe_mass",
+              "name": "机体质量",
+              "targetField": "params.mass",
+              "unit": "kg",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "airframe_inertia",
+              "name": "机体惯量",
+              "targetField": "params.inertia",
+              "unit": "kg*m^2",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "airframe_damping",
+              "name": "气动阻尼",
+              "targetField": "params.damping",
+              "unit": "N*m*s/rad",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "degradation"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:airframe_mass",
+            "slotName": "机体质量",
+            "layer": "physical",
+            "targetField": "params.mass",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "kg"
+          },
+          {
+            "slotId": "physical:airframe_inertia",
+            "slotName": "机体惯量",
+            "layer": "physical",
+            "targetField": "params.inertia",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "kg*m^2"
+          },
+          {
+            "slotId": "physical:airframe_damping",
+            "slotName": "气动阻尼",
+            "layer": "physical",
+            "targetField": "params.damping",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "degradation"
+            ],
+            "unit": "N*m*s/rad"
+          },
+          {
+            "slotId": "electrical:input:M1_推力",
+            "slotName": "M1 推力",
+            "layer": "electrical",
+            "targetField": "input.M1_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M1 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:input:M2_推力",
+            "slotName": "M2 推力",
+            "layer": "electrical",
+            "targetField": "input.M2_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M2 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:input:M3_推力",
+            "slotName": "M3 推力",
+            "layer": "electrical",
+            "targetField": "input.M3_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M3 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:input:M4_推力",
+            "slotName": "M4 推力",
+            "layer": "electrical",
+            "targetField": "input.M4_推力",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "M4 推力",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:俯仰角速度",
+            "slotName": "俯仰角速度",
+            "layer": "electrical",
+            "targetField": "output.俯仰角速度",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "俯仰角速度",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:俯仰状态",
+            "slotName": "俯仰状态",
+            "layer": "electrical",
+            "targetField": "middle.俯仰状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "俯仰状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-imu",
@@ -1759,9 +2766,137 @@
               "type": "scalar"
             }
           ],
-          "ffunctionNote": "陀螺仪零偏故障的主要注入对象。"
+          "ffunctionNote": "陀螺仪零偏故障的主要注入对象。",
+          "modelParameters": [
+            {
+              "key": "imu_zero_bias",
+              "name": "IMU 零偏",
+              "targetField": "params.gyro.bias",
+              "unit": "rad/s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "random"
+              ]
+            },
+            {
+              "key": "imu_scale_factor",
+              "name": "IMU 比例系数",
+              "targetField": "params.gyro.scale",
+              "unit": "ratio",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "step"
+              ]
+            },
+            {
+              "key": "imu_noise_std",
+              "name": "IMU 噪声标准差",
+              "targetField": "params.gyro.noiseStd",
+              "unit": "rad/s",
+              "allowedModels": [
+                "bias",
+                "drift",
+                "random"
+              ]
+            }
+          ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": [
+          {
+            "slotId": "physical:imu_zero_bias",
+            "slotName": "IMU 零偏",
+            "layer": "physical",
+            "targetField": "params.gyro.bias",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "random"
+            ],
+            "unit": "rad/s"
+          },
+          {
+            "slotId": "physical:imu_scale_factor",
+            "slotName": "IMU 比例系数",
+            "layer": "physical",
+            "targetField": "params.gyro.scale",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "step"
+            ],
+            "unit": "ratio"
+          },
+          {
+            "slotId": "physical:imu_noise_std",
+            "slotName": "IMU 噪声标准差",
+            "layer": "physical",
+            "targetField": "params.gyro.noiseStd",
+            "allowedModels": [
+              "bias",
+              "drift",
+              "random"
+            ],
+            "unit": "rad/s"
+          },
+          {
+            "slotId": "imu-gyro-feedback",
+            "slotName": "陀螺仪反馈信号",
+            "signalId": "imu.pitch_rate",
+            "allowedFaultIds": [
+              "gyro_zero_bias_offset",
+              "gyro_zero_bias_drift",
+              "gyro_zero_bias_intermittent"
+            ],
+            "layer": "electrical",
+            "targetField": "",
+            "allowedModels": []
+          },
+          {
+            "slotId": "electrical:input:机体角速度",
+            "slotName": "机体角速度",
+            "layer": "electrical",
+            "targetField": "input.机体角速度",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "机体角速度",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:output:测量角速度",
+            "slotName": "测量角速度",
+            "layer": "electrical",
+            "targetField": "output.测量角速度",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "测量角速度",
+            "unit": ""
+          },
+          {
+            "slotId": "electrical:middle:陀螺仪零偏状态",
+            "slotName": "陀螺仪零偏状态",
+            "layer": "electrical",
+            "targetField": "middle.陀螺仪零偏状态",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "parameterKey": "陀螺仪零偏状态",
+            "unit": ""
+          }
+        ]
       },
       {
         "id": "node-scope",
@@ -1786,7 +2921,8 @@
             }
           ]
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": []
       },
       {
         "id": "node-residual-logger",
@@ -1800,7 +2936,8 @@
           "instrumentType": "logger",
           "sampleRate": "1000 Hz"
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": []
       },
       {
         "id": "node-residual-spectrum",
@@ -1814,7 +2951,8 @@
           "instrumentType": "spectrum",
           "sampleRate": "1000 Hz"
         },
-        "pythonBinding": null
+        "pythonBinding": null,
+        "faultSlots": []
       }
     ],
     "modelEdges": [
@@ -1827,7 +2965,23 @@
         "lineType": "normal",
         "label": "姿态指令",
         "signalId": "cmd.pitch",
-        "signalUnit": "rad"
+        "signalUnit": "rad",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "姿态指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "cmd.pitch",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-shaper-error",
@@ -1838,7 +2992,23 @@
         "lineType": "normal",
         "label": "整形指令",
         "signalId": "cmd.pitch.shaped",
-        "signalUnit": "rad"
+        "signalUnit": "rad",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "整形指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "cmd.pitch.shaped",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-imu-error",
@@ -1863,6 +3033,48 @@
             "signalUnit": "rad/s",
             "faultPropagationPolicy": "propagates"
           }
+        ],
+        "faultSlots": [
+          {
+            "slotId": "imu-feedback-can",
+            "slotName": "IMU 反馈 CAN 报文",
+            "signalId": "imu.pitch_rate",
+            "allowedFaultIds": [
+              "can_bus_delay"
+            ],
+            "layer": "protocol",
+            "targetField": "",
+            "allowedModels": []
+          },
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "IMU 反馈",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "imu.pitch_rate",
+            "lineType": "can"
+          },
+          {
+            "slotId": "protocol:can_message",
+            "slotName": "0x184",
+            "layer": "protocol",
+            "targetField": "can.payload",
+            "allowedModels": [
+              "delay",
+              "dropout",
+              "tamper",
+              "stale"
+            ],
+            "signalId": "imu.pitch_rate",
+            "channelId": "CAN-FC-IMU",
+            "messageId": "0x184"
+          }
         ]
       },
       {
@@ -1874,7 +3086,23 @@
         "lineType": "normal",
         "label": "姿态误差",
         "signalId": "err.pitch",
-        "signalUnit": "rad/s"
+        "signalUnit": "rad/s",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "姿态误差",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "err.pitch",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-controller-allocator",
@@ -1885,7 +3113,23 @@
         "lineType": "normal",
         "label": "控制量",
         "signalId": "ctrl.pitch",
-        "signalUnit": "N*m"
+        "signalUnit": "N*m",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "控制量",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "ctrl.pitch",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-allocator-motor",
@@ -1895,7 +3139,23 @@
         "targetPortIndex": 0,
         "lineType": "normal",
         "label": "电机总指令",
-        "signalId": "motor.command.total"
+        "signalId": "motor.command.total",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "电机总指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.command.total",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-motor-motor1",
@@ -1919,6 +3179,48 @@
             "payloadKind": "float32",
             "signalUnit": "norm",
             "faultPropagationPolicy": "propagates"
+          }
+        ],
+        "faultSlots": [
+          {
+            "slotId": "motor1-can-command",
+            "slotName": "1号电机控制指令",
+            "signalId": "motor.command.m1",
+            "allowedFaultIds": [
+              "control_command_tamper"
+            ],
+            "layer": "protocol",
+            "targetField": "",
+            "allowedModels": []
+          },
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "1号电机 CAN 指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.command.m1",
+            "lineType": "can"
+          },
+          {
+            "slotId": "protocol:can_message",
+            "slotName": "0x211",
+            "layer": "protocol",
+            "targetField": "can.payload",
+            "allowedModels": [
+              "delay",
+              "dropout",
+              "tamper",
+              "stale"
+            ],
+            "signalId": "motor.command.m1",
+            "channelId": "CAN-FC-M1",
+            "messageId": "0x211"
           }
         ]
       },
@@ -1945,6 +3247,37 @@
             "signalUnit": "norm",
             "faultPropagationPolicy": "propagates"
           }
+        ],
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "2号电机 CAN 指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.command.m2",
+            "lineType": "can"
+          },
+          {
+            "slotId": "protocol:can_message",
+            "slotName": "0x212",
+            "layer": "protocol",
+            "targetField": "can.payload",
+            "allowedModels": [
+              "delay",
+              "dropout",
+              "tamper",
+              "stale"
+            ],
+            "signalId": "motor.command.m2",
+            "channelId": "CAN-FC-M2",
+            "messageId": "0x212"
+          }
         ]
       },
       {
@@ -1969,6 +3302,37 @@
             "payloadKind": "float32",
             "signalUnit": "norm",
             "faultPropagationPolicy": "propagates"
+          }
+        ],
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "3号电机 CAN 指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.command.m3",
+            "lineType": "can"
+          },
+          {
+            "slotId": "protocol:can_message",
+            "slotName": "0x213",
+            "layer": "protocol",
+            "targetField": "can.payload",
+            "allowedModels": [
+              "delay",
+              "dropout",
+              "tamper",
+              "stale"
+            ],
+            "signalId": "motor.command.m3",
+            "channelId": "CAN-FC-M3",
+            "messageId": "0x213"
           }
         ]
       },
@@ -1995,6 +3359,37 @@
             "signalUnit": "norm",
             "faultPropagationPolicy": "propagates"
           }
+        ],
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "4号电机 CAN 指令",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.command.m4",
+            "lineType": "can"
+          },
+          {
+            "slotId": "protocol:can_message",
+            "slotName": "0x214",
+            "layer": "protocol",
+            "targetField": "can.payload",
+            "allowedModels": [
+              "delay",
+              "dropout",
+              "tamper",
+              "stale"
+            ],
+            "signalId": "motor.command.m4",
+            "channelId": "CAN-FC-M4",
+            "messageId": "0x214"
+          }
         ]
       },
       {
@@ -2006,7 +3401,23 @@
         "lineType": "normal",
         "label": "M1 推力响应",
         "signalId": "motor.thrust.m1",
-        "signalUnit": "N"
+        "signalUnit": "N",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "M1 推力响应",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.thrust.m1",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-motor2-dynamics",
@@ -2017,7 +3428,23 @@
         "lineType": "normal",
         "label": "M2 推力响应",
         "signalId": "motor.thrust.m2",
-        "signalUnit": "N"
+        "signalUnit": "N",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "M2 推力响应",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.thrust.m2",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-motor3-dynamics",
@@ -2028,7 +3455,23 @@
         "lineType": "normal",
         "label": "M3 推力响应",
         "signalId": "motor.thrust.m3",
-        "signalUnit": "N"
+        "signalUnit": "N",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "M3 推力响应",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.thrust.m3",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-motor4-dynamics",
@@ -2039,7 +3482,23 @@
         "lineType": "normal",
         "label": "M4 推力响应",
         "signalId": "motor.thrust.m4",
-        "signalUnit": "N"
+        "signalUnit": "N",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "M4 推力响应",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "motor.thrust.m4",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-dynamics-imu-can",
@@ -2050,7 +3509,23 @@
         "lineType": "normal",
         "label": "机体俯仰角速度",
         "signalId": "body.pitch_rate",
-        "signalUnit": "rad/s"
+        "signalUnit": "rad/s",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "机体俯仰角速度",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "body.pitch_rate",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-command-scope",
@@ -2060,7 +3535,23 @@
         "targetPortIndex": 0,
         "lineType": "normal",
         "label": "指令观测",
-        "signalId": "scope.command"
+        "signalId": "scope.command",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "指令观测",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "scope.command",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-imu-scope",
@@ -2070,7 +3561,23 @@
         "targetPortIndex": 1,
         "lineType": "normal",
         "label": "反馈观测",
-        "signalId": "scope.imu"
+        "signalId": "scope.imu",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "反馈观测",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "scope.imu",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-error-logger",
@@ -2080,7 +3587,23 @@
         "targetPortIndex": 0,
         "lineType": "normal",
         "label": "残差诊断",
-        "signalId": "diag.residual"
+        "signalId": "diag.residual",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "残差诊断",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "diag.residual",
+            "lineType": "normal"
+          }
+        ]
       },
       {
         "id": "edge-error-spectrum",
@@ -2090,7 +3613,23 @@
         "targetPortIndex": 0,
         "lineType": "normal",
         "label": "频谱诊断",
-        "signalId": "diag.spectrum"
+        "signalId": "diag.spectrum",
+        "faultSlots": [
+          {
+            "slotId": "electrical:signal_value",
+            "slotName": "频谱诊断",
+            "layer": "electrical",
+            "targetField": "signal.value",
+            "allowedModels": [
+              "bias",
+              "noise",
+              "freeze",
+              "intermittent"
+            ],
+            "signalId": "diag.spectrum",
+            "lineType": "normal"
+          }
+        ]
       }
     ],
     "nodeSeq": 15,

@@ -15,6 +15,9 @@ import {
   createWorkbenchSnapshot,
   restoreWorkbenchSnapshot
 } from '../src/services/workbenchSnapshotService.js';
+import {
+  FAULT_MATH_MODEL_DEFINITIONS
+} from '../src/services/modelStore.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -937,6 +940,120 @@ describe('flightModelPackageService', () => {
         messageId: '0x184'
       })
     ]);
+  });
+
+  it('declares injectable slots directly on every closed-loop demo edge', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const edges = closedLoopPackage.workbenchSnapshot.modelEdges;
+    const normalEdge = edges.find((edge) => edge.id === 'edge-command-shaper');
+    const canEdge = edges.find((edge) => edge.id === 'edge-imu-error');
+
+    expect(edges.length).toBeGreaterThan(0);
+    edges.forEach((edge) => {
+      expect(edge.faultSlots, edge.id).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          slotId: expect.any(String),
+          layer: 'electrical',
+          targetField: 'signal.value',
+          allowedModels: expect.arrayContaining(['bias', 'noise', 'freeze', 'intermittent'])
+        })
+      ]));
+    });
+
+    expect(normalEdge.faultSlots.map((slot) => slot.layer)).toEqual(['electrical']);
+    expect(canEdge.faultSlots).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        slotId: 'protocol:can_message',
+        layer: 'protocol',
+        targetField: 'can.payload',
+        allowedModels: expect.arrayContaining(['delay', 'dropout', 'tamper', 'stale'])
+      })
+    ]));
+  });
+
+  it('keeps core component parameter fault slots in the closed-loop demo package', () => {
+    const closedLoopPackage = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const nodes = closedLoopPackage.workbenchSnapshot.modelNodes;
+    const imu = nodes.find((node) => node.id === 'node-imu');
+    const motor = nodes.find((node) => node.id === 'node-motor-1');
+    const allocator = nodes.find((node) => node.id === 'node-allocator');
+
+    expect(imu.faultSlots).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        slotId: 'physical:imu_zero_bias',
+        layer: 'physical',
+        targetField: 'params.gyro.bias',
+        allowedModels: expect.arrayContaining(['bias', 'drift', 'random'])
+      })
+    ]));
+    expect(motor.faultSlots).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        slotId: 'physical:motor_thrust_coefficient',
+        layer: 'physical',
+        targetField: 'params.thrustCoefficient',
+        allowedModels: expect.arrayContaining(['bias', 'drift', 'degradation'])
+      })
+    ]));
+    expect(allocator.faultSlots).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        slotId: 'physical:allocation_matrix',
+        layer: 'physical',
+        targetField: 'params.allocationMatrix',
+        allowedModels: expect.arrayContaining(['step'])
+      })
+    ]));
+  });
+
+  it('defines distinct physical-layer math models for slot selection', () => {
+    const byId = Object.fromEntries(
+      FAULT_MATH_MODEL_DEFINITIONS.physical.map((model) => [model.id, model])
+    );
+
+    expect(Object.keys(byId)).toEqual([
+      'bias',
+      'drift',
+      'step',
+      'degradation',
+      'freeze',
+      'random'
+    ]);
+    expect(byId.bias.formula).toBe('p_fault = p + bias');
+    expect(byId.drift.formula).toBe('p_fault = p + rate * max(t - start, 0)');
+    expect(byId.random.defaultParameters).toMatchObject({ seed: 1, std: 0.08 });
+  });
+
+  it('normalizes edge fault slots when applying packages that do not declare them yet', () => {
+    const packageData = {
+      ...VALID_PACKAGE,
+      workbenchSnapshot: {
+        ...VALID_PACKAGE.workbenchSnapshot,
+        modelEdges: [
+          {
+            id: 'edge-normal',
+            lineType: 'normal',
+            signalId: 'controller.output',
+            sourceNodeId: 'node-source',
+            targetNodeId: 'node-target'
+          },
+          {
+            id: 'edge-can',
+            lineType: 'can',
+            signalId: 'imu.pitch_rate',
+            channelId: 'CAN-FC-IMU',
+            messageId: '0x184',
+            sourceNodeId: 'node-imu',
+            targetNodeId: 'node-controller'
+          }
+        ]
+      }
+    };
+    const applied = applyFlightModelPackage(packageData);
+    const normalEdge = applied.snapshot.modelEdges.find((edge) => edge.id === 'edge-normal');
+    const canEdge = applied.snapshot.modelEdges.find((edge) => edge.id === 'edge-can');
+
+    expect(applied.ok).toBe(true);
+    expect(normalEdge.faultSlots.map((slot) => slot.layer)).toEqual(['electrical']);
+    expect(canEdge.faultSlots.map((slot) => slot.layer)).toEqual(['electrical', 'protocol']);
   });
 
   it('defines component-owned fault capabilities for the closed-loop demo', () => {

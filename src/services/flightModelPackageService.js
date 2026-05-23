@@ -7,6 +7,9 @@ import {
   createWorkbenchSnapshot,
   restoreWorkbenchSnapshot
 } from './workbenchSnapshotService.js';
+import {
+  normalizeModelStoreSnapshot
+} from './modelStore.js';
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -446,9 +449,13 @@ export function applyFlightModelPackage(pkg) {
     };
   }
 
+  const normalizedSnapshot = normalizeModelStoreSnapshot(hydratedSnapshot.snapshot, {
+    faultCapabilityMap: pkg.faultCapabilityMap
+  });
+
   return {
     ok: true,
-    snapshot: hydratedSnapshot.snapshot,
+    snapshot: normalizedSnapshot,
     descriptor: createFlightModelPackageDescriptor(pkg),
     faultLibrary: clone(Array.isArray(pkg.faultLibrary) ? pkg.faultLibrary : []),
     diagnosticModel: isPlainObject(pkg.diagnosticModel) ? clone(pkg.diagnosticModel) : null,
@@ -457,7 +464,9 @@ export function applyFlightModelPackage(pkg) {
 }
 
 export function buildFlightModelPackage({ meta = {}, snapshot = {}, faultLibrary = [] } = {}) {
-  const normalizedSnapshot = createWorkbenchSnapshot(snapshot);
+  const normalizedSnapshot = normalizeModelStoreSnapshot(createWorkbenchSnapshot(snapshot), {
+    faultCapabilityMap: meta.faultCapabilityMap
+  });
   const exportedSnapshot = mapSnapshotNodes(normalizedSnapshot, exportSimulationNode);
   const pythonModulesById = collectPythonModulesFromSnapshot(normalizedSnapshot);
 
