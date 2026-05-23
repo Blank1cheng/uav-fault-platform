@@ -208,6 +208,12 @@ describe('canvas layout cleanup', () => {
     expect(componentsCss).toContain('.sbar-log-head');
     expect(componentsCss).toContain('flex:0 0 30px');
     expect(componentsCss).toContain('height:17px;');
+    expect(findCssRule(componentsCss, '.layered-fault-dialog')).toMatch(/width\s*:\s*min\(520px/);
+    expect(findCssRule(componentsCss, '.layered-fault-dialog')).toMatch(/right\s*:\s*calc\(var\(--workbench-right-w/);
+    expect(findCssRule(componentsCss, '.layered-fault-dialog__head')).toMatch(/cursor\s*:\s*move/);
+    expect(findCssRule(componentsCss, '.edge-hit.is-fault-drop-compatible')).toMatch(/stroke-width\s*:\s*36!important/);
+    expect(findCssRule(componentsCss, '.edge-label.is-fault-drop-compatible')).toMatch(/pointer-events\s*:\s*auto/);
+    expect(findCssRule(componentsCss, '.diagram.fault-drop-preview .fault-tag-card')).toMatch(/opacity\s*:\s*\.16/);
     expect(componentsCss).not.toMatch(/@media\s*\(max-height:820px\)[\s\S]*?\.sbar\s*\{[\s\S]*?height:78px/);
     expect(componentsCss).not.toMatch(/\.sbar\s*\{[\s\S]*?max-height:78px/);
 
@@ -1305,6 +1311,16 @@ describe('canvas layout cleanup', () => {
     expect(window.canBindLayeredFaultInjectorToTarget(protocolInjector, normalEdge)).toBe(false);
     expect(window.canBindLayeredFaultInjectorToTarget(protocolInjector, canEdge)).toBe(true);
 
+    document.querySelector(`[data-layered-fault-bind="${protocolInjector.id}"]`)?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(document.getElementById('diagram')?.classList.contains('fault-drop-preview--edge')).toBe(true);
+    expect(document.querySelector(`.edge-hit[data-edge-id="${canEdge.id}"]`)?.classList.contains('is-fault-drop-compatible')).toBe(true);
+    expect(document.querySelector(`.edge-label[data-edge-id="${canEdge.id}"]`)?.classList.contains('is-fault-drop-compatible')).toBe(true);
+
     wrapper.unmount();
   });
 
@@ -1394,8 +1410,18 @@ describe('canvas layout cleanup', () => {
     dispatchPointer(targetEl, 'pointerup', { pointerId: 42, clientX: 720, clientY: 320 });
     await flushRuntime();
 
-    expect(document.querySelector('[data-layered-fault-binding-dialog]')).not.toBeNull();
-    expect(document.querySelector('[data-layered-fault-binding-dialog]')?.textContent).toContain('IMU');
+    const dialog = document.querySelector('[data-layered-fault-binding-dialog]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain('IMU');
+    const handle = dialog?.querySelector('[data-layered-fault-dialog-handle]');
+    expect(handle).not.toBeNull();
+    dispatchPointer(handle, 'pointerdown', { pointerId: 77, clientX: 300, clientY: 200 });
+    dispatchPointer(window, 'pointermove', { pointerId: 77, clientX: 360, clientY: 246 });
+    dispatchPointer(window, 'pointerup', { pointerId: 77, clientX: 360, clientY: 246 });
+    await flushRuntime();
+    expect(dialog?.style.left).not.toBe('');
+    expect(dialog?.style.top).not.toBe('');
+    expect(dialog?.style.right).toBe('auto');
 
     wrapper.unmount();
   });

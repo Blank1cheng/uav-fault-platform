@@ -20842,12 +20842,15 @@ function decorateDataflowEdges(){
     if(!injector||!isLayeredFaultInjectorType(injector.type)) return;
     const diagram=document.getElementById('diagram');
     diagram?.classList.add('fault-drop-preview');
+    let compatibleNodeCount=0;
+    let compatibleEdgeCount=0;
     arr(S.modelNodes).forEach(node=>{
       if(node.id===injector.id) return;
       const el=document.getElementById(`b-${node.id}`);
       if(!el) return;
       const compatible=canBindLayeredFaultInjectorToTarget(injector,node);
       if(compatible){
+        compatibleNodeCount+=1;
         el.classList.add('fault-drop-compatible');
         el.dataset.faultDropState='compatible';
         attachLayeredFaultTargetHandlers(el,node);
@@ -20856,12 +20859,15 @@ function decorateDataflowEdges(){
     arr(S.modelEdges).forEach(edge=>{
       const compatible=canBindLayeredFaultInjectorToTarget(injector,edge);
       if(!compatible) return;
+      compatibleEdgeCount+=1;
       document.querySelectorAll(`[data-edge-id="${edge.id}"]`).forEach(el=>{
         el.classList.add('is-fault-drop-compatible');
         el.dataset.faultDropState='compatible';
         attachLayeredFaultTargetHandlers(el,edge);
       });
     });
+    diagram?.classList.toggle('fault-drop-preview--node',compatibleNodeCount>0);
+    diagram?.classList.toggle('fault-drop-preview--edge',compatibleEdgeCount>0);
   }
 
   function beginLayeredFaultBinding(injectorId){
@@ -20903,11 +20909,74 @@ function decorateDataflowEdges(){
   }
 
   function removeLayeredFaultBindingDialog(){
-    document.querySelectorAll('[data-layered-fault-binding-dialog]').forEach(el=>el.remove());
+    document.querySelectorAll('[data-layered-fault-binding-dialog]').forEach(el=>{
+      if(typeof el.__layeredFaultDragCleanup==='function') el.__layeredFaultDragCleanup();
+      el.remove();
+    });
   }
 
   function closeLayeredFaultBindingDialog(){
     removeLayeredFaultBindingDialog();
+  }
+
+  function makeLayeredFaultBindingDialogDraggable(dialog){
+    if(!dialog) return;
+    const handle=dialog.querySelector('[data-layered-fault-dialog-handle]');
+    if(!handle) return;
+    let dragState=null;
+    const clampDialog=()=>{
+      const rect=dialog.getBoundingClientRect();
+      const margin=12;
+      const maxLeft=Math.max(margin,window.innerWidth-rect.width-margin);
+      const maxTop=Math.max(margin,window.innerHeight-rect.height-margin);
+      const left=clamp(Number.parseFloat(dialog.style.left)||rect.left||margin,margin,maxLeft);
+      const top=clamp(Number.parseFloat(dialog.style.top)||rect.top||margin,margin,maxTop);
+      dialog.style.left=`${Math.round(left)}px`;
+      dialog.style.top=`${Math.round(top)}px`;
+      dialog.style.right='auto';
+    };
+    handle.addEventListener('pointerdown',event=>{
+      if(event.target?.closest?.('button,input,select,textarea')) return;
+      const rect=dialog.getBoundingClientRect();
+      dialog.style.left=`${Math.round(rect.left)}px`;
+      dialog.style.top=`${Math.round(rect.top)}px`;
+      dialog.style.right='auto';
+      dragState={
+        pointerId:event.pointerId||1,
+        startX:event.clientX,
+        startY:event.clientY,
+        left:rect.left,
+        top:rect.top
+      };
+      dialog.classList.add('is-dragging');
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    const move=event=>{
+      if(!dragState) return;
+      const dx=event.clientX-dragState.startX;
+      const dy=event.clientY-dragState.startY;
+      const rect=dialog.getBoundingClientRect();
+      const margin=12;
+      const maxLeft=Math.max(margin,window.innerWidth-rect.width-margin);
+      const maxTop=Math.max(margin,window.innerHeight-rect.height-margin);
+      dialog.style.left=`${Math.round(clamp(dragState.left+dx,margin,maxLeft))}px`;
+      dialog.style.top=`${Math.round(clamp(dragState.top+dy,margin,maxTop))}px`;
+      dialog.style.right='auto';
+      event.preventDefault();
+    };
+    const up=()=>{
+      if(!dragState) return;
+      dragState=null;
+      dialog.classList.remove('is-dragging');
+      clampDialog();
+    };
+    window.addEventListener('pointermove',move);
+    window.addEventListener('pointerup',up);
+    dialog.__layeredFaultDragCleanup=()=>{
+      window.removeEventListener('pointermove',move);
+      window.removeEventListener('pointerup',up);
+    };
   }
 
   function getTargetDisplayName(target){
@@ -20974,7 +21043,7 @@ function decorateDataflowEdges(){
     dialog.dataset.layeredFaultBindingDialog='true';
     const models=getLayeredMathModels(config.layer);
     dialog.innerHTML=`
-      <div class="layered-fault-dialog__head">
+      <div class="layered-fault-dialog__head" data-layered-fault-dialog-handle>
         <div>
           <div class="layered-fault-dialog__eyebrow">${escapeHtml(config.layerLabel)}注入</div>
           <strong>确认绑定目标</strong>
@@ -21009,6 +21078,7 @@ function decorateDataflowEdges(){
     const modelSelect=dialog.querySelector('[data-layered-fault-model]');
     renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel);
     modelSelect.addEventListener('change',()=>renderDialogParameterFields(paramsHost,config.layer,modelSelect.value||config.defaultModel));
+    makeLayeredFaultBindingDialogDraggable(dialog);
     dialog.querySelectorAll('[data-layered-fault-cancel]').forEach(button=>{
       button.addEventListener('click',event=>{
         event.preventDefault();

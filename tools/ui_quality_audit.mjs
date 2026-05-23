@@ -21,7 +21,9 @@ const files = {
   statusbar: readProjectFile('src/fragments/statusbar.html'),
   statusRuntime: readProjectFile('src/services/statusBarRuntime.js'),
   legacyRuntime: readProjectFile('src/services/legacy-runtime.txt'),
-  packageJson: readProjectFile('package.json')
+  packageJson: readProjectFile('package.json'),
+  componentSchemaDoc: readProjectFile('docs/component-python-schema.md'),
+  platformFileMapDoc: readProjectFile('docs/platform-file-map.md')
 };
 
 function count(text, pattern) {
@@ -429,6 +431,34 @@ function makeAudit() {
     files.packageJson.includes('"audit:ui": "node tools/ui_quality_audit.mjs"'),
     'Makes the improvement mechanism discoverable and easy to rerun.',
     'package.json'
+  );
+
+  check(
+    'component-python-schema-documented',
+    'Component JSON and Python module contracts are documented',
+    hasAll(files.componentSchemaDoc, [
+      'faultSlots',
+      'pythonModules',
+      'faultCapabilityMap',
+      'def process',
+      'model-authoring/evtol_small_nonlinear/modules/'
+    ]),
+    'Keeps future component and fault authoring aligned with the imported demo model and Python execution contract.',
+    'docs/component-python-schema.md'
+  );
+
+  check(
+    'platform-file-map-documented',
+    'Platform files are classified without deleting cleanup candidates',
+    hasAll(files.platformFileMapDoc, [
+      'src/services/legacy-runtime.txt',
+      'public/model-packages/evtol_closed_loop_fault_demo.json',
+      'tools/python_model_runner/server.py',
+      '可以人工评估删除的候选',
+      '不要在本阶段自动删除'
+    ]),
+    'Gives the user a staged cleanup map while preserving all files for manual review.',
+    'docs/platform-file-map.md'
   );
 
   audit.suggestions.push(
