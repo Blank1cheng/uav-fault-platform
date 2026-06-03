@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gz-platform.local/schemas/fault-model.schema.json",
+  "title": "Fault Model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "layer", "modelClass", "runtimeBehavior", "defaultParameters"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "layer": {
+      "type": "string",
+      "enum": ["physical", "electrical", "protocol"]
+    },
+    "modelClass": {
+      "type": "string",
+      "enum": ["continuous", "discrete", "event", "hybrid"]
+    },
+    "runtimeBehavior": {
+      "type": "string",
+      "enum": [
+        "additive_bias",
+        "parameter_bias",
+        "parameter_drift",
+        "parameter_step",
+        "scale",
+        "lock",
+        "saturation",
+        "noise",
+        "colored_noise",
+        "freeze",
+        "jump_or_invert",
+        "intermittent",
+        "fixed_delay",
+        "jitter_delay",
+        "packet_loss",
+        "burst_loss",
+        "tamper",
+        "interrupt"
+      ]
+    },
+    "compatibleTargets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["input", "output", "intermediate", "parameter", "node", "edge"]
+      },
+      "uniqueItems": true
+    },
+    "parameterSchema": {
+      "type": "object"
+    },
+    "defaultParameters": {
+      "type": "object"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "injectionDesign": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requiresSlot": {
+          "type": "boolean"
+        },
+        "supportsPropagation": {
+          "type": "boolean"
+        },
+        "stackingPolicy": {
+          "type": "string",
+          "enum": ["single", "ordered", "parallel"]
+        }
+      }
+    }
+  }
+}
+

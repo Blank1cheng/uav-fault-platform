@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gz-platform.local/schemas/fault-scenario.schema.json",
+  "title": "Fault Scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "modelPackageId", "faultInstances"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modelPackageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "faultInstances": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/faultInstance"
+      }
+    }
+  },
+  "$defs": {
+    "faultInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instanceId",
+        "faultTypeId",
+        "moduleId",
+        "targetKind",
+        "targetId",
+        "bindingObject",
+        "layer",
+        "injectionForm",
+        "parameters",
+        "timing"
+      ],
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "faultTypeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetKind": {
+          "type": "string",
+          "enum": ["input", "output", "intermediate", "parameter", "node", "edge"]
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bindingObject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slotId": {
+          "type": "string"
+        },
+        "layer": {
+          "type": "string",
+          "enum": ["physical", "electrical", "protocol"]
+        },
+        "injectionForm": {
+          "type": "string",
+          "enum": ["module-variable", "signal-edge", "protocol-bus"]
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start"],
+          "properties": {
+            "start": {
+              "type": "number",
+              "minimum": 0
+            },
+            "duration": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "repeat": {
+              "type": "string",
+              "enum": ["none", "periodic", "random"]
+            }
+          }
+        },
+        "propagation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "sourceInstanceId": {
+              "type": "string"
+            },
+            "path": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
