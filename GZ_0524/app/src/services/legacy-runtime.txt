@@ -17979,124 +17979,99 @@ function decorateDataflowEdges(){
     pd.style.display='block';
     const title=document.querySelector('.ph-title');
     const sub=document.querySelector('.ph-sub');
-    if(title){title.textContent='属性面板';}
-    if(sub){sub.textContent='当前选择 · 故障标签';}
-    const params=Object.entries(tag.parameters||{});
-    const target=getFaultTagTarget(tag);
-    const targetName=tag.targetName||target?.props?.name||tag.targetId||'目标对象';
-    pd.innerHTML=`
-      <div class="pgroup fault-tag-inspector" data-fault-tag-inspector="${escapeHtml(tag.id)}">
-        <div class="pglbl">故障标签</div>
-        <div class="props-target-card is-faulted">
-          <div>
-            <div class="props-target-title">${escapeHtml(tag.name||'故障')}</div>
-            <div class="props-target-meta">${escapeHtml(tag.modelClass||'故障')} · ${escapeHtml(tag.layer||'飞控故障库')}</div>
-          </div>
-          <span class="props-state-pill is-faulted">已注入</span>
-        </div>
-        <div class="prow"><span class="pk">目标对象</span><span class="pv">${escapeHtml(targetName)}</span></div>
-        <div class="prow"><span class="pk">目标类型</span><span class="pv">${tag.targetKind==='edge'?'连线':'模块'}</span></div>
-        <div class="prow"><span class="pk">运行行为</span><span class="pv">${escapeHtml(tag.runtimeBehavior||'按故障库定义')}</span></div>
-      </div>
-      <div class="pgroup fault-tag-param-panel" data-fault-tag-param-panel="${escapeHtml(tag.id)}">
-        <div class="pglbl">故障参数</div>
-        ${params.length?params.map(([key,value])=>`
-          <label class="fault-tag-param-row">
-            <span>${escapeHtml(key)}</span>
-            <input value="${escapeHtml(value)}" data-fault-tag-param="${escapeHtml(key)}">
-          </label>
-        `).join(''):'<div class="props-empty-inline">该故障没有额外参数。</div>'}
-        ${params.length?`
-          <div class="fault-tag-param-actions">
-            <span data-fault-tag-param-status>参数未修改</span>
-            <div>
-              <button type="button" class="props-secondary fault-tag-param-reset" data-fault-tag-reset disabled>取消修改</button>
-              <button type="button" class="props-save fault-tag-param-apply" data-fault-tag-apply disabled>应用修改</button>
-            </div>
-          </div>
-        `:''}
-      </div>
-    `;
     if(title){title.textContent='\u6545\u969c\u6807\u7b7e';}
     if(sub){sub.textContent='\u5f53\u524d\u9009\u62e9 \u00b7 \u6545\u969c\u5b9e\u4f8b';}
-    const paramPanelTitle=pd.querySelector('[data-fault-tag-param-panel] .pglbl');
-    if(paramPanelTitle){paramPanelTitle.textContent='\u6545\u969c\u53c2\u6570';}
-    const paramEmpty=pd.querySelector('[data-fault-tag-param-panel] .props-empty-inline');
-    if(paramEmpty){paramEmpty.textContent='\u8be5\u6545\u969c\u6ca1\u6709\u989d\u5916\u53c2\u6570\u3002';}
-    const initialStatusText=pd.querySelector('[data-fault-tag-param-status]');
-    if(initialStatusText){initialStatusText.textContent='\u53c2\u6570\u672a\u4fee\u6539';}
-    const initialResetButton=pd.querySelector('[data-fault-tag-reset]');
-    if(initialResetButton){initialResetButton.textContent='\u53d6\u6d88\u4fee\u6539';}
-    const initialApplyButton=pd.querySelector('[data-fault-tag-apply]');
-    if(initialApplyButton){initialApplyButton.textContent='\u5e94\u7528\u4fee\u6539';}
-    const originalInspector=pd.querySelector('[data-fault-tag-inspector]');
-    const originalParamPanel=pd.querySelector('[data-fault-tag-param-panel]');
+    const params=Object.entries(tag.parameters||{});
+    const target=getFaultTagTarget(tag);
+    const targetName=tag.targetName||target?.props?.name||tag.targetId||'\u76ee\u6807\u5bf9\u8c61';
+    const targetKindLabel=tag.targetKind==='edge'?'\u8fde\u63a5\u7ebf':'\u6a21\u5757';
+    const layerLabelMap={
+      physical:'\u7269\u7406\u5c42',
+      electrical:'\u7535\u6c14\u5c42',
+      protocol:'\u534f\u8bae\u5c42'
+    };
+    const runtimeLabelMap={
+      bias:'\u504f\u5dee\u6545\u969c',
+      stuck:'\u5361\u6b7b\u6545\u969c',
+      freeze:'\u5361\u6b7b\u6545\u969c',
+      tamper:'\u6570\u636e\u7be1\u6539',
+      delay:'\u5ef6\u8fdf\u6545\u969c',
+      dropout:'\u4e22\u5305\u6545\u969c',
+      stale:'\u65e7\u503c\u91cd\u653e',
+      overwrite:'\u8986\u76d6\u5199\u5165'
+    };
+    const paramLabelMap={
+      scale:'\u7be1\u6539\u500d\u7387',
+      bias:'\u504f\u7f6e\u503c',
+      value:'\u6545\u969c\u503c',
+      start:'\u5f00\u59cb\u65f6\u95f4',
+      duration:'\u6301\u7eed\u65f6\u95f4',
+      mode:'\u5199\u5165\u65b9\u5f0f',
+      drop_rate:'\u4e22\u5305\u7387',
+      delay:'\u5ef6\u8fdf\u65f6\u95f4',
+      delay_steps:'\u5ef6\u8fdf\u6b65\u6570',
+      seed:'\u968f\u673a\u79cd\u5b50',
+      lock_value:'\u5361\u6b7b\u503c',
+      offset:'\u504f\u7f6e\u503c',
+      std:'\u6807\u51c6\u5dee',
+      period:'\u5468\u671f',
+      duty:'\u5360\u7a7a\u6bd4'
+    };
+    const layerLabel=layerLabelMap[tag.layer]||tag.layer||'\u672a\u6307\u5b9a\u5c42\u7ea7';
+    const runtimeValue=tag.runtimeBehavior||tag.mathModel||tag.modelClass||'';
+    const runtimeLabel=runtimeLabelMap[String(runtimeValue)]||runtimeValue||'\u6309\u6545\u969c\u5e93\u5b9a\u4e49';
+    const paramName=(key)=>paramLabelMap[key]||key;
+    const paramEmpty='\u8be5\u6545\u969c\u6ca1\u6709\u989d\u5916\u53c2\u6570\u3002';
+    const paramPreview=params.length?params.map(([key,value])=>`
+      <div class="fault-tag-param-preview__row">
+        <span>${escapeHtml(paramName(key))}</span>
+        <strong>${escapeHtml(value)}</strong>
+      </div>
+    `).join(''):`<div class="props-empty-inline">${paramEmpty}</div>`;
+    const paramEditor=params.length?params.map(([key,value])=>`
+      <label class="fault-tag-param-row">
+        <span>${escapeHtml(paramName(key))}</span>
+        <input value="${escapeHtml(value)}" data-fault-tag-param="${escapeHtml(key)}">
+      </label>
+    `).join(''):`<div class="props-empty-inline">${paramEmpty}</div>`;
     if(S.propertyPanelTab==='parameters'){
-      originalInspector?.remove();
+      pd.innerHTML=`
+        <div class="pgroup fault-tag-param-panel" data-fault-tag-param-panel="${escapeHtml(tag.id)}">
+          <div class="pglbl">\u6545\u969c\u53c2\u6570</div>
+          ${paramEditor}
+          ${params.length?`
+            <div class="fault-tag-param-actions">
+              <span data-fault-tag-param-status>\u53c2\u6570\u672a\u4fee\u6539</span>
+              <div>
+                <button type="button" class="props-secondary fault-tag-param-reset" data-fault-tag-reset disabled>\u53d6\u6d88\u4fee\u6539</button>
+                <button type="button" class="props-save fault-tag-param-apply" data-fault-tag-apply disabled>\u5e94\u7528\u4fee\u6539</button>
+              </div>
+            </div>
+          `:''}
+        </div>
+      `;
     }else{
-      originalParamPanel?.remove();
-      if(originalInspector){
-        const targetKindLabel=tag.targetKind==='edge'?'杩炵嚎':'妯″潡';
-        originalInspector.classList.add('fault-tag-overview-panel');
-        originalInspector.innerHTML=`
-          <div class="pglbl">缁戝畾瀵硅薄</div>
+      pd.innerHTML=`
+        <div class="pgroup fault-tag-inspector fault-tag-overview-panel" data-fault-tag-inspector="${escapeHtml(tag.id)}">
+          <div class="pglbl">\u7ed1\u5b9a\u6982\u89c8</div>
+          <div class="props-fault-card">
+            <div class="props-fault-card__top">
+              <div>
+                <strong>${escapeHtml(tag.name||'\u6545\u969c')}</strong>
+                <span>${escapeHtml(runtimeLabel)} \u00b7 ${escapeHtml(layerLabel)}</span>
+              </div>
+              <span class="props-state-pill is-faulted">\u5df2\u6ce8\u5165</span>
+            </div>
+          </div>
           <div class="fault-tag-binding-card">
-            <div><span>鐩爣</span><strong>${escapeHtml(targetName)}</strong></div>
-            <div><span>绫诲瀷</span><strong>${targetKindLabel}</strong></div>
-            <div><span>琛屼负</span><strong>${escapeHtml(tag.runtimeBehavior||'鎸夋晠闅滃簱瀹氫箟')}</strong></div>
+            <div><span>\u76ee\u6807\u5bf9\u8c61</span><strong>${escapeHtml(targetName)}</strong></div>
+            <div><span>\u76ee\u6807\u7c7b\u578b</span><strong>${targetKindLabel}</strong></div>
+            <div><span>\u8fd0\u884c\u884c\u4e3a</span><strong>${escapeHtml(runtimeLabel)}</strong></div>
           </div>
           <div class="fault-tag-param-preview">
-            <div class="pglbl">鍙傛暟鎽樿</div>
-            ${params.length?params.map(([key,value])=>`
-              <div class="fault-tag-param-preview__row">
-                <span>${escapeHtml(key)}</span>
-                <strong>${escapeHtml(value)}</strong>
-              </div>
-            `).join(''):'<div class="props-empty-inline">璇ユ晠闅滄病鏈夐澶栧弬鏁般€?/div>'}
+            <div class="pglbl">\u6545\u969c\u53c2\u6570</div>
+            ${paramPreview}
           </div>
-        `;
-      }
-    }
-    if(S.propertyPanelTab!=='parameters'&&originalInspector){
-      const targetKindLabel=tag.targetKind==='edge'?'\u8fde\u63a5\u7ebf':'\u6a21\u5757';
-      const runtimeLabelMap={
-        bias:'\u504f\u5dee\u6545\u969c',
-        stuck:'\u5361\u6b7b\u6545\u969c',
-        tamper:'\u6570\u636e\u7be1\u6539',
-        delay:'\u5ef6\u8fdf\u6545\u969c',
-        dropout:'\u4e22\u5305\u6545\u969c',
-        stale:'\u65e7\u503c\u91cd\u653e',
-        overwrite:'\u8986\u76d6\u5199\u5165'
-      };
-      const paramLabelMap={
-        scale:'\u7be1\u6539\u500d\u7387',
-        bias:'\u504f\u7f6e\u503c',
-        value:'\u6545\u969c\u503c',
-        start:'\u5f00\u59cb\u65f6\u95f4',
-        duration:'\u6301\u7eed\u65f6\u95f4',
-        mode:'\u5199\u5165\u65b9\u5f0f',
-        drop_rate:'\u4e22\u5305\u7387',
-        delay:'\u5ef6\u8fdf\u65f6\u95f4',
-        seed:'\u968f\u673a\u79cd\u5b50'
-      };
-      const runtimeValue=tag.runtimeBehavior||tag.mathModel||tag.modelClass||'';
-      const runtimeLabel=runtimeLabelMap[String(runtimeValue)]||runtimeValue||'\u6309\u6545\u969c\u5e93\u5b9a\u4e49';
-      originalInspector.classList.add('fault-tag-overview-panel');
-      originalInspector.innerHTML=`
-        <div class="pglbl">\u7ed1\u5b9a\u6982\u89c8</div>
-        <div class="fault-tag-binding-card">
-          <div><span>\u76ee\u6807\u5bf9\u8c61</span><strong>${escapeHtml(targetName)}</strong></div>
-          <div><span>\u76ee\u6807\u7c7b\u578b</span><strong>${targetKindLabel}</strong></div>
-          <div><span>\u8fd0\u884c\u884c\u4e3a</span><strong>${escapeHtml(runtimeLabel)}</strong></div>
-        </div>
-        <div class="fault-tag-param-preview">
-          <div class="pglbl">\u6545\u969c\u53c2\u6570</div>
-          ${params.length?params.map(([key,value])=>`
-            <div class="fault-tag-param-preview__row">
-              <span>${escapeHtml(paramLabelMap[key]||key)}</span>
-              <strong>${escapeHtml(value)}</strong>
-            </div>
-          `).join(''):'<div class="props-empty-inline">\u8be5\u6545\u969c\u6ca1\u6709\u989d\u5916\u53c2\u6570\u3002</div>'}
         </div>
       `;
     }
@@ -18121,7 +18096,7 @@ function decorateDataflowEdges(){
       const dirty=isDirty();
       if(applyButton){applyButton.disabled=!dirty;}
       if(resetButton){resetButton.disabled=!dirty;}
-      if(statusText){statusText.textContent=dirty?'有未应用修改':'参数未修改';}
+      if(statusText){statusText.textContent=dirty?'\u6709\u672a\u5e94\u7528\u4fee\u6539':'\u53c2\u6570\u672a\u4fee\u6539';}
     };
     inputs.forEach(input=>{
       input.addEventListener('input',setDirtyState);
@@ -18135,7 +18110,7 @@ function decorateDataflowEdges(){
       renderModelNodes();
       renderEdges();
       updateUI();
-      toast('故障参数修改已应用','s');
+      toast('\u6545\u969c\u53c2\u6570\u4fee\u6539\u5df2\u5e94\u7528','s');
     });
     resetButton?.addEventListener('click',()=>{
       inputs.forEach(input=>{
@@ -19266,17 +19241,37 @@ function decorateDataflowEdges(){
     };
   }
 
+  function getFaultLayerLabel(layer){
+    return ({
+      physical:'\u7269\u7406\u5c42',
+      electrical:'\u7535\u6c14\u5c42',
+      protocol:'\u534f\u8bae\u5c42'
+    })[layer]||layer||'\u672a\u5b9a\u4e49';
+  }
+
+  function getFaultRuntimeLabel(value){
+    return ({
+      bias:'\u504f\u5dee\u6545\u969c',
+      stuck:'\u5361\u6b7b\u6545\u969c',
+      freeze:'\u5361\u6b7b\u6545\u969c',
+      tamper:'\u6570\u636e\u7be1\u6539',
+      delay:'\u5ef6\u8fdf\u6545\u969c',
+      dropout:'\u4e22\u5305\u6545\u969c',
+      stale:'\u65e7\u503c\u91cd\u653e',
+      overwrite:'\u8986\u76d6\u5199\u5165'
+    })[String(value)]||value||'\u6309\u6a21\u578b\u5b9a\u4e49';
+  }
+
   function getFaultTagSummary(tag){
     return {
-      title:tag?.name||'故障实例',
+      title:tag?.name||'\u6545\u969c\u5b9e\u4f8b',
       rows:[
-        ['故障层级',tag?.layer||'未定义'],
-        ['目标对象',tag?.targetName||tag?.targetId||'未绑定'],
-        ['运行方式',tag?.runtimeBehavior||'按模型定义']
+        ['\u6545\u969c\u5c42\u7ea7',getFaultLayerLabel(tag?.layer)],
+        ['\u76ee\u6807\u5bf9\u8c61',tag?.targetName||tag?.targetId||'\u672a\u7ed1\u5b9a'],
+        ['\u8fd0\u884c\u65b9\u5f0f',getFaultRuntimeLabel(tag?.runtimeBehavior||tag?.mathModel||tag?.modelClass)]
       ]
     };
   }
-
   function getInjectorSummary(target){
     const config=typeof getLayeredFaultInjectorConfig==='function'
       ?getLayeredFaultInjectorConfig(target?.type)
@@ -19339,22 +19334,10 @@ function decorateDataflowEdges(){
   function renderPanelHero(kind,target,options={}){
     const summary=getPanelSummary(kind,target,options);
     const faultTag=options.faultTag||getSelectedFaultTagForChrome();
-    /* const heroRows=kind==='fault-tag'
-      ?[
-        ['鐘舵€?,'宸叉敞鍏?],
-        ['灞傜骇',faultTag?.layer||'--'],
-        ['鍙傛暟',String(Object.keys(faultTag?.parameters||{}).length)]
-      ]
-      :kind==='scope'
-        ?[
-          [(summary?.rows||[])[0]?.[0]||'閫氶亾',(summary?.rows||[])[0]?.[1]||'0'],
-          ['鐘舵€?,getNodeStatusLabel(target)]
-        ]
-        :(summary?.rows||[]); */
     const heroRows=kind==='fault-tag'
       ?[
         ['\u72b6\u6001','\u5df2\u6ce8\u5165'],
-        ['\u5c42\u7ea7',faultTag?.layer||'--'],
+        ['\u5c42\u7ea7',getFaultLayerLabel(faultTag?.layer)],
         ['\u53c2\u6570',String(Object.keys(faultTag?.parameters||{}).length)]
       ]
       :kind==='scope'

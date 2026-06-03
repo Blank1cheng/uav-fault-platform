@@ -389,12 +389,19 @@ describe('property panel interaction', () => {
     expect(document.querySelector(`[data-fault-tag-inspector="${tag.id}"]`)).not.toBeNull();
     expect(document.querySelector('.fault-tag-overview-panel')).not.toBeNull();
     const overviewText = document.querySelector('.fault-tag-overview-panel')?.textContent || '';
-    expect(overviewText).toContain('绑定概览');
-    expect(overviewText).toContain('目标对象');
-    expect(overviewText).toContain('目标类型');
-    expect(overviewText).toContain('运行行为');
-    expect(overviewText).toContain('故障参数');
-    expect(overviewText).not.toMatch(/[缂鑱鐞閻鏉濡]/);
+    expect(overviewText).toContain('\u7ed1\u5b9a\u6982\u89c8');
+    expect(overviewText).toContain('\u76ee\u6807\u5bf9\u8c61');
+    expect(overviewText).toContain('\u76ee\u6807\u7c7b\u578b');
+    expect(overviewText).toContain('\u8fd0\u884c\u884c\u4e3a');
+    expect(overviewText).toContain('\u6545\u969c\u53c2\u6570');
+    expect(overviewText).toContain('\u8fde\u63a5\u7ebf');
+    expect(overviewText).toContain('\u534f\u8bae\u5c42');
+    expect(overviewText).toContain('\u5df2\u6ce8\u5165');
+    expect(overviewText).toContain('\u6545\u969c\u503c');
+    expect(overviewText).toContain('\u5f00\u59cb\u65f6\u95f4');
+    expect(overviewText).toContain('\u6301\u7eed\u65f6\u95f4');
+    expect(overviewText).toContain('\u5199\u5165\u65b9\u5f0f');
+    expect(overviewText).not.toContain('\ufffd');
     expect(document.querySelector('[data-props-tab="faults"]')?.hidden).toBe(true);
     expect(document.querySelector('[data-props-tab="outputs"]')?.hidden).toBe(true);
     expect(document.querySelectorAll('.props-target-card')).toHaveLength(0);
@@ -405,7 +412,13 @@ describe('property panel interaction', () => {
     expect(document.querySelector('[data-props-tab="parameters"]')?.classList.contains('is-active')).toBe(true);
     expect(document.querySelector('[data-props-panel-kind="fault-tag"]')).not.toBeNull();
     expect(document.querySelector(`[data-fault-tag-param-panel="${tag.id}"]`)).not.toBeNull();
-
+    const parameterText = document.querySelector(`[data-fault-tag-param-panel="${tag.id}"]`)?.textContent || '';
+    expect(parameterText).toContain('\u6545\u969c\u53c2\u6570');
+    expect(parameterText).toContain('\u6545\u969c\u503c');
+    expect(parameterText).toContain('\u5f00\u59cb\u65f6\u95f4');
+    expect(parameterText).toContain('\u6301\u7eed\u65f6\u95f4');
+    expect(parameterText).toContain('\u5199\u5165\u65b9\u5f0f');
+    expect(parameterText).not.toContain('\ufffd');
     wrapper.unmount();
   });
 
