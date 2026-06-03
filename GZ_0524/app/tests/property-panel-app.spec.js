@@ -440,6 +440,73 @@ describe('property panel interaction', () => {
     wrapper.unmount();
   });
 
+  it('deletes the selected fault tag and runtime binding with the Delete key', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const target = state.modelNodes.find((node) => node.id === 'node-imu');
+    const injector = window.createNode('electrical_fault_injector', 420, 260);
+    await flushRuntime();
+
+    const bindResult = window.bindLayeredFaultInjectorToTarget(injector.id, {
+      targetKind: 'node',
+      targetId: target.id,
+      slotId: 'electrical:测量角速度',
+      mathModel: 'bias',
+      parameters: { bias: 5, start: 1, duration: 2 }
+    });
+    await flushRuntime();
+
+    expect(bindResult).toMatchObject({ ok: true });
+    expect(target.faultBindings?.some((binding) => binding.active !== false)).toBe(true);
+    expect(state.faultInstances).toContainEqual(expect.objectContaining({
+      targetId: target.id,
+      slotId: 'electrical:测量角速度'
+    }));
+
+    const tag = state.faultTags.find((item) => item.targetId === target.id);
+    expect(tag).toBeTruthy();
+    tag.expanded = true;
+    tag.collapsed = false;
+    window.renderModelNodes();
+    window.renderEdges();
+    await flushRuntime();
+
+    const tagEl = document.querySelector(`[data-fault-tag-id="${tag.id}"]`);
+    expect(tagEl).not.toBeNull();
+    tagEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flushRuntime();
+
+    expect(state.selFaultTag).toBe(tag.id);
+    expect(document.querySelector(`[data-fault-tag-id="${tag.id}"]`)?.classList.contains('is-selected')).toBe(true);
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Delete',
+      bubbles: true,
+      cancelable: true
+    }));
+    await flushRuntime();
+
+    expect(state.selFaultTag).toBeNull();
+    expect(state.faultTags.some((item) => item.id === tag.id)).toBe(false);
+    expect(state.faultInstances.some((instance) => (
+      instance.targetId === target.id
+      && instance.slotId === 'electrical:测量角速度'
+      && instance.active !== false
+    ))).toBe(false);
+    expect(target.faultBindings?.some((binding) => binding.active !== false)).toBe(false);
+    expect(target.injectedFault).toBeUndefined();
+    expect(document.querySelector(`[data-fault-tag-id="${tag.id}"]`)).toBeNull();
+
+    wrapper.unmount();
+  });
+
   it('edits component-owned injectable variables from the fault settings tab', async () => {
     const wrapper = await mountWorkbench();
 

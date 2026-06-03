@@ -1124,6 +1124,7 @@ function getElectricalInjectableNodes(){
 function clearCanvasSelection(){
   S.selBlk=null;
   S.selEdge=null;
+  S.selFaultTag=null;
   renderModelNodes();
   renderPropertyPanel(null);
 }
@@ -2217,6 +2218,10 @@ function deleteSelectedEdge(){
 }
 
 function deleteCurrentSelection(){
+  if(S.selFaultTag&&typeof window.deleteSelectedFaultTag==='function'){
+    window.deleteSelectedFaultTag();
+    return;
+  }
   if(S.selEdge){
     deleteSelectedEdge();
     return;
@@ -2514,7 +2519,7 @@ function bindCanvasInteractions(){
       active.tagName==='SELECT'||
       active.isContentEditable
     );
-    if((event.key==='Delete'||event.key==='Backspace')&&!editing&&!document.querySelector('.overlay.open')&&(S.selBlk||S.selEdge)){
+    if((event.key==='Delete'||event.key==='Backspace')&&!editing&&!document.querySelector('.overlay.open')&&(S.selBlk||S.selEdge||S.selFaultTag)){
       event.preventDefault();
       deleteCurrentSelection();
     }
@@ -18300,6 +18305,30 @@ function decorateDataflowEdges(){
     updateUI();
   }
 
+  function deleteSelectedFaultTag(){
+    const tag=getFaultTagById(S.selFaultTag);
+    if(!tag){return false;}
+    const faultId=tag.faultModelId||tag.faultTypeId||tag.modelId||tag.id||'';
+    const targetKind=tag.targetKind==='edge'?'edge':'node';
+    const targetId=tag.targetId||'';
+    let removed=false;
+    if(targetId&&faultId&&typeof window.removeFaultBinding==='function'){
+      removed=window.removeFaultBinding(targetKind,targetId,faultId);
+    }
+    if(!removed&&faultId){
+      removed=removeVisualFaultInjectionArtifacts(faultId,{skipRender:true});
+    }
+    S.selFaultTag=null;
+    if(removed){
+      renderModelNodes();
+      renderEdges();
+      renderPropertyPanel(null);
+      updateUI();
+      toast('\u6545\u969c\u6807\u7b7e\u5df2\u5220\u9664','s');
+    }
+    return removed;
+  }
+
   window.__GZ_RENDER_FAULT_TAG_PANEL__=renderFaultTagPropertyPanel;
 
   const FAULT_TAG_DRAG={
@@ -18650,6 +18679,7 @@ function decorateDataflowEdges(){
   window.renderModelNodes=renderModelNodes;
   window.renderFaultTags=renderFaultTags;
   window.selectFaultTag=selectFaultTag;
+  window.deleteSelectedFaultTag=deleteSelectedFaultTag;
   window.createManualFaultTag=createManualFaultTag;
   window.collapseAllFaultTags=()=>setAllFaultTagsCollapsed(true);
   window.expandAllFaultTags=()=>setAllFaultTagsCollapsed(false);
