@@ -1,4 +1,4 @@
-(function(){let e=document.createElement(`link`).relList;if(e&&e.supports&&e.supports(`modulepreload`))return;for(let e of document.querySelectorAll(`link[rel="modulepreload"]`))n(e);new MutationObserver(e=>{for(let t of e)if(t.type===`childList`)for(let e of t.addedNodes)e.tagName===`LINK`&&e.rel===`modulepreload`&&n(e)}).observe(document,{childList:!0,subtree:!0});function t(e){let t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),e.crossOrigin===`use-credentials`?t.credentials=`include`:e.crossOrigin===`anonymous`?t.credentials=`omit`:t.credentials=`same-origin`,t}function n(e){if(e.ep)return;e.ep=!0;let n=t(e);fetch(e.href,n)}})();function e(e){let t=Object.create(null);for(let n of e.split(`,`))t[n]=1;return e=>e in t}var t={},n=[],r=()=>{},i=()=>!1,a=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),o=e=>e.startsWith(`onUpdate:`),s=Object.assign,c=(e,t)=>{let n=e.indexOf(t);n>-1&&e.splice(n,1)},l=Object.prototype.hasOwnProperty,u=(e,t)=>l.call(e,t),d=Array.isArray,f=e=>x(e)===`[object Map]`,p=e=>x(e)===`[object Set]`,m=e=>x(e)===`[object Date]`,h=e=>typeof e==`function`,g=e=>typeof e==`string`,_=e=>typeof e==`symbol`,v=e=>typeof e==`object`&&!!e,y=e=>(v(e)||h(e))&&h(e.then)&&h(e.catch),b=Object.prototype.toString,x=e=>b.call(e),ee=e=>x(e).slice(8,-1),S=e=>x(e)===`[object Object]`,te=e=>g(e)&&e!==`NaN`&&e[0]!==`-`&&``+parseInt(e,10)===e,ne=e(`,key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted`),re=e=>{let t=Object.create(null);return(n=>t[n]||(t[n]=e(n)))},ie=/-\w/g,C=re(e=>e.replace(ie,e=>e.slice(1).toUpperCase())),ae=/\B([A-Z])/g,w=re(e=>e.replace(ae,`-$1`).toLowerCase()),oe=re(e=>e.charAt(0).toUpperCase()+e.slice(1)),se=re(e=>e?`on${oe(e)}`:``),T=(e,t)=>!Object.is(e,t),ce=(e,...t)=>{for(let n=0;n<e.length;n++)e[n](...t)},E=(e,t,n,r=!1)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:r,value:n})},le=e=>{let t=parseFloat(e);return isNaN(t)?e:t},ue,de=()=>ue||=typeof globalThis<`u`?globalThis:typeof self<`u`?self:typeof window<`u`?window:typeof global<`u`?global:{};function fe(e){if(d(e)){let t={};for(let n=0;n<e.length;n++){let r=e[n],i=g(r)?ge(r):fe(r);if(i)for(let e in i)t[e]=i[e]}return t}else if(g(e)||v(e))return e}var pe=/;(?![^(]*\))/g,me=/:([^]+)/,he=/\/\*[^]*?\*\//g;function ge(e){let t={};return e.replace(he,``).split(pe).forEach(e=>{if(e){let n=e.split(me);n.length>1&&(t[n[0].trim()]=n[1].trim())}}),t}function _e(e){let t=``;if(g(e))t=e;else if(d(e))for(let n=0;n<e.length;n++){let r=_e(e[n]);r&&(t+=r+` `)}else if(v(e))for(let n in e)e[n]&&(t+=n+` `);return t.trim()}var ve=`itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`,ye=e(ve);ve+``;function be(e){return!!e||e===``}function xe(e,t){if(e.length!==t.length)return!1;let n=!0;for(let r=0;n&&r<e.length;r++)n=Se(e[r],t[r]);return n}function Se(e,t){if(e===t)return!0;let n=m(e),r=m(t);if(n||r)return n&&r?e.getTime()===t.getTime():!1;if(n=_(e),r=_(t),n||r)return e===t;if(n=d(e),r=d(t),n||r)return n&&r?xe(e,t):!1;if(n=v(e),r=v(t),n||r){if(!n||!r||Object.keys(e).length!==Object.keys(t).length)return!1;for(let n in e){let r=e.hasOwnProperty(n),i=t.hasOwnProperty(n);if(r&&!i||!r&&i||!Se(e[n],t[n]))return!1}}return String(e)===String(t)}function Ce(e,t){return e.findIndex(e=>Se(e,t))}var we=e=>!!(e&&e.__v_isRef===!0),D=e=>g(e)?e:e==null?``:d(e)||v(e)&&(e.toString===b||!h(e.toString))?we(e)?D(e.value):JSON.stringify(e,Te,2):String(e),Te=(e,t)=>we(t)?Te(e,t.value):f(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((e,[t,n],r)=>(e[Ee(t,r)+` =>`]=n,e),{})}:p(t)?{[`Set(${t.size})`]:[...t.values()].map(e=>Ee(e))}:_(t)?Ee(t):v(t)&&!d(t)&&!S(t)?String(t):t,Ee=(e,t=``)=>_(e)?`Symbol(${e.description??t})`:e,O,De=class{constructor(e=!1){this.detached=e,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.__v_skip=!0,this.parent=O,!e&&O&&(this.index=(O.scopes||=[]).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].pause();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].resume();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].resume()}}run(e){if(this._active){let t=O;try{return O=this,e()}finally{O=t}}}on(){++this._on===1&&(this.prevScope=O,O=this)}off(){this._on>0&&--this._on===0&&(O=this.prevScope,this.prevScope=void 0)}stop(e){if(this._active){this._active=!1;let t,n;for(t=0,n=this.effects.length;t<n;t++)this.effects[t].stop();for(this.effects.length=0,t=0,n=this.cleanups.length;t<n;t++)this.cleanups[t]();if(this.cleanups.length=0,this.scopes){for(t=0,n=this.scopes.length;t<n;t++)this.scopes[t].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!e){let e=this.parent.scopes.pop();e&&e!==this&&(this.parent.scopes[this.index]=e,e.index=this.index)}this.parent=void 0}}};function Oe(){return O}var k,ke=new WeakSet,Ae=class{constructor(e){this.fn=e,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,O&&O.active&&O.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,ke.has(this)&&(ke.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||Pe(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,qe(this),Le(this);let e=k,t=Ue;k=this,Ue=!0;try{return this.fn()}finally{Re(this),k=e,Ue=t,this.flags&=-3}}stop(){if(this.flags&1){for(let e=this.deps;e;e=e.nextDep)Ve(e);this.deps=this.depsTail=void 0,qe(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?ke.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){ze(this)&&this.run()}get dirty(){return ze(this)}},je=0,Me,Ne;function Pe(e,t=!1){if(e.flags|=8,t){e.next=Ne,Ne=e;return}e.next=Me,Me=e}function Fe(){je++}function Ie(){if(--je>0)return;if(Ne){let e=Ne;for(Ne=void 0;e;){let t=e.next;e.next=void 0,e.flags&=-9,e=t}}let e;for(;Me;){let t=Me;for(Me=void 0;t;){let n=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(t){e||=t}t=n}}if(e)throw e}function Le(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function Re(e){let t,n=e.depsTail,r=n;for(;r;){let e=r.prevDep;r.version===-1?(r===n&&(n=e),Ve(r),He(r)):t=r,r.dep.activeLink=r.prevActiveLink,r.prevActiveLink=void 0,r=e}e.deps=t,e.depsTail=n}function ze(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(Be(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function Be(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===Je)||(e.globalVersion=Je,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!ze(e))))return;e.flags|=2;let t=e.dep,n=k,r=Ue;k=e,Ue=!0;try{Le(e);let n=e.fn(e._value);(t.version===0||T(n,e._value))&&(e.flags|=128,e._value=n,t.version++)}catch(e){throw t.version++,e}finally{k=n,Ue=r,Re(e),e.flags&=-3}}function Ve(e,t=!1){let{dep:n,prevSub:r,nextSub:i}=e;if(r&&(r.nextSub=i,e.prevSub=void 0),i&&(i.prevSub=r,e.nextSub=void 0),n.subs===e&&(n.subs=r,!r&&n.computed)){n.computed.flags&=-5;for(let e=n.computed.deps;e;e=e.nextDep)Ve(e,!0)}!t&&!--n.sc&&n.map&&n.map.delete(n.key)}function He(e){let{prevDep:t,nextDep:n}=e;t&&(t.nextDep=n,e.prevDep=void 0),n&&(n.prevDep=t,e.nextDep=void 0)}var Ue=!0,We=[];function Ge(){We.push(Ue),Ue=!1}function Ke(){let e=We.pop();Ue=e===void 0?!0:e}function qe(e){let{cleanup:t}=e;if(e.cleanup=void 0,t){let e=k;k=void 0;try{t()}finally{k=e}}}var Je=0,Ye=class{constructor(e,t){this.sub=e,this.dep=t,this.version=t.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}},Xe=class{constructor(e){this.computed=e,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(e){if(!k||!Ue||k===this.computed)return;let t=this.activeLink;if(t===void 0||t.sub!==k)t=this.activeLink=new Ye(k,this),k.deps?(t.prevDep=k.depsTail,k.depsTail.nextDep=t,k.depsTail=t):k.deps=k.depsTail=t,Ze(t);else if(t.version===-1&&(t.version=this.version,t.nextDep)){let e=t.nextDep;e.prevDep=t.prevDep,t.prevDep&&(t.prevDep.nextDep=e),t.prevDep=k.depsTail,t.nextDep=void 0,k.depsTail.nextDep=t,k.depsTail=t,k.deps===t&&(k.deps=e)}return t}trigger(e){this.version++,Je++,this.notify(e)}notify(e){Fe();try{for(let e=this.subs;e;e=e.prevSub)e.sub.notify()&&e.sub.dep.notify()}finally{Ie()}}};function Ze(e){if(e.dep.sc++,e.sub.flags&4){let t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let e=t.deps;e;e=e.nextDep)Ze(e)}let n=e.dep.subs;n!==e&&(e.prevSub=n,n&&(n.nextSub=e)),e.dep.subs=e}}var Qe=new WeakMap,$e=Symbol(``),et=Symbol(``),tt=Symbol(``);function A(e,t,n){if(Ue&&k){let t=Qe.get(e);t||Qe.set(e,t=new Map);let r=t.get(n);r||(t.set(n,r=new Xe),r.map=t,r.key=n),r.track()}}function nt(e,t,n,r,i,a){let o=Qe.get(e);if(!o){Je++;return}let s=e=>{e&&e.trigger()};if(Fe(),t===`clear`)o.forEach(s);else{let i=d(e),a=i&&te(n);if(i&&n===`length`){let e=Number(r);o.forEach((t,n)=>{(n===`length`||n===tt||!_(n)&&n>=e)&&s(t)})}else switch((n!==void 0||o.has(void 0))&&s(o.get(n)),a&&s(o.get(tt)),t){case`add`:i?a&&s(o.get(`length`)):(s(o.get($e)),f(e)&&s(o.get(et)));break;case`delete`:i||(s(o.get($e)),f(e)&&s(o.get(et)));break;case`set`:f(e)&&s(o.get($e));break}}Ie()}function rt(e){let t=j(e);return t===e?t:(A(t,`iterate`,tt),Ut(e)?t:t.map(Kt))}function it(e){return A(e=j(e),`iterate`,tt),e}function at(e,t){return Ht(e)?qt(Vt(e)?Kt(t):t):Kt(t)}var ot={__proto__:null,[Symbol.iterator](){return st(this,Symbol.iterator,e=>at(this,e))},concat(...e){return rt(this).concat(...e.map(e=>d(e)?rt(e):e))},entries(){return st(this,`entries`,e=>(e[1]=at(this,e[1]),e))},every(e,t){return lt(this,`every`,e,t,void 0,arguments)},filter(e,t){return lt(this,`filter`,e,t,e=>e.map(e=>at(this,e)),arguments)},find(e,t){return lt(this,`find`,e,t,e=>at(this,e),arguments)},findIndex(e,t){return lt(this,`findIndex`,e,t,void 0,arguments)},findLast(e,t){return lt(this,`findLast`,e,t,e=>at(this,e),arguments)},findLastIndex(e,t){return lt(this,`findLastIndex`,e,t,void 0,arguments)},forEach(e,t){return lt(this,`forEach`,e,t,void 0,arguments)},includes(...e){return dt(this,`includes`,e)},indexOf(...e){return dt(this,`indexOf`,e)},join(e){return rt(this).join(e)},lastIndexOf(...e){return dt(this,`lastIndexOf`,e)},map(e,t){return lt(this,`map`,e,t,void 0,arguments)},pop(){return ft(this,`pop`)},push(...e){return ft(this,`push`,e)},reduce(e,...t){return ut(this,`reduce`,e,t)},reduceRight(e,...t){return ut(this,`reduceRight`,e,t)},shift(){return ft(this,`shift`)},some(e,t){return lt(this,`some`,e,t,void 0,arguments)},splice(...e){return ft(this,`splice`,e)},toReversed(){return rt(this).toReversed()},toSorted(e){return rt(this).toSorted(e)},toSpliced(...e){return rt(this).toSpliced(...e)},unshift(...e){return ft(this,`unshift`,e)},values(){return st(this,`values`,e=>at(this,e))}};function st(e,t,n){let r=it(e),i=r[t]();return r!==e&&!Ut(e)&&(i._next=i.next,i.next=()=>{let e=i._next();return e.done||(e.value=n(e.value)),e}),i}var ct=Array.prototype;function lt(e,t,n,r,i,a){let o=it(e),s=o!==e&&!Ut(e),c=o[t];if(c!==ct[t]){let t=c.apply(e,a);return s?Kt(t):t}let l=n;o!==e&&(s?l=function(t,r){return n.call(this,at(e,t),r,e)}:n.length>2&&(l=function(t,r){return n.call(this,t,r,e)}));let u=c.call(o,l,r);return s&&i?i(u):u}function ut(e,t,n,r){let i=it(e),a=i!==e&&!Ut(e),o=n,s=!1;i!==e&&(a?(s=r.length===0,o=function(t,r,i){return s&&(s=!1,t=at(e,t)),n.call(this,t,at(e,r),i,e)}):n.length>3&&(o=function(t,r,i){return n.call(this,t,r,i,e)}));let c=i[t](o,...r);return s?at(e,c):c}function dt(e,t,n){let r=j(e);A(r,`iterate`,tt);let i=r[t](...n);return(i===-1||i===!1)&&Wt(n[0])?(n[0]=j(n[0]),r[t](...n)):i}function ft(e,t,n=[]){Ge(),Fe();let r=j(e)[t].apply(e,n);return Ie(),Ke(),r}var pt=e(`__proto__,__v_isRef,__isVue`),mt=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!==`arguments`&&e!==`caller`).map(e=>Symbol[e]).filter(_));function ht(e){_(e)||(e=String(e));let t=j(this);return A(t,`has`,e),t.hasOwnProperty(e)}var gt=class{constructor(e=!1,t=!1){this._isReadonly=e,this._isShallow=t}get(e,t,n){if(t===`__v_skip`)return e.__v_skip;let r=this._isReadonly,i=this._isShallow;if(t===`__v_isReactive`)return!r;if(t===`__v_isReadonly`)return r;if(t===`__v_isShallow`)return i;if(t===`__v_raw`)return n===(r?i?Pt:Nt:i?Mt:jt).get(e)||Object.getPrototypeOf(e)===Object.getPrototypeOf(n)?e:void 0;let a=d(e);if(!r){let e;if(a&&(e=ot[t]))return e;if(t===`hasOwnProperty`)return ht}let o=Reflect.get(e,t,M(e)?e:n);if((_(t)?mt.has(t):pt(t))||(r||A(e,`get`,t),i))return o;if(M(o)){let e=a&&te(t)?o:o.value;return r&&v(e)?zt(e):e}return v(o)?r?zt(o):Lt(o):o}},_t=class extends gt{constructor(e=!1){super(!1,e)}set(e,t,n,r){let i=e[t],a=d(e)&&te(t);if(!this._isShallow){let e=Ht(i);if(!Ut(n)&&!Ht(n)&&(i=j(i),n=j(n)),!a&&M(i)&&!M(n))return e||(i.value=n),!0}let o=a?Number(t)<e.length:u(e,t),s=Reflect.set(e,t,n,M(e)?e:r);return e===j(r)&&(o?T(n,i)&&nt(e,`set`,t,n,i):nt(e,`add`,t,n)),s}deleteProperty(e,t){let n=u(e,t),r=e[t],i=Reflect.deleteProperty(e,t);return i&&n&&nt(e,`delete`,t,void 0,r),i}has(e,t){let n=Reflect.has(e,t);return(!_(t)||!mt.has(t))&&A(e,`has`,t),n}ownKeys(e){return A(e,`iterate`,d(e)?`length`:$e),Reflect.ownKeys(e)}},vt=class extends gt{constructor(e=!1){super(!0,e)}set(e,t){return!0}deleteProperty(e,t){return!0}},yt=new _t,bt=new vt,xt=new _t(!0),St=e=>e,Ct=e=>Reflect.getPrototypeOf(e);function wt(e,t,n){return function(...r){let i=this.__v_raw,a=j(i),o=f(a),c=e===`entries`||e===Symbol.iterator&&o,l=e===`keys`&&o,u=i[e](...r),d=n?St:t?qt:Kt;return!t&&A(a,`iterate`,l?et:$e),s(Object.create(u),{next(){let{value:e,done:t}=u.next();return t?{value:e,done:t}:{value:c?[d(e[0]),d(e[1])]:d(e),done:t}}})}}function Tt(e){return function(...t){return e===`delete`?!1:e===`clear`?void 0:this}}function Et(e,t){let n={get(n){let r=this.__v_raw,i=j(r),a=j(n);e||(T(n,a)&&A(i,`get`,n),A(i,`get`,a));let{has:o}=Ct(i),s=t?St:e?qt:Kt;if(o.call(i,n))return s(r.get(n));if(o.call(i,a))return s(r.get(a));r!==i&&r.get(n)},get size(){let t=this.__v_raw;return!e&&A(j(t),`iterate`,$e),t.size},has(t){let n=this.__v_raw,r=j(n),i=j(t);return e||(T(t,i)&&A(r,`has`,t),A(r,`has`,i)),t===i?n.has(t):n.has(t)||n.has(i)},forEach(n,r){let i=this,a=i.__v_raw,o=j(a),s=t?St:e?qt:Kt;return!e&&A(o,`iterate`,$e),a.forEach((e,t)=>n.call(r,s(e),s(t),i))}};return s(n,e?{add:Tt(`add`),set:Tt(`set`),delete:Tt(`delete`),clear:Tt(`clear`)}:{add(e){let n=j(this),r=Ct(n),i=j(e),a=!t&&!Ut(e)&&!Ht(e)?i:e;return r.has.call(n,a)||T(e,a)&&r.has.call(n,e)||T(i,a)&&r.has.call(n,i)||(n.add(a),nt(n,`add`,a,a)),this},set(e,n){!t&&!Ut(n)&&!Ht(n)&&(n=j(n));let r=j(this),{has:i,get:a}=Ct(r),o=i.call(r,e);o||=(e=j(e),i.call(r,e));let s=a.call(r,e);return r.set(e,n),o?T(n,s)&&nt(r,`set`,e,n,s):nt(r,`add`,e,n),this},delete(e){let t=j(this),{has:n,get:r}=Ct(t),i=n.call(t,e);i||=(e=j(e),n.call(t,e));let a=r?r.call(t,e):void 0,o=t.delete(e);return i&&nt(t,`delete`,e,void 0,a),o},clear(){let e=j(this),t=e.size!==0,n=e.clear();return t&&nt(e,`clear`,void 0,void 0,void 0),n}}),[`keys`,`values`,`entries`,Symbol.iterator].forEach(r=>{n[r]=wt(r,e,t)}),n}function Dt(e,t){let n=Et(e,t);return(t,r,i)=>r===`__v_isReactive`?!e:r===`__v_isReadonly`?e:r===`__v_raw`?t:Reflect.get(u(n,r)&&r in t?n:t,r,i)}var Ot={get:Dt(!1,!1)},kt={get:Dt(!1,!0)},At={get:Dt(!0,!1)},jt=new WeakMap,Mt=new WeakMap,Nt=new WeakMap,Pt=new WeakMap;function Ft(e){switch(e){case`Object`:case`Array`:return 1;case`Map`:case`Set`:case`WeakMap`:case`WeakSet`:return 2;default:return 0}}function It(e){return e.__v_skip||!Object.isExtensible(e)?0:Ft(ee(e))}function Lt(e){return Ht(e)?e:Bt(e,!1,yt,Ot,jt)}function Rt(e){return Bt(e,!1,xt,kt,Mt)}function zt(e){return Bt(e,!0,bt,At,Nt)}function Bt(e,t,n,r,i){if(!v(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;let a=It(e);if(a===0)return e;let o=i.get(e);if(o)return o;let s=new Proxy(e,a===2?r:n);return i.set(e,s),s}function Vt(e){return Ht(e)?Vt(e.__v_raw):!!(e&&e.__v_isReactive)}function Ht(e){return!!(e&&e.__v_isReadonly)}function Ut(e){return!!(e&&e.__v_isShallow)}function Wt(e){return e?!!e.__v_raw:!1}function j(e){let t=e&&e.__v_raw;return t?j(t):e}function Gt(e){return!u(e,`__v_skip`)&&Object.isExtensible(e)&&E(e,`__v_skip`,!0),e}var Kt=e=>v(e)?Lt(e):e,qt=e=>v(e)?zt(e):e;function M(e){return e?e.__v_isRef===!0:!1}function Jt(e){return Yt(e,!1)}function Yt(e,t){return M(e)?e:new Xt(e,t)}var Xt=class{constructor(e,t){this.dep=new Xe,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=t?e:j(e),this._value=t?e:Kt(e),this.__v_isShallow=t}get value(){return this.dep.track(),this._value}set value(e){let t=this._rawValue,n=this.__v_isShallow||Ut(e)||Ht(e);e=n?e:j(e),T(e,t)&&(this._rawValue=e,this._value=n?e:Kt(e),this.dep.trigger())}};function N(e){return M(e)?e.value:e}var Zt={get:(e,t,n)=>t===`__v_raw`?e:N(Reflect.get(e,t,n)),set:(e,t,n,r)=>{let i=e[t];return M(i)&&!M(n)?(i.value=n,!0):Reflect.set(e,t,n,r)}};function Qt(e){return Vt(e)?e:new Proxy(e,Zt)}var $t=class{constructor(e,t,n){this.fn=e,this.setter=t,this._value=void 0,this.dep=new Xe(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=Je-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!t,this.isSSR=n}notify(){if(this.flags|=16,!(this.flags&8)&&k!==this)return Pe(this,!0),!0}get value(){let e=this.dep.track();return Be(this),e&&(e.version=this.dep.version),this._value}set value(e){this.setter&&this.setter(e)}};function en(e,t,n=!1){let r,i;return h(e)?r=e:(r=e.get,i=e.set),new $t(r,i,n)}var tn={},nn=new WeakMap,rn=void 0;function an(e,t=!1,n=rn){if(n){let t=nn.get(n);t||nn.set(n,t=[]),t.push(e)}}function on(e,n,i=t){let{immediate:a,deep:o,once:s,scheduler:l,augmentJob:u,call:f}=i,p=e=>o?e:Ut(e)||o===!1||o===0?sn(e,1):sn(e),m,g,_,v,y=!1,b=!1;if(M(e)?(g=()=>e.value,y=Ut(e)):Vt(e)?(g=()=>p(e),y=!0):d(e)?(b=!0,y=e.some(e=>Vt(e)||Ut(e)),g=()=>e.map(e=>{if(M(e))return e.value;if(Vt(e))return p(e);if(h(e))return f?f(e,2):e()})):g=h(e)?n?f?()=>f(e,2):e:()=>{if(_){Ge();try{_()}finally{Ke()}}let t=rn;rn=m;try{return f?f(e,3,[v]):e(v)}finally{rn=t}}:r,n&&o){let e=g,t=o===!0?1/0:o;g=()=>sn(e(),t)}let x=Oe(),ee=()=>{m.stop(),x&&x.active&&c(x.effects,m)};if(s&&n){let e=n;n=(...t)=>{e(...t),ee()}}let S=b?Array(e.length).fill(tn):tn,te=e=>{if(!(!(m.flags&1)||!m.dirty&&!e))if(n){let e=m.run();if(o||y||(b?e.some((e,t)=>T(e,S[t])):T(e,S))){_&&_();let t=rn;rn=m;try{let t=[e,S===tn?void 0:b&&S[0]===tn?[]:S,v];S=e,f?f(n,3,t):n(...t)}finally{rn=t}}}else m.run()};return u&&u(te),m=new Ae(g),m.scheduler=l?()=>l(te,!1):te,v=e=>an(e,!1,m),_=m.onStop=()=>{let e=nn.get(m);if(e){if(f)f(e,4);else for(let t of e)t();nn.delete(m)}},n?a?te(!0):S=m.run():l?l(te.bind(null,!0),!0):m.run(),ee.pause=m.pause.bind(m),ee.resume=m.resume.bind(m),ee.stop=ee,ee}function sn(e,t=1/0,n){if(t<=0||!v(e)||e.__v_skip||(n||=new Map,(n.get(e)||0)>=t))return e;if(n.set(e,t),t--,M(e))sn(e.value,t,n);else if(d(e))for(let r=0;r<e.length;r++)sn(e[r],t,n);else if(p(e)||f(e))e.forEach(e=>{sn(e,t,n)});else if(S(e)){for(let r in e)sn(e[r],t,n);for(let r of Object.getOwnPropertySymbols(e))Object.prototype.propertyIsEnumerable.call(e,r)&&sn(e[r],t,n)}return e}function cn(e,t,n,r){try{return r?e(...r):e()}catch(e){un(e,t,n)}}function ln(e,t,n,r){if(h(e)){let i=cn(e,t,n,r);return i&&y(i)&&i.catch(e=>{un(e,t,n)}),i}if(d(e)){let i=[];for(let a=0;a<e.length;a++)i.push(ln(e[a],t,n,r));return i}}function un(e,n,r,i=!0){let a=n?n.vnode:null,{errorHandler:o,throwUnhandledErrorInProduction:s}=n&&n.appContext.config||t;if(n){let t=n.parent,i=n.proxy,a=`https://vuejs.org/error-reference/#runtime-${r}`;for(;t;){let n=t.ec;if(n){for(let t=0;t<n.length;t++)if(n[t](e,i,a)===!1)return}t=t.parent}if(o){Ge(),cn(o,null,10,[e,i,a]),Ke();return}}dn(e,r,a,i,s)}function dn(e,t,n,r=!0,i=!1){if(i)throw e;console.error(e)}var P=[],fn=-1,pn=[],mn=null,hn=0,gn=Promise.resolve(),_n=null;function vn(e){let t=_n||gn;return e?t.then(this?e.bind(this):e):t}function yn(e){let t=fn+1,n=P.length;for(;t<n;){let r=t+n>>>1,i=P[r],a=Tn(i);a<e||a===e&&i.flags&2?t=r+1:n=r}return t}function bn(e){if(!(e.flags&1)){let t=Tn(e),n=P[P.length-1];!n||!(e.flags&2)&&t>=Tn(n)?P.push(e):P.splice(yn(t),0,e),e.flags|=1,xn()}}function xn(){_n||=gn.then(En)}function Sn(e){d(e)?pn.push(...e):mn&&e.id===-1?mn.splice(hn+1,0,e):e.flags&1||(pn.push(e),e.flags|=1),xn()}function Cn(e,t,n=fn+1){for(;n<P.length;n++){let t=P[n];if(t&&t.flags&2){if(e&&t.id!==e.uid)continue;P.splice(n,1),n--,t.flags&4&&(t.flags&=-2),t(),t.flags&4||(t.flags&=-2)}}}function wn(e){if(pn.length){let e=[...new Set(pn)].sort((e,t)=>Tn(e)-Tn(t));if(pn.length=0,mn){mn.push(...e);return}for(mn=e,hn=0;hn<mn.length;hn++){let e=mn[hn];e.flags&4&&(e.flags&=-2),e.flags&8||e(),e.flags&=-2}mn=null,hn=0}}var Tn=e=>e.id==null?e.flags&2?-1:1/0:e.id;function En(e){try{for(fn=0;fn<P.length;fn++){let e=P[fn];e&&!(e.flags&8)&&(e.flags&4&&(e.flags&=-2),cn(e,e.i,e.i?15:14),e.flags&4||(e.flags&=-2))}}finally{for(;fn<P.length;fn++){let e=P[fn];e&&(e.flags&=-2)}fn=-1,P.length=0,wn(e),_n=null,(P.length||pn.length)&&En(e)}}var Dn=null,On=null;function kn(e){let t=Dn;return Dn=e,On=e&&e.type.__scopeId||null,t}function An(e,t=Dn,n){if(!t||e._n)return e;let r=(...n)=>{r._d&&Mi(-1);let i=kn(t),a;try{a=e(...n)}finally{kn(i),r._d&&Mi(1)}return a};return r._n=!0,r._c=!0,r._d=!0,r}function F(e,n){if(Dn===null)return e;let r=ma(Dn),i=e.dirs||=[];for(let e=0;e<n.length;e++){let[a,o,s,c=t]=n[e];a&&(h(a)&&(a={mounted:a,updated:a}),a.deep&&sn(o),i.push({dir:a,instance:r,value:o,oldValue:void 0,arg:s,modifiers:c}))}return e}function jn(e,t,n,r){let i=e.dirs,a=t&&t.dirs;for(let o=0;o<i.length;o++){let s=i[o];a&&(s.oldValue=a[o].value);let c=s.dir[r];c&&(Ge(),ln(c,n,8,[e.el,s,e,t]),Ke())}}function Mn(e,t){if(W){let n=W.provides,r=W.parent&&W.parent.provides;r===n&&(n=W.provides=Object.create(r)),n[e]=t}}function Nn(e,t,n=!1){let r=$i();if(r||Lr){let i=Lr?Lr._context.provides:r?r.parent==null||r.ce?r.vnode.appContext&&r.vnode.appContext.provides:r.parent.provides:void 0;if(i&&e in i)return i[e];if(arguments.length>1)return n&&h(t)?t.call(r&&r.proxy):t}}var Pn=Symbol.for(`v-scx`),Fn=()=>Nn(Pn);function In(e,t,n){return Ln(e,t,n)}function Ln(e,n,i=t){let{immediate:a,deep:o,flush:c,once:l}=i,u=s({},i),d=n&&a||!n&&c!==`post`,f;if(aa){if(c===`sync`){let e=Fn();f=e.__watcherHandles||=[]}else if(!d){let e=()=>{};return e.stop=r,e.resume=r,e.pause=r,e}}let p=W;u.call=(e,t,n)=>ln(e,p,t,n);let m=!1;c===`post`?u.scheduler=e=>{L(e,p&&p.suspense)}:c!==`sync`&&(m=!0,u.scheduler=(e,t)=>{t?e():bn(e)}),u.augmentJob=e=>{n&&(e.flags|=4),m&&(e.flags|=2,p&&(e.id=p.uid,e.i=p))};let h=on(e,n,u);return aa&&(f?f.push(h):d&&h()),h}function Rn(e,t,n){let r=this.proxy,i=g(e)?e.includes(`.`)?zn(r,e):()=>r[e]:e.bind(r,r),a;h(t)?a=t:(a=t.handler,n=t);let o=na(this),s=Ln(i,a.bind(r),n);return o(),s}function zn(e,t){let n=t.split(`.`);return()=>{let t=e;for(let e=0;e<n.length&&t;e++)t=t[n[e]];return t}}var Bn=Symbol(`_vte`),Vn=e=>e.__isTeleport,Hn=Symbol(`_leaveCb`);function Un(e,t){e.shapeFlag&6&&e.component?(e.transition=t,Un(e.component.subTree,t)):e.shapeFlag&128?(e.ssContent.transition=t.clone(e.ssContent),e.ssFallback.transition=t.clone(e.ssFallback)):e.transition=t}function Wn(e){e.ids=[e.ids[0]+ e.ids[2]+++`-`,0,0]}function Gn(e,t){let n;return!!((n=Object.getOwnPropertyDescriptor(e,t))&&!n.configurable)}var Kn=new WeakMap;function qn(e,n,r,a,o=!1){if(d(e)){e.forEach((e,t)=>qn(e,n&&(d(n)?n[t]:n),r,a,o));return}if(Yn(a)&&!o){a.shapeFlag&512&&a.type.__asyncResolved&&a.component.subTree.component&&qn(e,n,r,a.component.subTree);return}let s=a.shapeFlag&4?ma(a.component):a.el,l=o?null:s,{i:f,r:p}=e,m=n&&n.r,_=f.refs===t?f.refs={}:f.refs,v=f.setupState,y=j(v),b=v===t?i:e=>Gn(_,e)?!1:u(y,e),x=(e,t)=>!(t&&Gn(_,t));if(m!=null&&m!==p){if(Jn(n),g(m))_[m]=null,b(m)&&(v[m]=null);else if(M(m)){let e=n;x(m,e.k)&&(m.value=null),e.k&&(_[e.k]=null)}}if(h(p))cn(p,f,12,[l,_]);else{let t=g(p),n=M(p);if(t||n){let i=()=>{if(e.f){let n=t?b(p)?v[p]:_[p]:x(p)||!e.k?p.value:_[e.k];if(o)d(n)&&c(n,s);else if(d(n))n.includes(s)||n.push(s);else if(t)_[p]=[s],b(p)&&(v[p]=_[p]);else{let t=[s];x(p,e.k)&&(p.value=t),e.k&&(_[e.k]=t)}}else t?(_[p]=l,b(p)&&(v[p]=l)):n&&(x(p,e.k)&&(p.value=l),e.k&&(_[e.k]=l))};if(l){let t=()=>{i(),Kn.delete(e)};t.id=-1,Kn.set(e,t),L(t,r)}else Jn(e),i()}}}function Jn(e){let t=Kn.get(e);t&&(t.flags|=8,Kn.delete(e))}de().requestIdleCallback,de().cancelIdleCallback;var Yn=e=>!!e.type.__asyncLoader,Xn=e=>e.type.__isKeepAlive;function Zn(e,t){$n(e,`a`,t)}function Qn(e,t){$n(e,`da`,t)}function $n(e,t,n=W){let r=e.__wdc||=()=>{let t=n;for(;t;){if(t.isDeactivated)return;t=t.parent}return e()};if(tr(t,r,n),n){let e=n.parent;for(;e&&e.parent;)Xn(e.parent.vnode)&&er(r,t,n,e),e=e.parent}}function er(e,t,n,r){let i=tr(t,e,r,!0);cr(()=>{c(r[t],i)},n)}function tr(e,t,n=W,r=!1){if(n){let i=n[e]||(n[e]=[]),a=t.__weh||=(...r)=>{Ge();let i=na(n),a=ln(t,n,e,r);return i(),Ke(),a};return r?i.unshift(a):i.push(a),a}}var nr=e=>(t,n=W)=>{(!aa||e===`sp`)&&tr(e,(...e)=>t(...e),n)},rr=nr(`bm`),ir=nr(`m`),ar=nr(`bu`),or=nr(`u`),sr=nr(`bum`),cr=nr(`um`),lr=nr(`sp`),ur=nr(`rtg`),dr=nr(`rtc`);function fr(e,t=W){tr(`ec`,e,t)}var pr=Symbol.for(`v-ndc`);function mr(e,t,n,r){let i,a=n&&n[r],o=d(e);if(o||g(e)){let n=o&&Vt(e),r=!1,s=!1;n&&(r=!Ut(e),s=Ht(e),e=it(e)),i=Array(e.length);for(let n=0,o=e.length;n<o;n++)i[n]=t(r?s?qt(Kt(e[n])):Kt(e[n]):e[n],n,void 0,a&&a[n])}else if(typeof e==`number`){i=Array(e);for(let n=0;n<e;n++)i[n]=t(n+1,n,void 0,a&&a[n])}else if(v(e))if(e[Symbol.iterator])i=Array.from(e,(e,n)=>t(e,n,void 0,a&&a[n]));else{let n=Object.keys(e);i=Array(n.length);for(let r=0,o=n.length;r<o;r++){let o=n[r];i[r]=t(e[o],o,r,a&&a[r])}}else i=[];return n&&(n[r]=i),i}var hr=e=>e?ia(e)?ma(e):hr(e.parent):null,gr=s(Object.create(null),{$:e=>e,$el:e=>e.vnode.el,$data:e=>e.data,$props:e=>e.props,$attrs:e=>e.attrs,$slots:e=>e.slots,$refs:e=>e.refs,$parent:e=>hr(e.parent),$root:e=>hr(e.root),$host:e=>e.ce,$emit:e=>e.emit,$options:e=>Tr(e),$forceUpdate:e=>e.f||=()=>{bn(e.update)},$nextTick:e=>e.n||=vn.bind(e.proxy),$watch:e=>Rn.bind(e)}),_r=(e,n)=>e!==t&&!e.__isScriptSetup&&u(e,n),vr={get({_:e},n){if(n===`__v_skip`)return!0;let{ctx:r,setupState:i,data:a,props:o,accessCache:s,type:c,appContext:l}=e;if(n[0]!==`$`){let e=s[n];if(e!==void 0)switch(e){case 1:return i[n];case 2:return a[n];case 4:return r[n];case 3:return o[n]}else if(_r(i,n))return s[n]=1,i[n];else if(a!==t&&u(a,n))return s[n]=2,a[n];else if(u(o,n))return s[n]=3,o[n];else if(r!==t&&u(r,n))return s[n]=4,r[n];else br&&(s[n]=0)}let d=gr[n],f,p;if(d)return n===`$attrs`&&A(e.attrs,`get`,``),d(e);if((f=c.__cssModules)&&(f=f[n]))return f;if(r!==t&&u(r,n))return s[n]=4,r[n];if(p=l.config.globalProperties,u(p,n))return p[n]},set({_:e},n,r){let{data:i,setupState:a,ctx:o}=e;return _r(a,n)?(a[n]=r,!0):i!==t&&u(i,n)?(i[n]=r,!0):u(e.props,n)||n[0]===`$`&&n.slice(1)in e?!1:(o[n]=r,!0)},has({_:{data:e,setupState:n,accessCache:r,ctx:i,appContext:a,props:o,type:s}},c){let l;return!!(r[c]||e!==t&&c[0]!==`$`&&u(e,c)||_r(n,c)||u(o,c)||u(i,c)||u(gr,c)||u(a.config.globalProperties,c)||(l=s.__cssModules)&&l[c])},defineProperty(e,t,n){return n.get==null?u(n,`value`)&&this.set(e,t,n.value,null):e._.accessCache[t]=0,Reflect.defineProperty(e,t,n)}};function yr(e){return d(e)?e.reduce((e,t)=>(e[t]=null,e),{}):e}var br=!0;function xr(e){let t=Tr(e),n=e.proxy,i=e.ctx;br=!1,t.beforeCreate&&Cr(t.beforeCreate,e,`bc`);let{data:a,computed:o,methods:s,watch:c,provide:l,inject:u,created:f,beforeMount:p,mounted:m,beforeUpdate:g,updated:_,activated:y,deactivated:b,beforeDestroy:x,beforeUnmount:ee,destroyed:S,unmounted:te,render:ne,renderTracked:re,renderTriggered:ie,errorCaptured:C,serverPrefetch:ae,expose:w,inheritAttrs:oe,components:se,directives:T,filters:ce}=t;if(u&&Sr(u,i,null),s)for(let e in s){let t=s[e];h(t)&&(i[e]=t.bind(n))}if(a){let t=a.call(n,n);v(t)&&(e.data=Lt(t))}if(br=!0,o)for(let e in o){let t=o[e],a=ga({get:h(t)?t.bind(n,n):h(t.get)?t.get.bind(n,n):r,set:!h(t)&&h(t.set)?t.set.bind(n):r});Object.defineProperty(i,e,{enumerable:!0,configurable:!0,get:()=>a.value,set:e=>a.value=e})}if(c)for(let e in c)wr(c[e],i,n,e);if(l){let e=h(l)?l.call(n):l;Reflect.ownKeys(e).forEach(t=>{Mn(t,e[t])})}f&&Cr(f,e,`c`);function E(e,t){d(t)?t.forEach(t=>e(t.bind(n))):t&&e(t.bind(n))}if(E(rr,p),E(ir,m),E(ar,g),E(or,_),E(Zn,y),E(Qn,b),E(fr,C),E(dr,re),E(ur,ie),E(sr,ee),E(cr,te),E(lr,ae),d(w))if(w.length){let t=e.exposed||={};w.forEach(e=>{Object.defineProperty(t,e,{get:()=>n[e],set:t=>n[e]=t,enumerable:!0})})}else e.exposed||={};ne&&e.render===r&&(e.render=ne),oe!=null&&(e.inheritAttrs=oe),se&&(e.components=se),T&&(e.directives=T),ae&&Wn(e)}function Sr(e,t,n=r){d(e)&&(e=Ar(e));for(let n in e){let r=e[n],i;i=v(r)?`default`in r?Nn(r.from||n,r.default,!0):Nn(r.from||n):Nn(r),M(i)?Object.defineProperty(t,n,{enumerable:!0,configurable:!0,get:()=>i.value,set:e=>i.value=e}):t[n]=i}}function Cr(e,t,n){ln(d(e)?e.map(e=>e.bind(t.proxy)):e.bind(t.proxy),t,n)}function wr(e,t,n,r){let i=r.includes(`.`)?zn(n,r):()=>n[r];if(g(e)){let n=t[e];h(n)&&In(i,n)}else if(h(e))In(i,e.bind(n));else if(v(e))if(d(e))e.forEach(e=>wr(e,t,n,r));else{let r=h(e.handler)?e.handler.bind(n):t[e.handler];h(r)&&In(i,r,e)}}function Tr(e){let t=e.type,{mixins:n,extends:r}=t,{mixins:i,optionsCache:a,config:{optionMergeStrategies:o}}=e.appContext,s=a.get(t),c;return s?c=s:!i.length&&!n&&!r?c=t:(c={},i.length&&i.forEach(e=>Er(c,e,o,!0)),Er(c,t,o)),v(t)&&a.set(t,c),c}function Er(e,t,n,r=!1){let{mixins:i,extends:a}=t;a&&Er(e,a,n,!0),i&&i.forEach(t=>Er(e,t,n,!0));for(let i in t)if(!(r&&i===`expose`)){let r=Dr[i]||n&&n[i];e[i]=r?r(e[i],t[i]):t[i]}return e}var Dr={data:Or,props:Mr,emits:Mr,methods:jr,computed:jr,beforeCreate:I,created:I,beforeMount:I,mounted:I,beforeUpdate:I,updated:I,beforeDestroy:I,beforeUnmount:I,destroyed:I,unmounted:I,activated:I,deactivated:I,errorCaptured:I,serverPrefetch:I,components:jr,directives:jr,watch:Nr,provide:Or,inject:kr};function Or(e,t){return t?e?function(){return s(h(e)?e.call(this,this):e,h(t)?t.call(this,this):t)}:t:e}function kr(e,t){return jr(Ar(e),Ar(t))}function Ar(e){if(d(e)){let t={};for(let n=0;n<e.length;n++)t[e[n]]=e[n];return t}return e}function I(e,t){return e?[...new Set([].concat(e,t))]:t}function jr(e,t){return e?s(Object.create(null),e,t):t}function Mr(e,t){return e?d(e)&&d(t)?[...new Set([...e,...t])]:s(Object.create(null),yr(e),yr(t??{})):t}function Nr(e,t){if(!e)return t;if(!t)return e;let n=s(Object.create(null),e);for(let r in t)n[r]=I(e[r],t[r]);return n}function Pr(){return{app:null,config:{isNativeTag:i,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}var Fr=0;function Ir(e,t){return function(n,r=null){h(n)||(n=s({},n)),r!=null&&!v(r)&&(r=null);let i=Pr(),a=new WeakSet,o=[],c=!1,l=i.app={_uid:Fr++,_component:n,_props:r,_container:null,_context:i,_instance:null,version:_a,get config(){return i.config},set config(e){},use(e,...t){return a.has(e)||(e&&h(e.install)?(a.add(e),e.install(l,...t)):h(e)&&(a.add(e),e(l,...t))),l},mixin(e){return i.mixins.includes(e)||i.mixins.push(e),l},component(e,t){return t?(i.components[e]=t,l):i.components[e]},directive(e,t){return t?(i.directives[e]=t,l):i.directives[e]},mount(a,o,s){if(!c){let u=l._ceVNode||U(n,r);return u.appContext=i,s===!0?s=`svg`:s===!1&&(s=void 0),o&&t?t(u,a):e(u,a,s),c=!0,l._container=a,a.__vue_app__=l,ma(u.component)}},onUnmount(e){o.push(e)},unmount(){c&&(ln(o,l._instance,16),e(null,l._container),delete l._container.__vue_app__)},provide(e,t){return i.provides[e]=t,l},runWithContext(e){let t=Lr;Lr=l;try{return e()}finally{Lr=t}}};return l}}var Lr=null,Rr=(e,t)=>t===`modelValue`||t===`model-value`?e.modelModifiers:e[`${t}Modifiers`]||e[`${C(t)}Modifiers`]||e[`${w(t)}Modifiers`];function zr(e,n,...r){if(e.isUnmounted)return;let i=e.vnode.props||t,a=r,o=n.startsWith(`update:`),s=o&&Rr(i,n.slice(7));s&&(s.trim&&(a=r.map(e=>g(e)?e.trim():e)),s.number&&(a=r.map(le)));let c,l=i[c=se(n)]||i[c=se(C(n))];!l&&o&&(l=i[c=se(w(n))]),l&&ln(l,e,6,a);let u=i[c+`Once`];if(u){if(!e.emitted)e.emitted={};else if(e.emitted[c])return;e.emitted[c]=!0,ln(u,e,6,a)}}var Br=new WeakMap;function Vr(e,t,n=!1){let r=n?Br:t.emitsCache,i=r.get(e);if(i!==void 0)return i;let a=e.emits,o={},c=!1;if(!h(e)){let r=e=>{let n=Vr(e,t,!0);n&&(c=!0,s(o,n))};!n&&t.mixins.length&&t.mixins.forEach(r),e.extends&&r(e.extends),e.mixins&&e.mixins.forEach(r)}return!a&&!c?(v(e)&&r.set(e,null),null):(d(a)?a.forEach(e=>o[e]=null):s(o,a),v(e)&&r.set(e,o),o)}function Hr(e,t){return!e||!a(t)?!1:(t=t.slice(2).replace(/Once$/,``),u(e,t[0].toLowerCase()+t.slice(1))||u(e,w(t))||u(e,t))}function Ur(e){let{type:t,vnode:n,proxy:r,withProxy:i,propsOptions:[a],slots:s,attrs:c,emit:l,render:u,renderCache:d,props:f,data:p,setupState:m,ctx:h,inheritAttrs:g}=e,_=kn(e),v,y;try{if(n.shapeFlag&4){let e=i||r,t=e;v=Gi(u.call(t,e,d,f,m,p,h)),y=c}else{let e=t;v=Gi(e.length>1?e(f,{attrs:c,slots:s,emit:l}):e(f,null)),y=t.props?c:Wr(c)}}catch(t){ki.length=0,un(t,e,1),v=U(Di)}let b=v;if(y&&g!==!1){let e=Object.keys(y),{shapeFlag:t}=b;e.length&&t&7&&(a&&e.some(o)&&(y=Gr(y,a)),b=Vi(b,y,!1,!0))}return n.dirs&&(b=Vi(b,null,!1,!0),b.dirs=b.dirs?b.dirs.concat(n.dirs):n.dirs),n.transition&&Un(b,n.transition),v=b,kn(_),v}var Wr=e=>{let t;for(let n in e)(n===`class`||n===`style`||a(n))&&((t||={})[n]=e[n]);return t},Gr=(e,t)=>{let n={};for(let r in e)(!o(r)||!(r.slice(9)in t))&&(n[r]=e[r]);return n};function Kr(e,t,n){let{props:r,children:i,component:a}=e,{props:o,children:s,patchFlag:c}=t,l=a.emitsOptions;if(t.dirs||t.transition)return!0;if(n&&c>=0){if(c&1024)return!0;if(c&16)return r?qr(r,o,l):!!o;if(c&8){let e=t.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t];if(Jr(o,r,n)&&!Hr(l,n))return!0}}}else return(i||s)&&(!s||!s.$stable)?!0:r===o?!1:r?o?qr(r,o,l):!0:!!o;return!1}function qr(e,t,n){let r=Object.keys(t);if(r.length!==Object.keys(e).length)return!0;for(let i=0;i<r.length;i++){let a=r[i];if(Jr(t,e,a)&&!Hr(n,a))return!0}return!1}function Jr(e,t,n){let r=e[n],i=t[n];return n===`style`&&v(r)&&v(i)?!Se(r,i):r!==i}function Yr({vnode:e,parent:t,suspense:n},r){for(;t;){let n=t.subTree;if(n.suspense&&n.suspense.activeBranch===e&&(n.suspense.vnode.el=n.el=r,e=n),n===e)(e=t.vnode).el=r,t=t.parent;else break}n&&n.activeBranch===e&&(n.vnode.el=r)}var Xr={},Zr=()=>Object.create(Xr),Qr=e=>Object.getPrototypeOf(e)===Xr;function $r(e,t,n,r=!1){let i={},a=Zr();e.propsDefaults=Object.create(null),ti(e,t,i,a);for(let t in e.propsOptions[0])t in i||(i[t]=void 0);n?e.props=r?i:Rt(i):e.type.props?e.props=i:e.props=a,e.attrs=a}function ei(e,t,n,r){let{props:i,attrs:a,vnode:{patchFlag:o}}=e,s=j(i),[c]=e.propsOptions,l=!1;if((r||o>0)&&!(o&16)){if(o&8){let n=e.vnode.dynamicProps;for(let r=0;r<n.length;r++){let o=n[r];if(Hr(e.emitsOptions,o))continue;let d=t[o];if(c)if(u(a,o))d!==a[o]&&(a[o]=d,l=!0);else{let t=C(o);i[t]=ni(c,s,t,d,e,!1)}else d!==a[o]&&(a[o]=d,l=!0)}}}else{ti(e,t,i,a)&&(l=!0);let r;for(let a in s)(!t||!u(t,a)&&((r=w(a))===a||!u(t,r)))&&(c?n&&(n[a]!==void 0||n[r]!==void 0)&&(i[a]=ni(c,s,a,void 0,e,!0)):delete i[a]);if(a!==s)for(let e in a)(!t||!u(t,e))&&(delete a[e],l=!0)}l&&nt(e.attrs,`set`,``)}function ti(e,n,r,i){let[a,o]=e.propsOptions,s=!1,c;if(n)for(let t in n){if(ne(t))continue;let l=n[t],d;a&&u(a,d=C(t))?!o||!o.includes(d)?r[d]=l:(c||={})[d]=l:Hr(e.emitsOptions,t)||(!(t in i)||l!==i[t])&&(i[t]=l,s=!0)}if(o){let n=j(r),i=c||t;for(let t=0;t<o.length;t++){let s=o[t];r[s]=ni(a,n,s,i[s],e,!u(i,s))}}return s}function ni(e,t,n,r,i,a){let o=e[n];if(o!=null){let e=u(o,`default`);if(e&&r===void 0){let e=o.default;if(o.type!==Function&&!o.skipFactory&&h(e)){let{propsDefaults:a}=i;if(n in a)r=a[n];else{let o=na(i);r=a[n]=e.call(null,t),o()}}else r=e;i.ce&&i.ce._setProp(n,r)}o[0]&&(a&&!e?r=!1:o[1]&&(r===``||r===w(n))&&(r=!0))}return r}var ri=new WeakMap;function ii(e,r,i=!1){let a=i?ri:r.propsCache,o=a.get(e);if(o)return o;let c=e.props,l={},f=[],p=!1;if(!h(e)){let t=e=>{p=!0;let[t,n]=ii(e,r,!0);s(l,t),n&&f.push(...n)};!i&&r.mixins.length&&r.mixins.forEach(t),e.extends&&t(e.extends),e.mixins&&e.mixins.forEach(t)}if(!c&&!p)return v(e)&&a.set(e,n),n;if(d(c))for(let e=0;e<c.length;e++){let n=C(c[e]);ai(n)&&(l[n]=t)}else if(c)for(let e in c){let t=C(e);if(ai(t)){let n=c[e],r=l[t]=d(n)||h(n)?{type:n}:s({},n),i=r.type,a=!1,o=!0;if(d(i))for(let e=0;e<i.length;++e){let t=i[e],n=h(t)&&t.name;if(n===`Boolean`){a=!0;break}else n===`String`&&(o=!1)}else a=h(i)&&i.name===`Boolean`;r[0]=a,r[1]=o,(a||u(r,`default`))&&f.push(t)}}let m=[l,f];return v(e)&&a.set(e,m),m}function ai(e){return e[0]!==`$`&&!ne(e)}var oi=e=>e===`_`||e===`_ctx`||e===`$stable`,si=e=>d(e)?e.map(Gi):[Gi(e)],ci=(e,t,n)=>{if(t._n)return t;let r=An((...e)=>si(t(...e)),n);return r._c=!1,r},li=(e,t,n)=>{let r=e._ctx;for(let n in e){if(oi(n))continue;let i=e[n];if(h(i))t[n]=ci(n,i,r);else if(i!=null){let e=si(i);t[n]=()=>e}}},ui=(e,t)=>{let n=si(t);e.slots.default=()=>n},di=(e,t,n)=>{for(let r in t)(n||!oi(r))&&(e[r]=t[r])},fi=(e,t,n)=>{let r=e.slots=Zr();if(e.vnode.shapeFlag&32){let e=t._;e?(di(r,t,n),n&&E(r,`_`,e,!0)):li(t,r)}else t&&ui(e,t)},pi=(e,n,r)=>{let{vnode:i,slots:a}=e,o=!0,s=t;if(i.shapeFlag&32){let e=n._;e?r&&e===1?o=!1:di(a,n,r):(o=!n.$stable,li(n,a)),s=n}else n&&(ui(e,n),s={default:1});if(o)for(let e in a)!oi(e)&&s[e]==null&&delete a[e]},L=Ti;function mi(e){return hi(e)}function hi(e,i){let a=de();a.__VUE__=!0;let{insert:o,remove:s,patchProp:c,createElement:l,createText:u,createComment:d,setText:f,setElementText:p,parentNode:m,nextSibling:h,setScopeId:g=r,insertStaticContent:_}=e,v=(e,t,n,r=null,i=null,a=null,o=void 0,s=null,c=!!t.dynamicChildren)=>{if(e===t)return;e&&!Ii(e,t)&&(r=Se(e),_e(e,i,a,!0),e=null),t.patchFlag===-2&&(c=!1,t.dynamicChildren=null);let{type:l,ref:u,shapeFlag:d}=t;switch(l){case Ei:y(e,t,n,r);break;case Di:b(e,t,n,r);break;case Oi:e??x(t,n,r,o);break;case R:se(e,t,n,r,i,a,o,s,c);break;default:d&1?te(e,t,n,r,i,a,o,s,c):d&6?T(e,t,n,r,i,a,o,s,c):(d&64||d&128)&&l.process(e,t,n,r,i,a,o,s,c,D)}u!=null&&i?qn(u,e&&e.ref,a,t||e,!t):u==null&&e&&e.ref!=null&&qn(e.ref,null,a,e,!0)},y=(e,t,n,r)=>{if(e==null)o(t.el=u(t.children),n,r);else{let n=t.el=e.el;t.children!==e.children&&f(n,t.children)}},b=(e,t,n,r)=>{e==null?o(t.el=d(t.children||``),n,r):t.el=e.el},x=(e,t,n,r)=>{[e.el,e.anchor]=_(e.children,t,n,r,e.el,e.anchor)},ee=({el:e,anchor:t},n,r)=>{let i;for(;e&&e!==t;)i=h(e),o(e,n,r),e=i;o(t,n,r)},S=({el:e,anchor:t})=>{let n;for(;e&&e!==t;)n=h(e),s(e),e=n;s(t)},te=(e,t,n,r,i,a,o,s,c)=>{if(t.type===`svg`?o=`svg`:t.type===`math`&&(o=`mathml`),e==null)re(t,n,r,i,a,o,s,c);else{let n=e.el&&e.el._isVueCE?e.el:null;try{n&&n._beginPatch(),ae(e,t,i,a,o,s,c)}finally{n&&n._endPatch()}}},re=(e,t,n,r,i,a,s,u)=>{let d,f,{props:m,shapeFlag:h,transition:g,dirs:_}=e;if(d=e.el=l(e.type,a,m&&m.is,m),h&8?p(d,e.children):h&16&&C(e.children,d,null,r,i,gi(e,a),s,u),_&&jn(e,null,r,`created`),ie(d,e,e.scopeId,s,r),m){for(let e in m)e!==`value`&&!ne(e)&&c(d,e,null,m[e],a,r);`value`in m&&c(d,`value`,null,m.value,a),(f=m.onVnodeBeforeMount)&&Yi(f,r,e)}_&&jn(e,null,r,`beforeMount`);let v=vi(i,g);v&&g.beforeEnter(d),o(d,t,n),((f=m&&m.onVnodeMounted)||v||_)&&L(()=>{try{f&&Yi(f,r,e),v&&g.enter(d),_&&jn(e,null,r,`mounted`)}finally{}},i)},ie=(e,t,n,r,i)=>{if(n&&g(e,n),r)for(let t=0;t<r.length;t++)g(e,r[t]);if(i){let n=i.subTree;if(t===n||wi(n.type)&&(n.ssContent===t||n.ssFallback===t)){let t=i.vnode;ie(e,t,t.scopeId,t.slotScopeIds,i.parent)}}},C=(e,t,n,r,i,a,o,s,c=0)=>{for(let l=c;l<e.length;l++)v(null,e[l]=s?Ki(e[l]):Gi(e[l]),t,n,r,i,a,o,s)},ae=(e,n,r,i,a,o,s)=>{let l=n.el=e.el,{patchFlag:u,dynamicChildren:d,dirs:f}=n;u|=e.patchFlag&16;let m=e.props||t,h=n.props||t,g;if(r&&_i(r,!1),(g=h.onVnodeBeforeUpdate)&&Yi(g,r,n,e),f&&jn(n,e,r,`beforeUpdate`),r&&_i(r,!0),(m.innerHTML&&h.innerHTML==null||m.textContent&&h.textContent==null)&&p(l,``),d?w(e.dynamicChildren,d,l,r,i,gi(n,a),o):s||pe(e,n,l,null,r,i,gi(n,a),o,!1),u>0){if(u&16)oe(l,m,h,r,a);else if(u&2&&m.class!==h.class&&c(l,`class`,null,h.class,a),u&4&&c(l,`style`,m.style,h.style,a),u&8){let e=n.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t],i=m[n],o=h[n];(o!==i||n===`value`)&&c(l,n,i,o,a,r)}}u&1&&e.children!==n.children&&p(l,n.children)}else !s&&d==null&&oe(l,m,h,r,a);((g=h.onVnodeUpdated)||f)&&L(()=>{g&&Yi(g,r,n,e),f&&jn(n,e,r,`updated`)},i)},w=(e,t,n,r,i,a,o)=>{for(let s=0;s<t.length;s++){let c=e[s],l=t[s];v(c,l,c.el&&(c.type===R||!Ii(c,l)||c.shapeFlag&198)?m(c.el):n,null,r,i,a,o,!0)}},oe=(e,n,r,i,a)=>{if(n!==r){if(n!==t)for(let t in n)!ne(t)&&!(t in r)&&c(e,t,n[t],null,a,i);for(let t in r){if(ne(t))continue;let o=r[t],s=n[t];o!==s&&t!==`value`&&c(e,t,s,o,a,i)}`value`in r&&c(e,`value`,n.value,r.value,a)}},se=(e,t,n,r,i,a,s,c,l)=>{let d=t.el=e?e.el:u(``),f=t.anchor=e?e.anchor:u(``),{patchFlag:p,dynamicChildren:m,slotScopeIds:h}=t;h&&(c=c?c.concat(h):h),e==null?(o(d,n,r),o(f,n,r),C(t.children||[],n,f,i,a,s,c,l)):p>0&&p&64&&m&&e.dynamicChildren&&e.dynamicChildren.length===m.length?(w(e.dynamicChildren,m,n,i,a,s,c),(t.key!=null||i&&t===i.subTree)&&yi(e,t,!0)):pe(e,t,n,f,i,a,s,c,l)},T=(e,t,n,r,i,a,o,s,c)=>{t.slotScopeIds=s,e==null?t.shapeFlag&512?i.ctx.activate(t,n,r,o,c):E(t,n,r,i,a,o,c):le(e,t,c)},E=(e,t,n,r,i,a,o)=>{let s=e.component=Qi(e,r,i);if(Xn(e)&&(s.ctx.renderer=D),oa(s,!1,o),s.asyncDep){if(i&&i.registerDep(s,ue,o),!e.el){let r=s.subTree=U(Di);b(null,r,t,n),e.placeholder=r.el}}else ue(s,e,t,n,i,a,o)},le=(e,t,n)=>{let r=t.component=e.component;if(Kr(e,t,n))if(r.asyncDep&&!r.asyncResolved){fe(r,t,n);return}else r.next=t,r.update();else t.el=e.el,r.vnode=t},ue=(e,t,n,r,i,a,o)=>{let s=()=>{if(e.isMounted){let{next:t,bu:n,u:r,parent:s,vnode:c}=e;{let n=xi(e);if(n){t&&(t.el=c.el,fe(e,t,o)),n.asyncDep.then(()=>{L(()=>{e.isUnmounted||l()},i)});return}}let u=t,d;_i(e,!1),t?(t.el=c.el,fe(e,t,o)):t=c,n&&ce(n),(d=t.props&&t.props.onVnodeBeforeUpdate)&&Yi(d,s,t,c),_i(e,!0);let f=Ur(e),p=e.subTree;e.subTree=f,v(p,f,m(p.el),Se(p),e,i,a),t.el=f.el,u===null&&Yr(e,f.el),r&&L(r,i),(d=t.props&&t.props.onVnodeUpdated)&&L(()=>Yi(d,s,t,c),i)}else{let o,{el:s,props:c}=t,{bm:l,m:u,parent:d,root:f,type:p}=e,m=Yn(t);if(_i(e,!1),l&&ce(l),!m&&(o=c&&c.onVnodeBeforeMount)&&Yi(o,d,t),_i(e,!0),s&&Ee){let t=()=>{e.subTree=Ur(e),Ee(s,e.subTree,e,i,null)};m&&p.__asyncHydrate?p.__asyncHydrate(s,e,t):t()}else{f.ce&&f.ce._hasShadowRoot()&&f.ce._injectChildStyle(p,e.parent?e.parent.type:void 0);let o=e.subTree=Ur(e);v(null,o,n,r,e,i,a),t.el=o.el}if(u&&L(u,i),!m&&(o=c&&c.onVnodeMounted)){let e=t;L(()=>Yi(o,d,e),i)}(t.shapeFlag&256||d&&Yn(d.vnode)&&d.vnode.shapeFlag&256)&&e.a&&L(e.a,i),e.isMounted=!0,t=n=r=null}};e.scope.on();let c=e.effect=new Ae(s);e.scope.off();let l=e.update=c.run.bind(c),u=e.job=c.runIfDirty.bind(c);u.i=e,u.id=e.uid,c.scheduler=()=>bn(u),_i(e,!0),l()},fe=(e,t,n)=>{t.component=e;let r=e.vnode.props;e.vnode=t,e.next=null,ei(e,t.props,r,n),pi(e,t.children,n),Ge(),Cn(e),Ke()},pe=(e,t,n,r,i,a,o,s,c=!1)=>{let l=e&&e.children,u=e?e.shapeFlag:0,d=t.children,{patchFlag:f,shapeFlag:m}=t;if(f>0){if(f&128){he(l,d,n,r,i,a,o,s,c);return}else if(f&256){me(l,d,n,r,i,a,o,s,c);return}}m&8?(u&16&&xe(l,i,a),d!==l&&p(n,d)):u&16?m&16?he(l,d,n,r,i,a,o,s,c):xe(l,i,a,!0):(u&8&&p(n,``),m&16&&C(d,n,r,i,a,o,s,c))},me=(e,t,r,i,a,o,s,c,l)=>{e||=n,t||=n;let u=e.length,d=t.length,f=Math.min(u,d),p;for(p=0;p<f;p++){let n=t[p]=l?Ki(t[p]):Gi(t[p]);v(e[p],n,r,null,a,o,s,c,l)}u>d?xe(e,a,o,!0,!1,f):C(t,r,i,a,o,s,c,l,f)},he=(e,t,r,i,a,o,s,c,l)=>{let u=0,d=t.length,f=e.length-1,p=d-1;for(;u<=f&&u<=p;){let n=e[u],i=t[u]=l?Ki(t[u]):Gi(t[u]);if(Ii(n,i))v(n,i,r,null,a,o,s,c,l);else break;u++}for(;u<=f&&u<=p;){let n=e[f],i=t[p]=l?Ki(t[p]):Gi(t[p]);if(Ii(n,i))v(n,i,r,null,a,o,s,c,l);else break;f--,p--}if(u>f){if(u<=p){let e=p+1,n=e<d?t[e].el:i;for(;u<=p;)v(null,t[u]=l?Ki(t[u]):Gi(t[u]),r,n,a,o,s,c,l),u++}}else if(u>p)for(;u<=f;)_e(e[u],a,o,!0),u++;else{let m=u,h=u,g=new Map;for(u=h;u<=p;u++){let e=t[u]=l?Ki(t[u]):Gi(t[u]);e.key!=null&&g.set(e.key,u)}let _,y=0,b=p-h+1,x=!1,ee=0,S=Array(b);for(u=0;u<b;u++)S[u]=0;for(u=m;u<=f;u++){let n=e[u];if(y>=b){_e(n,a,o,!0);continue}let i;if(n.key!=null)i=g.get(n.key);else for(_=h;_<=p;_++)if(S[_-h]===0&&Ii(n,t[_])){i=_;break}i===void 0?_e(n,a,o,!0):(S[i-h]=u+1,i>=ee?ee=i:x=!0,v(n,t[i],r,null,a,o,s,c,l),y++)}let te=x?bi(S):n;for(_=te.length-1,u=b-1;u>=0;u--){let e=h+u,n=t[e],f=t[e+1],p=e+1<d?f.el||Ci(f):i;S[u]===0?v(null,n,r,p,a,o,s,c,l):x&&(_<0||u!==te[_]?ge(n,r,p,2):_--)}}},ge=(e,t,n,r,i=null)=>{let{el:a,type:c,transition:l,children:u,shapeFlag:d}=e;if(d&6){ge(e.component.subTree,t,n,r);return}if(d&128){e.suspense.move(t,n,r);return}if(d&64){c.move(e,t,n,D);return}if(c===R){o(a,t,n);for(let e=0;e<u.length;e++)ge(u[e],t,n,r);o(e.anchor,t,n);return}if(c===Oi){ee(e,t,n);return}if(r!==2&&d&1&&l)if(r===0)l.beforeEnter(a),o(a,t,n),L(()=>l.enter(a),i);else{let{leave:r,delayLeave:i,afterLeave:c}=l,u=()=>{e.ctx.isUnmounted?s(a):o(a,t,n)},d=()=>{a._isLeaving&&a[Hn](!0),r(a,()=>{u(),c&&c()})};i?i(a,u,d):d()}else o(a,t,n)},_e=(e,t,n,r=!1,i=!1)=>{let{type:a,props:o,ref:s,children:c,dynamicChildren:l,shapeFlag:u,patchFlag:d,dirs:f,cacheIndex:p,memo:m}=e;if(d===-2&&(i=!1),s!=null&&(Ge(),qn(s,null,n,e,!0),Ke()),p!=null&&(t.renderCache[p]=void 0),u&256){t.ctx.deactivate(e);return}let h=u&1&&f,g=!Yn(e),_;if(g&&(_=o&&o.onVnodeBeforeUnmount)&&Yi(_,t,e),u&6)be(e.component,n,r);else{if(u&128){e.suspense.unmount(n,r);return}h&&jn(e,null,t,`beforeUnmount`),u&64?e.type.remove(e,t,n,D,r):l&&!l.hasOnce&&(a!==R||d>0&&d&64)?xe(l,t,n,!1,!0):(a===R&&d&384||!i&&u&16)&&xe(c,t,n),r&&ve(e)}let v=m!=null&&p==null;(g&&(_=o&&o.onVnodeUnmounted)||h||v)&&L(()=>{_&&Yi(_,t,e),h&&jn(e,null,t,`unmounted`),v&&(e.el=null)},n)},ve=e=>{let{type:t,el:n,anchor:r,transition:i}=e;if(t===R){ye(n,r);return}if(t===Oi){S(e);return}let a=()=>{s(n),i&&!i.persisted&&i.afterLeave&&i.afterLeave()};if(e.shapeFlag&1&&i&&!i.persisted){let{leave:t,delayLeave:r}=i,o=()=>t(n,a);r?r(e.el,a,o):o()}else a()},ye=(e,t)=>{let n;for(;e!==t;)n=h(e),s(e),e=n;s(t)},be=(e,t,n)=>{let{bum:r,scope:i,job:a,subTree:o,um:s,m:c,a:l}=e;Si(c),Si(l),r&&ce(r),i.stop(),a&&(a.flags|=8,_e(o,e,t,n)),s&&L(s,t),L(()=>{e.isUnmounted=!0},t)},xe=(e,t,n,r=!1,i=!1,a=0)=>{for(let o=a;o<e.length;o++)_e(e[o],t,n,r,i)},Se=e=>{if(e.shapeFlag&6)return Se(e.component.subTree);if(e.shapeFlag&128)return e.suspense.next();let t=h(e.anchor||e.el),n=t&&t[Bn];return n?h(n):t},Ce=!1,we=(e,t,n)=>{let r;e==null?t._vnode&&(_e(t._vnode,null,null,!0),r=t._vnode.component):v(t._vnode||null,e,t,null,null,null,n),t._vnode=e,Ce||=(Ce=!0,Cn(r),wn(),!1)},D={p:v,um:_e,m:ge,r:ve,mt:E,mc:C,pc:pe,pbc:w,n:Se,o:e},Te,Ee;return i&&([Te,Ee]=i(D)),{render:we,hydrate:Te,createApp:Ir(we,Te)}}function gi({type:e,props:t},n){return n===`svg`&&e===`foreignObject`||n===`mathml`&&e===`annotation-xml`&&t&&t.encoding&&t.encoding.includes(`html`)?void 0:n}function _i({effect:e,job:t},n){n?(e.flags|=32,t.flags|=4):(e.flags&=-33,t.flags&=-5)}function vi(e,t){return(!e||e&&!e.pendingBranch)&&t&&!t.persisted}function yi(e,t,n=!1){let r=e.children,i=t.children;if(d(r)&&d(i))for(let e=0;e<r.length;e++){let t=r[e],a=i[e];a.shapeFlag&1&&!a.dynamicChildren&&((a.patchFlag<=0||a.patchFlag===32)&&(a=i[e]=Ki(i[e]),a.el=t.el),!n&&a.patchFlag!==-2&&yi(t,a)),a.type===Ei&&(a.patchFlag===-1&&(a=i[e]=Ki(a)),a.el=t.el),a.type===Di&&!a.el&&(a.el=t.el)}}function bi(e){let t=e.slice(),n=[0],r,i,a,o,s,c=e.length;for(r=0;r<c;r++){let c=e[r];if(c!==0){if(i=n[n.length-1],e[i]<c){t[r]=i,n.push(r);continue}for(a=0,o=n.length-1;a<o;)s=a+o>>1,e[n[s]]<c?a=s+1:o=s;c<e[n[a]]&&(a>0&&(t[r]=n[a-1]),n[a]=r)}}for(a=n.length,o=n[a-1];a-- >0;)n[a]=o,o=t[o];return n}function xi(e){let t=e.subTree.component;if(t)return t.asyncDep&&!t.asyncResolved?t:xi(t)}function Si(e){if(e)for(let t=0;t<e.length;t++)e[t].flags|=8}function Ci(e){if(e.placeholder)return e.placeholder;let t=e.component;return t?Ci(t.subTree):null}var wi=e=>e.__isSuspense;function Ti(e,t){t&&t.pendingBranch?d(e)?t.effects.push(...e):t.effects.push(e):Sn(e)}var R=Symbol.for(`v-fgt`),Ei=Symbol.for(`v-txt`),Di=Symbol.for(`v-cmt`),Oi=Symbol.for(`v-stc`),ki=[],z=null;function B(e=!1){ki.push(z=e?null:[])}function Ai(){ki.pop(),z=ki[ki.length-1]||null}var ji=1;function Mi(e,t=!1){ji+=e,e<0&&z&&t&&(z.hasOnce=!0)}function Ni(e){return e.dynamicChildren=ji>0?z||n:null,Ai(),ji>0&&z&&z.push(e),e}function V(e,t,n,r,i,a){return Ni(H(e,t,n,r,i,a,!0))}function Pi(e,t,n,r,i){return Ni(U(e,t,n,r,i,!0))}function Fi(e){return e?e.__v_isVNode===!0:!1}function Ii(e,t){return e.type===t.type&&e.key===t.key}var Li=({key:e})=>e??null,Ri=({ref:e,ref_key:t,ref_for:n})=>(typeof e==`number`&&(e=``+e),e==null?null:g(e)||M(e)||h(e)?{i:Dn,r:e,k:t,f:!!n}:e);function H(e,t=null,n=null,r=0,i=null,a=e===R?0:1,o=!1,s=!1){let c={__v_isVNode:!0,__v_skip:!0,type:e,props:t,key:t&&Li(t),ref:t&&Ri(t),scopeId:On,slotScopeIds:null,children:n,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetStart:null,targetAnchor:null,staticCount:0,shapeFlag:a,patchFlag:r,dynamicProps:i,dynamicChildren:null,appContext:null,ctx:Dn};return s?(qi(c,n),a&128&&e.normalize(c)):n&&(c.shapeFlag|=g(n)?8:16),ji>0&&!o&&z&&(c.patchFlag>0||a&6)&&c.patchFlag!==32&&z.push(c),c}var U=zi;function zi(e,t=null,n=null,r=0,i=null,a=!1){if((!e||e===pr)&&(e=Di),Fi(e)){let r=Vi(e,t,!0);return n&&qi(r,n),ji>0&&!a&&z&&(r.shapeFlag&6?z[z.indexOf(e)]=r:z.push(r)),r.patchFlag=-2,r}if(ha(e)&&(e=e.__vccOpts),t){t=Bi(t);let{class:e,style:n}=t;e&&!g(e)&&(t.class=_e(e)),v(n)&&(Wt(n)&&!d(n)&&(n=s({},n)),t.style=fe(n))}let o=g(e)?1:wi(e)?128:Vn(e)?64:v(e)?4:h(e)?2:0;return H(e,t,n,r,i,o,a,!0)}function Bi(e){return e?Wt(e)||Qr(e)?s({},e):e:null}function Vi(e,t,n=!1,r=!1){let{props:i,ref:a,patchFlag:o,children:s,transition:c}=e,l=t?Ji(i||{},t):i,u={__v_isVNode:!0,__v_skip:!0,type:e.type,props:l,key:l&&Li(l),ref:t&&t.ref?n&&a?d(a)?a.concat(Ri(t)):[a,Ri(t)]:Ri(t):a,scopeId:e.scopeId,slotScopeIds:e.slotScopeIds,children:s,target:e.target,targetStart:e.targetStart,targetAnchor:e.targetAnchor,staticCount:e.staticCount,shapeFlag:e.shapeFlag,patchFlag:t&&e.type!==R?o===-1?16:o|16:o,dynamicProps:e.dynamicProps,dynamicChildren:e.dynamicChildren,appContext:e.appContext,dirs:e.dirs,transition:c,component:e.component,suspense:e.suspense,ssContent:e.ssContent&&Vi(e.ssContent),ssFallback:e.ssFallback&&Vi(e.ssFallback),placeholder:e.placeholder,el:e.el,anchor:e.anchor,ctx:e.ctx,ce:e.ce};return c&&r&&Un(u,c.clone(u)),u}function Hi(e=` `,t=0){return U(Ei,null,e,t)}function Ui(e,t){let n=U(Oi,null,e);return n.staticCount=t,n}function Wi(e=``,t=!1){return t?(B(),Pi(Di,null,e)):U(Di,null,e)}function Gi(e){return e==null||typeof e==`boolean`?U(Di):d(e)?U(R,null,e.slice()):Fi(e)?Ki(e):U(Ei,null,String(e))}function Ki(e){return e.el===null&&e.patchFlag!==-1||e.memo?e:Vi(e)}function qi(e,t){let n=0,{shapeFlag:r}=e;if(t==null)t=null;else if(d(t))n=16;else if(typeof t==`object`)if(r&65){let n=t.default;n&&(n._c&&(n._d=!1),qi(e,n()),n._c&&(n._d=!0));return}else{n=32;let r=t._;!r&&!Qr(t)?t._ctx=Dn:r===3&&Dn&&(Dn.slots._===1?t._=1:(t._=2,e.patchFlag|=1024))}else h(t)?(t={default:t,_ctx:Dn},n=32):(t=String(t),r&64?(n=16,t=[Hi(t)]):n=8);e.children=t,e.shapeFlag|=n}function Ji(...e){let t={};for(let n=0;n<e.length;n++){let r=e[n];for(let e in r)if(e===`class`)t.class!==r.class&&(t.class=_e([t.class,r.class]));else if(e===`style`)t.style=fe([t.style,r.style]);else if(a(e)){let n=t[e],i=r[e];i&&n!==i&&!(d(n)&&n.includes(i))?t[e]=n?[].concat(n,i):i:i==null&&n==null&&!o(e)&&(t[e]=i)}else e!==``&&(t[e]=r[e])}return t}function Yi(e,t,n,r=null){ln(e,t,7,[n,r])}var Xi=Pr(),Zi=0;function Qi(e,n,r){let i=e.type,a=(n?n.appContext:e.appContext)||Xi,o={uid:Zi++,vnode:e,type:i,parent:n,appContext:a,root:null,next:null,subTree:null,effect:null,update:null,job:null,scope:new De(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:n?n.provides:Object.create(a.provides),ids:n?n.ids:[``,0,0],accessCache:null,renderCache:[],components:null,directives:null,propsOptions:ii(i,a),emitsOptions:Vr(i,a),emit:null,emitted:null,propsDefaults:t,inheritAttrs:i.inheritAttrs,ctx:t,data:t,props:t,attrs:t,slots:t,refs:t,setupState:t,setupContext:null,suspense:r,suspenseId:r?r.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return o.ctx={_:o},o.root=n?n.root:o,o.emit=zr.bind(null,o),e.ce&&e.ce(o),o}var W=null,$i=()=>W||Dn,ea,ta;{let e=de(),t=(t,n)=>{let r;return(r=e[t])||(r=e[t]=[]),r.push(n),e=>{r.length>1?r.forEach(t=>t(e)):r[0](e)}};ea=t(`__VUE_INSTANCE_SETTERS__`,e=>W=e),ta=t(`__VUE_SSR_SETTERS__`,e=>aa=e)}var na=e=>{let t=W;return ea(e),e.scope.on(),()=>{e.scope.off(),ea(t)}},ra=()=>{W&&W.scope.off(),ea(null)};function ia(e){return e.vnode.shapeFlag&4}var aa=!1;function oa(e,t=!1,n=!1){t&&ta(t);let{props:r,children:i}=e.vnode,a=ia(e);$r(e,r,a,t),fi(e,i,n||t);let o=a?sa(e,t):void 0;return t&&ta(!1),o}function sa(e,t){let n=e.type;e.accessCache=Object.create(null),e.proxy=new Proxy(e.ctx,vr);let{setup:r}=n;if(r){Ge();let n=e.setupContext=r.length>1?pa(e):null,i=na(e),a=cn(r,e,0,[e.props,n]),o=y(a);if(Ke(),i(),(o||e.sp)&&!Yn(e)&&Wn(e),o){if(a.then(ra,ra),t)return a.then(n=>{ca(e,n,t)}).catch(t=>{un(t,e,0)});e.asyncDep=a}else ca(e,a,t)}else da(e,t)}function ca(e,t,n){h(t)?e.type.__ssrInlineRender?e.ssrRender=t:e.render=t:v(t)&&(e.setupState=Qt(t)),da(e,n)}var la,ua;function da(e,t,n){let i=e.type;if(!e.render){if(!t&&la&&!i.render){let t=i.template||Tr(e).template;if(t){let{isCustomElement:n,compilerOptions:r}=e.appContext.config,{delimiters:a,compilerOptions:o}=i;i.render=la(t,s(s({isCustomElement:n,delimiters:a},r),o))}}e.render=i.render||r,ua&&ua(e)}{let t=na(e);Ge();try{xr(e)}finally{Ke(),t()}}}var fa={get(e,t){return A(e,`get`,``),e[t]}};function pa(e){return{attrs:new Proxy(e.attrs,fa),slots:e.slots,emit:e.emit,expose:t=>{e.exposed=t||{}}}}function ma(e){return e.exposed?e.exposeProxy||=new Proxy(Qt(Gt(e.exposed)),{get(t,n){if(n in t)return t[n];if(n in gr)return gr[n](e)},has(e,t){return t in e||t in gr}}):e.proxy}function ha(e){return h(e)&&`__vccOpts`in e}var ga=(e,t)=>en(e,t,aa),_a=`3.5.32`,va=void 0,ya=typeof window<`u`&&window.trustedTypes;if(ya)try{va=ya.createPolicy(`vue`,{createHTML:e=>e})}catch{}var ba=va?e=>va.createHTML(e):e=>e,xa=`http://www.w3.org/2000/svg`,Sa=`http://www.w3.org/1998/Math/MathML`,Ca=typeof document<`u`?document:null,wa=Ca&&Ca.createElement(`template`),Ta={insert:(e,t,n)=>{t.insertBefore(e,n||null)},remove:e=>{let t=e.parentNode;t&&t.removeChild(e)},createElement:(e,t,n,r)=>{let i=t===`svg`?Ca.createElementNS(xa,e):t===`mathml`?Ca.createElementNS(Sa,e):n?Ca.createElement(e,{is:n}):Ca.createElement(e);return e===`select`&&r&&r.multiple!=null&&i.setAttribute(`multiple`,r.multiple),i},createText:e=>Ca.createTextNode(e),createComment:e=>Ca.createComment(e),setText:(e,t)=>{e.nodeValue=t},setElementText:(e,t)=>{e.textContent=t},parentNode:e=>e.parentNode,nextSibling:e=>e.nextSibling,querySelector:e=>Ca.querySelector(e),setScopeId(e,t){e.setAttribute(t,``)},insertStaticContent(e,t,n,r,i,a){let o=n?n.previousSibling:t.lastChild;if(i&&(i===a||i.nextSibling))for(;t.insertBefore(i.cloneNode(!0),n),!(i===a||!(i=i.nextSibling)););else{wa.innerHTML=ba(r===`svg`?`<svg>${e}</svg>`:r===`mathml`?`<math>${e}</math>`:e);let i=wa.content;if(r===`svg`||r===`mathml`){let e=i.firstChild;for(;e.firstChild;)i.appendChild(e.firstChild);i.removeChild(e)}t.insertBefore(i,n)}return[o?o.nextSibling:t.firstChild,n?n.previousSibling:t.lastChild]}},Ea=Symbol(`_vtc`);function Da(e,t,n){let r=e[Ea];r&&(t=(t?[t,...r]:[...r]).join(` `)),t==null?e.removeAttribute(`class`):n?e.setAttribute(`class`,t):e.className=t}var Oa=Symbol(`_vod`),ka=Symbol(`_vsh`),Aa=Symbol(``),ja=/(?:^|;)\s*display\s*:/;function Ma(e,t,n){let r=e.style,i=g(n),a=!1;if(n&&!i){if(t)if(g(t))for(let e of t.split(`;`)){let t=e.slice(0,e.indexOf(`:`)).trim();n[t]??Pa(r,t,``)}else for(let e in t)n[e]??Pa(r,e,``);for(let e in n)e===`display`&&(a=!0),Pa(r,e,n[e])}else if(i){if(t!==n){let e=r[Aa];e&&(n+=`;`+e),r.cssText=n,a=ja.test(n)}}else t&&e.removeAttribute(`style`);Oa in e&&(e[Oa]=a?r.display:``,e[ka]&&(r.display=`none`))}var Na=/\s*!important$/;function Pa(e,t,n){if(d(n))n.forEach(n=>Pa(e,t,n));else if(n??=``,t.startsWith(`--`))e.setProperty(t,n);else{let r=La(e,t);Na.test(n)?e.setProperty(w(r),n.replace(Na,``),`important`):e[r]=n}}var Fa=[`Webkit`,`Moz`,`ms`],Ia={};function La(e,t){let n=Ia[t];if(n)return n;let r=C(t);if(r!==`filter`&&r in e)return Ia[t]=r;r=oe(r);for(let n=0;n<Fa.length;n++){let i=Fa[n]+r;if(i in e)return Ia[t]=i}return t}var Ra=`http://www.w3.org/1999/xlink`;function za(e,t,n,r,i,a=ye(t)){r&&t.startsWith(`xlink:`)?n==null?e.removeAttributeNS(Ra,t.slice(6,t.length)):e.setAttributeNS(Ra,t,n):n==null||a&&!be(n)?e.removeAttribute(t):e.setAttribute(t,a?``:_(n)?String(n):n)}function Ba(e,t,n,r,i){if(t===`innerHTML`||t===`textContent`){n!=null&&(e[t]=t===`innerHTML`?ba(n):n);return}let a=e.tagName;if(t===`value`&&a!==`PROGRESS`&&!a.includes(`-`)){let r=a===`OPTION`?e.getAttribute(`value`)||``:e.value,i=n==null?e.type===`checkbox`?`on`:``:String(n);(r!==i||!(`_value`in e))&&(e.value=i),n??e.removeAttribute(t),e._value=n;return}let o=!1;if(n===``||n==null){let r=typeof e[t];r===`boolean`?n=be(n):n==null&&r===`string`?(n=``,o=!0):r===`number`&&(n=0,o=!0)}try{e[t]=n}catch{}o&&e.removeAttribute(i||t)}function Va(e,t,n,r){e.addEventListener(t,n,r)}function Ha(e,t,n,r){e.removeEventListener(t,n,r)}var Ua=Symbol(`_vei`);function Wa(e,t,n,r,i=null){let a=e[Ua]||(e[Ua]={}),o=a[t];if(r&&o)o.value=r;else{let[n,s]=Ka(t);r?Va(e,n,a[t]=Xa(r,i),s):o&&(Ha(e,n,o,s),a[t]=void 0)}}var Ga=/(?:Once|Passive|Capture)$/;function Ka(e){let t;if(Ga.test(e)){t={};let n;for(;n=e.match(Ga);)e=e.slice(0,e.length-n[0].length),t[n[0].toLowerCase()]=!0}return[e[2]===`:`?e.slice(3):w(e.slice(2)),t]}var qa=0,Ja=Promise.resolve(),Ya=()=>qa||=(Ja.then(()=>qa=0),Date.now());function Xa(e,t){let n=e=>{if(!e._vts)e._vts=Date.now();else if(e._vts<=n.attached)return;ln(Za(e,n.value),t,5,[e])};return n.value=e,n.attached=Ya(),n}function Za(e,t){if(d(t)){let n=e.stopImmediatePropagation;return e.stopImmediatePropagation=()=>{n.call(e),e._stopped=!0},t.map(e=>t=>!t._stopped&&e&&e(t))}else return t}var Qa=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&e.charCodeAt(2)>96&&e.charCodeAt(2)<123,$a=(e,t,n,r,i,s)=>{let c=i===`svg`;t===`class`?Da(e,r,c):t===`style`?Ma(e,n,r):a(t)?o(t)||Wa(e,t,n,r,s):(t[0]===`.`?(t=t.slice(1),!0):t[0]===`^`?(t=t.slice(1),!1):eo(e,t,r,c))?(Ba(e,t,r),!e.tagName.includes(`-`)&&(t===`value`||t===`checked`||t===`selected`)&&za(e,t,r,c,s,t!==`value`)):e._isVueCE&&(to(e,t)||e._def.__asyncLoader&&(/[A-Z]/.test(t)||!g(r)))?Ba(e,C(t),r,s,t):(t===`true-value`?e._trueValue=r:t===`false-value`&&(e._falseValue=r),za(e,t,r,c))};function eo(e,t,n,r){if(r)return!!(t===`innerHTML`||t===`textContent`||t in e&&Qa(t)&&h(n));if(t===`spellcheck`||t===`draggable`||t===`translate`||t===`autocorrect`||t===`sandbox`&&e.tagName===`IFRAME`||t===`form`||t===`list`&&e.tagName===`INPUT`||t===`type`&&e.tagName===`TEXTAREA`)return!1;if(t===`width`||t===`height`){let t=e.tagName;if(t===`IMG`||t===`VIDEO`||t===`CANVAS`||t===`SOURCE`)return!1}return Qa(t)&&g(n)?!1:t in e}function to(e,t){let n=e._def.props;if(!n)return!1;let r=C(t);return Array.isArray(n)?n.some(e=>C(e)===r):Object.keys(n).some(e=>C(e)===r)}var no=e=>{let t=e.props[`onUpdate:modelValue`]||!1;return d(t)?e=>ce(t,e):t};function ro(e){e.target.composing=!0}function io(e){let t=e.target;t.composing&&(t.composing=!1,t.dispatchEvent(new Event(`input`)))}var ao=Symbol(`_assign`);function oo(e,t,n){return t&&(e=e.trim()),n&&(e=le(e)),e}var so={created(e,{modifiers:{lazy:t,trim:n,number:r}},i){e[ao]=no(i);let a=r||i.props&&i.props.type===`number`;Va(e,t?`change`:`input`,t=>{t.target.composing||e[ao](oo(e.value,n,a))}),(n||a)&&Va(e,`change`,()=>{e.value=oo(e.value,n,a)}),t||(Va(e,`compositionstart`,ro),Va(e,`compositionend`,io),Va(e,`change`,io))},mounted(e,{value:t}){e.value=t??``},beforeUpdate(e,{value:t,oldValue:n,modifiers:{lazy:r,trim:i,number:a}},o){if(e[ao]=no(o),e.composing)return;let s=(a||e.type===`number`)&&!/^0\d/.test(e.value)?le(e.value):e.value,c=t??``;if(s===c)return;let l=e.getRootNode();(l instanceof Document||l instanceof ShadowRoot)&&l.activeElement===e&&e.type!==`range`&&(r&&t===n||i&&e.value.trim()===c)||(e.value=c)}},co={deep:!0,created(e,{value:t,modifiers:{number:n}},r){let i=p(t);Va(e,`change`,()=>{let t=Array.prototype.filter.call(e.options,e=>e.selected).map(e=>n?le(uo(e)):uo(e));e[ao](e.multiple?i?new Set(t):t:t[0]),e._assigning=!0,vn(()=>{e._assigning=!1})}),e[ao]=no(r)},mounted(e,{value:t}){lo(e,t)},beforeUpdate(e,t,n){e[ao]=no(n)},updated(e,{value:t}){e._assigning||lo(e,t)}};function lo(e,t){let n=e.multiple,r=d(t);if(!(n&&!r&&!p(t))){for(let i=0,a=e.options.length;i<a;i++){let a=e.options[i],o=uo(a);if(n)if(r){let e=typeof o;e===`string`||e===`number`?a.selected=t.some(e=>String(e)===String(o)):a.selected=Ce(t,o)>-1}else a.selected=t.has(o);else if(Se(uo(a),t)){e.selectedIndex!==i&&(e.selectedIndex=i);return}}!n&&e.selectedIndex!==-1&&(e.selectedIndex=-1)}}function uo(e){return`_value`in e?e._value:e.value}var fo=s({patchProp:$a},Ta),po;function mo(){return po||=mi(fo)}var ho=((...e)=>{let t=mo().createApp(...e),{mount:n}=t;return t.mount=e=>{let r=_o(e);if(!r)return;let i=t._component;!h(i)&&!i.render&&!i.template&&(i.template=r.innerHTML),r.nodeType===1&&(r.textContent=``);let a=n(r,!1,go(r));return r instanceof Element&&(r.removeAttribute(`v-cloak`),r.setAttribute(`data-v-app`,``)),a},t});function go(e){if(e instanceof SVGElement)return`svg`;if(typeof MathMLElement==`function`&&e instanceof MathMLElement)return`mathml`}function _o(e){return g(e)?document.querySelector(e):e}var vo=`<header>
+(function(){let e=document.createElement(`link`).relList;if(e&&e.supports&&e.supports(`modulepreload`))return;for(let e of document.querySelectorAll(`link[rel="modulepreload"]`))n(e);new MutationObserver(e=>{for(let t of e)if(t.type===`childList`)for(let e of t.addedNodes)e.tagName===`LINK`&&e.rel===`modulepreload`&&n(e)}).observe(document,{childList:!0,subtree:!0});function t(e){let t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),e.crossOrigin===`use-credentials`?t.credentials=`include`:e.crossOrigin===`anonymous`?t.credentials=`omit`:t.credentials=`same-origin`,t}function n(e){if(e.ep)return;e.ep=!0;let n=t(e);fetch(e.href,n)}})();function e(e){let t=Object.create(null);for(let n of e.split(`,`))t[n]=1;return e=>e in t}var t={},n=[],r=()=>{},i=()=>!1,a=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),o=e=>e.startsWith(`onUpdate:`),s=Object.assign,c=(e,t)=>{let n=e.indexOf(t);n>-1&&e.splice(n,1)},l=Object.prototype.hasOwnProperty,u=(e,t)=>l.call(e,t),d=Array.isArray,f=e=>x(e)===`[object Map]`,p=e=>x(e)===`[object Set]`,m=e=>x(e)===`[object Date]`,h=e=>typeof e==`function`,g=e=>typeof e==`string`,_=e=>typeof e==`symbol`,v=e=>typeof e==`object`&&!!e,y=e=>(v(e)||h(e))&&h(e.then)&&h(e.catch),b=Object.prototype.toString,x=e=>b.call(e),ee=e=>x(e).slice(8,-1),S=e=>x(e)===`[object Object]`,te=e=>g(e)&&e!==`NaN`&&e[0]!==`-`&&``+parseInt(e,10)===e,ne=e(`,key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted`),re=e=>{let t=Object.create(null);return(n=>t[n]||(t[n]=e(n)))},ie=/-\w/g,C=re(e=>e.replace(ie,e=>e.slice(1).toUpperCase())),ae=/\B([A-Z])/g,oe=re(e=>e.replace(ae,`-$1`).toLowerCase()),se=re(e=>e.charAt(0).toUpperCase()+e.slice(1)),ce=re(e=>e?`on${se(e)}`:``),w=(e,t)=>!Object.is(e,t),le=(e,...t)=>{for(let n=0;n<e.length;n++)e[n](...t)},T=(e,t,n,r=!1)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:r,value:n})},ue=e=>{let t=parseFloat(e);return isNaN(t)?e:t},de,fe=()=>de||=typeof globalThis<`u`?globalThis:typeof self<`u`?self:typeof window<`u`?window:typeof global<`u`?global:{};function pe(e){if(d(e)){let t={};for(let n=0;n<e.length;n++){let r=e[n],i=g(r)?_e(r):pe(r);if(i)for(let e in i)t[e]=i[e]}return t}else if(g(e)||v(e))return e}var me=/;(?![^(]*\))/g,he=/:([^]+)/,ge=/\/\*[^]*?\*\//g;function _e(e){let t={};return e.replace(ge,``).split(me).forEach(e=>{if(e){let n=e.split(he);n.length>1&&(t[n[0].trim()]=n[1].trim())}}),t}function ve(e){let t=``;if(g(e))t=e;else if(d(e))for(let n=0;n<e.length;n++){let r=ve(e[n]);r&&(t+=r+` `)}else if(v(e))for(let n in e)e[n]&&(t+=n+` `);return t.trim()}var ye=`itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`,be=e(ye);ye+``;function xe(e){return!!e||e===``}function Se(e,t){if(e.length!==t.length)return!1;let n=!0;for(let r=0;n&&r<e.length;r++)n=Ce(e[r],t[r]);return n}function Ce(e,t){if(e===t)return!0;let n=m(e),r=m(t);if(n||r)return n&&r?e.getTime()===t.getTime():!1;if(n=_(e),r=_(t),n||r)return e===t;if(n=d(e),r=d(t),n||r)return n&&r?Se(e,t):!1;if(n=v(e),r=v(t),n||r){if(!n||!r||Object.keys(e).length!==Object.keys(t).length)return!1;for(let n in e){let r=e.hasOwnProperty(n),i=t.hasOwnProperty(n);if(r&&!i||!r&&i||!Ce(e[n],t[n]))return!1}}return String(e)===String(t)}function we(e,t){return e.findIndex(e=>Ce(e,t))}var Te=e=>!!(e&&e.__v_isRef===!0),E=e=>g(e)?e:e==null?``:d(e)||v(e)&&(e.toString===b||!h(e.toString))?Te(e)?E(e.value):JSON.stringify(e,Ee,2):String(e),Ee=(e,t)=>Te(t)?Ee(e,t.value):f(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((e,[t,n],r)=>(e[De(t,r)+` =>`]=n,e),{})}:p(t)?{[`Set(${t.size})`]:[...t.values()].map(e=>De(e))}:_(t)?De(t):v(t)&&!d(t)&&!S(t)?String(t):t,De=(e,t=``)=>_(e)?`Symbol(${e.description??t})`:e,Oe,ke=class{constructor(e=!1){this.detached=e,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.__v_skip=!0,this.parent=Oe,!e&&Oe&&(this.index=(Oe.scopes||=[]).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].pause();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let e,t;if(this.scopes)for(e=0,t=this.scopes.length;e<t;e++)this.scopes[e].resume();for(e=0,t=this.effects.length;e<t;e++)this.effects[e].resume()}}run(e){if(this._active){let t=Oe;try{return Oe=this,e()}finally{Oe=t}}}on(){++this._on===1&&(this.prevScope=Oe,Oe=this)}off(){this._on>0&&--this._on===0&&(Oe=this.prevScope,this.prevScope=void 0)}stop(e){if(this._active){this._active=!1;let t,n;for(t=0,n=this.effects.length;t<n;t++)this.effects[t].stop();for(this.effects.length=0,t=0,n=this.cleanups.length;t<n;t++)this.cleanups[t]();if(this.cleanups.length=0,this.scopes){for(t=0,n=this.scopes.length;t<n;t++)this.scopes[t].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!e){let e=this.parent.scopes.pop();e&&e!==this&&(this.parent.scopes[this.index]=e,e.index=this.index)}this.parent=void 0}}};function Ae(){return Oe}var D,je=new WeakSet,Me=class{constructor(e){this.fn=e,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,Oe&&Oe.active&&Oe.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,je.has(this)&&(je.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||Ie(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,Ye(this),ze(this);let e=D,t=Ge;D=this,Ge=!0;try{return this.fn()}finally{Be(this),D=e,Ge=t,this.flags&=-3}}stop(){if(this.flags&1){for(let e=this.deps;e;e=e.nextDep)Ue(e);this.deps=this.depsTail=void 0,Ye(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?je.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){Ve(this)&&this.run()}get dirty(){return Ve(this)}},Ne=0,Pe,Fe;function Ie(e,t=!1){if(e.flags|=8,t){e.next=Fe,Fe=e;return}e.next=Pe,Pe=e}function Le(){Ne++}function Re(){if(--Ne>0)return;if(Fe){let e=Fe;for(Fe=void 0;e;){let t=e.next;e.next=void 0,e.flags&=-9,e=t}}let e;for(;Pe;){let t=Pe;for(Pe=void 0;t;){let n=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(t){e||=t}t=n}}if(e)throw e}function ze(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function Be(e){let t,n=e.depsTail,r=n;for(;r;){let e=r.prevDep;r.version===-1?(r===n&&(n=e),Ue(r),We(r)):t=r,r.dep.activeLink=r.prevActiveLink,r.prevActiveLink=void 0,r=e}e.deps=t,e.depsTail=n}function Ve(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(He(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function He(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===Xe)||(e.globalVersion=Xe,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!Ve(e))))return;e.flags|=2;let t=e.dep,n=D,r=Ge;D=e,Ge=!0;try{ze(e);let n=e.fn(e._value);(t.version===0||w(n,e._value))&&(e.flags|=128,e._value=n,t.version++)}catch(e){throw t.version++,e}finally{D=n,Ge=r,Be(e),e.flags&=-3}}function Ue(e,t=!1){let{dep:n,prevSub:r,nextSub:i}=e;if(r&&(r.nextSub=i,e.prevSub=void 0),i&&(i.prevSub=r,e.nextSub=void 0),n.subs===e&&(n.subs=r,!r&&n.computed)){n.computed.flags&=-5;for(let e=n.computed.deps;e;e=e.nextDep)Ue(e,!0)}!t&&!--n.sc&&n.map&&n.map.delete(n.key)}function We(e){let{prevDep:t,nextDep:n}=e;t&&(t.nextDep=n,e.prevDep=void 0),n&&(n.prevDep=t,e.nextDep=void 0)}var Ge=!0,Ke=[];function qe(){Ke.push(Ge),Ge=!1}function Je(){let e=Ke.pop();Ge=e===void 0?!0:e}function Ye(e){let{cleanup:t}=e;if(e.cleanup=void 0,t){let e=D;D=void 0;try{t()}finally{D=e}}}var Xe=0,Ze=class{constructor(e,t){this.sub=e,this.dep=t,this.version=t.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}},Qe=class{constructor(e){this.computed=e,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(e){if(!D||!Ge||D===this.computed)return;let t=this.activeLink;if(t===void 0||t.sub!==D)t=this.activeLink=new Ze(D,this),D.deps?(t.prevDep=D.depsTail,D.depsTail.nextDep=t,D.depsTail=t):D.deps=D.depsTail=t,$e(t);else if(t.version===-1&&(t.version=this.version,t.nextDep)){let e=t.nextDep;e.prevDep=t.prevDep,t.prevDep&&(t.prevDep.nextDep=e),t.prevDep=D.depsTail,t.nextDep=void 0,D.depsTail.nextDep=t,D.depsTail=t,D.deps===t&&(D.deps=e)}return t}trigger(e){this.version++,Xe++,this.notify(e)}notify(e){Le();try{for(let e=this.subs;e;e=e.prevSub)e.sub.notify()&&e.sub.dep.notify()}finally{Re()}}};function $e(e){if(e.dep.sc++,e.sub.flags&4){let t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let e=t.deps;e;e=e.nextDep)$e(e)}let n=e.dep.subs;n!==e&&(e.prevSub=n,n&&(n.nextSub=e)),e.dep.subs=e}}var et=new WeakMap,tt=Symbol(``),nt=Symbol(``),rt=Symbol(``);function O(e,t,n){if(Ge&&D){let t=et.get(e);t||et.set(e,t=new Map);let r=t.get(n);r||(t.set(n,r=new Qe),r.map=t,r.key=n),r.track()}}function it(e,t,n,r,i,a){let o=et.get(e);if(!o){Xe++;return}let s=e=>{e&&e.trigger()};if(Le(),t===`clear`)o.forEach(s);else{let i=d(e),a=i&&te(n);if(i&&n===`length`){let e=Number(r);o.forEach((t,n)=>{(n===`length`||n===rt||!_(n)&&n>=e)&&s(t)})}else switch((n!==void 0||o.has(void 0))&&s(o.get(n)),a&&s(o.get(rt)),t){case`add`:i?a&&s(o.get(`length`)):(s(o.get(tt)),f(e)&&s(o.get(nt)));break;case`delete`:i||(s(o.get(tt)),f(e)&&s(o.get(nt)));break;case`set`:f(e)&&s(o.get(tt));break}}Re()}function at(e){let t=k(e);return t===e?t:(O(t,`iterate`,rt),Gt(e)?t:t.map(Jt))}function ot(e){return O(e=k(e),`iterate`,rt),e}function st(e,t){return Wt(e)?Yt(Ut(e)?Jt(t):t):Jt(t)}var ct={__proto__:null,[Symbol.iterator](){return lt(this,Symbol.iterator,e=>st(this,e))},concat(...e){return at(this).concat(...e.map(e=>d(e)?at(e):e))},entries(){return lt(this,`entries`,e=>(e[1]=st(this,e[1]),e))},every(e,t){return dt(this,`every`,e,t,void 0,arguments)},filter(e,t){return dt(this,`filter`,e,t,e=>e.map(e=>st(this,e)),arguments)},find(e,t){return dt(this,`find`,e,t,e=>st(this,e),arguments)},findIndex(e,t){return dt(this,`findIndex`,e,t,void 0,arguments)},findLast(e,t){return dt(this,`findLast`,e,t,e=>st(this,e),arguments)},findLastIndex(e,t){return dt(this,`findLastIndex`,e,t,void 0,arguments)},forEach(e,t){return dt(this,`forEach`,e,t,void 0,arguments)},includes(...e){return pt(this,`includes`,e)},indexOf(...e){return pt(this,`indexOf`,e)},join(e){return at(this).join(e)},lastIndexOf(...e){return pt(this,`lastIndexOf`,e)},map(e,t){return dt(this,`map`,e,t,void 0,arguments)},pop(){return mt(this,`pop`)},push(...e){return mt(this,`push`,e)},reduce(e,...t){return ft(this,`reduce`,e,t)},reduceRight(e,...t){return ft(this,`reduceRight`,e,t)},shift(){return mt(this,`shift`)},some(e,t){return dt(this,`some`,e,t,void 0,arguments)},splice(...e){return mt(this,`splice`,e)},toReversed(){return at(this).toReversed()},toSorted(e){return at(this).toSorted(e)},toSpliced(...e){return at(this).toSpliced(...e)},unshift(...e){return mt(this,`unshift`,e)},values(){return lt(this,`values`,e=>st(this,e))}};function lt(e,t,n){let r=ot(e),i=r[t]();return r!==e&&!Gt(e)&&(i._next=i.next,i.next=()=>{let e=i._next();return e.done||(e.value=n(e.value)),e}),i}var ut=Array.prototype;function dt(e,t,n,r,i,a){let o=ot(e),s=o!==e&&!Gt(e),c=o[t];if(c!==ut[t]){let t=c.apply(e,a);return s?Jt(t):t}let l=n;o!==e&&(s?l=function(t,r){return n.call(this,st(e,t),r,e)}:n.length>2&&(l=function(t,r){return n.call(this,t,r,e)}));let u=c.call(o,l,r);return s&&i?i(u):u}function ft(e,t,n,r){let i=ot(e),a=i!==e&&!Gt(e),o=n,s=!1;i!==e&&(a?(s=r.length===0,o=function(t,r,i){return s&&(s=!1,t=st(e,t)),n.call(this,t,st(e,r),i,e)}):n.length>3&&(o=function(t,r,i){return n.call(this,t,r,i,e)}));let c=i[t](o,...r);return s?st(e,c):c}function pt(e,t,n){let r=k(e);O(r,`iterate`,rt);let i=r[t](...n);return(i===-1||i===!1)&&Kt(n[0])?(n[0]=k(n[0]),r[t](...n)):i}function mt(e,t,n=[]){qe(),Le();let r=k(e)[t].apply(e,n);return Re(),Je(),r}var ht=e(`__proto__,__v_isRef,__isVue`),gt=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!==`arguments`&&e!==`caller`).map(e=>Symbol[e]).filter(_));function _t(e){_(e)||(e=String(e));let t=k(this);return O(t,`has`,e),t.hasOwnProperty(e)}var vt=class{constructor(e=!1,t=!1){this._isReadonly=e,this._isShallow=t}get(e,t,n){if(t===`__v_skip`)return e.__v_skip;let r=this._isReadonly,i=this._isShallow;if(t===`__v_isReactive`)return!r;if(t===`__v_isReadonly`)return r;if(t===`__v_isShallow`)return i;if(t===`__v_raw`)return n===(r?i?It:Ft:i?Pt:Nt).get(e)||Object.getPrototypeOf(e)===Object.getPrototypeOf(n)?e:void 0;let a=d(e);if(!r){let e;if(a&&(e=ct[t]))return e;if(t===`hasOwnProperty`)return _t}let o=Reflect.get(e,t,A(e)?e:n);if((_(t)?gt.has(t):ht(t))||(r||O(e,`get`,t),i))return o;if(A(o)){let e=a&&te(t)?o:o.value;return r&&v(e)?Vt(e):e}return v(o)?r?Vt(o):zt(o):o}},yt=class extends vt{constructor(e=!1){super(!1,e)}set(e,t,n,r){let i=e[t],a=d(e)&&te(t);if(!this._isShallow){let e=Wt(i);if(!Gt(n)&&!Wt(n)&&(i=k(i),n=k(n)),!a&&A(i)&&!A(n))return e||(i.value=n),!0}let o=a?Number(t)<e.length:u(e,t),s=Reflect.set(e,t,n,A(e)?e:r);return e===k(r)&&(o?w(n,i)&&it(e,`set`,t,n,i):it(e,`add`,t,n)),s}deleteProperty(e,t){let n=u(e,t),r=e[t],i=Reflect.deleteProperty(e,t);return i&&n&&it(e,`delete`,t,void 0,r),i}has(e,t){let n=Reflect.has(e,t);return(!_(t)||!gt.has(t))&&O(e,`has`,t),n}ownKeys(e){return O(e,`iterate`,d(e)?`length`:tt),Reflect.ownKeys(e)}},bt=class extends vt{constructor(e=!1){super(!0,e)}set(e,t){return!0}deleteProperty(e,t){return!0}},xt=new yt,St=new bt,Ct=new yt(!0),wt=e=>e,Tt=e=>Reflect.getPrototypeOf(e);function Et(e,t,n){return function(...r){let i=this.__v_raw,a=k(i),o=f(a),c=e===`entries`||e===Symbol.iterator&&o,l=e===`keys`&&o,u=i[e](...r),d=n?wt:t?Yt:Jt;return!t&&O(a,`iterate`,l?nt:tt),s(Object.create(u),{next(){let{value:e,done:t}=u.next();return t?{value:e,done:t}:{value:c?[d(e[0]),d(e[1])]:d(e),done:t}}})}}function Dt(e){return function(...t){return e===`delete`?!1:e===`clear`?void 0:this}}function Ot(e,t){let n={get(n){let r=this.__v_raw,i=k(r),a=k(n);e||(w(n,a)&&O(i,`get`,n),O(i,`get`,a));let{has:o}=Tt(i),s=t?wt:e?Yt:Jt;if(o.call(i,n))return s(r.get(n));if(o.call(i,a))return s(r.get(a));r!==i&&r.get(n)},get size(){let t=this.__v_raw;return!e&&O(k(t),`iterate`,tt),t.size},has(t){let n=this.__v_raw,r=k(n),i=k(t);return e||(w(t,i)&&O(r,`has`,t),O(r,`has`,i)),t===i?n.has(t):n.has(t)||n.has(i)},forEach(n,r){let i=this,a=i.__v_raw,o=k(a),s=t?wt:e?Yt:Jt;return!e&&O(o,`iterate`,tt),a.forEach((e,t)=>n.call(r,s(e),s(t),i))}};return s(n,e?{add:Dt(`add`),set:Dt(`set`),delete:Dt(`delete`),clear:Dt(`clear`)}:{add(e){let n=k(this),r=Tt(n),i=k(e),a=!t&&!Gt(e)&&!Wt(e)?i:e;return r.has.call(n,a)||w(e,a)&&r.has.call(n,e)||w(i,a)&&r.has.call(n,i)||(n.add(a),it(n,`add`,a,a)),this},set(e,n){!t&&!Gt(n)&&!Wt(n)&&(n=k(n));let r=k(this),{has:i,get:a}=Tt(r),o=i.call(r,e);o||=(e=k(e),i.call(r,e));let s=a.call(r,e);return r.set(e,n),o?w(n,s)&&it(r,`set`,e,n,s):it(r,`add`,e,n),this},delete(e){let t=k(this),{has:n,get:r}=Tt(t),i=n.call(t,e);i||=(e=k(e),n.call(t,e));let a=r?r.call(t,e):void 0,o=t.delete(e);return i&&it(t,`delete`,e,void 0,a),o},clear(){let e=k(this),t=e.size!==0,n=e.clear();return t&&it(e,`clear`,void 0,void 0,void 0),n}}),[`keys`,`values`,`entries`,Symbol.iterator].forEach(r=>{n[r]=Et(r,e,t)}),n}function kt(e,t){let n=Ot(e,t);return(t,r,i)=>r===`__v_isReactive`?!e:r===`__v_isReadonly`?e:r===`__v_raw`?t:Reflect.get(u(n,r)&&r in t?n:t,r,i)}var At={get:kt(!1,!1)},jt={get:kt(!1,!0)},Mt={get:kt(!0,!1)},Nt=new WeakMap,Pt=new WeakMap,Ft=new WeakMap,It=new WeakMap;function Lt(e){switch(e){case`Object`:case`Array`:return 1;case`Map`:case`Set`:case`WeakMap`:case`WeakSet`:return 2;default:return 0}}function Rt(e){return e.__v_skip||!Object.isExtensible(e)?0:Lt(ee(e))}function zt(e){return Wt(e)?e:Ht(e,!1,xt,At,Nt)}function Bt(e){return Ht(e,!1,Ct,jt,Pt)}function Vt(e){return Ht(e,!0,St,Mt,Ft)}function Ht(e,t,n,r,i){if(!v(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;let a=Rt(e);if(a===0)return e;let o=i.get(e);if(o)return o;let s=new Proxy(e,a===2?r:n);return i.set(e,s),s}function Ut(e){return Wt(e)?Ut(e.__v_raw):!!(e&&e.__v_isReactive)}function Wt(e){return!!(e&&e.__v_isReadonly)}function Gt(e){return!!(e&&e.__v_isShallow)}function Kt(e){return e?!!e.__v_raw:!1}function k(e){let t=e&&e.__v_raw;return t?k(t):e}function qt(e){return!u(e,`__v_skip`)&&Object.isExtensible(e)&&T(e,`__v_skip`,!0),e}var Jt=e=>v(e)?zt(e):e,Yt=e=>v(e)?Vt(e):e;function A(e){return e?e.__v_isRef===!0:!1}function Xt(e){return Zt(e,!1)}function Zt(e,t){return A(e)?e:new Qt(e,t)}var Qt=class{constructor(e,t){this.dep=new Qe,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=t?e:k(e),this._value=t?e:Jt(e),this.__v_isShallow=t}get value(){return this.dep.track(),this._value}set value(e){let t=this._rawValue,n=this.__v_isShallow||Gt(e)||Wt(e);e=n?e:k(e),w(e,t)&&(this._rawValue=e,this._value=n?e:Jt(e),this.dep.trigger())}};function j(e){return A(e)?e.value:e}var $t={get:(e,t,n)=>t===`__v_raw`?e:j(Reflect.get(e,t,n)),set:(e,t,n,r)=>{let i=e[t];return A(i)&&!A(n)?(i.value=n,!0):Reflect.set(e,t,n,r)}};function en(e){return Ut(e)?e:new Proxy(e,$t)}var tn=class{constructor(e,t,n){this.fn=e,this.setter=t,this._value=void 0,this.dep=new Qe(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=Xe-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!t,this.isSSR=n}notify(){if(this.flags|=16,!(this.flags&8)&&D!==this)return Ie(this,!0),!0}get value(){let e=this.dep.track();return He(this),e&&(e.version=this.dep.version),this._value}set value(e){this.setter&&this.setter(e)}};function nn(e,t,n=!1){let r,i;return h(e)?r=e:(r=e.get,i=e.set),new tn(r,i,n)}var rn={},an=new WeakMap,on=void 0;function sn(e,t=!1,n=on){if(n){let t=an.get(n);t||an.set(n,t=[]),t.push(e)}}function cn(e,n,i=t){let{immediate:a,deep:o,once:s,scheduler:l,augmentJob:u,call:f}=i,p=e=>o?e:Gt(e)||o===!1||o===0?ln(e,1):ln(e),m,g,_,v,y=!1,b=!1;if(A(e)?(g=()=>e.value,y=Gt(e)):Ut(e)?(g=()=>p(e),y=!0):d(e)?(b=!0,y=e.some(e=>Ut(e)||Gt(e)),g=()=>e.map(e=>{if(A(e))return e.value;if(Ut(e))return p(e);if(h(e))return f?f(e,2):e()})):g=h(e)?n?f?()=>f(e,2):e:()=>{if(_){qe();try{_()}finally{Je()}}let t=on;on=m;try{return f?f(e,3,[v]):e(v)}finally{on=t}}:r,n&&o){let e=g,t=o===!0?1/0:o;g=()=>ln(e(),t)}let x=Ae(),ee=()=>{m.stop(),x&&x.active&&c(x.effects,m)};if(s&&n){let e=n;n=(...t)=>{e(...t),ee()}}let S=b?Array(e.length).fill(rn):rn,te=e=>{if(!(!(m.flags&1)||!m.dirty&&!e))if(n){let e=m.run();if(o||y||(b?e.some((e,t)=>w(e,S[t])):w(e,S))){_&&_();let t=on;on=m;try{let t=[e,S===rn?void 0:b&&S[0]===rn?[]:S,v];S=e,f?f(n,3,t):n(...t)}finally{on=t}}}else m.run()};return u&&u(te),m=new Me(g),m.scheduler=l?()=>l(te,!1):te,v=e=>sn(e,!1,m),_=m.onStop=()=>{let e=an.get(m);if(e){if(f)f(e,4);else for(let t of e)t();an.delete(m)}},n?a?te(!0):S=m.run():l?l(te.bind(null,!0),!0):m.run(),ee.pause=m.pause.bind(m),ee.resume=m.resume.bind(m),ee.stop=ee,ee}function ln(e,t=1/0,n){if(t<=0||!v(e)||e.__v_skip||(n||=new Map,(n.get(e)||0)>=t))return e;if(n.set(e,t),t--,A(e))ln(e.value,t,n);else if(d(e))for(let r=0;r<e.length;r++)ln(e[r],t,n);else if(p(e)||f(e))e.forEach(e=>{ln(e,t,n)});else if(S(e)){for(let r in e)ln(e[r],t,n);for(let r of Object.getOwnPropertySymbols(e))Object.prototype.propertyIsEnumerable.call(e,r)&&ln(e[r],t,n)}return e}function un(e,t,n,r){try{return r?e(...r):e()}catch(e){fn(e,t,n)}}function dn(e,t,n,r){if(h(e)){let i=un(e,t,n,r);return i&&y(i)&&i.catch(e=>{fn(e,t,n)}),i}if(d(e)){let i=[];for(let a=0;a<e.length;a++)i.push(dn(e[a],t,n,r));return i}}function fn(e,n,r,i=!0){let a=n?n.vnode:null,{errorHandler:o,throwUnhandledErrorInProduction:s}=n&&n.appContext.config||t;if(n){let t=n.parent,i=n.proxy,a=`https://vuejs.org/error-reference/#runtime-${r}`;for(;t;){let n=t.ec;if(n){for(let t=0;t<n.length;t++)if(n[t](e,i,a)===!1)return}t=t.parent}if(o){qe(),un(o,null,10,[e,i,a]),Je();return}}pn(e,r,a,i,s)}function pn(e,t,n,r=!0,i=!1){if(i)throw e;console.error(e)}var M=[],mn=-1,hn=[],gn=null,_n=0,vn=Promise.resolve(),yn=null;function bn(e){let t=yn||vn;return e?t.then(this?e.bind(this):e):t}function xn(e){let t=mn+1,n=M.length;for(;t<n;){let r=t+n>>>1,i=M[r],a=Dn(i);a<e||a===e&&i.flags&2?t=r+1:n=r}return t}function Sn(e){if(!(e.flags&1)){let t=Dn(e),n=M[M.length-1];!n||!(e.flags&2)&&t>=Dn(n)?M.push(e):M.splice(xn(t),0,e),e.flags|=1,Cn()}}function Cn(){yn||=vn.then(On)}function wn(e){d(e)?hn.push(...e):gn&&e.id===-1?gn.splice(_n+1,0,e):e.flags&1||(hn.push(e),e.flags|=1),Cn()}function Tn(e,t,n=mn+1){for(;n<M.length;n++){let t=M[n];if(t&&t.flags&2){if(e&&t.id!==e.uid)continue;M.splice(n,1),n--,t.flags&4&&(t.flags&=-2),t(),t.flags&4||(t.flags&=-2)}}}function En(e){if(hn.length){let e=[...new Set(hn)].sort((e,t)=>Dn(e)-Dn(t));if(hn.length=0,gn){gn.push(...e);return}for(gn=e,_n=0;_n<gn.length;_n++){let e=gn[_n];e.flags&4&&(e.flags&=-2),e.flags&8||e(),e.flags&=-2}gn=null,_n=0}}var Dn=e=>e.id==null?e.flags&2?-1:1/0:e.id;function On(e){try{for(mn=0;mn<M.length;mn++){let e=M[mn];e&&!(e.flags&8)&&(e.flags&4&&(e.flags&=-2),un(e,e.i,e.i?15:14),e.flags&4||(e.flags&=-2))}}finally{for(;mn<M.length;mn++){let e=M[mn];e&&(e.flags&=-2)}mn=-1,M.length=0,En(e),yn=null,(M.length||hn.length)&&On(e)}}var kn=null,An=null;function jn(e){let t=kn;return kn=e,An=e&&e.type.__scopeId||null,t}function Mn(e,t=kn,n){if(!t||e._n)return e;let r=(...n)=>{r._d&&Fi(-1);let i=jn(t),a;try{a=e(...n)}finally{jn(i),r._d&&Fi(1)}return a};return r._n=!0,r._c=!0,r._d=!0,r}function Nn(e,n){if(kn===null)return e;let r=_a(kn),i=e.dirs||=[];for(let e=0;e<n.length;e++){let[a,o,s,c=t]=n[e];a&&(h(a)&&(a={mounted:a,updated:a}),a.deep&&ln(o),i.push({dir:a,instance:r,value:o,oldValue:void 0,arg:s,modifiers:c}))}return e}function Pn(e,t,n,r){let i=e.dirs,a=t&&t.dirs;for(let o=0;o<i.length;o++){let s=i[o];a&&(s.oldValue=a[o].value);let c=s.dir[r];c&&(qe(),dn(c,n,8,[e.el,s,e,t]),Je())}}function Fn(e,t){if(V){let n=V.provides,r=V.parent&&V.parent.provides;r===n&&(n=V.provides=Object.create(r)),n[e]=t}}function In(e,t,n=!1){let r=na();if(r||Br){let i=Br?Br._context.provides:r?r.parent==null||r.ce?r.vnode.appContext&&r.vnode.appContext.provides:r.parent.provides:void 0;if(i&&e in i)return i[e];if(arguments.length>1)return n&&h(t)?t.call(r&&r.proxy):t}}var Ln=Symbol.for(`v-scx`),Rn=()=>In(Ln);function zn(e,t,n){return Bn(e,t,n)}function Bn(e,n,i=t){let{immediate:a,deep:o,flush:c,once:l}=i,u=s({},i),d=n&&a||!n&&c!==`post`,f;if(ca){if(c===`sync`){let e=Rn();f=e.__watcherHandles||=[]}else if(!d){let e=()=>{};return e.stop=r,e.resume=r,e.pause=r,e}}let p=V;u.call=(e,t,n)=>dn(e,p,t,n);let m=!1;c===`post`?u.scheduler=e=>{P(e,p&&p.suspense)}:c!==`sync`&&(m=!0,u.scheduler=(e,t)=>{t?e():Sn(e)}),u.augmentJob=e=>{n&&(e.flags|=4),m&&(e.flags|=2,p&&(e.id=p.uid,e.i=p))};let h=cn(e,n,u);return ca&&(f?f.push(h):d&&h()),h}function Vn(e,t,n){let r=this.proxy,i=g(e)?e.includes(`.`)?Hn(r,e):()=>r[e]:e.bind(r,r),a;h(t)?a=t:(a=t.handler,n=t);let o=aa(this),s=Bn(i,a.bind(r),n);return o(),s}function Hn(e,t){let n=t.split(`.`);return()=>{let t=e;for(let e=0;e<n.length&&t;e++)t=t[n[e]];return t}}var Un=Symbol(`_vte`),Wn=e=>e.__isTeleport,Gn=Symbol(`_leaveCb`);function Kn(e,t){e.shapeFlag&6&&e.component?(e.transition=t,Kn(e.component.subTree,t)):e.shapeFlag&128?(e.ssContent.transition=t.clone(e.ssContent),e.ssFallback.transition=t.clone(e.ssFallback)):e.transition=t}function qn(e){e.ids=[e.ids[0]+ e.ids[2]+++`-`,0,0]}function Jn(e,t){let n;return!!((n=Object.getOwnPropertyDescriptor(e,t))&&!n.configurable)}var Yn=new WeakMap;function Xn(e,n,r,a,o=!1){if(d(e)){e.forEach((e,t)=>Xn(e,n&&(d(n)?n[t]:n),r,a,o));return}if(Qn(a)&&!o){a.shapeFlag&512&&a.type.__asyncResolved&&a.component.subTree.component&&Xn(e,n,r,a.component.subTree);return}let s=a.shapeFlag&4?_a(a.component):a.el,l=o?null:s,{i:f,r:p}=e,m=n&&n.r,_=f.refs===t?f.refs={}:f.refs,v=f.setupState,y=k(v),b=v===t?i:e=>Jn(_,e)?!1:u(y,e),x=(e,t)=>!(t&&Jn(_,t));if(m!=null&&m!==p){if(Zn(n),g(m))_[m]=null,b(m)&&(v[m]=null);else if(A(m)){let e=n;x(m,e.k)&&(m.value=null),e.k&&(_[e.k]=null)}}if(h(p))un(p,f,12,[l,_]);else{let t=g(p),n=A(p);if(t||n){let i=()=>{if(e.f){let n=t?b(p)?v[p]:_[p]:x(p)||!e.k?p.value:_[e.k];if(o)d(n)&&c(n,s);else if(d(n))n.includes(s)||n.push(s);else if(t)_[p]=[s],b(p)&&(v[p]=_[p]);else{let t=[s];x(p,e.k)&&(p.value=t),e.k&&(_[e.k]=t)}}else t?(_[p]=l,b(p)&&(v[p]=l)):n&&(x(p,e.k)&&(p.value=l),e.k&&(_[e.k]=l))};if(l){let t=()=>{i(),Yn.delete(e)};t.id=-1,Yn.set(e,t),P(t,r)}else Zn(e),i()}}}function Zn(e){let t=Yn.get(e);t&&(t.flags|=8,Yn.delete(e))}fe().requestIdleCallback,fe().cancelIdleCallback;var Qn=e=>!!e.type.__asyncLoader,$n=e=>e.type.__isKeepAlive;function er(e,t){nr(e,`a`,t)}function tr(e,t){nr(e,`da`,t)}function nr(e,t,n=V){let r=e.__wdc||=()=>{let t=n;for(;t;){if(t.isDeactivated)return;t=t.parent}return e()};if(ir(t,r,n),n){let e=n.parent;for(;e&&e.parent;)$n(e.parent.vnode)&&rr(r,t,n,e),e=e.parent}}function rr(e,t,n,r){let i=ir(t,e,r,!0);dr(()=>{c(r[t],i)},n)}function ir(e,t,n=V,r=!1){if(n){let i=n[e]||(n[e]=[]),a=t.__weh||=(...r)=>{qe();let i=aa(n),a=dn(t,n,e,r);return i(),Je(),a};return r?i.unshift(a):i.push(a),a}}var ar=e=>(t,n=V)=>{(!ca||e===`sp`)&&ir(e,(...e)=>t(...e),n)},or=ar(`bm`),sr=ar(`m`),cr=ar(`bu`),lr=ar(`u`),ur=ar(`bum`),dr=ar(`um`),fr=ar(`sp`),pr=ar(`rtg`),mr=ar(`rtc`);function hr(e,t=V){ir(`ec`,e,t)}var gr=Symbol.for(`v-ndc`);function _r(e,t,n,r){let i,a=n&&n[r],o=d(e);if(o||g(e)){let n=o&&Ut(e),r=!1,s=!1;n&&(r=!Gt(e),s=Wt(e),e=ot(e)),i=Array(e.length);for(let n=0,o=e.length;n<o;n++)i[n]=t(r?s?Yt(Jt(e[n])):Jt(e[n]):e[n],n,void 0,a&&a[n])}else if(typeof e==`number`){i=Array(e);for(let n=0;n<e;n++)i[n]=t(n+1,n,void 0,a&&a[n])}else if(v(e))if(e[Symbol.iterator])i=Array.from(e,(e,n)=>t(e,n,void 0,a&&a[n]));else{let n=Object.keys(e);i=Array(n.length);for(let r=0,o=n.length;r<o;r++){let o=n[r];i[r]=t(e[o],o,r,a&&a[r])}}else i=[];return n&&(n[r]=i),i}var vr=e=>e?sa(e)?_a(e):vr(e.parent):null,yr=s(Object.create(null),{$:e=>e,$el:e=>e.vnode.el,$data:e=>e.data,$props:e=>e.props,$attrs:e=>e.attrs,$slots:e=>e.slots,$refs:e=>e.refs,$parent:e=>vr(e.parent),$root:e=>vr(e.root),$host:e=>e.ce,$emit:e=>e.emit,$options:e=>Or(e),$forceUpdate:e=>e.f||=()=>{Sn(e.update)},$nextTick:e=>e.n||=bn.bind(e.proxy),$watch:e=>Vn.bind(e)}),br=(e,n)=>e!==t&&!e.__isScriptSetup&&u(e,n),xr={get({_:e},n){if(n===`__v_skip`)return!0;let{ctx:r,setupState:i,data:a,props:o,accessCache:s,type:c,appContext:l}=e;if(n[0]!==`$`){let e=s[n];if(e!==void 0)switch(e){case 1:return i[n];case 2:return a[n];case 4:return r[n];case 3:return o[n]}else if(br(i,n))return s[n]=1,i[n];else if(a!==t&&u(a,n))return s[n]=2,a[n];else if(u(o,n))return s[n]=3,o[n];else if(r!==t&&u(r,n))return s[n]=4,r[n];else Cr&&(s[n]=0)}let d=yr[n],f,p;if(d)return n===`$attrs`&&O(e.attrs,`get`,``),d(e);if((f=c.__cssModules)&&(f=f[n]))return f;if(r!==t&&u(r,n))return s[n]=4,r[n];if(p=l.config.globalProperties,u(p,n))return p[n]},set({_:e},n,r){let{data:i,setupState:a,ctx:o}=e;return br(a,n)?(a[n]=r,!0):i!==t&&u(i,n)?(i[n]=r,!0):u(e.props,n)||n[0]===`$`&&n.slice(1)in e?!1:(o[n]=r,!0)},has({_:{data:e,setupState:n,accessCache:r,ctx:i,appContext:a,props:o,type:s}},c){let l;return!!(r[c]||e!==t&&c[0]!==`$`&&u(e,c)||br(n,c)||u(o,c)||u(i,c)||u(yr,c)||u(a.config.globalProperties,c)||(l=s.__cssModules)&&l[c])},defineProperty(e,t,n){return n.get==null?u(n,`value`)&&this.set(e,t,n.value,null):e._.accessCache[t]=0,Reflect.defineProperty(e,t,n)}};function Sr(e){return d(e)?e.reduce((e,t)=>(e[t]=null,e),{}):e}var Cr=!0;function wr(e){let t=Or(e),n=e.proxy,i=e.ctx;Cr=!1,t.beforeCreate&&Er(t.beforeCreate,e,`bc`);let{data:a,computed:o,methods:s,watch:c,provide:l,inject:u,created:f,beforeMount:p,mounted:m,beforeUpdate:g,updated:_,activated:y,deactivated:b,beforeDestroy:x,beforeUnmount:ee,destroyed:S,unmounted:te,render:ne,renderTracked:re,renderTriggered:ie,errorCaptured:C,serverPrefetch:ae,expose:oe,inheritAttrs:se,components:ce,directives:w,filters:le}=t;if(u&&Tr(u,i,null),s)for(let e in s){let t=s[e];h(t)&&(i[e]=t.bind(n))}if(a){let t=a.call(n,n);v(t)&&(e.data=zt(t))}if(Cr=!0,o)for(let e in o){let t=o[e],a=ya({get:h(t)?t.bind(n,n):h(t.get)?t.get.bind(n,n):r,set:!h(t)&&h(t.set)?t.set.bind(n):r});Object.defineProperty(i,e,{enumerable:!0,configurable:!0,get:()=>a.value,set:e=>a.value=e})}if(c)for(let e in c)Dr(c[e],i,n,e);if(l){let e=h(l)?l.call(n):l;Reflect.ownKeys(e).forEach(t=>{Fn(t,e[t])})}f&&Er(f,e,`c`);function T(e,t){d(t)?t.forEach(t=>e(t.bind(n))):t&&e(t.bind(n))}if(T(or,p),T(sr,m),T(cr,g),T(lr,_),T(er,y),T(tr,b),T(hr,C),T(mr,re),T(pr,ie),T(ur,ee),T(dr,te),T(fr,ae),d(oe))if(oe.length){let t=e.exposed||={};oe.forEach(e=>{Object.defineProperty(t,e,{get:()=>n[e],set:t=>n[e]=t,enumerable:!0})})}else e.exposed||={};ne&&e.render===r&&(e.render=ne),se!=null&&(e.inheritAttrs=se),ce&&(e.components=ce),w&&(e.directives=w),ae&&qn(e)}function Tr(e,t,n=r){d(e)&&(e=Nr(e));for(let n in e){let r=e[n],i;i=v(r)?`default`in r?In(r.from||n,r.default,!0):In(r.from||n):In(r),A(i)?Object.defineProperty(t,n,{enumerable:!0,configurable:!0,get:()=>i.value,set:e=>i.value=e}):t[n]=i}}function Er(e,t,n){dn(d(e)?e.map(e=>e.bind(t.proxy)):e.bind(t.proxy),t,n)}function Dr(e,t,n,r){let i=r.includes(`.`)?Hn(n,r):()=>n[r];if(g(e)){let n=t[e];h(n)&&zn(i,n)}else if(h(e))zn(i,e.bind(n));else if(v(e))if(d(e))e.forEach(e=>Dr(e,t,n,r));else{let r=h(e.handler)?e.handler.bind(n):t[e.handler];h(r)&&zn(i,r,e)}}function Or(e){let t=e.type,{mixins:n,extends:r}=t,{mixins:i,optionsCache:a,config:{optionMergeStrategies:o}}=e.appContext,s=a.get(t),c;return s?c=s:!i.length&&!n&&!r?c=t:(c={},i.length&&i.forEach(e=>kr(c,e,o,!0)),kr(c,t,o)),v(t)&&a.set(t,c),c}function kr(e,t,n,r=!1){let{mixins:i,extends:a}=t;a&&kr(e,a,n,!0),i&&i.forEach(t=>kr(e,t,n,!0));for(let i in t)if(!(r&&i===`expose`)){let r=Ar[i]||n&&n[i];e[i]=r?r(e[i],t[i]):t[i]}return e}var Ar={data:jr,props:Fr,emits:Fr,methods:Pr,computed:Pr,beforeCreate:N,created:N,beforeMount:N,mounted:N,beforeUpdate:N,updated:N,beforeDestroy:N,beforeUnmount:N,destroyed:N,unmounted:N,activated:N,deactivated:N,errorCaptured:N,serverPrefetch:N,components:Pr,directives:Pr,watch:Ir,provide:jr,inject:Mr};function jr(e,t){return t?e?function(){return s(h(e)?e.call(this,this):e,h(t)?t.call(this,this):t)}:t:e}function Mr(e,t){return Pr(Nr(e),Nr(t))}function Nr(e){if(d(e)){let t={};for(let n=0;n<e.length;n++)t[e[n]]=e[n];return t}return e}function N(e,t){return e?[...new Set([].concat(e,t))]:t}function Pr(e,t){return e?s(Object.create(null),e,t):t}function Fr(e,t){return e?d(e)&&d(t)?[...new Set([...e,...t])]:s(Object.create(null),Sr(e),Sr(t??{})):t}function Ir(e,t){if(!e)return t;if(!t)return e;let n=s(Object.create(null),e);for(let r in t)n[r]=N(e[r],t[r]);return n}function Lr(){return{app:null,config:{isNativeTag:i,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}var Rr=0;function zr(e,t){return function(n,r=null){h(n)||(n=s({},n)),r!=null&&!v(r)&&(r=null);let i=Lr(),a=new WeakSet,o=[],c=!1,l=i.app={_uid:Rr++,_component:n,_props:r,_container:null,_context:i,_instance:null,version:ba,get config(){return i.config},set config(e){},use(e,...t){return a.has(e)||(e&&h(e.install)?(a.add(e),e.install(l,...t)):h(e)&&(a.add(e),e(l,...t))),l},mixin(e){return i.mixins.includes(e)||i.mixins.push(e),l},component(e,t){return t?(i.components[e]=t,l):i.components[e]},directive(e,t){return t?(i.directives[e]=t,l):i.directives[e]},mount(a,o,s){if(!c){let u=l._ceVNode||B(n,r);return u.appContext=i,s===!0?s=`svg`:s===!1&&(s=void 0),o&&t?t(u,a):e(u,a,s),c=!0,l._container=a,a.__vue_app__=l,_a(u.component)}},onUnmount(e){o.push(e)},unmount(){c&&(dn(o,l._instance,16),e(null,l._container),delete l._container.__vue_app__)},provide(e,t){return i.provides[e]=t,l},runWithContext(e){let t=Br;Br=l;try{return e()}finally{Br=t}}};return l}}var Br=null,Vr=(e,t)=>t===`modelValue`||t===`model-value`?e.modelModifiers:e[`${t}Modifiers`]||e[`${C(t)}Modifiers`]||e[`${oe(t)}Modifiers`];function Hr(e,n,...r){if(e.isUnmounted)return;let i=e.vnode.props||t,a=r,o=n.startsWith(`update:`),s=o&&Vr(i,n.slice(7));s&&(s.trim&&(a=r.map(e=>g(e)?e.trim():e)),s.number&&(a=r.map(ue)));let c,l=i[c=ce(n)]||i[c=ce(C(n))];!l&&o&&(l=i[c=ce(oe(n))]),l&&dn(l,e,6,a);let u=i[c+`Once`];if(u){if(!e.emitted)e.emitted={};else if(e.emitted[c])return;e.emitted[c]=!0,dn(u,e,6,a)}}var Ur=new WeakMap;function Wr(e,t,n=!1){let r=n?Ur:t.emitsCache,i=r.get(e);if(i!==void 0)return i;let a=e.emits,o={},c=!1;if(!h(e)){let r=e=>{let n=Wr(e,t,!0);n&&(c=!0,s(o,n))};!n&&t.mixins.length&&t.mixins.forEach(r),e.extends&&r(e.extends),e.mixins&&e.mixins.forEach(r)}return!a&&!c?(v(e)&&r.set(e,null),null):(d(a)?a.forEach(e=>o[e]=null):s(o,a),v(e)&&r.set(e,o),o)}function Gr(e,t){return!e||!a(t)?!1:(t=t.slice(2).replace(/Once$/,``),u(e,t[0].toLowerCase()+t.slice(1))||u(e,oe(t))||u(e,t))}function Kr(e){let{type:t,vnode:n,proxy:r,withProxy:i,propsOptions:[a],slots:s,attrs:c,emit:l,render:u,renderCache:d,props:f,data:p,setupState:m,ctx:h,inheritAttrs:g}=e,_=jn(e),v,y;try{if(n.shapeFlag&4){let e=i||r,t=e;v=Ji(u.call(t,e,d,f,m,p,h)),y=c}else{let e=t;v=Ji(e.length>1?e(f,{attrs:c,slots:s,emit:l}):e(f,null)),y=t.props?c:qr(c)}}catch(t){Mi.length=0,fn(t,e,1),v=B(Ai)}let b=v;if(y&&g!==!1){let e=Object.keys(y),{shapeFlag:t}=b;e.length&&t&7&&(a&&e.some(o)&&(y=Jr(y,a)),b=Wi(b,y,!1,!0))}return n.dirs&&(b=Wi(b,null,!1,!0),b.dirs=b.dirs?b.dirs.concat(n.dirs):n.dirs),n.transition&&Kn(b,n.transition),v=b,jn(_),v}var qr=e=>{let t;for(let n in e)(n===`class`||n===`style`||a(n))&&((t||={})[n]=e[n]);return t},Jr=(e,t)=>{let n={};for(let r in e)(!o(r)||!(r.slice(9)in t))&&(n[r]=e[r]);return n};function Yr(e,t,n){let{props:r,children:i,component:a}=e,{props:o,children:s,patchFlag:c}=t,l=a.emitsOptions;if(t.dirs||t.transition)return!0;if(n&&c>=0){if(c&1024)return!0;if(c&16)return r?Xr(r,o,l):!!o;if(c&8){let e=t.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t];if(Zr(o,r,n)&&!Gr(l,n))return!0}}}else return(i||s)&&(!s||!s.$stable)?!0:r===o?!1:r?o?Xr(r,o,l):!0:!!o;return!1}function Xr(e,t,n){let r=Object.keys(t);if(r.length!==Object.keys(e).length)return!0;for(let i=0;i<r.length;i++){let a=r[i];if(Zr(t,e,a)&&!Gr(n,a))return!0}return!1}function Zr(e,t,n){let r=e[n],i=t[n];return n===`style`&&v(r)&&v(i)?!Ce(r,i):r!==i}function Qr({vnode:e,parent:t,suspense:n},r){for(;t;){let n=t.subTree;if(n.suspense&&n.suspense.activeBranch===e&&(n.suspense.vnode.el=n.el=r,e=n),n===e)(e=t.vnode).el=r,t=t.parent;else break}n&&n.activeBranch===e&&(n.vnode.el=r)}var $r={},ei=()=>Object.create($r),ti=e=>Object.getPrototypeOf(e)===$r;function ni(e,t,n,r=!1){let i={},a=ei();e.propsDefaults=Object.create(null),ii(e,t,i,a);for(let t in e.propsOptions[0])t in i||(i[t]=void 0);n?e.props=r?i:Bt(i):e.type.props?e.props=i:e.props=a,e.attrs=a}function ri(e,t,n,r){let{props:i,attrs:a,vnode:{patchFlag:o}}=e,s=k(i),[c]=e.propsOptions,l=!1;if((r||o>0)&&!(o&16)){if(o&8){let n=e.vnode.dynamicProps;for(let r=0;r<n.length;r++){let o=n[r];if(Gr(e.emitsOptions,o))continue;let d=t[o];if(c)if(u(a,o))d!==a[o]&&(a[o]=d,l=!0);else{let t=C(o);i[t]=ai(c,s,t,d,e,!1)}else d!==a[o]&&(a[o]=d,l=!0)}}}else{ii(e,t,i,a)&&(l=!0);let r;for(let a in s)(!t||!u(t,a)&&((r=oe(a))===a||!u(t,r)))&&(c?n&&(n[a]!==void 0||n[r]!==void 0)&&(i[a]=ai(c,s,a,void 0,e,!0)):delete i[a]);if(a!==s)for(let e in a)(!t||!u(t,e))&&(delete a[e],l=!0)}l&&it(e.attrs,`set`,``)}function ii(e,n,r,i){let[a,o]=e.propsOptions,s=!1,c;if(n)for(let t in n){if(ne(t))continue;let l=n[t],d;a&&u(a,d=C(t))?!o||!o.includes(d)?r[d]=l:(c||={})[d]=l:Gr(e.emitsOptions,t)||(!(t in i)||l!==i[t])&&(i[t]=l,s=!0)}if(o){let n=k(r),i=c||t;for(let t=0;t<o.length;t++){let s=o[t];r[s]=ai(a,n,s,i[s],e,!u(i,s))}}return s}function ai(e,t,n,r,i,a){let o=e[n];if(o!=null){let e=u(o,`default`);if(e&&r===void 0){let e=o.default;if(o.type!==Function&&!o.skipFactory&&h(e)){let{propsDefaults:a}=i;if(n in a)r=a[n];else{let o=aa(i);r=a[n]=e.call(null,t),o()}}else r=e;i.ce&&i.ce._setProp(n,r)}o[0]&&(a&&!e?r=!1:o[1]&&(r===``||r===oe(n))&&(r=!0))}return r}var oi=new WeakMap;function si(e,r,i=!1){let a=i?oi:r.propsCache,o=a.get(e);if(o)return o;let c=e.props,l={},f=[],p=!1;if(!h(e)){let t=e=>{p=!0;let[t,n]=si(e,r,!0);s(l,t),n&&f.push(...n)};!i&&r.mixins.length&&r.mixins.forEach(t),e.extends&&t(e.extends),e.mixins&&e.mixins.forEach(t)}if(!c&&!p)return v(e)&&a.set(e,n),n;if(d(c))for(let e=0;e<c.length;e++){let n=C(c[e]);ci(n)&&(l[n]=t)}else if(c)for(let e in c){let t=C(e);if(ci(t)){let n=c[e],r=l[t]=d(n)||h(n)?{type:n}:s({},n),i=r.type,a=!1,o=!0;if(d(i))for(let e=0;e<i.length;++e){let t=i[e],n=h(t)&&t.name;if(n===`Boolean`){a=!0;break}else n===`String`&&(o=!1)}else a=h(i)&&i.name===`Boolean`;r[0]=a,r[1]=o,(a||u(r,`default`))&&f.push(t)}}let m=[l,f];return v(e)&&a.set(e,m),m}function ci(e){return e[0]!==`$`&&!ne(e)}var li=e=>e===`_`||e===`_ctx`||e===`$stable`,ui=e=>d(e)?e.map(Ji):[Ji(e)],di=(e,t,n)=>{if(t._n)return t;let r=Mn((...e)=>ui(t(...e)),n);return r._c=!1,r},fi=(e,t,n)=>{let r=e._ctx;for(let n in e){if(li(n))continue;let i=e[n];if(h(i))t[n]=di(n,i,r);else if(i!=null){let e=ui(i);t[n]=()=>e}}},pi=(e,t)=>{let n=ui(t);e.slots.default=()=>n},mi=(e,t,n)=>{for(let r in t)(n||!li(r))&&(e[r]=t[r])},hi=(e,t,n)=>{let r=e.slots=ei();if(e.vnode.shapeFlag&32){let e=t._;e?(mi(r,t,n),n&&T(r,`_`,e,!0)):fi(t,r)}else t&&pi(e,t)},gi=(e,n,r)=>{let{vnode:i,slots:a}=e,o=!0,s=t;if(i.shapeFlag&32){let e=n._;e?r&&e===1?o=!1:mi(a,n,r):(o=!n.$stable,fi(n,a)),s=n}else n&&(pi(e,n),s={default:1});if(o)for(let e in a)!li(e)&&s[e]==null&&delete a[e]},P=Oi;function _i(e){return vi(e)}function vi(e,i){let a=fe();a.__VUE__=!0;let{insert:o,remove:s,patchProp:c,createElement:l,createText:u,createComment:d,setText:f,setElementText:p,parentNode:m,nextSibling:h,setScopeId:g=r,insertStaticContent:_}=e,v=(e,t,n,r=null,i=null,a=null,o=void 0,s=null,c=!!t.dynamicChildren)=>{if(e===t)return;e&&!zi(e,t)&&(r=Ce(e),ve(e,i,a,!0),e=null),t.patchFlag===-2&&(c=!1,t.dynamicChildren=null);let{type:l,ref:u,shapeFlag:d}=t;switch(l){case ki:y(e,t,n,r);break;case Ai:b(e,t,n,r);break;case ji:e??x(t,n,r,o);break;case F:ce(e,t,n,r,i,a,o,s,c);break;default:d&1?te(e,t,n,r,i,a,o,s,c):d&6?w(e,t,n,r,i,a,o,s,c):(d&64||d&128)&&l.process(e,t,n,r,i,a,o,s,c,E)}u!=null&&i?Xn(u,e&&e.ref,a,t||e,!t):u==null&&e&&e.ref!=null&&Xn(e.ref,null,a,e,!0)},y=(e,t,n,r)=>{if(e==null)o(t.el=u(t.children),n,r);else{let n=t.el=e.el;t.children!==e.children&&f(n,t.children)}},b=(e,t,n,r)=>{e==null?o(t.el=d(t.children||``),n,r):t.el=e.el},x=(e,t,n,r)=>{[e.el,e.anchor]=_(e.children,t,n,r,e.el,e.anchor)},ee=({el:e,anchor:t},n,r)=>{let i;for(;e&&e!==t;)i=h(e),o(e,n,r),e=i;o(t,n,r)},S=({el:e,anchor:t})=>{let n;for(;e&&e!==t;)n=h(e),s(e),e=n;s(t)},te=(e,t,n,r,i,a,o,s,c)=>{if(t.type===`svg`?o=`svg`:t.type===`math`&&(o=`mathml`),e==null)re(t,n,r,i,a,o,s,c);else{let n=e.el&&e.el._isVueCE?e.el:null;try{n&&n._beginPatch(),ae(e,t,i,a,o,s,c)}finally{n&&n._endPatch()}}},re=(e,t,n,r,i,a,s,u)=>{let d,f,{props:m,shapeFlag:h,transition:g,dirs:_}=e;if(d=e.el=l(e.type,a,m&&m.is,m),h&8?p(d,e.children):h&16&&C(e.children,d,null,r,i,yi(e,a),s,u),_&&Pn(e,null,r,`created`),ie(d,e,e.scopeId,s,r),m){for(let e in m)e!==`value`&&!ne(e)&&c(d,e,null,m[e],a,r);`value`in m&&c(d,`value`,null,m.value,a),(f=m.onVnodeBeforeMount)&&Qi(f,r,e)}_&&Pn(e,null,r,`beforeMount`);let v=xi(i,g);v&&g.beforeEnter(d),o(d,t,n),((f=m&&m.onVnodeMounted)||v||_)&&P(()=>{try{f&&Qi(f,r,e),v&&g.enter(d),_&&Pn(e,null,r,`mounted`)}finally{}},i)},ie=(e,t,n,r,i)=>{if(n&&g(e,n),r)for(let t=0;t<r.length;t++)g(e,r[t]);if(i){let n=i.subTree;if(t===n||Di(n.type)&&(n.ssContent===t||n.ssFallback===t)){let t=i.vnode;ie(e,t,t.scopeId,t.slotScopeIds,i.parent)}}},C=(e,t,n,r,i,a,o,s,c=0)=>{for(let l=c;l<e.length;l++)v(null,e[l]=s?Yi(e[l]):Ji(e[l]),t,n,r,i,a,o,s)},ae=(e,n,r,i,a,o,s)=>{let l=n.el=e.el,{patchFlag:u,dynamicChildren:d,dirs:f}=n;u|=e.patchFlag&16;let m=e.props||t,h=n.props||t,g;if(r&&bi(r,!1),(g=h.onVnodeBeforeUpdate)&&Qi(g,r,n,e),f&&Pn(n,e,r,`beforeUpdate`),r&&bi(r,!0),(m.innerHTML&&h.innerHTML==null||m.textContent&&h.textContent==null)&&p(l,``),d?oe(e.dynamicChildren,d,l,r,i,yi(n,a),o):s||me(e,n,l,null,r,i,yi(n,a),o,!1),u>0){if(u&16)se(l,m,h,r,a);else if(u&2&&m.class!==h.class&&c(l,`class`,null,h.class,a),u&4&&c(l,`style`,m.style,h.style,a),u&8){let e=n.dynamicProps;for(let t=0;t<e.length;t++){let n=e[t],i=m[n],o=h[n];(o!==i||n===`value`)&&c(l,n,i,o,a,r)}}u&1&&e.children!==n.children&&p(l,n.children)}else !s&&d==null&&se(l,m,h,r,a);((g=h.onVnodeUpdated)||f)&&P(()=>{g&&Qi(g,r,n,e),f&&Pn(n,e,r,`updated`)},i)},oe=(e,t,n,r,i,a,o)=>{for(let s=0;s<t.length;s++){let c=e[s],l=t[s];v(c,l,c.el&&(c.type===F||!zi(c,l)||c.shapeFlag&198)?m(c.el):n,null,r,i,a,o,!0)}},se=(e,n,r,i,a)=>{if(n!==r){if(n!==t)for(let t in n)!ne(t)&&!(t in r)&&c(e,t,n[t],null,a,i);for(let t in r){if(ne(t))continue;let o=r[t],s=n[t];o!==s&&t!==`value`&&c(e,t,s,o,a,i)}`value`in r&&c(e,`value`,n.value,r.value,a)}},ce=(e,t,n,r,i,a,s,c,l)=>{let d=t.el=e?e.el:u(``),f=t.anchor=e?e.anchor:u(``),{patchFlag:p,dynamicChildren:m,slotScopeIds:h}=t;h&&(c=c?c.concat(h):h),e==null?(o(d,n,r),o(f,n,r),C(t.children||[],n,f,i,a,s,c,l)):p>0&&p&64&&m&&e.dynamicChildren&&e.dynamicChildren.length===m.length?(oe(e.dynamicChildren,m,n,i,a,s,c),(t.key!=null||i&&t===i.subTree)&&Si(e,t,!0)):me(e,t,n,f,i,a,s,c,l)},w=(e,t,n,r,i,a,o,s,c)=>{t.slotScopeIds=s,e==null?t.shapeFlag&512?i.ctx.activate(t,n,r,o,c):T(t,n,r,i,a,o,c):ue(e,t,c)},T=(e,t,n,r,i,a,o)=>{let s=e.component=ta(e,r,i);if($n(e)&&(s.ctx.renderer=E),la(s,!1,o),s.asyncDep){if(i&&i.registerDep(s,de,o),!e.el){let r=s.subTree=B(Ai);b(null,r,t,n),e.placeholder=r.el}}else de(s,e,t,n,i,a,o)},ue=(e,t,n)=>{let r=t.component=e.component;if(Yr(e,t,n))if(r.asyncDep&&!r.asyncResolved){pe(r,t,n);return}else r.next=t,r.update();else t.el=e.el,r.vnode=t},de=(e,t,n,r,i,a,o)=>{let s=()=>{if(e.isMounted){let{next:t,bu:n,u:r,parent:s,vnode:c}=e;{let n=wi(e);if(n){t&&(t.el=c.el,pe(e,t,o)),n.asyncDep.then(()=>{P(()=>{e.isUnmounted||l()},i)});return}}let u=t,d;bi(e,!1),t?(t.el=c.el,pe(e,t,o)):t=c,n&&le(n),(d=t.props&&t.props.onVnodeBeforeUpdate)&&Qi(d,s,t,c),bi(e,!0);let f=Kr(e),p=e.subTree;e.subTree=f,v(p,f,m(p.el),Ce(p),e,i,a),t.el=f.el,u===null&&Qr(e,f.el),r&&P(r,i),(d=t.props&&t.props.onVnodeUpdated)&&P(()=>Qi(d,s,t,c),i)}else{let o,{el:s,props:c}=t,{bm:l,m:u,parent:d,root:f,type:p}=e,m=Qn(t);if(bi(e,!1),l&&le(l),!m&&(o=c&&c.onVnodeBeforeMount)&&Qi(o,d,t),bi(e,!0),s&&De){let t=()=>{e.subTree=Kr(e),De(s,e.subTree,e,i,null)};m&&p.__asyncHydrate?p.__asyncHydrate(s,e,t):t()}else{f.ce&&f.ce._hasShadowRoot()&&f.ce._injectChildStyle(p,e.parent?e.parent.type:void 0);let o=e.subTree=Kr(e);v(null,o,n,r,e,i,a),t.el=o.el}if(u&&P(u,i),!m&&(o=c&&c.onVnodeMounted)){let e=t;P(()=>Qi(o,d,e),i)}(t.shapeFlag&256||d&&Qn(d.vnode)&&d.vnode.shapeFlag&256)&&e.a&&P(e.a,i),e.isMounted=!0,t=n=r=null}};e.scope.on();let c=e.effect=new Me(s);e.scope.off();let l=e.update=c.run.bind(c),u=e.job=c.runIfDirty.bind(c);u.i=e,u.id=e.uid,c.scheduler=()=>Sn(u),bi(e,!0),l()},pe=(e,t,n)=>{t.component=e;let r=e.vnode.props;e.vnode=t,e.next=null,ri(e,t.props,r,n),gi(e,t.children,n),qe(),Tn(e),Je()},me=(e,t,n,r,i,a,o,s,c=!1)=>{let l=e&&e.children,u=e?e.shapeFlag:0,d=t.children,{patchFlag:f,shapeFlag:m}=t;if(f>0){if(f&128){ge(l,d,n,r,i,a,o,s,c);return}else if(f&256){he(l,d,n,r,i,a,o,s,c);return}}m&8?(u&16&&Se(l,i,a),d!==l&&p(n,d)):u&16?m&16?ge(l,d,n,r,i,a,o,s,c):Se(l,i,a,!0):(u&8&&p(n,``),m&16&&C(d,n,r,i,a,o,s,c))},he=(e,t,r,i,a,o,s,c,l)=>{e||=n,t||=n;let u=e.length,d=t.length,f=Math.min(u,d),p;for(p=0;p<f;p++){let n=t[p]=l?Yi(t[p]):Ji(t[p]);v(e[p],n,r,null,a,o,s,c,l)}u>d?Se(e,a,o,!0,!1,f):C(t,r,i,a,o,s,c,l,f)},ge=(e,t,r,i,a,o,s,c,l)=>{let u=0,d=t.length,f=e.length-1,p=d-1;for(;u<=f&&u<=p;){let n=e[u],i=t[u]=l?Yi(t[u]):Ji(t[u]);if(zi(n,i))v(n,i,r,null,a,o,s,c,l);else break;u++}for(;u<=f&&u<=p;){let n=e[f],i=t[p]=l?Yi(t[p]):Ji(t[p]);if(zi(n,i))v(n,i,r,null,a,o,s,c,l);else break;f--,p--}if(u>f){if(u<=p){let e=p+1,n=e<d?t[e].el:i;for(;u<=p;)v(null,t[u]=l?Yi(t[u]):Ji(t[u]),r,n,a,o,s,c,l),u++}}else if(u>p)for(;u<=f;)ve(e[u],a,o,!0),u++;else{let m=u,h=u,g=new Map;for(u=h;u<=p;u++){let e=t[u]=l?Yi(t[u]):Ji(t[u]);e.key!=null&&g.set(e.key,u)}let _,y=0,b=p-h+1,x=!1,ee=0,S=Array(b);for(u=0;u<b;u++)S[u]=0;for(u=m;u<=f;u++){let n=e[u];if(y>=b){ve(n,a,o,!0);continue}let i;if(n.key!=null)i=g.get(n.key);else for(_=h;_<=p;_++)if(S[_-h]===0&&zi(n,t[_])){i=_;break}i===void 0?ve(n,a,o,!0):(S[i-h]=u+1,i>=ee?ee=i:x=!0,v(n,t[i],r,null,a,o,s,c,l),y++)}let te=x?Ci(S):n;for(_=te.length-1,u=b-1;u>=0;u--){let e=h+u,n=t[e],f=t[e+1],p=e+1<d?f.el||Ei(f):i;S[u]===0?v(null,n,r,p,a,o,s,c,l):x&&(_<0||u!==te[_]?_e(n,r,p,2):_--)}}},_e=(e,t,n,r,i=null)=>{let{el:a,type:c,transition:l,children:u,shapeFlag:d}=e;if(d&6){_e(e.component.subTree,t,n,r);return}if(d&128){e.suspense.move(t,n,r);return}if(d&64){c.move(e,t,n,E);return}if(c===F){o(a,t,n);for(let e=0;e<u.length;e++)_e(u[e],t,n,r);o(e.anchor,t,n);return}if(c===ji){ee(e,t,n);return}if(r!==2&&d&1&&l)if(r===0)l.beforeEnter(a),o(a,t,n),P(()=>l.enter(a),i);else{let{leave:r,delayLeave:i,afterLeave:c}=l,u=()=>{e.ctx.isUnmounted?s(a):o(a,t,n)},d=()=>{a._isLeaving&&a[Gn](!0),r(a,()=>{u(),c&&c()})};i?i(a,u,d):d()}else o(a,t,n)},ve=(e,t,n,r=!1,i=!1)=>{let{type:a,props:o,ref:s,children:c,dynamicChildren:l,shapeFlag:u,patchFlag:d,dirs:f,cacheIndex:p,memo:m}=e;if(d===-2&&(i=!1),s!=null&&(qe(),Xn(s,null,n,e,!0),Je()),p!=null&&(t.renderCache[p]=void 0),u&256){t.ctx.deactivate(e);return}let h=u&1&&f,g=!Qn(e),_;if(g&&(_=o&&o.onVnodeBeforeUnmount)&&Qi(_,t,e),u&6)xe(e.component,n,r);else{if(u&128){e.suspense.unmount(n,r);return}h&&Pn(e,null,t,`beforeUnmount`),u&64?e.type.remove(e,t,n,E,r):l&&!l.hasOnce&&(a!==F||d>0&&d&64)?Se(l,t,n,!1,!0):(a===F&&d&384||!i&&u&16)&&Se(c,t,n),r&&ye(e)}let v=m!=null&&p==null;(g&&(_=o&&o.onVnodeUnmounted)||h||v)&&P(()=>{_&&Qi(_,t,e),h&&Pn(e,null,t,`unmounted`),v&&(e.el=null)},n)},ye=e=>{let{type:t,el:n,anchor:r,transition:i}=e;if(t===F){be(n,r);return}if(t===ji){S(e);return}let a=()=>{s(n),i&&!i.persisted&&i.afterLeave&&i.afterLeave()};if(e.shapeFlag&1&&i&&!i.persisted){let{leave:t,delayLeave:r}=i,o=()=>t(n,a);r?r(e.el,a,o):o()}else a()},be=(e,t)=>{let n;for(;e!==t;)n=h(e),s(e),e=n;s(t)},xe=(e,t,n)=>{let{bum:r,scope:i,job:a,subTree:o,um:s,m:c,a:l}=e;Ti(c),Ti(l),r&&le(r),i.stop(),a&&(a.flags|=8,ve(o,e,t,n)),s&&P(s,t),P(()=>{e.isUnmounted=!0},t)},Se=(e,t,n,r=!1,i=!1,a=0)=>{for(let o=a;o<e.length;o++)ve(e[o],t,n,r,i)},Ce=e=>{if(e.shapeFlag&6)return Ce(e.component.subTree);if(e.shapeFlag&128)return e.suspense.next();let t=h(e.anchor||e.el),n=t&&t[Un];return n?h(n):t},we=!1,Te=(e,t,n)=>{let r;e==null?t._vnode&&(ve(t._vnode,null,null,!0),r=t._vnode.component):v(t._vnode||null,e,t,null,null,null,n),t._vnode=e,we||=(we=!0,Tn(r),En(),!1)},E={p:v,um:ve,m:_e,r:ye,mt:T,mc:C,pc:me,pbc:oe,n:Ce,o:e},Ee,De;return i&&([Ee,De]=i(E)),{render:Te,hydrate:Ee,createApp:zr(Te,Ee)}}function yi({type:e,props:t},n){return n===`svg`&&e===`foreignObject`||n===`mathml`&&e===`annotation-xml`&&t&&t.encoding&&t.encoding.includes(`html`)?void 0:n}function bi({effect:e,job:t},n){n?(e.flags|=32,t.flags|=4):(e.flags&=-33,t.flags&=-5)}function xi(e,t){return(!e||e&&!e.pendingBranch)&&t&&!t.persisted}function Si(e,t,n=!1){let r=e.children,i=t.children;if(d(r)&&d(i))for(let e=0;e<r.length;e++){let t=r[e],a=i[e];a.shapeFlag&1&&!a.dynamicChildren&&((a.patchFlag<=0||a.patchFlag===32)&&(a=i[e]=Yi(i[e]),a.el=t.el),!n&&a.patchFlag!==-2&&Si(t,a)),a.type===ki&&(a.patchFlag===-1&&(a=i[e]=Yi(a)),a.el=t.el),a.type===Ai&&!a.el&&(a.el=t.el)}}function Ci(e){let t=e.slice(),n=[0],r,i,a,o,s,c=e.length;for(r=0;r<c;r++){let c=e[r];if(c!==0){if(i=n[n.length-1],e[i]<c){t[r]=i,n.push(r);continue}for(a=0,o=n.length-1;a<o;)s=a+o>>1,e[n[s]]<c?a=s+1:o=s;c<e[n[a]]&&(a>0&&(t[r]=n[a-1]),n[a]=r)}}for(a=n.length,o=n[a-1];a-- >0;)n[a]=o,o=t[o];return n}function wi(e){let t=e.subTree.component;if(t)return t.asyncDep&&!t.asyncResolved?t:wi(t)}function Ti(e){if(e)for(let t=0;t<e.length;t++)e[t].flags|=8}function Ei(e){if(e.placeholder)return e.placeholder;let t=e.component;return t?Ei(t.subTree):null}var Di=e=>e.__isSuspense;function Oi(e,t){t&&t.pendingBranch?d(e)?t.effects.push(...e):t.effects.push(e):wn(e)}var F=Symbol.for(`v-fgt`),ki=Symbol.for(`v-txt`),Ai=Symbol.for(`v-cmt`),ji=Symbol.for(`v-stc`),Mi=[],I=null;function L(e=!1){Mi.push(I=e?null:[])}function Ni(){Mi.pop(),I=Mi[Mi.length-1]||null}var Pi=1;function Fi(e,t=!1){Pi+=e,e<0&&I&&t&&(I.hasOnce=!0)}function Ii(e){return e.dynamicChildren=Pi>0?I||n:null,Ni(),Pi>0&&I&&I.push(e),e}function R(e,t,n,r,i,a){return Ii(z(e,t,n,r,i,a,!0))}function Li(e,t,n,r,i){return Ii(B(e,t,n,r,i,!0))}function Ri(e){return e?e.__v_isVNode===!0:!1}function zi(e,t){return e.type===t.type&&e.key===t.key}var Bi=({key:e})=>e??null,Vi=({ref:e,ref_key:t,ref_for:n})=>(typeof e==`number`&&(e=``+e),e==null?null:g(e)||A(e)||h(e)?{i:kn,r:e,k:t,f:!!n}:e);function z(e,t=null,n=null,r=0,i=null,a=e===F?0:1,o=!1,s=!1){let c={__v_isVNode:!0,__v_skip:!0,type:e,props:t,key:t&&Bi(t),ref:t&&Vi(t),scopeId:An,slotScopeIds:null,children:n,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetStart:null,targetAnchor:null,staticCount:0,shapeFlag:a,patchFlag:r,dynamicProps:i,dynamicChildren:null,appContext:null,ctx:kn};return s?(Xi(c,n),a&128&&e.normalize(c)):n&&(c.shapeFlag|=g(n)?8:16),Pi>0&&!o&&I&&(c.patchFlag>0||a&6)&&c.patchFlag!==32&&I.push(c),c}var B=Hi;function Hi(e,t=null,n=null,r=0,i=null,a=!1){if((!e||e===gr)&&(e=Ai),Ri(e)){let r=Wi(e,t,!0);return n&&Xi(r,n),Pi>0&&!a&&I&&(r.shapeFlag&6?I[I.indexOf(e)]=r:I.push(r)),r.patchFlag=-2,r}if(va(e)&&(e=e.__vccOpts),t){t=Ui(t);let{class:e,style:n}=t;e&&!g(e)&&(t.class=ve(e)),v(n)&&(Kt(n)&&!d(n)&&(n=s({},n)),t.style=pe(n))}let o=g(e)?1:Di(e)?128:Wn(e)?64:v(e)?4:h(e)?2:0;return z(e,t,n,r,i,o,a,!0)}function Ui(e){return e?Kt(e)||ti(e)?s({},e):e:null}function Wi(e,t,n=!1,r=!1){let{props:i,ref:a,patchFlag:o,children:s,transition:c}=e,l=t?Zi(i||{},t):i,u={__v_isVNode:!0,__v_skip:!0,type:e.type,props:l,key:l&&Bi(l),ref:t&&t.ref?n&&a?d(a)?a.concat(Vi(t)):[a,Vi(t)]:Vi(t):a,scopeId:e.scopeId,slotScopeIds:e.slotScopeIds,children:s,target:e.target,targetStart:e.targetStart,targetAnchor:e.targetAnchor,staticCount:e.staticCount,shapeFlag:e.shapeFlag,patchFlag:t&&e.type!==F?o===-1?16:o|16:o,dynamicProps:e.dynamicProps,dynamicChildren:e.dynamicChildren,appContext:e.appContext,dirs:e.dirs,transition:c,component:e.component,suspense:e.suspense,ssContent:e.ssContent&&Wi(e.ssContent),ssFallback:e.ssFallback&&Wi(e.ssFallback),placeholder:e.placeholder,el:e.el,anchor:e.anchor,ctx:e.ctx,ce:e.ce};return c&&r&&Kn(u,c.clone(u)),u}function Gi(e=` `,t=0){return B(ki,null,e,t)}function Ki(e,t){let n=B(ji,null,e);return n.staticCount=t,n}function qi(e=``,t=!1){return t?(L(),Li(Ai,null,e)):B(Ai,null,e)}function Ji(e){return e==null||typeof e==`boolean`?B(Ai):d(e)?B(F,null,e.slice()):Ri(e)?Yi(e):B(ki,null,String(e))}function Yi(e){return e.el===null&&e.patchFlag!==-1||e.memo?e:Wi(e)}function Xi(e,t){let n=0,{shapeFlag:r}=e;if(t==null)t=null;else if(d(t))n=16;else if(typeof t==`object`)if(r&65){let n=t.default;n&&(n._c&&(n._d=!1),Xi(e,n()),n._c&&(n._d=!0));return}else{n=32;let r=t._;!r&&!ti(t)?t._ctx=kn:r===3&&kn&&(kn.slots._===1?t._=1:(t._=2,e.patchFlag|=1024))}else h(t)?(t={default:t,_ctx:kn},n=32):(t=String(t),r&64?(n=16,t=[Gi(t)]):n=8);e.children=t,e.shapeFlag|=n}function Zi(...e){let t={};for(let n=0;n<e.length;n++){let r=e[n];for(let e in r)if(e===`class`)t.class!==r.class&&(t.class=ve([t.class,r.class]));else if(e===`style`)t.style=pe([t.style,r.style]);else if(a(e)){let n=t[e],i=r[e];i&&n!==i&&!(d(n)&&n.includes(i))?t[e]=n?[].concat(n,i):i:i==null&&n==null&&!o(e)&&(t[e]=i)}else e!==``&&(t[e]=r[e])}return t}function Qi(e,t,n,r=null){dn(e,t,7,[n,r])}var $i=Lr(),ea=0;function ta(e,n,r){let i=e.type,a=(n?n.appContext:e.appContext)||$i,o={uid:ea++,vnode:e,type:i,parent:n,appContext:a,root:null,next:null,subTree:null,effect:null,update:null,job:null,scope:new ke(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:n?n.provides:Object.create(a.provides),ids:n?n.ids:[``,0,0],accessCache:null,renderCache:[],components:null,directives:null,propsOptions:si(i,a),emitsOptions:Wr(i,a),emit:null,emitted:null,propsDefaults:t,inheritAttrs:i.inheritAttrs,ctx:t,data:t,props:t,attrs:t,slots:t,refs:t,setupState:t,setupContext:null,suspense:r,suspenseId:r?r.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return o.ctx={_:o},o.root=n?n.root:o,o.emit=Hr.bind(null,o),e.ce&&e.ce(o),o}var V=null,na=()=>V||kn,ra,ia;{let e=fe(),t=(t,n)=>{let r;return(r=e[t])||(r=e[t]=[]),r.push(n),e=>{r.length>1?r.forEach(t=>t(e)):r[0](e)}};ra=t(`__VUE_INSTANCE_SETTERS__`,e=>V=e),ia=t(`__VUE_SSR_SETTERS__`,e=>ca=e)}var aa=e=>{let t=V;return ra(e),e.scope.on(),()=>{e.scope.off(),ra(t)}},oa=()=>{V&&V.scope.off(),ra(null)};function sa(e){return e.vnode.shapeFlag&4}var ca=!1;function la(e,t=!1,n=!1){t&&ia(t);let{props:r,children:i}=e.vnode,a=sa(e);ni(e,r,a,t),hi(e,i,n||t);let o=a?ua(e,t):void 0;return t&&ia(!1),o}function ua(e,t){let n=e.type;e.accessCache=Object.create(null),e.proxy=new Proxy(e.ctx,xr);let{setup:r}=n;if(r){qe();let n=e.setupContext=r.length>1?ga(e):null,i=aa(e),a=un(r,e,0,[e.props,n]),o=y(a);if(Je(),i(),(o||e.sp)&&!Qn(e)&&qn(e),o){if(a.then(oa,oa),t)return a.then(n=>{da(e,n,t)}).catch(t=>{fn(t,e,0)});e.asyncDep=a}else da(e,a,t)}else ma(e,t)}function da(e,t,n){h(t)?e.type.__ssrInlineRender?e.ssrRender=t:e.render=t:v(t)&&(e.setupState=en(t)),ma(e,n)}var fa,pa;function ma(e,t,n){let i=e.type;if(!e.render){if(!t&&fa&&!i.render){let t=i.template||Or(e).template;if(t){let{isCustomElement:n,compilerOptions:r}=e.appContext.config,{delimiters:a,compilerOptions:o}=i;i.render=fa(t,s(s({isCustomElement:n,delimiters:a},r),o))}}e.render=i.render||r,pa&&pa(e)}{let t=aa(e);qe();try{wr(e)}finally{Je(),t()}}}var ha={get(e,t){return O(e,`get`,``),e[t]}};function ga(e){return{attrs:new Proxy(e.attrs,ha),slots:e.slots,emit:e.emit,expose:t=>{e.exposed=t||{}}}}function _a(e){return e.exposed?e.exposeProxy||=new Proxy(en(qt(e.exposed)),{get(t,n){if(n in t)return t[n];if(n in yr)return yr[n](e)},has(e,t){return t in e||t in yr}}):e.proxy}function va(e){return h(e)&&`__vccOpts`in e}var ya=(e,t)=>nn(e,t,ca),ba=`3.5.32`,xa=void 0,Sa=typeof window<`u`&&window.trustedTypes;if(Sa)try{xa=Sa.createPolicy(`vue`,{createHTML:e=>e})}catch{}var Ca=xa?e=>xa.createHTML(e):e=>e,wa=`http://www.w3.org/2000/svg`,Ta=`http://www.w3.org/1998/Math/MathML`,Ea=typeof document<`u`?document:null,Da=Ea&&Ea.createElement(`template`),Oa={insert:(e,t,n)=>{t.insertBefore(e,n||null)},remove:e=>{let t=e.parentNode;t&&t.removeChild(e)},createElement:(e,t,n,r)=>{let i=t===`svg`?Ea.createElementNS(wa,e):t===`mathml`?Ea.createElementNS(Ta,e):n?Ea.createElement(e,{is:n}):Ea.createElement(e);return e===`select`&&r&&r.multiple!=null&&i.setAttribute(`multiple`,r.multiple),i},createText:e=>Ea.createTextNode(e),createComment:e=>Ea.createComment(e),setText:(e,t)=>{e.nodeValue=t},setElementText:(e,t)=>{e.textContent=t},parentNode:e=>e.parentNode,nextSibling:e=>e.nextSibling,querySelector:e=>Ea.querySelector(e),setScopeId(e,t){e.setAttribute(t,``)},insertStaticContent(e,t,n,r,i,a){let o=n?n.previousSibling:t.lastChild;if(i&&(i===a||i.nextSibling))for(;t.insertBefore(i.cloneNode(!0),n),!(i===a||!(i=i.nextSibling)););else{Da.innerHTML=Ca(r===`svg`?`<svg>${e}</svg>`:r===`mathml`?`<math>${e}</math>`:e);let i=Da.content;if(r===`svg`||r===`mathml`){let e=i.firstChild;for(;e.firstChild;)i.appendChild(e.firstChild);i.removeChild(e)}t.insertBefore(i,n)}return[o?o.nextSibling:t.firstChild,n?n.previousSibling:t.lastChild]}},ka=Symbol(`_vtc`);function Aa(e,t,n){let r=e[ka];r&&(t=(t?[t,...r]:[...r]).join(` `)),t==null?e.removeAttribute(`class`):n?e.setAttribute(`class`,t):e.className=t}var ja=Symbol(`_vod`),Ma=Symbol(`_vsh`),Na=Symbol(``),Pa=/(?:^|;)\s*display\s*:/;function Fa(e,t,n){let r=e.style,i=g(n),a=!1;if(n&&!i){if(t)if(g(t))for(let e of t.split(`;`)){let t=e.slice(0,e.indexOf(`:`)).trim();n[t]??La(r,t,``)}else for(let e in t)n[e]??La(r,e,``);for(let e in n)e===`display`&&(a=!0),La(r,e,n[e])}else if(i){if(t!==n){let e=r[Na];e&&(n+=`;`+e),r.cssText=n,a=Pa.test(n)}}else t&&e.removeAttribute(`style`);ja in e&&(e[ja]=a?r.display:``,e[Ma]&&(r.display=`none`))}var Ia=/\s*!important$/;function La(e,t,n){if(d(n))n.forEach(n=>La(e,t,n));else if(n??=``,t.startsWith(`--`))e.setProperty(t,n);else{let r=Ba(e,t);Ia.test(n)?e.setProperty(oe(r),n.replace(Ia,``),`important`):e[r]=n}}var Ra=[`Webkit`,`Moz`,`ms`],za={};function Ba(e,t){let n=za[t];if(n)return n;let r=C(t);if(r!==`filter`&&r in e)return za[t]=r;r=se(r);for(let n=0;n<Ra.length;n++){let i=Ra[n]+r;if(i in e)return za[t]=i}return t}var Va=`http://www.w3.org/1999/xlink`;function Ha(e,t,n,r,i,a=be(t)){r&&t.startsWith(`xlink:`)?n==null?e.removeAttributeNS(Va,t.slice(6,t.length)):e.setAttributeNS(Va,t,n):n==null||a&&!xe(n)?e.removeAttribute(t):e.setAttribute(t,a?``:_(n)?String(n):n)}function Ua(e,t,n,r,i){if(t===`innerHTML`||t===`textContent`){n!=null&&(e[t]=t===`innerHTML`?Ca(n):n);return}let a=e.tagName;if(t===`value`&&a!==`PROGRESS`&&!a.includes(`-`)){let r=a===`OPTION`?e.getAttribute(`value`)||``:e.value,i=n==null?e.type===`checkbox`?`on`:``:String(n);(r!==i||!(`_value`in e))&&(e.value=i),n??e.removeAttribute(t),e._value=n;return}let o=!1;if(n===``||n==null){let r=typeof e[t];r===`boolean`?n=xe(n):n==null&&r===`string`?(n=``,o=!0):r===`number`&&(n=0,o=!0)}try{e[t]=n}catch{}o&&e.removeAttribute(i||t)}function Wa(e,t,n,r){e.addEventListener(t,n,r)}function Ga(e,t,n,r){e.removeEventListener(t,n,r)}var Ka=Symbol(`_vei`);function qa(e,t,n,r,i=null){let a=e[Ka]||(e[Ka]={}),o=a[t];if(r&&o)o.value=r;else{let[n,s]=Ya(t);r?Wa(e,n,a[t]=$a(r,i),s):o&&(Ga(e,n,o,s),a[t]=void 0)}}var Ja=/(?:Once|Passive|Capture)$/;function Ya(e){let t;if(Ja.test(e)){t={};let n;for(;n=e.match(Ja);)e=e.slice(0,e.length-n[0].length),t[n[0].toLowerCase()]=!0}return[e[2]===`:`?e.slice(3):oe(e.slice(2)),t]}var Xa=0,Za=Promise.resolve(),Qa=()=>Xa||=(Za.then(()=>Xa=0),Date.now());function $a(e,t){let n=e=>{if(!e._vts)e._vts=Date.now();else if(e._vts<=n.attached)return;dn(eo(e,n.value),t,5,[e])};return n.value=e,n.attached=Qa(),n}function eo(e,t){if(d(t)){let n=e.stopImmediatePropagation;return e.stopImmediatePropagation=()=>{n.call(e),e._stopped=!0},t.map(e=>t=>!t._stopped&&e&&e(t))}else return t}var to=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&e.charCodeAt(2)>96&&e.charCodeAt(2)<123,no=(e,t,n,r,i,s)=>{let c=i===`svg`;t===`class`?Aa(e,r,c):t===`style`?Fa(e,n,r):a(t)?o(t)||qa(e,t,n,r,s):(t[0]===`.`?(t=t.slice(1),!0):t[0]===`^`?(t=t.slice(1),!1):ro(e,t,r,c))?(Ua(e,t,r),!e.tagName.includes(`-`)&&(t===`value`||t===`checked`||t===`selected`)&&Ha(e,t,r,c,s,t!==`value`)):e._isVueCE&&(io(e,t)||e._def.__asyncLoader&&(/[A-Z]/.test(t)||!g(r)))?Ua(e,C(t),r,s,t):(t===`true-value`?e._trueValue=r:t===`false-value`&&(e._falseValue=r),Ha(e,t,r,c))};function ro(e,t,n,r){if(r)return!!(t===`innerHTML`||t===`textContent`||t in e&&to(t)&&h(n));if(t===`spellcheck`||t===`draggable`||t===`translate`||t===`autocorrect`||t===`sandbox`&&e.tagName===`IFRAME`||t===`form`||t===`list`&&e.tagName===`INPUT`||t===`type`&&e.tagName===`TEXTAREA`)return!1;if(t===`width`||t===`height`){let t=e.tagName;if(t===`IMG`||t===`VIDEO`||t===`CANVAS`||t===`SOURCE`)return!1}return to(t)&&g(n)?!1:t in e}function io(e,t){let n=e._def.props;if(!n)return!1;let r=C(t);return Array.isArray(n)?n.some(e=>C(e)===r):Object.keys(n).some(e=>C(e)===r)}var ao=e=>{let t=e.props[`onUpdate:modelValue`]||!1;return d(t)?e=>le(t,e):t};function oo(e){e.target.composing=!0}function so(e){let t=e.target;t.composing&&(t.composing=!1,t.dispatchEvent(new Event(`input`)))}var co=Symbol(`_assign`);function lo(e,t,n){return t&&(e=e.trim()),n&&(e=ue(e)),e}var uo={created(e,{modifiers:{lazy:t,trim:n,number:r}},i){e[co]=ao(i);let a=r||i.props&&i.props.type===`number`;Wa(e,t?`change`:`input`,t=>{t.target.composing||e[co](lo(e.value,n,a))}),(n||a)&&Wa(e,`change`,()=>{e.value=lo(e.value,n,a)}),t||(Wa(e,`compositionstart`,oo),Wa(e,`compositionend`,so),Wa(e,`change`,so))},mounted(e,{value:t}){e.value=t??``},beforeUpdate(e,{value:t,oldValue:n,modifiers:{lazy:r,trim:i,number:a}},o){if(e[co]=ao(o),e.composing)return;let s=(a||e.type===`number`)&&!/^0\d/.test(e.value)?ue(e.value):e.value,c=t??``;if(s===c)return;let l=e.getRootNode();(l instanceof Document||l instanceof ShadowRoot)&&l.activeElement===e&&e.type!==`range`&&(r&&t===n||i&&e.value.trim()===c)||(e.value=c)}},fo={deep:!0,created(e,{value:t,modifiers:{number:n}},r){let i=p(t);Wa(e,`change`,()=>{let t=Array.prototype.filter.call(e.options,e=>e.selected).map(e=>n?ue(mo(e)):mo(e));e[co](e.multiple?i?new Set(t):t:t[0]),e._assigning=!0,bn(()=>{e._assigning=!1})}),e[co]=ao(r)},mounted(e,{value:t}){po(e,t)},beforeUpdate(e,t,n){e[co]=ao(n)},updated(e,{value:t}){e._assigning||po(e,t)}};function po(e,t){let n=e.multiple,r=d(t);if(!(n&&!r&&!p(t))){for(let i=0,a=e.options.length;i<a;i++){let a=e.options[i],o=mo(a);if(n)if(r){let e=typeof o;e===`string`||e===`number`?a.selected=t.some(e=>String(e)===String(o)):a.selected=we(t,o)>-1}else a.selected=t.has(o);else if(Ce(mo(a),t)){e.selectedIndex!==i&&(e.selectedIndex=i);return}}!n&&e.selectedIndex!==-1&&(e.selectedIndex=-1)}}function mo(e){return`_value`in e?e._value:e.value}var ho=s({patchProp:no},Oa),go;function _o(){return go||=_i(ho)}var vo=((...e)=>{let t=_o().createApp(...e),{mount:n}=t;return t.mount=e=>{let r=bo(e);if(!r)return;let i=t._component;!h(i)&&!i.render&&!i.template&&(i.template=r.innerHTML),r.nodeType===1&&(r.textContent=``);let a=n(r,!1,yo(r));return r instanceof Element&&(r.removeAttribute(`v-cloak`),r.setAttribute(`data-v-app`,``)),a},t});function yo(e){if(e instanceof SVGElement)return`svg`;if(typeof MathMLElement==`function`&&e instanceof MathMLElement)return`mathml`}function bo(e){return g(e)?document.querySelector(e):e}var xo=`<header>
   <div class="logo">
     <div class="logo-badge">GZ</div>
     <div class="logo-name">故障注入平台</div>
@@ -46,7 +46,7 @@
     <button class="tbtn tbtn-save-res tbtn-disabled" onclick="doSaveRes()" id="btn-save-res">保存仿真结果</button>
   </div>
 </header>
-`,yo=[`innerHTML`],bo={__name:`WorkbenchHeader`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`header-bar`,innerHTML:N(vo)},null,8,yo))}},xo=`<aside class="lpanel">
+`,So=[`innerHTML`],Co={__name:`WorkbenchHeader`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`header-bar`,innerHTML:j(xo)},null,8,So))}},wo=`<aside class="lpanel">
   <div class="lscroll">
     <div class="lgroup-head lgroup-head--system" data-palette-group="signals" onclick="toggleGroup('g-signals')">
       <span class="lgroup-icon">信</span>
@@ -127,23 +127,18 @@
       <span class="lgroup-arrow open" id="arr-g-faults">&#9654;</span>
     </div>
     <div class="lgroup-body" id="g-faults" data-palette-body="faults">
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="fault_tag">
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="physical_fault_injector">
         <span class="citem-icon-badge citem-icon-badge--fault">F</span>
-        <span class="citem-label">故障注入</span>
+        <span class="citem-label">物理层注入</span>
       </div>
-      <div class="citem citem-fault citem-draggable" draggable="true" data-component="edge_fault_tag">
-        <span class="citem-icon-badge citem-icon-badge--fault">线</span>
-        <span class="citem-label">连线故障注入</span>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="electrical_fault_injector">
+        <span class="citem-icon-badge citem-icon-badge--fault">E</span>
+        <span class="citem-label">电气层注入</span>
       </div>
-      <button
-        type="button"
-        class="citem citem-authoring-action citem-authoring-action--fault"
-        data-open-fault-authoring-for-selected
-        onclick="window.__GZ_AUTHORING_RUNTIME__?.openFaultAuthoringForSelectedTarget?.()"
-      >
-        <span class="citem-icon-badge citem-icon-badge--fault">+</span>
-        <span class="citem-label">新增故障</span>
-      </button>
+      <div class="citem citem-fault citem-draggable" draggable="true" data-component="protocol_fault_injector">
+        <span class="citem-icon-badge citem-icon-badge--fault">P</span>
+        <span class="citem-label">协议层注入</span>
+      </div>
     </div>
 
     <div class="lgroup-head lgroup-head--instrument" data-palette-group="instruments" onclick="toggleGroup('g-instruments')">
@@ -183,7 +178,7 @@
     </div>
   </div>
 </aside>
-`,G=Lt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null},componentAuthoring:{open:!1,parsedInterface:null},faultAuthoring:{open:!1,target:null}});function So(e={}){G.pythonBinding.open=!0,G.pythonBinding.targetNode=e.targetNode??null,G.pythonBinding.parsedInterface=e.parsedInterface??null,G.pythonBinding.boundSnapshot=e.boundSnapshot??null,G.pythonBinding.parseError=e.parseError??``}function Co(){G.pythonBinding.open=!1,G.pythonBinding.targetNode=null,G.pythonBinding.parsedInterface=null,G.pythonBinding.boundSnapshot=null,G.pythonBinding.parseError=``}function wo(e){G.pythonBinding.parsedInterface=e,G.pythonBinding.parseError=``}function To(e){G.pythonBinding.parseError=e}function Eo(e={}){G.componentAuthoring.open=!0,G.componentAuthoring.parsedInterface=e.parsedInterface??null}function Do(){G.componentAuthoring.open=!1,G.componentAuthoring.parsedInterface=null}function Oo(e={}){G.faultAuthoring.open=!0,G.faultAuthoring.target=e.target??null}function ko(){G.faultAuthoring.open=!1,G.faultAuthoring.target=null}function Ao(){return{dialogsState:G,openPythonBindingDialog:So,closePythonBindingDialog:Co,setPythonBindingPreview:wo,setPythonBindingError:To,openComponentAuthoringDialog:Eo,closeComponentAuthoringDialog:Do,openFaultAuthoringDialog:Oo,closeFaultAuthoringDialog:ko}}function jo(e){return JSON.parse(JSON.stringify(e??null))}function Mo(e){return Array.isArray(e)?jo(e):[]}function No(e){return e&&typeof e==`object`&&!Array.isArray(e)?jo(e):{}}function Po(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Fo({modelId:e=`untitled-model`,modelName:t=`未命名模型`}={}){return{schemaVersion:`3.0`,packageType:`flight-control-model`,modelInfo:{modelId:Po(e,`untitled-model`),modelName:Po(t,`未命名模型`)},componentTemplates:[],systemModel:{nodes:[],edges:[]},faultTypeCatalog:[],faultCapabilityMap:[],faultInstances:[],diagnosticModel:{testPoints:[],detectabilityMatrix:[]},pythonModules:[]}}function Io(e={}){let t=No(e),n=Fo({modelId:t.modelInfo?.modelId??t.modelId,modelName:t.modelInfo?.modelName??t.modelName}),r=No(t.modelInfo),i=No(t.systemModel),a=No(t.diagnosticModel);return{...n,...t,schemaVersion:`3.0`,packageType:Po(t.packageType,n.packageType),modelInfo:{...n.modelInfo,...r,modelId:Po(r.modelId??t.modelId,n.modelInfo.modelId),modelName:Po(r.modelName??t.modelName,n.modelInfo.modelName)},componentTemplates:Mo(t.componentTemplates),systemModel:{...i,nodes:Mo(i.nodes??t.nodes??t.workbenchSnapshot?.modelNodes),edges:Mo(i.edges??t.edges??t.workbenchSnapshot?.modelEdges)},faultTypeCatalog:Mo(t.faultTypeCatalog??t.faultLibrary??t.faultTypes),faultCapabilityMap:Mo(t.faultCapabilityMap),faultInstances:Mo(t.faultInstances),diagnosticModel:{...a,testPoints:Mo(a.testPoints??t.testPoints),detectabilityMatrix:Mo(a.detectabilityMatrix??t.detectabilityMatrix)},pythonModules:Mo(t.pythonModules)}}function Lo(e,t,n=`id`){let r=Mo(e),i=jo(t),a=i?.[n];if(!a)throw Error(`Missing ${n}`);let o=r.findIndex(e=>e?.[n]===a);return o===-1?[...r,i]:r.map((e,t)=>t===o?i:e)}var Ro=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],zo=[{type:`fault_tag`,label:`故障注入`},{type:`edge_fault_tag`,label:`连线故障注入`}],Bo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Vo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Ho(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Ro,faultInjection:zo,instruments:Bo,edges:Vo}}}var Uo=Lt(Ho()),Wo=Jt(!1),Go=Jt(null);function Ko(e){return e.displayName??e.comment??e.name}function qo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Jo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...qo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Ko(e),type:e.type??`any`,comment:e.comment??``}))}}}function Yo(){function e(){Wo.value=!0}function t(e){Go.value=e}return{shellState:Uo,runtimeReady:Wo,selectedNodeBinding:Go,markReady:e,setSelectedNodeBinding:t}}function Xo(e){return JSON.parse(JSON.stringify(e??null))}function K(e){return Array.isArray(e)?Xo(e):[]}function q(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Zo(e={}){return q(e.moduleName,typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):`python_module`)}function Qo(e,t,n){return q(t?.signalId,`${e}.${q(t?.name,`signal_${n}`)}`)}function $o(e,t){return q(e?.displayName,q(e?.comment,q(e?.name,t)))}function es(e,t,n){return K(e).map((e,r)=>{let i=Qo(n,e,r),a=$o(e,`${t}_${r}`),o=q(e.id??e.portId,`${t}-${r}`);return{id:o,portId:o,signalId:i,varName:q(e.name,`signal_${r}`),name:a,displayName:a,type:q(e.type,`any`),comment:q(e.comment),direction:t}})}function ts(e,t){return K(e).map((e,n)=>{let r=Qo(t,e,n),i=$o(e,`middle_${n}`);return{id:q(e.id??e.stateId,q(e.name,`state_${n}`)),stateId:r,signalId:r,varName:q(e.name,`signal_${n}`),name:i,displayName:i,type:q(e.type,`any`),comment:q(e.comment)}})}function ns(e,t){return K(e).filter(e=>e.default!==null&&e.default!==void 0).map((e,n)=>{let r=Qo(t,e,n),i=$o(e,`parameter_${n}`);return{id:q(e.id??e.parameterId,q(e.name,`parameter_${n}`)),parameterId:`${r}.default`,signalId:r,varName:q(e.name,`signal_${n}`),name:i,displayName:i,type:q(e.type,`any`),default:Xo(e.default),comment:q(e.comment)}})}function rs(e,t,n){let r=Xo(e);return r.portMapping={...r.portMapping,inputs:K(r.portMapping?.inputs).map((e,n)=>({...e,signalId:t.inputs[n]?.signalId??e.signalId})),outputs:K(r.portMapping?.outputs).map((e,n)=>({...e,signalId:t.outputs[n]?.signalId??e.signalId})),middleVars:K(r.portMapping?.middleVars).map((e,t)=>({...e,signalId:n[t]?.signalId??e.signalId}))},r}function is(e){return K(e).map(e=>({signalId:e.signalId,varName:e.varName,name:e.displayName,displayName:e.displayName,type:e.type,comment:e.comment}))}function as({templateId:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,parsedInterface:i}={}){if(!e)throw Error(`Missing templateId`);if(!i?.entryFunction)throw Error(`Missing parsed Python entry function`);let a=Xo(i),o=Zo(a),s={inputs:es(a.inputs,`input`,o),outputs:es(a.outputs,`output`,o)},c=ts(a.middleVars,o),l=rs(Jo(a,{moduleCategory:n}),s,c);return{templateId:e,type:`simulation_block`,displayName:q(t,a.description??e),category:n,geometry:r,ports:s,parameters:ns(a.inputs,o),stateVariables:c,pythonBinding:l,faultSlots:[]}}function os(e,t){let n=Xo(e),r=Xo(t),i=r?.slotId;if(!i)throw Error(`Missing slotId`);r.displayName=q(r.displayName??r.slotName,i),r.slotName=q(r.slotName??r.displayName,i),r.kind=q(r.kind,`output_signal`),r.allowedFaultTypeIds=K(r.allowedFaultTypeIds??r.allowedFaultIds),delete r.allowedFaultIds;let a=K(n.faultSlots),o=a.findIndex(e=>e?.slotId===i);return n.faultSlots=o===-1?[...a,r]:a.map((e,t)=>t===o?r:e),n}function ss(e,{id:t,x:n=0,y:r=0}={}){let i=Xo(e);if(!t)throw Error(`Missing id`);return{id:t,templateId:i.templateId,type:`simulation_block`,x:n,y:r,w:176,h:96,geometry:i.geometry??`rect`,props:{name:i.displayName,moduleType:i.category??`仿真模块`,geometry:i.geometry??`rect`,parameters:K(i.parameters),inputs:is(i.ports?.inputs),outputs:is(i.ports?.outputs),middleVars:is(i.stateVariables)},ports:Xo(i.ports),parameters:K(i.parameters),stateVariables:K(i.stateVariables),faultSlots:K(i.faultSlots),pythonBinding:{...Xo(i.pythonBinding),bound:!0}}}function cs(e){return JSON.parse(JSON.stringify(e??null))}function ls(e){return Array.isArray(e)?cs(e):[]}function us(e){return e&&typeof e==`object`&&!Array.isArray(e)?cs(e):{}}function ds(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function fs(e){return Object.fromEntries(Object.entries(us(e)).map(([e,t])=>[e,t&&typeof t==`object`&&ds(t,`default`)?cs(t.default):``]))}function ps(e,t){return t===`edge`?{section:`edges`,targets:ls(e.systemModel?.edges)}:{section:`nodes`,targets:ls(e.systemModel?.nodes)}}function ms(e){return ls(e?.allowedFaultTypeIds??e?.allowedFaultIds)}function hs(e,{targetKind:t,targetId:n,slotId:r}){let{section:i,targets:a}=ps(e,t),o=a.findIndex(e=>e?.id===n);if(o===-1)return null;let s=a[o],c=ls(s.faultSlots),l=c.findIndex(e=>e?.slotId===r);return l===-1?null:{section:i,targets:a,targetIndex:o,faultSlots:c,slotIndex:l,slot:c[l]}}function gs(e,{targetKind:t,targetId:n,slotId:r}){let i=ls(e.faultCapabilityMap),a=i.findIndex(e=>e?.targetId===n&&(e.targetKind||t)===t);if(a===-1)return null;let o=ls(i[a].faultSlots),s=o.findIndex(e=>e?.slotId===r);return s===-1?null:{capabilityMap:i,capabilityIndex:a,faultSlots:o,slotIndex:s,slot:o[s]}}function _s(e,t){return{systemSlot:hs(e,t),capabilitySlot:gs(e,t)}}function vs(e,t){return{...e,allowedFaultTypeIds:[...new Set([...ms(e),t])]}}function ys(e,t,n){let r=vs(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e),a=t.targets.map((e,n)=>n===t.targetIndex?{...e,faultSlots:i}:e);return{...e,systemModel:{...e.systemModel,[t.section]:a}}}function bs(e,t,n){let r=vs(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e);return{...e,faultCapabilityMap:t.capabilityMap.map((e,n)=>n===t.capabilityIndex?{...e,faultSlots:i}:e)}}function xs({id:e,displayName:t,layer:n=`electrical`,faultClass:r=`故障`,runtimeBehavior:i,formula:a=``,parameters:o={}}={}){if(!e)throw Error(`Missing fault type id`);if(!i)throw Error(`Missing runtime behavior`);return{id:e,displayName:t||e,name:t||e,layer:n,faultClass:r,modelClass:r,runtimeBehavior:i,formula:a,parameters:us(o),defaultParameters:fs(o)}}function Ss(e,{targetKind:t,targetId:n,slotId:r,faultTypeId:i}={}){let a=Io(e),{systemSlot:o,capabilitySlot:s}=_s(a,{targetKind:t,targetId:n,slotId:r});if(!o&&!s)throw Error(`Missing target slot`);let c=a;return o&&(c=ys(c,o,i)),s&&(c=bs(c,s,i)),c}function Cs(e){return JSON.parse(JSON.stringify(e??null))}function J(e){return Array.isArray(e)?Cs(e):[]}function ws(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Ts(e){return e&&typeof e==`object`&&!Array.isArray(e)?Cs(e):{}}function Es(){return window.__GZ_STATE__??null}function Ds(e,t=`item`){return String(e??``).trim().toLowerCase().replace(/[^a-z0-9_-]+/g,`-`).replace(/^[-_]+|[-_]+$/g,``)||t}function Os(e,t){let n=1,r=`${e}-${n}`;for(;t.has(r);)n+=1,r=`${e}-${n}`;return r}function ks(e){return J(e?.modelNodes?.length?e.modelNodes:e?.nodes)}function As(e){return J(e?.modelEdges?.length?e.modelEdges:e?.edges)}function js(e){let t=Io(e?.activeModelPackage??{modelInfo:{modelId:`runtime-authored-model`,modelName:`当前编辑模型`}});return{...t,systemModel:{...t.systemModel,nodes:ks(e),edges:As(e)},faultTypeCatalog:J(t.faultTypeCatalog?.length?t.faultTypeCatalog:e?.faultLibrary),faultCapabilityMap:J(t.faultCapabilityMap),faultInstances:J(e?.faultInstances?.length?e.faultInstances:t.faultInstances)}}function Ms(e,t){e.activeModelPackage=Cs(t),e.modelNodes=J(t.systemModel?.nodes),e.modelEdges=J(t.systemModel?.edges),e.nodes=e.modelNodes,e.edges=e.modelEdges,e.faultInstances=J(t.faultInstances),e.sysLoaded=!0,e.systemSaved=!1,e.workspaceSource=e.workspaceSource||`authored`,Array.isArray(t.faultTypeCatalog)&&(e.faultLibrary=J(t.faultTypeCatalog),e.faults=e.faultLibrary)}function Ns(e=``){window.renderModelNodes?.(),window.renderEdges?.(),e&&window.selectNode?.(e),window.updateUI?.()}function Ps(e,t){let n=J(e?.outputs)[0];return{signalId:n?.signalId||`${ws(e?.moduleName,t)}.${ws(n?.name,`output`)}`,name:n?.displayName||n?.comment||n?.name||`输出信号`}}function Fs(e={}){let t=Ds(e.displayName,`custom_component`).replace(/-/g,`_`);return{fileName:`${t}.py`,moduleName:t,description:ws(e.displayName,`自定义组件`),entryFunction:`process`,inputs:[{name:`input_0`,displayName:`输入 1`,type:`float`}],outputs:[{name:`output_0`,displayName:`输出 1`,type:`float`}],middleVars:[],rawSource:``}}function Is(e){return{targetKind:`node`,targetId:e.id,targetName:e.props?.name||e.id,faultSlots:J(e.faultSlots)}}function Ls({parsedInterface:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,slotName:i=``,slotKind:a=`output_signal`,x:o,y:s}={}){let c=Es();if(!c)return{ok:!1,error:`missing-runtime-state`};let l=e?.entryFunction?Cs(e):Fs({displayName:t}),u=Ds(l.moduleName||t,`custom-component`),d=Ps(l,u),f=`${u}-${Ds(d.signalId,`output`)}-fault-slot`,p=os(as({templateId:u,displayName:ws(t,l.description||u),category:n,geometry:r,parsedInterface:l}),{slotId:f,slotName:ws(i,`${d.name}故障位`),displayName:ws(i,`${d.name}故障位`),kind:a,signalId:d.signalId,allowedFaultTypeIds:[]}),m=new Set(ks(c).map(e=>e.id)),h=ss(p,{id:Os(`node-${u}`,m),x:Number.isFinite(o)?o:260+m.size*36,y:Number.isFinite(s)?s:220+m.size*18}),g=js(c),_=[...J(g.systemModel.nodes),h],v=Is(h),y=[...J(g.faultCapabilityMap).filter(e=>!(e.targetKind===`node`&&e.targetId===h.id)),v],b={...g,componentTemplates:Lo(g.componentTemplates,p,`templateId`),systemModel:{...g.systemModel,nodes:_,edges:As(c)},faultCapabilityMap:y};return Ms(c,b),Ns(h.id),{ok:!0,node:h,template:p,package:b}}function Rs(e,t={}){let n={type:`number`,default:Number(t.start??0)},r={type:`number`,default:t.duration??``};return e===`drift`?{rate:{type:`number`,default:Number(t.rate??.01)},start:n,duration:r}:e===`noise`?{amplitude:{type:`number`,default:Number(t.amplitude??.1)},start:n,duration:r}:e===`intermittent`?{probability:{type:`number`,default:Number(t.probability??.1)},start:n,duration:r}:e===`lock`?{lock_value:{type:`number`,default:Number(t.lock_value??0)},start:n,duration:r}:e===`tamper`?{scale:{type:`number`,default:Number(t.scale??1)},start:n,duration:r}:{bias:{type:`number`,default:Number(t.bias??.1)},start:n,duration:r}}function zs(e,t){let n=t.targetKind||`node`,r=t.targetId,i=t.slotId||`default-fault-slot`,a={slotId:i,slotName:t.slotName||t.slotDisplayName||i,displayName:t.slotName||t.slotDisplayName||i,kind:t.slotKind||`output_signal`,signalId:t.signalId||``,allowedFaultTypeIds:[]},o=J(e.faultCapabilityMap),s=o.findIndex(e=>e.targetKind===n&&e.targetId===r),c=s===-1?[...o,{targetKind:n,targetId:r,targetName:t.targetName||r,faultSlots:[a]}]:o.map((e,n)=>{if(n!==s)return e;let o=J(e.faultSlots);return{...e,targetName:e.targetName||t.targetName||r,faultSlots:o.some(e=>e.slotId===i)?o:[...o,a]}}),l=n===`edge`?`edges`:`nodes`,u=J(e.systemModel?.[l]).map(e=>{if(e.id!==r)return e;let t=J(e.faultSlots);return{...e,faultSlots:t.some(e=>e.slotId===i)?t:[...t,a]}});return{...e,faultCapabilityMap:c,systemModel:{...e.systemModel,[l]:u}}}function Bs({target:e,faultId:t,displayName:n,layer:r=`electrical`,faultClass:i=`自定义故障`,runtimeBehavior:a=`bias`,parameters:o={}}={}){let s=Es();if(!s)return{ok:!1,error:`missing-runtime-state`};if(!e?.targetId||!e?.slotId)return{ok:!1,error:`missing-target-slot`};let c=Ds(t||n,`custom-fault-${Date.now()}`),l=xs({id:c,displayName:ws(n,c),layer:r,faultClass:i,runtimeBehavior:a,formula:``,parameters:Rs(a,o)}),u=zs(js(s),{...Ts(e),targetKind:e.targetKind||`node`}),d=Ss({...u,faultTypeCatalog:Lo(u.faultTypeCatalog,l)},{targetKind:e.targetKind||`node`,targetId:e.targetId,slotId:e.slotId,faultTypeId:l.id});return Ms(s,d),Ns(e.targetKind===`node`?e.targetId:``),{ok:!0,faultType:l,package:d}}function Vs(e,t,n){return J(e?.activeModelPackage?.faultCapabilityMap).find(e=>e.targetKind===t&&e.targetId===n)??null}function Hs(){let e=Es();if(!e)return null;let t=e.selEdge?`edge`:`node`,n=e.selEdge||e.selBlk||``;if(!n)return null;let r=t===`edge`?As(e).find(e=>e.id===n):ks(e).find(e=>e.id===n);if(!r)return null;let i=Vs(e,t,n),a=J(r.faultSlots)[0]??J(i?.faultSlots)[0]??null;return a?{targetKind:t,targetId:n,targetName:r.props?.name||r.name||i?.targetName||n,slotId:a.slotId,slotName:a.slotName||a.displayName||a.slotId,slotKind:a.kind,signalId:a.signalId}:null}function Us(){let e=Hs();return e?(window.dispatchEvent(new CustomEvent(`gz:open-fault-authoring`,{detail:{target:e}})),!0):!1}typeof window<`u`&&(window.__GZ_AUTHORING_RUNTIME__={...window.__GZ_AUTHORING_RUNTIME__??{},addAuthoredComponentToRuntime:Ls,addAuthoredFaultToRuntime:Bs,openFaultAuthoringForSelectedTarget:Us});var Ws=[`innerHTML`],Gs={__name:`LeftPalette`,setup(e){function t(e){if(e.target?.closest?.(`[data-open-component-authoring]`)){e.preventDefault(),Eo({});return}e.target?.closest?.(`[data-open-fault-authoring-for-selected]`)&&(e.preventDefault(),Us())}return(e,n)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`left-palette`,onClick:t,innerHTML:N(xo)},null,8,Ws))}},Ks=`<div class="canvas-wrap" id="cw">
+`,H=zt({scope:!1,template:!1,faultLibrary:!1,electricalFault:!1,protocolFault:!1,config:!1,pythonBinding:{open:!1,targetNode:null,parsedInterface:null,parseError:``,boundSnapshot:null},componentAuthoring:{open:!1,parsedInterface:null},faultAuthoring:{open:!1,target:null}});function To(e={}){H.pythonBinding.open=!0,H.pythonBinding.targetNode=e.targetNode??null,H.pythonBinding.parsedInterface=e.parsedInterface??null,H.pythonBinding.boundSnapshot=e.boundSnapshot??null,H.pythonBinding.parseError=e.parseError??``}function Eo(){H.pythonBinding.open=!1,H.pythonBinding.targetNode=null,H.pythonBinding.parsedInterface=null,H.pythonBinding.boundSnapshot=null,H.pythonBinding.parseError=``}function Do(e){H.pythonBinding.parsedInterface=e,H.pythonBinding.parseError=``}function Oo(e){H.pythonBinding.parseError=e}function ko(e={}){H.componentAuthoring.open=!0,H.componentAuthoring.parsedInterface=e.parsedInterface??null}function Ao(){H.componentAuthoring.open=!1,H.componentAuthoring.parsedInterface=null}function jo(e={}){H.faultAuthoring.open=!0,H.faultAuthoring.target=e.target??null}function Mo(){H.faultAuthoring.open=!1,H.faultAuthoring.target=null}function No(){return{dialogsState:H,openPythonBindingDialog:To,closePythonBindingDialog:Eo,setPythonBindingPreview:Do,setPythonBindingError:Oo,openComponentAuthoringDialog:ko,closeComponentAuthoringDialog:Ao,openFaultAuthoringDialog:jo,closeFaultAuthoringDialog:Mo}}function Po(e){return JSON.parse(JSON.stringify(e??null))}function Fo(e){return Array.isArray(e)?Po(e):[]}function Io(e){return e&&typeof e==`object`&&!Array.isArray(e)?Po(e):{}}function Lo(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function Ro({modelId:e=`untitled-model`,modelName:t=`未命名模型`}={}){return{schemaVersion:`3.0`,packageType:`flight-control-model`,modelInfo:{modelId:Lo(e,`untitled-model`),modelName:Lo(t,`未命名模型`)},componentTemplates:[],systemModel:{nodes:[],edges:[]},faultTypeCatalog:[],faultCapabilityMap:[],faultInstances:[],diagnosticModel:{testPoints:[],detectabilityMatrix:[]},pythonModules:[]}}function zo(e={}){let t=Io(e),n=Ro({modelId:t.modelInfo?.modelId??t.modelId,modelName:t.modelInfo?.modelName??t.modelName}),r=Io(t.modelInfo),i=Io(t.systemModel),a=Io(t.diagnosticModel);return{...n,...t,schemaVersion:`3.0`,packageType:Lo(t.packageType,n.packageType),modelInfo:{...n.modelInfo,...r,modelId:Lo(r.modelId??t.modelId,n.modelInfo.modelId),modelName:Lo(r.modelName??t.modelName,n.modelInfo.modelName)},componentTemplates:Fo(t.componentTemplates),systemModel:{...i,nodes:Fo(i.nodes??t.nodes??t.workbenchSnapshot?.modelNodes),edges:Fo(i.edges??t.edges??t.workbenchSnapshot?.modelEdges)},faultTypeCatalog:Fo(t.faultTypeCatalog??t.faultLibrary??t.faultTypes),faultCapabilityMap:Fo(t.faultCapabilityMap),faultInstances:Fo(t.faultInstances),diagnosticModel:{...a,testPoints:Fo(a.testPoints??t.testPoints),detectabilityMatrix:Fo(a.detectabilityMatrix??t.detectabilityMatrix)},pythonModules:Fo(t.pythonModules)}}function Bo(e,t,n=`id`){let r=Fo(e),i=Po(t),a=i?.[n];if(!a)throw Error(`Missing ${n}`);let o=r.findIndex(e=>e?.[n]===a);return o===-1?[...r,i]:r.map((e,t)=>t===o?i:e)}var Vo=[{type:`signal_source`,label:`信号源`},{type:`flow_block`,label:`信号适配块`},{type:`gain_block`,label:`增益块`},{type:`sum_block`,label:`求和块`},{type:`mux_block`,label:`Mux 块`},{type:`simulation_block`,label:`仿真块`},{type:`subsystem_block`,label:`子系统块`}],Ho=[{type:`physical_fault_injector`,label:`物理层注入`},{type:`electrical_fault_injector`,label:`电气层注入`},{type:`protocol_fault_injector`,label:`协议层注入`}],Uo=[{type:`instrument_scope`,label:`示波器`},{type:`instrument_spectrum`,label:`频谱分析仪`},{type:`instrument_logger`,label:`数据记录仪`}],Wo=[{type:`normal`,label:`普通连接线`},{type:`can`,label:`CAN 总线`}];function Go(){return{title:`故障注入平台`,tabs:[`系统建模`,`故障注入`,`仿真分析`],topActions:[`导入系统模型`,`导入故障模型`,`保存系统模型`,`保存仿真结果`],palette:{systemModeling:Vo,faultInjection:Ho,instruments:Uo,edges:Wo}}}var Ko=zt(Go()),qo=Xt(!1),Jo=Xt(null);function Yo(e){return e.displayName??e.comment??e.name}function Xo(){return{bound:!1,moduleId:null,fileName:null,moduleName:null,moduleCategory:null,sourcePackageId:null,sourcePackageName:null,description:``,entryFunction:null,parsedInterface:null,rawSource:``,executionMode:`mock`,executionConfig:{endpoint:`http://127.0.0.1:8765/api/python-flow/execute`,timeoutMs:3e3},portMapping:{inputs:[],outputs:[],middleVars:[]}}}function Zo(e,t={}){let n=t.moduleId??e.moduleName??(typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):null);return{...Xo(),bound:!0,moduleId:n,moduleCategory:t.moduleCategory??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,fileName:e.fileName,moduleName:e.moduleName,description:e.description,entryFunction:e.entryFunction,parsedInterface:e,rawSource:e.rawSource,executionMode:t.executionMode??`mock`,portMapping:{inputs:(e.inputs??[]).map((e,t)=>({portId:`input-${t}`,varName:e.name,displayName:Yo(e),type:e.type??`any`,default:e.default??null,comment:e.comment??``,connected:!1})),outputs:(e.outputs??[]).map((e,t)=>({portId:`output-${t}`,varName:e.name,displayName:Yo(e),type:e.type??`any`,comment:e.comment??``})),middleVars:(e.middleVars??[]).map((e,t)=>({portId:`middle-${t}`,varName:e.name,displayName:Yo(e),type:e.type??`any`,comment:e.comment??``}))}}}function Qo(){function e(){qo.value=!0}function t(e){Jo.value=e}return{shellState:Ko,runtimeReady:qo,selectedNodeBinding:Jo,markReady:e,setSelectedNodeBinding:t}}function $o(e){return JSON.parse(JSON.stringify(e??null))}function es(e){return Array.isArray(e)?$o(e):[]}function U(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function ts(e={}){return U(e.moduleName,typeof e.fileName==`string`?e.fileName.replace(/\.py$/i,``):`python_module`)}function ns(e,t,n){return U(t?.signalId,`${e}.${U(t?.name,`signal_${n}`)}`)}function rs(e,t){return U(e?.displayName,U(e?.comment,U(e?.name,t)))}function is(e,t,n){return es(e).map((e,r)=>{let i=ns(n,e,r),a=rs(e,`${t}_${r}`),o=U(e.id??e.portId,`${t}-${r}`);return{id:o,portId:o,signalId:i,varName:U(e.name,`signal_${r}`),name:a,displayName:a,type:U(e.type,`any`),comment:U(e.comment),direction:t}})}function as(e,t){return es(e).map((e,n)=>{let r=ns(t,e,n),i=rs(e,`middle_${n}`);return{id:U(e.id??e.stateId,U(e.name,`state_${n}`)),stateId:r,signalId:r,varName:U(e.name,`signal_${n}`),name:i,displayName:i,type:U(e.type,`any`),comment:U(e.comment)}})}function os(e,t){return es(e).filter(e=>e.default!==null&&e.default!==void 0).map((e,n)=>{let r=ns(t,e,n),i=rs(e,`parameter_${n}`);return{id:U(e.id??e.parameterId,U(e.name,`parameter_${n}`)),parameterId:`${r}.default`,signalId:r,varName:U(e.name,`signal_${n}`),name:i,displayName:i,type:U(e.type,`any`),default:$o(e.default),comment:U(e.comment)}})}function ss(e,t,n){let r=$o(e);return r.portMapping={...r.portMapping,inputs:es(r.portMapping?.inputs).map((e,n)=>({...e,signalId:t.inputs[n]?.signalId??e.signalId})),outputs:es(r.portMapping?.outputs).map((e,n)=>({...e,signalId:t.outputs[n]?.signalId??e.signalId})),middleVars:es(r.portMapping?.middleVars).map((e,t)=>({...e,signalId:n[t]?.signalId??e.signalId}))},r}function cs(e){return es(e).map(e=>({signalId:e.signalId,varName:e.varName,name:e.displayName,displayName:e.displayName,type:e.type,comment:e.comment}))}function ls({templateId:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,parsedInterface:i}={}){if(!e)throw Error(`Missing templateId`);if(!i?.entryFunction)throw Error(`Missing parsed Python entry function`);let a=$o(i),o=ts(a),s={inputs:is(a.inputs,`input`,o),outputs:is(a.outputs,`output`,o)},c=as(a.middleVars,o),l=ss(Zo(a,{moduleCategory:n}),s,c);return{templateId:e,type:`simulation_block`,displayName:U(t,a.description??e),category:n,geometry:r,ports:s,parameters:os(a.inputs,o),stateVariables:c,pythonBinding:l,faultSlots:[]}}function us(e,t){let n=$o(e),r=$o(t),i=r?.slotId;if(!i)throw Error(`Missing slotId`);r.displayName=U(r.displayName??r.slotName,i),r.slotName=U(r.slotName??r.displayName,i),r.kind=U(r.kind,`output_signal`),r.allowedFaultTypeIds=es(r.allowedFaultTypeIds??r.allowedFaultIds),delete r.allowedFaultIds;let a=es(n.faultSlots),o=a.findIndex(e=>e?.slotId===i);return n.faultSlots=o===-1?[...a,r]:a.map((e,t)=>t===o?r:e),n}function ds(e,{id:t,x:n=0,y:r=0}={}){let i=$o(e);if(!t)throw Error(`Missing id`);return{id:t,templateId:i.templateId,type:`simulation_block`,x:n,y:r,w:176,h:96,geometry:i.geometry??`rect`,props:{name:i.displayName,moduleType:i.category??`仿真模块`,geometry:i.geometry??`rect`,parameters:es(i.parameters),inputs:cs(i.ports?.inputs),outputs:cs(i.ports?.outputs),middleVars:cs(i.stateVariables)},ports:$o(i.ports),parameters:es(i.parameters),stateVariables:es(i.stateVariables),faultSlots:es(i.faultSlots),pythonBinding:{...$o(i.pythonBinding),bound:!0}}}function fs(e){return JSON.parse(JSON.stringify(e??null))}function ps(e){return Array.isArray(e)?fs(e):[]}function ms(e){return e&&typeof e==`object`&&!Array.isArray(e)?fs(e):{}}function hs(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function gs(e){return Object.fromEntries(Object.entries(ms(e)).map(([e,t])=>[e,t&&typeof t==`object`&&hs(t,`default`)?fs(t.default):``]))}function _s(e,t){return t===`edge`?{section:`edges`,targets:ps(e.systemModel?.edges)}:{section:`nodes`,targets:ps(e.systemModel?.nodes)}}function vs(e){return ps(e?.allowedFaultTypeIds??e?.allowedFaultIds)}function ys(e,{targetKind:t,targetId:n,slotId:r}){let{section:i,targets:a}=_s(e,t),o=a.findIndex(e=>e?.id===n);if(o===-1)return null;let s=a[o],c=ps(s.faultSlots),l=c.findIndex(e=>e?.slotId===r);return l===-1?null:{section:i,targets:a,targetIndex:o,faultSlots:c,slotIndex:l,slot:c[l]}}function bs(e,{targetKind:t,targetId:n,slotId:r}){let i=ps(e.faultCapabilityMap),a=i.findIndex(e=>e?.targetId===n&&(e.targetKind||t)===t);if(a===-1)return null;let o=ps(i[a].faultSlots),s=o.findIndex(e=>e?.slotId===r);return s===-1?null:{capabilityMap:i,capabilityIndex:a,faultSlots:o,slotIndex:s,slot:o[s]}}function xs(e,t){return{systemSlot:ys(e,t),capabilitySlot:bs(e,t)}}function Ss(e,t){return{...e,allowedFaultTypeIds:[...new Set([...vs(e),t])]}}function Cs(e,t,n){let r=Ss(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e),a=t.targets.map((e,n)=>n===t.targetIndex?{...e,faultSlots:i}:e);return{...e,systemModel:{...e.systemModel,[t.section]:a}}}function ws(e,t,n){let r=Ss(t.slot,n),i=t.faultSlots.map((e,n)=>n===t.slotIndex?r:e);return{...e,faultCapabilityMap:t.capabilityMap.map((e,n)=>n===t.capabilityIndex?{...e,faultSlots:i}:e)}}function Ts({id:e,displayName:t,layer:n=`electrical`,faultClass:r=`故障`,runtimeBehavior:i,formula:a=``,parameters:o={}}={}){if(!e)throw Error(`Missing fault type id`);if(!i)throw Error(`Missing runtime behavior`);return{id:e,displayName:t||e,name:t||e,layer:n,faultClass:r,modelClass:r,runtimeBehavior:i,formula:a,parameters:ms(o),defaultParameters:gs(o)}}function Es(e,{targetKind:t,targetId:n,slotId:r,faultTypeId:i}={}){let a=zo(e),{systemSlot:o,capabilitySlot:s}=xs(a,{targetKind:t,targetId:n,slotId:r});if(!o&&!s)throw Error(`Missing target slot`);let c=a;return o&&(c=Cs(c,o,i)),s&&(c=ws(c,s,i)),c}function Ds(e){return JSON.parse(JSON.stringify(e??null))}function W(e){return Array.isArray(e)?Ds(e):[]}function Os(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function ks(e){return e&&typeof e==`object`&&!Array.isArray(e)?Ds(e):{}}function As(){return window.__GZ_STATE__??null}function js(e,t=`item`){return String(e??``).trim().toLowerCase().replace(/[^a-z0-9_-]+/g,`-`).replace(/^[-_]+|[-_]+$/g,``)||t}function Ms(e,t){let n=1,r=`${e}-${n}`;for(;t.has(r);)n+=1,r=`${e}-${n}`;return r}function Ns(e){return W(e?.modelNodes?.length?e.modelNodes:e?.nodes)}function Ps(e){return W(e?.modelEdges?.length?e.modelEdges:e?.edges)}function Fs(e){let t=zo(e?.activeModelPackage??{modelInfo:{modelId:`runtime-authored-model`,modelName:`当前编辑模型`}});return{...t,systemModel:{...t.systemModel,nodes:Ns(e),edges:Ps(e)},faultTypeCatalog:W(t.faultTypeCatalog?.length?t.faultTypeCatalog:e?.faultLibrary),faultCapabilityMap:W(t.faultCapabilityMap),faultInstances:W(e?.faultInstances?.length?e.faultInstances:t.faultInstances)}}function Is(e,t){e.activeModelPackage=Ds(t),e.modelNodes=W(t.systemModel?.nodes),e.modelEdges=W(t.systemModel?.edges),e.nodes=e.modelNodes,e.edges=e.modelEdges,e.faultInstances=W(t.faultInstances),e.sysLoaded=!0,e.systemSaved=!1,e.workspaceSource=e.workspaceSource||`authored`,Array.isArray(t.faultTypeCatalog)&&(e.faultLibrary=W(t.faultTypeCatalog),e.faults=e.faultLibrary)}function Ls(e=``){window.renderModelNodes?.(),window.renderEdges?.(),e&&window.selectNode?.(e),window.updateUI?.()}function Rs(e,t){let n=W(e?.outputs)[0];return{signalId:n?.signalId||`${Os(e?.moduleName,t)}.${Os(n?.name,`output`)}`,name:n?.displayName||n?.comment||n?.name||`输出信号`}}function zs(e={}){let t=js(e.displayName,`custom_component`).replace(/-/g,`_`);return{fileName:`${t}.py`,moduleName:t,description:Os(e.displayName,`自定义组件`),entryFunction:`process`,inputs:[{name:`input_0`,displayName:`输入 1`,type:`float`}],outputs:[{name:`output_0`,displayName:`输出 1`,type:`float`}],middleVars:[],rawSource:``}}function Bs(e){return{targetKind:`node`,targetId:e.id,targetName:e.props?.name||e.id,faultSlots:W(e.faultSlots)}}function Vs({parsedInterface:e,displayName:t,category:n=`仿真模块`,geometry:r=`rect`,slotName:i=``,slotKind:a=`output_signal`,x:o,y:s}={}){let c=As();if(!c)return{ok:!1,error:`missing-runtime-state`};let l=e?.entryFunction?Ds(e):zs({displayName:t}),u=js(l.moduleName||t,`custom-component`),d=Rs(l,u),f=`${u}-${js(d.signalId,`output`)}-fault-slot`,p=us(ls({templateId:u,displayName:Os(t,l.description||u),category:n,geometry:r,parsedInterface:l}),{slotId:f,slotName:Os(i,`${d.name}故障位`),displayName:Os(i,`${d.name}故障位`),kind:a,signalId:d.signalId,allowedFaultTypeIds:[]}),m=new Set(Ns(c).map(e=>e.id)),h=ds(p,{id:Ms(`node-${u}`,m),x:Number.isFinite(o)?o:260+m.size*36,y:Number.isFinite(s)?s:220+m.size*18}),g=Fs(c),_=[...W(g.systemModel.nodes),h],v=Bs(h),y=[...W(g.faultCapabilityMap).filter(e=>!(e.targetKind===`node`&&e.targetId===h.id)),v],b={...g,componentTemplates:Bo(g.componentTemplates,p,`templateId`),systemModel:{...g.systemModel,nodes:_,edges:Ps(c)},faultCapabilityMap:y};return Is(c,b),Ls(h.id),{ok:!0,node:h,template:p,package:b}}function Hs(e,t={}){let n={type:`number`,default:Number(t.start??0)},r={type:`number`,default:t.duration??``};return e===`drift`?{rate:{type:`number`,default:Number(t.rate??.01)},start:n,duration:r}:e===`noise`?{amplitude:{type:`number`,default:Number(t.amplitude??.1)},start:n,duration:r}:e===`intermittent`?{probability:{type:`number`,default:Number(t.probability??.1)},start:n,duration:r}:e===`lock`?{lock_value:{type:`number`,default:Number(t.lock_value??0)},start:n,duration:r}:e===`tamper`?{scale:{type:`number`,default:Number(t.scale??1)},start:n,duration:r}:{bias:{type:`number`,default:Number(t.bias??.1)},start:n,duration:r}}function Us(e,t){let n=t.targetKind||`node`,r=t.targetId,i=t.slotId||`default-fault-slot`,a={slotId:i,slotName:t.slotName||t.slotDisplayName||i,displayName:t.slotName||t.slotDisplayName||i,kind:t.slotKind||`output_signal`,signalId:t.signalId||``,allowedFaultTypeIds:[]},o=W(e.faultCapabilityMap),s=o.findIndex(e=>e.targetKind===n&&e.targetId===r),c=s===-1?[...o,{targetKind:n,targetId:r,targetName:t.targetName||r,faultSlots:[a]}]:o.map((e,n)=>{if(n!==s)return e;let o=W(e.faultSlots);return{...e,targetName:e.targetName||t.targetName||r,faultSlots:o.some(e=>e.slotId===i)?o:[...o,a]}}),l=n===`edge`?`edges`:`nodes`,u=W(e.systemModel?.[l]).map(e=>{if(e.id!==r)return e;let t=W(e.faultSlots);return{...e,faultSlots:t.some(e=>e.slotId===i)?t:[...t,a]}});return{...e,faultCapabilityMap:c,systemModel:{...e.systemModel,[l]:u}}}function Ws({target:e,faultId:t,displayName:n,layer:r=`electrical`,faultClass:i=`自定义故障`,runtimeBehavior:a=`bias`,parameters:o={}}={}){let s=As();if(!s)return{ok:!1,error:`missing-runtime-state`};if(!e?.targetId||!e?.slotId)return{ok:!1,error:`missing-target-slot`};let c=js(t||n,`custom-fault-${Date.now()}`),l=Ts({id:c,displayName:Os(n,c),layer:r,faultClass:i,runtimeBehavior:a,formula:``,parameters:Hs(a,o)}),u=Us(Fs(s),{...ks(e),targetKind:e.targetKind||`node`}),d=Es({...u,faultTypeCatalog:Bo(u.faultTypeCatalog,l)},{targetKind:e.targetKind||`node`,targetId:e.targetId,slotId:e.slotId,faultTypeId:l.id});return Is(s,d),Ls(e.targetKind===`node`?e.targetId:``),{ok:!0,faultType:l,package:d}}function Gs(e,t,n){return W(e?.activeModelPackage?.faultCapabilityMap).find(e=>e.targetKind===t&&e.targetId===n)??null}function Ks(){let e=As();if(!e)return null;let t=e.selEdge?`edge`:`node`,n=e.selEdge||e.selBlk||``;if(!n)return null;let r=t===`edge`?Ps(e).find(e=>e.id===n):Ns(e).find(e=>e.id===n);if(!r)return null;let i=Gs(e,t,n),a=W(r.faultSlots)[0]??W(i?.faultSlots)[0]??null;return a?{targetKind:t,targetId:n,targetName:r.props?.name||r.name||i?.targetName||n,slotId:a.slotId,slotName:a.slotName||a.displayName||a.slotId,slotKind:a.kind,signalId:a.signalId}:null}function qs(){let e=Ks();return e?(window.dispatchEvent(new CustomEvent(`gz:open-fault-authoring`,{detail:{target:e}})),!0):!1}typeof window<`u`&&(window.__GZ_AUTHORING_RUNTIME__={...window.__GZ_AUTHORING_RUNTIME__??{},addAuthoredComponentToRuntime:Vs,addAuthoredFaultToRuntime:Ws,openFaultAuthoringForSelectedTarget:qs});var Js=[`innerHTML`],Ys={__name:`LeftPalette`,setup(e){function t(e){if(e.target?.closest?.(`[data-open-component-authoring]`)){e.preventDefault(),ko({});return}e.target?.closest?.(`[data-open-fault-authoring-for-selected]`)&&(e.preventDefault(),qs())}return(e,n)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`left-palette`,onClick:t,innerHTML:j(wo)},null,8,Js))}},Xs=`<div class="canvas-wrap" id="cw">
   <div class="canvas-grid"></div>
 
   <div class="canvas-chrome" aria-label="画布工具栏">
@@ -210,7 +205,7 @@
         <div class="simbar-rt">
           <span class="simbar-rt-lbl">实时模式</span>
           <label class="toggle-wrap">
-            <input type="checkbox" id="sim-rt" onchange="onRtToggle(this)">
+            <input type="checkbox" id="sim-rt" onchange="onRtToggle(this)" checked>
             <div class="toggle-track"></div>
             <div class="toggle-thumb"></div>
           </label>
@@ -316,7 +311,7 @@
     <div class="canvas-viewport" id="canvas-viewport">
       <div class="canvas-stage" id="canvas-stage">
         <div class="canvas-stage-grid"></div>
-        <svg class="edge-layer" id="edge-layer" viewBox="0 0 1600 980" preserveAspectRatio="none">
+        <svg class="edge-layer" id="edge-layer" viewBox="0 0 2400 1500" preserveAspectRatio="none">
           <defs>
             <marker id="edge-arrow-normal" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
               <path d="M1 1L8 5L1 9" fill="none" stroke="#84aee0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -337,7 +332,7 @@
     </div>
   </div>
 </div>
-`,qs=[`innerHTML`],Js={__name:`CanvasWorkbench`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`canvas-workbench`,innerHTML:N(Ks)},null,8,qs))}},Ys=`<aside class="rpanel">
+`,Zs=[`innerHTML`],Qs={__name:`CanvasWorkbench`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`canvas-workbench`,innerHTML:j(Xs)},null,8,Zs))}},$s=`<aside class="rpanel">
   <div class="ph">
     <div class="ph-title">属性面板</div>
     <div class="ph-sub">当前选择 · 配置参数</div>
@@ -357,7 +352,7 @@
     <div id="pd" style="display:none"></div>
   </div>
 </aside>
-`,Xs=[`innerHTML`],Zs={__name:`RightInspector`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`right-inspector`,innerHTML:N(Ys)},null,8,Xs))}},Qs=`<div class="sbar">
+`,ec=[`innerHTML`],tc={__name:`RightInspector`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`right-inspector`,innerHTML:j($s)},null,8,ec))}},nc=`<div class="sbar">
   <section class="sbar-log">
     <div class="sbar-log-head">
       <div class="sbar-tabs">
@@ -423,7 +418,7 @@
     </div>
   </section>
 </div>
-`,$s=[`innerHTML`],ec={__name:`WorkbenchStatusBar`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`status-bar`,innerHTML:N(Qs)},null,8,$s))}},tc=`<div class="overlay" id="ov-ifm">
+`,rc=[`innerHTML`],ic={__name:`WorkbenchStatusBar`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`status-bar`,innerHTML:j(nc)},null,8,rc))}},ac=`<div class="overlay" id="ov-ifm">
   <div class="modal ifm-modal">
     <div class="mhead">
       <div>
@@ -495,7 +490,7 @@
     </div>
   </div>
 </div>
-`,nc=[`innerHTML`],rc={__name:`FaultLibraryDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`fault-library-dialog`,innerHTML:N(tc)},null,8,nc))}},ic=`<div class="overlay" id="ov-tpl">
+`,oc=[`innerHTML`],sc={__name:`FaultLibraryDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`fault-library-dialog`,innerHTML:j(ac)},null,8,oc))}},cc=`<div class="overlay" id="ov-tpl">
   <div class="modal" style="width:820px;height:530px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--purple)">故障建模 · 模板库</div>
@@ -521,7 +516,7 @@
     </div>
   </div>
 </div>
-`,ac=[`innerHTML`],oc={__name:`TemplateDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`template-dialog`,innerHTML:N(ic)},null,8,ac))}},sc=`<div class="overlay" id="ov-elec">
+`,lc=[`innerHTML`],uc={__name:`TemplateDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`template-dialog`,innerHTML:j(cc)},null,8,lc))}},dc=`<div class="overlay" id="ov-elec">
   <div class="modal" style="width:860px;height:540px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--red)">电气层故障注入</div>
@@ -554,7 +549,7 @@
     </div>
   </div>
 </div>
-`,cc=[`innerHTML`],lc={__name:`ElectricalFaultDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`electrical-fault-dialog`,innerHTML:N(sc)},null,8,cc))}},uc=`<div class="overlay" id="ov-proto">
+`,fc=[`innerHTML`],pc={__name:`ElectricalFaultDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`electrical-fault-dialog`,innerHTML:j(dc)},null,8,fc))}},mc=`<div class="overlay" id="ov-proto">
   <div class="modal" style="width:860px;height:540px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--blue)">CAN 协议层故障注入</div>
@@ -587,7 +582,7 @@
     </div>
   </div>
 </div>
-`,dc=[`innerHTML`],fc={__name:`ProtocolFaultDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`protocol-fault-dialog`,innerHTML:N(uc)},null,8,dc))}},pc=`<div class="overlay" id="ov-cfg">
+`,hc=[`innerHTML`],gc={__name:`ProtocolFaultDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`protocol-fault-dialog`,innerHTML:j(mc)},null,8,hc))}},_c=`<div class="overlay" id="ov-cfg">
   <div class="modal" style="width:680px;height:490px">
     <div class="mhead">
       <div class="mtitle" style="color:var(--red)">故障配置 · 注入参数</div>
@@ -654,14 +649,14 @@
     </div>
   </div>
 </div>
-`,mc=[`innerHTML`],hc={__name:`ConfigDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`config-dialog`,innerHTML:N(pc)},null,8,mc))}},gc=`<div class="scope-dialog-stub" id="ov-scope" hidden data-scope-dialog-stub="true"></div>
-`,_c=[`innerHTML`],vc={__name:`ScopeDialog`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:N(gc)},null,8,_c))}};function yc(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function bc(e){return e.replace(/\r\n/g,`
-`)}function xc(e,t){let n=e.match(/("""|''')([\s\S]*?)\1/)?.[2]??``;return{moduleName:n.match(/Module:\s*([A-Za-z0-9_]+)/)?.[1]??t.replace(/\.py$/i,``),description:n.match(/Description:\s*(.+)/)?.[1]?.trim()??``}}function Sc(e){let t=/(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g,n=[],r;for(;r=t.exec(e);){if((r[4]??``).length!==0)continue;let t=r.index+r[1].length,i=e.slice(0,t).split(`
-`).length;n.push({startIndex:t,line:i,isEntry:!!r[3],name:r[5],paramsSource:r[6],returnAnnotation:r[7]?.trim()??``,headerComment:r[8]?.trim()??``})}return n.sort((e,t)=>e.startIndex-t.startIndex).map((t,n,r)=>({...t,endIndex:r[n+1]?.startIndex??e.length}))}function Cc(e){if(e.length===0)throw yc(`未找到可识别的入口函数`);let t=e.find(e=>e.isEntry);if(t)return t;let n=e.find(e=>e.name===`process`);if(n)return n;if(e.length===1)return e[0];throw yc(`找到多个顶层函数，但没有 @entry 或 process 入口`)}function wc(e){let t=[],n=``,r=0;for(let i of e){if((i===`(`||i===`[`||i===`{`)&&(r+=1),(i===`)`||i===`]`||i===`}`)&&(r=Math.max(0,r-1)),i===`,`&&r===0){n.trim()&&t.push(n.trim()),n=``;continue}n+=i}return n.trim()&&t.push(n.trim()),t}function Tc(e){return String(e??``).trim().replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u,``).trim()}function Ec({name:e,comment:t}){return Tc(t)||e}function Dc(e){let t=Tc(e);return t?wc(t):[]}function Oc(e){let t=e.indexOf(`#`);return t<0?{signature:e.trim().replace(/,$/,``),comment:``}:{signature:e.slice(0,t).trim().replace(/,$/,``),comment:e.slice(t+1).trim()}}function kc(e,t,n=``){let r=Dc(n),i=[];return e.includes(`#`)?e.split(`
-`).map(e=>e.trim()).filter(Boolean).forEach(e=>{let{signature:t,comment:n}=Oc(e),r=wc(t.replace(/,$/,``)).filter(Boolean),a=Dc(n);r.forEach((e,t)=>{i.push({signature:e,comment:a[t]??(r.length===1?Tc(n):``)})})}):wc(e).filter(Boolean).forEach((e,t)=>{i.push({signature:e,comment:r[t]??``})}),i.map((e,n)=>{let{signature:i,comment:a}=typeof e==`string`?Oc(e):e,o=i.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);if(!o)throw yc(`无法解析参数定义: ${i}`,t+n);let s=Tc(a||r[n]||``);return{name:o[1],displayName:Ec({name:o[1],comment:s}),type:o[2]?.trim()??`any`,default:o[3]?.trim()??null,comment:s}})}function Ac(e,t){let n=e.slice(t.startIndex,t.endIndex),r=n.indexOf(`
-`);return r===-1?``:n.slice(r+1)}function jc(e,t){let n=[...e.split(`
-`)].reverse().find(e=>e.trim().startsWith(`return `))?.match(/return\s+(.+?)(?:\s*#\s*(.+))?$/),r=Dc(n?.[2]??``),i=1;return n?.[1]?i=wc(n[1]).length:/Tuple?\[/.test(t)&&(i=wc(t.replace(/^Tuple?\[/,``).replace(/\]$/,``)).length),Array.from({length:Math.max(1,i)},(e,t)=>{let n=`output_${t}`,i=Tc(r[t]??``);return{name:n,displayName:Ec({name:n,comment:i}),type:`float`,comment:i}})}function Mc(e){let t=e.split(`
-`),n=[];for(let e=0;e<t.length;e+=1)if(t[e].includes(`@observable`))for(let r=e+1;r<t.length;r+=1){let e=t[r].trim();if(!e)continue;let i=e.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=.*?(?:#\s*(.+))?$/);if(i){let e=Tc(i[2]??``);n.push({name:i[1],displayName:Ec({name:i[1],comment:e}),type:`float`,comment:e})}break}return n}function Nc({fileName:e,source:t}){let n=bc(t),{moduleName:r,description:i}=xc(n,e),a=Cc(Sc(n)),o=Ac(n,a);return{fileName:e,moduleName:r,description:i,entryFunction:a.name,inputs:kc(a.paramsSource,a.line,a.headerComment),outputs:jc(o,a.returnAnnotation),middleVars:Mc(o),rawSource:n}}var Pc=(e,t)=>{let n=e.__vccOpts||e;for(let[e,r]of t)n[e]=r;return n},Fc={key:0,class:`overlay overlay--vue open`,"data-testid":`python-binding-dialog`},Ic={class:`modal python-binding-modal`},Lc={class:`mhead`},Rc={class:`python-binding-modal__sub`},zc={class:`mbody python-binding-modal__body`},Bc={class:`python-binding-modal__panel python-binding-modal__panel--left`},Vc={class:`python-binding-modal__toolbar`},Hc={key:0,class:`python-binding-modal__error`},Uc={key:1,class:`python-binding-modal__summary`},Wc={class:`python-binding-modal__file`},Gc={class:`python-binding-modal__meta`},Kc={class:`python-binding-modal__desc`},qc={key:2,class:`python-binding-modal__groups`},Jc={class:`python-binding-group`},Yc=[`value`,`onInput`],Xc={class:`python-binding-row__type`},Zc={class:`python-binding-row__note`},Qc={class:`python-binding-group`},$c=[`value`,`onInput`],el={class:`python-binding-row__type`},tl={class:`python-binding-row__note`},nl={class:`python-binding-group`},rl=[`value`,`onInput`],il={class:`python-binding-row__type`},al={class:`python-binding-row__note`},ol={class:`python-binding-modal__panel python-binding-modal__panel--right`},sl={class:`python-binding-modal__code`},cl={class:`mfoot`},ll=[`disabled`],ul=Pc({__name:`PythonBindingDialog`,props:{open:{type:Boolean,default:void 0},targetNode:{type:Object,default:void 0},parsedInterface:{type:Object,default:void 0}},emits:[`close`,`confirm`,`unbind`,`pick-file`],setup(e,{emit:t}){let n=e,r=t,{dialogsState:i,closePythonBindingDialog:a,openPythonBindingDialog:o,setPythonBindingError:s,setPythonBindingPreview:c}=Ao(),l=Jt(null),u=Jt(null),d=ga(()=>n.open??i.pythonBinding.open),f=ga(()=>n.targetNode??i.pythonBinding.targetNode),p=ga(()=>n.parsedInterface??i.pythonBinding.parsedInterface),m=ga(()=>i.pythonBinding.parseError);function h(e){if(!e){u.value=null;return}u.value={...e,inputs:(e.inputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),outputs:(e.outputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),middleVars:(e.middleVars??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name}))}}function g(){a(),r(`close`)}function _(){l.value?.click(),r(`pick-file`)}async function v(e){let t=e.target.files?.[0];if(t)try{let e=await t.text(),n=Nc({fileName:t.name,source:e});c(n),h(n)}catch(e){s(e?.message??`解析 Python 文件失败`)}finally{e.target.value=``}}function y(e,t,n){u.value&&(u.value[e][t].displayName=n)}function b(){if(!u.value||!f.value?.id)return;let e={nodeId:f.value.id,binding:Jo(u.value)};window.dispatchEvent(new CustomEvent(`gz:python-binding-confirm`,{detail:e})),r(`confirm`,e),g()}function x(){if(!f.value?.id)return;let e={nodeId:f.value.id};window.dispatchEvent(new CustomEvent(`gz:python-binding-unbind`,{detail:e})),r(`unbind`,e),g()}function ee(e){o(e.detail??{}),h(e.detail?.parsedInterface??e.detail?.boundSnapshot?.parsedInterface??null)}return In(p,e=>{h(e)},{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-python-binding`,ee)}),sr(()=>{window.removeEventListener(`gz:open-python-binding`,ee)}),(e,t)=>d.value?(B(),V(`div`,Fc,[H(`div`,Ic,[H(`div`,Lc,[H(`div`,null,[t[0]||=H(`div`,{class:`mtitle python-binding-modal__title`},`绑定 Python 文件`,-1),H(`div`,Rc,D(f.value?.label??f.value?.props?.name??`未选择仿真块`),1)]),H(`button`,{class:`mclose`,onClick:g},`×`)]),H(`div`,zc,[H(`section`,Bc,[H(`div`,Vc,[H(`button`,{class:`btn-ok btn-ok-b`,type:`button`,onClick:_},`选择 .py 文件`),H(`input`,{ref_key:`fileInput`,ref:l,class:`python-binding-modal__input`,type:`file`,accept:`.py`,onChange:v},null,544)]),m.value?(B(),V(`div`,Hc,D(m.value),1)):Wi(``,!0),u.value?(B(),V(`div`,Uc,[H(`div`,Wc,D(u.value.fileName),1),H(`div`,Gc,D(u.value.moduleName)+` · `+D(u.value.entryFunction),1),H(`div`,Kc,D(u.value.description||`未提供模块说明。`),1)])):Wi(``,!0),u.value?(B(),V(`div`,qc,[H(`div`,Jc,[t[1]||=H(`div`,{class:`python-binding-group__head`},`输入变量`,-1),(B(!0),V(R,null,mr(u.value.inputs,(e,t)=>(B(),V(`div`,{key:`input-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`inputs`,t,e.target.value)},null,40,Yc),H(`span`,Xc,D(e.type),1),H(`span`,Zc,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))]),H(`div`,Qc,[t[2]||=H(`div`,{class:`python-binding-group__head`},`输出变量`,-1),(B(!0),V(R,null,mr(u.value.outputs,(e,t)=>(B(),V(`div`,{key:`output-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`outputs`,t,e.target.value)},null,40,$c),H(`span`,el,D(e.type),1),H(`span`,tl,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))]),H(`div`,nl,[t[3]||=H(`div`,{class:`python-binding-group__head`},`中间变量`,-1),(B(!0),V(R,null,mr(u.value.middleVars,(e,t)=>(B(),V(`div`,{key:`middle-${e.name}`,class:`python-binding-row`},[H(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`middleVars`,t,e.target.value)},null,40,rl),H(`span`,il,D(e.type),1),H(`span`,al,D(e.name)+` · `+D(e.comment||`无注释`),1)]))),128))])])):Wi(``,!0)]),H(`section`,ol,[t[4]||=H(`div`,{class:`python-binding-group__head python-binding-modal__code-head`},`源码预览`,-1),H(`pre`,sl,D(u.value?.rawSource??`尚未选择 Python 文件。`),1)])]),H(`div`,cl,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:g},`取消`),H(`button`,{class:`btn-ok btn-ok-r`,type:`button`,onClick:x},`解除绑定`),H(`button`,{class:`btn-ok btn-ok-b`,type:`button`,disabled:!u.value,onClick:b},`确认绑定`,8,ll)])])])):Wi(``,!0)}},[[`__scopeId`,`data-v-1e025653`]]),dl={key:0,class:`overlay overlay--vue open`,"data-testid":`component-authoring-dialog`},fl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`component-authoring-title`},pl={class:`mhead`},ml={class:`authoring-modal__sub`},hl={class:`mbody authoring-modal__body`},gl={class:`authoring-card authoring-form`},_l={class:`authoring-form__row`},vl={class:`authoring-form__row`},yl={class:`authoring-form__row`},bl={class:`authoring-card`},xl={class:`authoring-meta`},Sl={class:`authoring-card`},Cl={key:0,class:`authoring-list`},wl={key:1,class:`authoring-empty`},Tl={class:`authoring-card`},El={key:0,class:`authoring-list`},Dl={key:1,class:`authoring-empty`},Ol={class:`authoring-card authoring-form`},kl={class:`authoring-form__row`},Al={class:`authoring-form__row`},jl={class:`mfoot`},Ml={__name:`ComponentAuthoringDialog`,setup(e){let{dialogsState:t}=Ao(),n=ga(()=>t.componentAuthoring.parsedInterface),r=ga(()=>n.value?.inputs??[]),i=ga(()=>n.value?.outputs??[]),a=Lt({displayName:``,category:`仿真模块`,geometry:`rect`,slotName:``,slotKind:`output_signal`});function o(e){return e?.displayName||e?.comment||e?.name||`未命名`}function s(e){let t=e?.outputs?.[0];return t?.displayName||t?.comment||t?.name||`输出信号`}function c(e){a.displayName=e?.description||e?.moduleName||`自定义仿真组件`,a.category=`仿真模块`,a.geometry=`rect`,a.slotName=`${s(e)}故障位`,a.slotKind=`output_signal`}function l(e){Eo(e.detail??{})}function u(){Ls({parsedInterface:n.value,displayName:a.displayName,category:a.category,geometry:a.geometry,slotName:a.slotName,slotKind:a.slotKind}).ok!==!1&&Do()}return In(n,c,{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-component-authoring`,l)}),sr(()=>{window.removeEventListener(`gz:open-component-authoring`,l)}),(e,s)=>N(t).componentAuthoring.open?(B(),V(`div`,dl,[H(`div`,fl,[H(`div`,pl,[H(`div`,null,[s[7]||=H(`div`,{id:`component-authoring-title`,class:`mtitle`},`新增仿真组件`,-1),H(`div`,ml,D(n.value?.fileName||`尚未选择 Python 接口`),1)]),H(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:s[0]||=(...e)=>N(Do)&&N(Do)(...e)},`×`)]),H(`div`,hl,[H(`section`,gl,[s[13]||=H(`div`,{class:`authoring-card__eyebrow`},`基础信息`,-1),H(`label`,_l,[s[8]||=H(`span`,null,`中文名称`,-1),F(H(`input`,{"onUpdate:modelValue":s[1]||=e=>a.displayName=e,"data-authoring-component-name":``,type:`text`},null,512),[[so,a.displayName]])]),H(`label`,vl,[s[10]||=H(`span`,null,`组件类别`,-1),F(H(`select`,{"onUpdate:modelValue":s[2]||=e=>a.category=e,"data-authoring-component-category":``},[...s[9]||=[Ui(`<option value="信号源">信号源</option><option value="仿真模块">仿真模块</option><option value="求和模块">求和模块</option><option value="仪器模块">仪器模块</option><option value="自定义模块">自定义模块</option>`,5)]],512),[[co,a.category]])]),H(`label`,yl,[s[12]||=H(`span`,null,`几何形状`,-1),F(H(`select`,{"onUpdate:modelValue":s[3]||=e=>a.geometry=e,"data-authoring-component-geometry":``},[...s[11]||=[H(`option`,{value:`rect`},`矩形模块`,-1),H(`option`,{value:`pill`},`胶囊模块`,-1),H(`option`,{value:`circle`},`圆形模块`,-1),H(`option`,{value:`instrument`},`仪表模块`,-1)]],512),[[co,a.geometry]])])]),H(`section`,bl,[s[14]||=H(`div`,{class:`authoring-card__eyebrow`},`Python 接口`,-1),H(`h3`,null,D(n.value?.description||`未命名组件`),1),H(`div`,xl,[H(`span`,null,D(n.value?.moduleName||`unknown_module`),1),H(`span`,null,D(n.value?.entryFunction||`process`),1)])]),H(`section`,Sl,[s[15]||=H(`div`,{class:`authoring-card__eyebrow`},`输入`,-1),r.value.length?(B(),V(`div`,Cl,[(B(!0),V(R,null,mr(r.value,e=>(B(),V(`div`,{key:`input-${e.name}`,class:`authoring-list__row`},[H(`strong`,null,D(o(e)),1),H(`span`,null,D(e.name),1),H(`code`,null,D(e.type||`any`),1)]))),128))])):(B(),V(`div`,wl,`暂无输入变量`))]),H(`section`,Tl,[s[16]||=H(`div`,{class:`authoring-card__eyebrow`},`输出`,-1),i.value.length?(B(),V(`div`,El,[(B(!0),V(R,null,mr(i.value,e=>(B(),V(`div`,{key:`output-${e.name}`,class:`authoring-list__row`},[H(`strong`,null,D(o(e)),1),H(`span`,null,D(e.name),1),H(`code`,null,D(e.type||`any`),1)]))),128))])):(B(),V(`div`,Dl,`暂无输出变量`))]),H(`section`,Ol,[s[20]||=H(`div`,{class:`authoring-card__eyebrow`},`默认故障槽位`,-1),H(`label`,kl,[s[17]||=H(`span`,null,`槽位名称`,-1),F(H(`input`,{"onUpdate:modelValue":s[4]||=e=>a.slotName=e,"data-authoring-slot-name":``,type:`text`},null,512),[[so,a.slotName]])]),H(`label`,Al,[s[19]||=H(`span`,null,`槽位类型`,-1),F(H(`select`,{"onUpdate:modelValue":s[5]||=e=>a.slotKind=e,"data-authoring-slot-kind":``},[...s[18]||=[H(`option`,{value:`output_signal`},`输出信号`,-1),H(`option`,{value:`input_signal`},`输入信号`,-1),H(`option`,{value:`state_variable`},`内部状态`,-1),H(`option`,{value:`parameter`},`参数`,-1)]],512),[[co,a.slotKind]])])])]),H(`div`,jl,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:s[6]||=(...e)=>N(Do)&&N(Do)(...e)},`取消`),H(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-component":``,onClick:u},`保存组件`)])])])):Wi(``,!0)}},Nl={key:0,class:`overlay overlay--vue open`,"data-testid":`fault-authoring-dialog`},Pl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`fault-authoring-title`},Fl={class:`mhead`},Il={class:`authoring-modal__sub`},Ll={class:`mbody authoring-modal__body`},Rl={class:`authoring-card`},zl={class:`authoring-meta`},Bl={class:`authoring-card authoring-form`},Vl={class:`authoring-form__row`},Hl={class:`authoring-form__row`},Ul={class:`authoring-form__row`},Wl=[`value`],Gl={class:`authoring-form__row`},Kl={class:`authoring-form__row`},ql=[`value`],Jl={class:`authoring-card authoring-form`},Yl={class:`authoring-form__row`},Xl={class:`authoring-form__row`},Zl={class:`authoring-form__row`},Ql={class:`mfoot`},$l={__name:`FaultAuthoringDialog`,setup(e){let{dialogsState:t}=Ao(),n=ga(()=>t.faultAuthoring.target),r=[{value:`bias`,label:`Bias 固定偏置`},{value:`drift`,label:`Drift 缓慢漂移`},{value:`intermittent`,label:`Intermittent 间歇故障`},{value:`noise`,label:`Noise 噪声扰动`},{value:`lock`,label:`Lock 锁定输出`},{value:`tamper`,label:`Tamper 篡改信号`}],i=[{value:`electrical`,label:`电气层`},{value:`physical`,label:`物理层`},{value:`protocol`,label:`协议层`},{value:`local_state`,label:`本地状态故障`}],a=Lt({faultId:``,displayName:``,layer:`electrical`,faultClass:`偏差故障`,runtimeBehavior:`bias`,parameters:{bias:.1,start:0,duration:``}});function o(e){return String(e||``).trim().toLowerCase().replace(/[^a-z0-9]+/g,`_`).replace(/^_+|_+$/g,``)}function s(e){a.displayName=`${e?.targetName||e?.targetId||`目标对象`}自定义偏置`,a.faultId=o(`${e?.targetId||`target`}_${e?.slotId||`slot`}_bias`)||`custom_fault_bias`,a.layer=`electrical`,a.faultClass=`偏差故障`,a.runtimeBehavior=`bias`,a.parameters.bias=.1,a.parameters.start=0,a.parameters.duration=``}function c(e){Oo(e.detail??{})}function l(){Bs({target:n.value,faultId:a.faultId,displayName:a.displayName,layer:a.layer,faultClass:a.faultClass,runtimeBehavior:a.runtimeBehavior,parameters:a.parameters}).ok!==!1&&ko()}return In(n,s,{immediate:!0}),ir(()=>{window.addEventListener(`gz:open-fault-authoring`,c)}),sr(()=>{window.removeEventListener(`gz:open-fault-authoring`,c)}),(e,o)=>N(t).faultAuthoring.open?(B(),V(`div`,Nl,[H(`div`,Pl,[H(`div`,Fl,[H(`div`,null,[o[10]||=H(`div`,{id:`fault-authoring-title`,class:`mtitle`},`新增故障模型`,-1),H(`div`,Il,D(n.value?.targetKind||`target`)+` · `+D(n.value?.targetId||`未选择目标`),1)]),H(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:o[0]||=(...e)=>N(ko)&&N(ko)(...e)},`×`)]),H(`div`,Ll,[H(`section`,Rl,[o[11]||=H(`div`,{class:`authoring-card__eyebrow`},`目标槽位`,-1),H(`h3`,null,D(n.value?.targetName||`未命名目标`),1),H(`div`,zl,[H(`span`,null,D(n.value?.slotName||`未选择槽位`),1),H(`span`,null,D(n.value?.slotId||`slot`),1)])]),H(`section`,Bl,[o[17]||=H(`div`,{class:`authoring-card__eyebrow`},`故障信息`,-1),H(`label`,Vl,[o[12]||=H(`span`,null,`故障 ID`,-1),F(H(`input`,{"onUpdate:modelValue":o[1]||=e=>a.faultId=e,"data-authoring-fault-id":``,type:`text`},null,512),[[so,a.faultId]])]),H(`label`,Hl,[o[13]||=H(`span`,null,`故障名称`,-1),F(H(`input`,{"onUpdate:modelValue":o[2]||=e=>a.displayName=e,"data-authoring-fault-name":``,type:`text`,placeholder:`例如：陀螺仪固定偏置`},null,512),[[so,a.displayName]])]),H(`label`,Ul,[o[14]||=H(`span`,null,`故障层级`,-1),F(H(`select`,{"onUpdate:modelValue":o[3]||=e=>a.layer=e,"data-authoring-fault-layer":``},[(B(),V(R,null,mr(i,e=>H(`option`,{key:e.value,value:e.value},D(e.label),9,Wl)),64))],512),[[co,a.layer]])]),H(`label`,Gl,[o[15]||=H(`span`,null,`故障类别`,-1),F(H(`input`,{"onUpdate:modelValue":o[4]||=e=>a.faultClass=e,"data-authoring-fault-class":``,type:`text`},null,512),[[so,a.faultClass]])]),H(`label`,Kl,[o[16]||=H(`span`,null,`运行行为`,-1),F(H(`select`,{"onUpdate:modelValue":o[5]||=e=>a.runtimeBehavior=e,"data-authoring-fault-behavior":``},[(B(),V(R,null,mr(r,e=>H(`option`,{key:e.value,value:e.value},D(e.label),9,ql)),64))],512),[[co,a.runtimeBehavior]])])]),H(`section`,Jl,[o[21]||=H(`div`,{class:`authoring-card__eyebrow`},`默认参数`,-1),H(`label`,Yl,[o[18]||=H(`span`,null,`bias`,-1),F(H(`input`,{"onUpdate:modelValue":o[6]||=e=>a.parameters.bias=e,"data-authoring-param-name":`bias`,type:`number`,step:`0.01`},null,512),[[so,a.parameters.bias]])]),H(`label`,Xl,[o[19]||=H(`span`,null,`start`,-1),F(H(`input`,{"onUpdate:modelValue":o[7]||=e=>a.parameters.start=e,"data-authoring-param-name":`start`,type:`number`,step:`1`},null,512),[[so,a.parameters.start]])]),H(`label`,Zl,[o[20]||=H(`span`,null,`duration`,-1),F(H(`input`,{"onUpdate:modelValue":o[8]||=e=>a.parameters.duration=e,"data-authoring-param-name":`duration`,type:`number`,step:`1`},null,512),[[so,a.parameters.duration]])])])]),H(`div`,Ql,[H(`button`,{class:`btn-cancel`,type:`button`,onClick:o[9]||=(...e)=>N(ko)&&N(ko)(...e)},`取消`),H(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-fault":``,onClick:l},`保存故障`)])])])):Wi(``,!0)}},eu=`<div class="toast" id="toast"><span id="ti"></span><span id="tm"></span></div>`,tu=[`innerHTML`],nu={__name:`ToastHost`,setup(e){return(e,t)=>(B(),V(`div`,{class:`gz-shell-fragment`,"data-testid":`toast-host`,innerHTML:N(eu)},null,8,tu))}},ru=`// --- 状态 ---\r
+`,vc=[`innerHTML`],yc={__name:`ConfigDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`config-dialog`,innerHTML:j(_c)},null,8,vc))}},bc=`<div class="scope-dialog-stub" id="ov-scope" hidden data-scope-dialog-stub="true"></div>
+`,xc=[`innerHTML`],Sc={__name:`ScopeDialog`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`scope-dialog`,innerHTML:j(bc)},null,8,xc))}};function Cc(e,t=null){let n=Error(`PYTHON_PARSE_ERROR: ${e}`);return n.code=`PYTHON_PARSE_ERROR`,n.line=t,n}function wc(e){return e.replace(/\r\n/g,`
+`)}function Tc(e,t){let n=e.match(/("""|''')([\s\S]*?)\1/)?.[2]??``;return{moduleName:n.match(/Module:\s*([A-Za-z0-9_]+)/)?.[1]??t.replace(/\.py$/i,``),description:n.match(/Description:\s*(.+)/)?.[1]?.trim()??``}}function Ec(e){let t=/(^|\n)([ \t]*)(#\s*@entry\s*\n)?([ \t]*)def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([\s\S]*?)\)\s*(?:->\s*([^\n:]+))?:[ \t]*(?:#\s*(.*))?/g,n=[],r;for(;r=t.exec(e);){if((r[4]??``).length!==0)continue;let t=r.index+r[1].length,i=e.slice(0,t).split(`
+`).length;n.push({startIndex:t,line:i,isEntry:!!r[3],name:r[5],paramsSource:r[6],returnAnnotation:r[7]?.trim()??``,headerComment:r[8]?.trim()??``})}return n.sort((e,t)=>e.startIndex-t.startIndex).map((t,n,r)=>({...t,endIndex:r[n+1]?.startIndex??e.length}))}function Dc(e){if(e.length===0)throw Cc(`未找到可识别的入口函数`);let t=e.find(e=>e.isEntry);if(t)return t;let n=e.find(e=>e.name===`process`);if(n)return n;if(e.length===1)return e[0];throw Cc(`找到多个顶层函数，但没有 @entry 或 process 入口`)}function Oc(e){let t=[],n=``,r=0;for(let i of e){if((i===`(`||i===`[`||i===`{`)&&(r+=1),(i===`)`||i===`]`||i===`}`)&&(r=Math.max(0,r-1)),i===`,`&&r===0){n.trim()&&t.push(n.trim()),n=``;continue}n+=i}return n.trim()&&t.push(n.trim()),t}function kc(e){return String(e??``).trim().replace(/^(输入|输出|中间变量|观测变量|可观测变量)\s*[:：]\s*/u,``).trim()}function Ac({name:e,comment:t}){return kc(t)||e}function jc(e){let t=kc(e);return t?Oc(t):[]}function Mc(e){let t=e.indexOf(`#`);return t<0?{signature:e.trim().replace(/,$/,``),comment:``}:{signature:e.slice(0,t).trim().replace(/,$/,``),comment:e.slice(t+1).trim()}}function Nc(e,t,n=``){let r=jc(n),i=[];return e.includes(`#`)?e.split(`
+`).map(e=>e.trim()).filter(Boolean).forEach(e=>{let{signature:t,comment:n}=Mc(e),r=Oc(t.replace(/,$/,``)).filter(Boolean),a=jc(n);r.forEach((e,t)=>{i.push({signature:e,comment:a[t]??(r.length===1?kc(n):``)})})}):Oc(e).filter(Boolean).forEach((e,t)=>{i.push({signature:e,comment:r[t]??``})}),i.map((e,n)=>{let{signature:i,comment:a}=typeof e==`string`?Mc(e):e,o=i.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*([^=]+?))?(?:\s*=\s*(.+))?$/);if(!o)throw Cc(`无法解析参数定义: ${i}`,t+n);let s=kc(a||r[n]||``);return{name:o[1],displayName:Ac({name:o[1],comment:s}),type:o[2]?.trim()??`any`,default:o[3]?.trim()??null,comment:s}})}function Pc(e,t){let n=e.slice(t.startIndex,t.endIndex),r=n.indexOf(`
+`);return r===-1?``:n.slice(r+1)}function Fc(e,t){let n=[...e.split(`
+`)].reverse().find(e=>e.trim().startsWith(`return `))?.match(/return\s+(.+?)(?:\s*#\s*(.+))?$/),r=jc(n?.[2]??``),i=1;return n?.[1]?i=Oc(n[1]).length:/Tuple?\[/.test(t)&&(i=Oc(t.replace(/^Tuple?\[/,``).replace(/\]$/,``)).length),Array.from({length:Math.max(1,i)},(e,t)=>{let n=`output_${t}`,i=kc(r[t]??``);return{name:n,displayName:Ac({name:n,comment:i}),type:`float`,comment:i}})}function Ic(e){let t=e.split(`
+`),n=[];for(let e=0;e<t.length;e+=1)if(t[e].includes(`@observable`))for(let r=e+1;r<t.length;r+=1){let e=t[r].trim();if(!e)continue;let i=e.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=.*?(?:#\s*(.+))?$/);if(i){let e=kc(i[2]??``);n.push({name:i[1],displayName:Ac({name:i[1],comment:e}),type:`float`,comment:e})}break}return n}function Lc({fileName:e,source:t}){let n=wc(t),{moduleName:r,description:i}=Tc(n,e),a=Dc(Ec(n)),o=Pc(n,a);return{fileName:e,moduleName:r,description:i,entryFunction:a.name,inputs:Nc(a.paramsSource,a.line,a.headerComment),outputs:Fc(o,a.returnAnnotation),middleVars:Ic(o),rawSource:n}}var Rc=(e,t)=>{let n=e.__vccOpts||e;for(let[e,r]of t)n[e]=r;return n},zc={key:0,class:`overlay overlay--vue open`,"data-testid":`python-binding-dialog`},Bc={class:`modal python-binding-modal`},Vc={class:`mhead`},Hc={class:`python-binding-modal__sub`},Uc={class:`mbody python-binding-modal__body`},Wc={class:`python-binding-modal__panel python-binding-modal__panel--left`},Gc={class:`python-binding-modal__toolbar`},Kc={key:0,class:`python-binding-modal__error`},qc={key:1,class:`python-binding-modal__summary`},Jc={class:`python-binding-modal__file`},Yc={class:`python-binding-modal__meta`},Xc={class:`python-binding-modal__desc`},Zc={key:2,class:`python-binding-modal__groups`},Qc={class:`python-binding-group`},$c=[`value`,`onInput`],el={class:`python-binding-row__type`},tl={class:`python-binding-row__note`},nl={class:`python-binding-group`},rl=[`value`,`onInput`],il={class:`python-binding-row__type`},al={class:`python-binding-row__note`},ol={class:`python-binding-group`},sl=[`value`,`onInput`],cl={class:`python-binding-row__type`},ll={class:`python-binding-row__note`},ul={class:`python-binding-modal__panel python-binding-modal__panel--right`},dl={class:`python-binding-modal__code`},fl={class:`mfoot`},pl=[`disabled`],ml=Rc({__name:`PythonBindingDialog`,props:{open:{type:Boolean,default:void 0},targetNode:{type:Object,default:void 0},parsedInterface:{type:Object,default:void 0}},emits:[`close`,`confirm`,`unbind`,`pick-file`],setup(e,{emit:t}){let n=e,r=t,{dialogsState:i,closePythonBindingDialog:a,openPythonBindingDialog:o,setPythonBindingError:s,setPythonBindingPreview:c}=No(),l=Xt(null),u=Xt(null),d=ya(()=>n.open??i.pythonBinding.open),f=ya(()=>n.targetNode??i.pythonBinding.targetNode),p=ya(()=>n.parsedInterface??i.pythonBinding.parsedInterface),m=ya(()=>i.pythonBinding.parseError);function h(e){if(!e){u.value=null;return}u.value={...e,inputs:(e.inputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),outputs:(e.outputs??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name})),middleVars:(e.middleVars??[]).map(e=>({...e,displayName:e.displayName??e.comment??e.name}))}}function g(){a(),r(`close`)}function _(){l.value?.click(),r(`pick-file`)}async function v(e){let t=e.target.files?.[0];if(t)try{let e=await t.text(),n=Lc({fileName:t.name,source:e});c(n),h(n)}catch(e){s(e?.message??`解析 Python 文件失败`)}finally{e.target.value=``}}function y(e,t,n){u.value&&(u.value[e][t].displayName=n)}function b(){if(!u.value||!f.value?.id)return;let e={nodeId:f.value.id,binding:Zo(u.value)};window.dispatchEvent(new CustomEvent(`gz:python-binding-confirm`,{detail:e})),r(`confirm`,e),g()}function x(){if(!f.value?.id)return;let e={nodeId:f.value.id};window.dispatchEvent(new CustomEvent(`gz:python-binding-unbind`,{detail:e})),r(`unbind`,e),g()}function ee(e){o(e.detail??{}),h(e.detail?.parsedInterface??e.detail?.boundSnapshot?.parsedInterface??null)}return zn(p,e=>{h(e)},{immediate:!0}),sr(()=>{window.addEventListener(`gz:open-python-binding`,ee)}),ur(()=>{window.removeEventListener(`gz:open-python-binding`,ee)}),(e,t)=>d.value?(L(),R(`div`,zc,[z(`div`,Bc,[z(`div`,Vc,[z(`div`,null,[t[0]||=z(`div`,{class:`mtitle python-binding-modal__title`},`绑定 Python 文件`,-1),z(`div`,Hc,E(f.value?.label??f.value?.props?.name??`未选择仿真块`),1)]),z(`button`,{class:`mclose`,onClick:g},`×`)]),z(`div`,Uc,[z(`section`,Wc,[z(`div`,Gc,[z(`button`,{class:`btn-ok btn-ok-b`,type:`button`,onClick:_},`选择 .py 文件`),z(`input`,{ref_key:`fileInput`,ref:l,class:`python-binding-modal__input`,type:`file`,accept:`.py`,onChange:v},null,544)]),m.value?(L(),R(`div`,Kc,E(m.value),1)):qi(``,!0),u.value?(L(),R(`div`,qc,[z(`div`,Jc,E(u.value.fileName),1),z(`div`,Yc,E(u.value.moduleName)+` · `+E(u.value.entryFunction),1),z(`div`,Xc,E(u.value.description||`未提供模块说明。`),1)])):qi(``,!0),u.value?(L(),R(`div`,Zc,[z(`div`,Qc,[t[1]||=z(`div`,{class:`python-binding-group__head`},`输入变量`,-1),(L(!0),R(F,null,_r(u.value.inputs,(e,t)=>(L(),R(`div`,{key:`input-${e.name}`,class:`python-binding-row`},[z(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`inputs`,t,e.target.value)},null,40,$c),z(`span`,el,E(e.type),1),z(`span`,tl,E(e.name)+` · `+E(e.comment||`无注释`),1)]))),128))]),z(`div`,nl,[t[2]||=z(`div`,{class:`python-binding-group__head`},`输出变量`,-1),(L(!0),R(F,null,_r(u.value.outputs,(e,t)=>(L(),R(`div`,{key:`output-${e.name}`,class:`python-binding-row`},[z(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`outputs`,t,e.target.value)},null,40,rl),z(`span`,il,E(e.type),1),z(`span`,al,E(e.name)+` · `+E(e.comment||`无注释`),1)]))),128))]),z(`div`,ol,[t[3]||=z(`div`,{class:`python-binding-group__head`},`中间变量`,-1),(L(!0),R(F,null,_r(u.value.middleVars,(e,t)=>(L(),R(`div`,{key:`middle-${e.name}`,class:`python-binding-row`},[z(`input`,{value:e.displayName,class:`python-binding-row__name`,onInput:e=>y(`middleVars`,t,e.target.value)},null,40,sl),z(`span`,cl,E(e.type),1),z(`span`,ll,E(e.name)+` · `+E(e.comment||`无注释`),1)]))),128))])])):qi(``,!0)]),z(`section`,ul,[t[4]||=z(`div`,{class:`python-binding-group__head python-binding-modal__code-head`},`源码预览`,-1),z(`pre`,dl,E(u.value?.rawSource??`尚未选择 Python 文件。`),1)])]),z(`div`,fl,[z(`button`,{class:`btn-cancel`,type:`button`,onClick:g},`取消`),z(`button`,{class:`btn-ok btn-ok-r`,type:`button`,onClick:x},`解除绑定`),z(`button`,{class:`btn-ok btn-ok-b`,type:`button`,disabled:!u.value,onClick:b},`确认绑定`,8,pl)])])])):qi(``,!0)}},[[`__scopeId`,`data-v-1e025653`]]),hl={key:0,class:`overlay overlay--vue open`,"data-testid":`component-authoring-dialog`},gl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`component-authoring-title`},_l={class:`mhead`},vl={class:`authoring-modal__sub`},yl={class:`mbody authoring-modal__body`},bl={class:`authoring-card authoring-form`},xl={class:`authoring-form__row`},Sl={class:`authoring-form__row`},Cl={class:`authoring-form__row`},wl={class:`authoring-card`},Tl={class:`authoring-meta`},El={class:`authoring-card`},Dl={key:0,class:`authoring-list`},Ol={key:1,class:`authoring-empty`},kl={class:`authoring-card`},Al={key:0,class:`authoring-list`},jl={key:1,class:`authoring-empty`},Ml={class:`authoring-card authoring-form`},Nl={class:`authoring-form__row`},Pl={class:`authoring-form__row`},Fl={class:`mfoot`},Il={__name:`ComponentAuthoringDialog`,setup(e){let{dialogsState:t}=No(),n=ya(()=>t.componentAuthoring.parsedInterface),r=ya(()=>n.value?.inputs??[]),i=ya(()=>n.value?.outputs??[]),a=zt({displayName:``,category:`仿真模块`,geometry:`rect`,slotName:``,slotKind:`output_signal`});function o(e){return e?.displayName||e?.comment||e?.name||`未命名`}function s(e){let t=e?.outputs?.[0];return t?.displayName||t?.comment||t?.name||`输出信号`}function c(e){a.displayName=e?.description||e?.moduleName||`自定义仿真组件`,a.category=`仿真模块`,a.geometry=`rect`,a.slotName=`${s(e)}故障位`,a.slotKind=`output_signal`}function l(e){ko(e.detail??{})}function u(){Vs({parsedInterface:n.value,displayName:a.displayName,category:a.category,geometry:a.geometry,slotName:a.slotName,slotKind:a.slotKind}).ok!==!1&&Ao()}return zn(n,c,{immediate:!0}),sr(()=>{window.addEventListener(`gz:open-component-authoring`,l)}),ur(()=>{window.removeEventListener(`gz:open-component-authoring`,l)}),(e,s)=>j(t).componentAuthoring.open?(L(),R(`div`,hl,[z(`div`,gl,[z(`div`,_l,[z(`div`,null,[s[7]||=z(`div`,{id:`component-authoring-title`,class:`mtitle`},`新增仿真组件`,-1),z(`div`,vl,E(n.value?.fileName||`尚未选择 Python 接口`),1)]),z(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:s[0]||=(...e)=>j(Ao)&&j(Ao)(...e)},`×`)]),z(`div`,yl,[z(`section`,bl,[s[13]||=z(`div`,{class:`authoring-card__eyebrow`},`基础信息`,-1),z(`label`,xl,[s[8]||=z(`span`,null,`中文名称`,-1),Nn(z(`input`,{"onUpdate:modelValue":s[1]||=e=>a.displayName=e,"data-authoring-component-name":``,type:`text`},null,512),[[uo,a.displayName]])]),z(`label`,Sl,[s[10]||=z(`span`,null,`组件类别`,-1),Nn(z(`select`,{"onUpdate:modelValue":s[2]||=e=>a.category=e,"data-authoring-component-category":``},[...s[9]||=[Ki(`<option value="信号源">信号源</option><option value="仿真模块">仿真模块</option><option value="求和模块">求和模块</option><option value="仪器模块">仪器模块</option><option value="自定义模块">自定义模块</option>`,5)]],512),[[fo,a.category]])]),z(`label`,Cl,[s[12]||=z(`span`,null,`几何形状`,-1),Nn(z(`select`,{"onUpdate:modelValue":s[3]||=e=>a.geometry=e,"data-authoring-component-geometry":``},[...s[11]||=[z(`option`,{value:`rect`},`矩形模块`,-1),z(`option`,{value:`pill`},`胶囊模块`,-1),z(`option`,{value:`circle`},`圆形模块`,-1),z(`option`,{value:`instrument`},`仪表模块`,-1)]],512),[[fo,a.geometry]])])]),z(`section`,wl,[s[14]||=z(`div`,{class:`authoring-card__eyebrow`},`Python 接口`,-1),z(`h3`,null,E(n.value?.description||`未命名组件`),1),z(`div`,Tl,[z(`span`,null,E(n.value?.moduleName||`unknown_module`),1),z(`span`,null,E(n.value?.entryFunction||`process`),1)])]),z(`section`,El,[s[15]||=z(`div`,{class:`authoring-card__eyebrow`},`输入`,-1),r.value.length?(L(),R(`div`,Dl,[(L(!0),R(F,null,_r(r.value,e=>(L(),R(`div`,{key:`input-${e.name}`,class:`authoring-list__row`},[z(`strong`,null,E(o(e)),1),z(`span`,null,E(e.name),1),z(`code`,null,E(e.type||`any`),1)]))),128))])):(L(),R(`div`,Ol,`暂无输入变量`))]),z(`section`,kl,[s[16]||=z(`div`,{class:`authoring-card__eyebrow`},`输出`,-1),i.value.length?(L(),R(`div`,Al,[(L(!0),R(F,null,_r(i.value,e=>(L(),R(`div`,{key:`output-${e.name}`,class:`authoring-list__row`},[z(`strong`,null,E(o(e)),1),z(`span`,null,E(e.name),1),z(`code`,null,E(e.type||`any`),1)]))),128))])):(L(),R(`div`,jl,`暂无输出变量`))]),z(`section`,Ml,[s[20]||=z(`div`,{class:`authoring-card__eyebrow`},`默认故障槽位`,-1),z(`label`,Nl,[s[17]||=z(`span`,null,`槽位名称`,-1),Nn(z(`input`,{"onUpdate:modelValue":s[4]||=e=>a.slotName=e,"data-authoring-slot-name":``,type:`text`},null,512),[[uo,a.slotName]])]),z(`label`,Pl,[s[19]||=z(`span`,null,`槽位类型`,-1),Nn(z(`select`,{"onUpdate:modelValue":s[5]||=e=>a.slotKind=e,"data-authoring-slot-kind":``},[...s[18]||=[z(`option`,{value:`output_signal`},`输出信号`,-1),z(`option`,{value:`input_signal`},`输入信号`,-1),z(`option`,{value:`state_variable`},`内部状态`,-1),z(`option`,{value:`parameter`},`参数`,-1)]],512),[[fo,a.slotKind]])])])]),z(`div`,Fl,[z(`button`,{class:`btn-cancel`,type:`button`,onClick:s[6]||=(...e)=>j(Ao)&&j(Ao)(...e)},`取消`),z(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-component":``,onClick:u},`保存组件`)])])])):qi(``,!0)}},Ll={key:0,class:`overlay overlay--vue open`,"data-testid":`fault-authoring-dialog`},Rl={class:`modal authoring-modal`,role:`dialog`,"aria-modal":`true`,"aria-labelledby":`fault-authoring-title`},zl={class:`mhead`},Bl={class:`authoring-modal__sub`},Vl={class:`mbody authoring-modal__body`},Hl={class:`authoring-card`},Ul={class:`authoring-meta`},Wl={class:`authoring-card authoring-form`},Gl={class:`authoring-form__row`},Kl={class:`authoring-form__row`},ql={class:`authoring-form__row`},Jl=[`value`],Yl={class:`authoring-form__row`},Xl={class:`authoring-form__row`},Zl=[`value`],Ql={class:`authoring-card authoring-form`},$l={class:`authoring-form__row`},eu={class:`authoring-form__row`},tu={class:`authoring-form__row`},nu={class:`mfoot`},ru={__name:`FaultAuthoringDialog`,setup(e){let{dialogsState:t}=No(),n=ya(()=>t.faultAuthoring.target),r=[{value:`bias`,label:`Bias 固定偏置`},{value:`drift`,label:`Drift 缓慢漂移`},{value:`intermittent`,label:`Intermittent 间歇故障`},{value:`noise`,label:`Noise 噪声扰动`},{value:`lock`,label:`Lock 锁定输出`},{value:`tamper`,label:`Tamper 篡改信号`}],i=[{value:`electrical`,label:`电气层`},{value:`physical`,label:`物理层`},{value:`protocol`,label:`协议层`},{value:`local_state`,label:`本地状态故障`}],a=zt({faultId:``,displayName:``,layer:`electrical`,faultClass:`偏差故障`,runtimeBehavior:`bias`,parameters:{bias:.1,start:0,duration:``}});function o(e){return String(e||``).trim().toLowerCase().replace(/[^a-z0-9]+/g,`_`).replace(/^_+|_+$/g,``)}function s(e){a.displayName=`${e?.targetName||e?.targetId||`目标对象`}自定义偏置`,a.faultId=o(`${e?.targetId||`target`}_${e?.slotId||`slot`}_bias`)||`custom_fault_bias`,a.layer=`electrical`,a.faultClass=`偏差故障`,a.runtimeBehavior=`bias`,a.parameters.bias=.1,a.parameters.start=0,a.parameters.duration=``}function c(e){jo(e.detail??{})}function l(){Ws({target:n.value,faultId:a.faultId,displayName:a.displayName,layer:a.layer,faultClass:a.faultClass,runtimeBehavior:a.runtimeBehavior,parameters:a.parameters}).ok!==!1&&Mo()}return zn(n,s,{immediate:!0}),sr(()=>{window.addEventListener(`gz:open-fault-authoring`,c)}),ur(()=>{window.removeEventListener(`gz:open-fault-authoring`,c)}),(e,o)=>j(t).faultAuthoring.open?(L(),R(`div`,Ll,[z(`div`,Rl,[z(`div`,zl,[z(`div`,null,[o[10]||=z(`div`,{id:`fault-authoring-title`,class:`mtitle`},`新增故障模型`,-1),z(`div`,Bl,E(n.value?.targetKind||`target`)+` · `+E(n.value?.targetId||`未选择目标`),1)]),z(`button`,{class:`mclose`,type:`button`,"aria-label":`关闭`,onClick:o[0]||=(...e)=>j(Mo)&&j(Mo)(...e)},`×`)]),z(`div`,Vl,[z(`section`,Hl,[o[11]||=z(`div`,{class:`authoring-card__eyebrow`},`目标槽位`,-1),z(`h3`,null,E(n.value?.targetName||`未命名目标`),1),z(`div`,Ul,[z(`span`,null,E(n.value?.slotName||`未选择槽位`),1),z(`span`,null,E(n.value?.slotId||`slot`),1)])]),z(`section`,Wl,[o[17]||=z(`div`,{class:`authoring-card__eyebrow`},`故障信息`,-1),z(`label`,Gl,[o[12]||=z(`span`,null,`故障 ID`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[1]||=e=>a.faultId=e,"data-authoring-fault-id":``,type:`text`},null,512),[[uo,a.faultId]])]),z(`label`,Kl,[o[13]||=z(`span`,null,`故障名称`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[2]||=e=>a.displayName=e,"data-authoring-fault-name":``,type:`text`,placeholder:`例如：陀螺仪固定偏置`},null,512),[[uo,a.displayName]])]),z(`label`,ql,[o[14]||=z(`span`,null,`故障层级`,-1),Nn(z(`select`,{"onUpdate:modelValue":o[3]||=e=>a.layer=e,"data-authoring-fault-layer":``},[(L(),R(F,null,_r(i,e=>z(`option`,{key:e.value,value:e.value},E(e.label),9,Jl)),64))],512),[[fo,a.layer]])]),z(`label`,Yl,[o[15]||=z(`span`,null,`故障类别`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[4]||=e=>a.faultClass=e,"data-authoring-fault-class":``,type:`text`},null,512),[[uo,a.faultClass]])]),z(`label`,Xl,[o[16]||=z(`span`,null,`运行行为`,-1),Nn(z(`select`,{"onUpdate:modelValue":o[5]||=e=>a.runtimeBehavior=e,"data-authoring-fault-behavior":``},[(L(),R(F,null,_r(r,e=>z(`option`,{key:e.value,value:e.value},E(e.label),9,Zl)),64))],512),[[fo,a.runtimeBehavior]])])]),z(`section`,Ql,[o[21]||=z(`div`,{class:`authoring-card__eyebrow`},`默认参数`,-1),z(`label`,$l,[o[18]||=z(`span`,null,`bias`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[6]||=e=>a.parameters.bias=e,"data-authoring-param-name":`bias`,type:`number`,step:`0.01`},null,512),[[uo,a.parameters.bias]])]),z(`label`,eu,[o[19]||=z(`span`,null,`start`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[7]||=e=>a.parameters.start=e,"data-authoring-param-name":`start`,type:`number`,step:`1`},null,512),[[uo,a.parameters.start]])]),z(`label`,tu,[o[20]||=z(`span`,null,`duration`,-1),Nn(z(`input`,{"onUpdate:modelValue":o[8]||=e=>a.parameters.duration=e,"data-authoring-param-name":`duration`,type:`number`,step:`1`},null,512),[[uo,a.parameters.duration]])])])]),z(`div`,nu,[z(`button`,{class:`btn-cancel`,type:`button`,onClick:o[9]||=(...e)=>j(Mo)&&j(Mo)(...e)},`取消`),z(`button`,{class:`btn-primary`,type:`button`,"data-save-authored-fault":``,onClick:l},`保存故障`)])])])):qi(``,!0)}},iu=`<div class="toast" id="toast"><span id="ti"></span><span id="tm"></span></div>`,au=[`innerHTML`],ou={__name:`ToastHost`,setup(e){return(e,t)=>(L(),R(`div`,{class:`gz-shell-fragment`,"data-testid":`toast-host`,innerHTML:j(iu)},null,8,au))}},su=`// --- 状态 ---\r
 const S={\r
   step:1,\r
   sysLoaded:false,\r
@@ -713,9 +708,16 @@ S.activeCanvasId='canvas-root';\r
 S.canvasTrail=['canvas-root'];\r
 S.canvases={};\r
 \r
-const CANVAS_STAGE={width:1600,height:980,minScale:0.6,maxScale:1.8,nodePadding:24,nodeMinY:118};\r
-const POINTER_DRAG_THRESHOLD=6;\r
-const SCOPE_WINDOW_LAYOUT={defaultWidth:560,estimatedHeight:356,gutter:16,reservedTop:96,cascadeX:36,cascadeY:32};\r
+const CANVAS_STAGE={width:2400,height:1500,minScale:0.3,maxScale:1.8,nodePadding:24,nodeMinY:24};
+const POINTER_DRAG_THRESHOLD=6;
+const SCOPE_WINDOW_LAYOUT={defaultWidth:560,estimatedHeight:356,gutter:16,reservedTop:96,cascadeX:36,cascadeY:32};
+const SCOPE_WINDOW_DEFAULT_SECONDS=4;
+const SCOPE_WINDOW_SIZE_OPTIONS=[
+  {value:2,label:'2s'},
+  {value:4,label:'4s'},
+  {value:8,label:'8s'},
+  {value:'all',label:'全部'}
+];
 const NODE_DRAG={active:false,engaged:false,pointerId:null,nodeId:'',startX:0,startY:0,originX:0,originY:0,clickSuppressUntil:0};\r
 const CANVAS_PAN={active:false,engaged:false,clearSelectionOnPointerUp:false,pointerId:null,startX:0,startY:0,originX:0,originY:0};\r
 const NODE_DOUBLE_CLICK={nodeId:'',timestamp:0};\r
@@ -779,7 +781,7 @@ const COMPONENT_LIBRARY={\r
     badge:'故障',
     className:'b-fault',
     width:196,
-    height:78,
+    height:96,
     defaults:{name:'故障注入',faultType:'故障标签',layer:'飞控故障库',trigger:'按目标绑定'}
   },
   edge_fault_tag:{
@@ -787,7 +789,7 @@ const COMPONENT_LIBRARY={\r
     badge:'故障',
     className:'b-fault',
     width:196,
-    height:78,
+    height:96,
     defaults:{name:'连线故障注入',faultType:'连线故障标签',layer:'飞控故障库',trigger:'按连线绑定'}
   },
   instrument_scope:{
@@ -1208,9 +1210,9 @@ function getWorkbenchSnapshotApi(){\r
   return window.__GZ_WORKBENCH_SNAPSHOT__||null;\r
 }\r
 \r
-function createSystemModelSnapshot(){\r
-  const api=getWorkbenchSnapshotApi();\r
-  return api?.createWorkbenchSnapshot?api.createWorkbenchSnapshot(S):cloneDefaults({\r
+function createSystemModelSnapshot(){
+  const api=getWorkbenchSnapshotApi();
+  return api?.createWorkbenchSnapshot?api.createWorkbenchSnapshot(S):cloneDefaults({
     version:1,\r
     modelNodes:S.modelNodes,\r
     modelEdges:S.modelEdges,\r
@@ -1223,6 +1225,7 @@ function createSystemModelSnapshot(){\r
     activeLineType:S.activeLineType,
     faultedBlks:S.faultedBlks,
     importedFaultModels:S.importedFaultModels,
+    faultInstances:S.faultInstances,
     faultTags:S.faultTags,
     faultInjectionLinks:S.faultInjectionLinks
   });
@@ -1246,6 +1249,7 @@ function restoreSystemModelSnapshot(snapshot){\r
   S.workspaceSource=typeof restored.workspaceSource==='string'?restored.workspaceSource:(S.workspaceSource||'');\r
   S.faultedBlks=restored.faultedBlks||[];
   S.importedFaultModels=restored.importedFaultModels||[];
+  S.faultInstances=Array.isArray(restored.faultInstances)?restored.faultInstances:[];
   S.faultTags=Array.isArray(restored.faultTags)?restored.faultTags:[];
   S.faultInjectionLinks=Array.isArray(restored.faultInjectionLinks)?restored.faultInjectionLinks:[];
   S.faultModels=S.importedFaultModels.length;
@@ -1281,10 +1285,14 @@ function clampInterfaceCount(value,[min,max]){\r
 function normalizeSimulationInterfaceList(items,prefix,fallbackType,minCount=0){\r
   const base=Array.isArray(items)?items:[];\r
   const normalized=base\r
-    .map((item,index)=>({\r
-      name:String(item?.name||\`\${prefix} \${index+1}\`).trim()||\`\${prefix} \${index+1}\`,\r
-      type:PORT_FORMATS.includes(item?.type)?item.type:(fallbackType||'标量')\r
-    }))\r
+    .map((item,index)=>{
+      const source=item&&typeof item==='object'?item:{};
+      return {
+        ...source,
+        name:String(source.name||source.displayName||source.varName||source.key||\`\${prefix} \${index+1}\`).trim()||\`\${prefix} \${index+1}\`,
+        type:PORT_FORMATS.includes(source.type)?source.type:(fallbackType||'标量')
+      };
+    })
     .filter(Boolean);\r
   while(normalized.length<minCount){\r
     normalized.push({\r
@@ -1784,10 +1792,11 @@ function findNearestEdgeIdByClientPoint(clientX,clientY,threshold=14){\r
   const point=clientToStagePoint(clientX,clientY);\r
   const stageThreshold=threshold/Math.max(S.canvasScale,0.001);\r
   let nearestId='';\r
-  let nearestDistance=Infinity;\r
-\r
-  paths.forEach(path=>{\r
-    const total=path.getTotalLength();\r
+  let nearestDistance=Infinity;
+
+  paths.forEach(path=>{
+    if(typeof path.getTotalLength!=='function'||typeof path.getPointAtLength!=='function') return;
+    const total=path.getTotalLength();
     const sampleStep=Math.max(8,total/18);\r
     for(let cursor=0;cursor<=total;cursor+=sampleStep){\r
       const pos=path.getPointAtLength(Math.min(cursor,total));\r
@@ -2293,9 +2302,116 @@ function markTopologyDirty(scope='system'){\r
   }\r
 }\r
 \r
-function buildSelectOptions(options,selected){\r
-  return options.map(option=>\`<option value="\${escapeHtml(option)}"\${option===selected?' selected':''}>\${escapeHtml(option)}</option>\`).join('');\r
-}\r
+function buildSelectOptions(options,selected){
+  return options.map(option=>\`<option value="\${escapeHtml(option)}"\${option===selected?' selected':''}>\${escapeHtml(option)}</option>\`).join('');
+}
+
+const FAULT_PARAMETER_LABELS={
+  value:'注入值',
+  bias:'偏置量',
+  std:'噪声标准差',
+  seed:'随机种子',
+  start:'开始时间',
+  duration:'持续时间',
+  mode:'写入方式',
+  rate:'漂移速率',
+  step:'突变量',
+  scale:'衰减系数',
+  delay_steps:'延迟步数',
+  delay_seconds:'延迟时间',
+  drop_rate:'丢包率',
+  dropRate:'丢包率',
+  loss_rate:'丢包率',
+  noise_type:'噪声类型',
+  probability:'发生概率',
+  amplitude:'幅值',
+  frequency:'频率',
+  threshold:'阈值',
+  hold_value:'保持值',
+  fault_value:'故障值'
+};
+
+const FAULT_PARAMETER_CHOICES={
+  mode:[
+    {value:'overwrite',label:'覆盖写入'},
+    {value:'add',label:'叠加'},
+    {value:'multiply',label:'倍率调整'},
+    {value:'zero',label:'置零卡位'},
+    {value:'hold',label:'保持原值'}
+  ],
+  noise_type:[
+    {value:'gaussian',label:'高斯噪声'},
+    {value:'uniform',label:'均匀噪声'},
+    {value:'impulse',label:'脉冲噪声'}
+  ]
+};
+
+function getFaultParameterLabel(key){
+  return FAULT_PARAMETER_LABELS[key]||key;
+}
+
+function getFaultParameterChoices(key){
+  return FAULT_PARAMETER_CHOICES[key]||[];
+}
+
+function getFaultParameterChoiceLabel(key,value){
+  const match=getFaultParameterChoices(key).find(option=>String(option.value)===String(value));
+  return match?.label||String(value??'');
+}
+
+function safeFaultParamDomId(key){
+  return String(key||'param').replace(/[^A-Za-z0-9_-]/g,'-');
+}
+
+function renderFaultParameterControl(key,value,dataAttributeName){
+  const attrName=String(dataAttributeName||'data-fault-param');
+  const attrValue=escapeHtml(key);
+  const choices=getFaultParameterChoices(key);
+  if(choices.length){
+    const selected=choices.some(option=>String(option.value)===String(value))?String(value):String(choices[0].value);
+    const label=getFaultParameterChoiceLabel(key,selected);
+    return \`
+      <details class="fault-param-dropdown" data-fault-param-dropdown="\${escapeHtml(key)}">
+        <summary>
+          <span data-fault-param-choice-label>\${escapeHtml(label)}</span>
+          <span class="fault-param-dropdown__caret">⌄</span>
+        </summary>
+        <div class="fault-param-dropdown__menu">
+          \${choices.map(option=>\`
+            <button type="button" data-fault-param-choice data-fault-param-choice-value="\${escapeHtml(option.value)}" aria-selected="\${String(option.value)===selected?'true':'false'}">\${escapeHtml(option.label)}</button>
+          \`).join('')}
+        </div>
+        <input type="hidden" \${attrName}="\${attrValue}" value="\${escapeHtml(selected)}">
+      </details>
+    \`;
+  }
+  return \`<input \${attrName}="\${attrValue}" value="\${escapeHtml(value)}" aria-label="\${escapeHtml(getFaultParameterLabel(key))}">\`;
+}
+
+function setFaultParameterChoice(button){
+  const dropdown=button?.closest?.('[data-fault-param-dropdown]');
+  if(!dropdown) return;
+  const value=button.getAttribute('data-fault-param-choice-value')||'';
+  const key=dropdown.getAttribute('data-fault-param-dropdown')||'';
+  const hidden=dropdown.querySelector('input[type="hidden"][data-layered-fault-param],input[type="hidden"][data-target-fault-param]');
+  if(hidden) hidden.value=value;
+  const label=dropdown.querySelector('[data-fault-param-choice-label]');
+  if(label) label.textContent=getFaultParameterChoiceLabel(key,value);
+  dropdown.querySelectorAll('[data-fault-param-choice]').forEach(item=>{
+    item.setAttribute('aria-selected',item===button?'true':'false');
+  });
+  dropdown.removeAttribute('open');
+}
+window.setFaultParameterChoice=setFaultParameterChoice;
+if(typeof document!=='undefined'&&!window.__faultParameterChoiceHandlerInstalled){
+  window.__faultParameterChoiceHandlerInstalled=true;
+  document.addEventListener('click',event=>{
+    const button=event.target?.closest?.('[data-fault-param-choice]');
+    if(!button) return;
+    event.preventDefault();
+    setFaultParameterChoice(button);
+  });
+}
 \r
 function buildNodeSubtitle(node){\r
   const props=node.props;\r
@@ -2406,12 +2522,19 @@ function updateNodePositionDOM(node){\r
   element.style.top=\`\${node.y}px\`;\r
 }\r
 \r
-function beginNodeDrag(event,nodeId){\r
-  if(event.button!==0||event.target.closest('.node-port')){return;}\r
-  const node=getNode(nodeId);\r
-  if(!node){return;}\r
-  selectNode(nodeId);\r
-  NODE_DRAG.active=true;\r
+function beginNodeDrag(event,nodeId){
+  if(event.button!==0||event.target.closest('.node-port')){return;}
+  const node=getNode(nodeId);
+  if(!node){return;}
+  event.stopPropagation();
+  window.getSelection?.().removeAllRanges?.();
+  CANVAS_PAN.active=false;
+  CANVAS_PAN.engaged=false;
+  CANVAS_PAN.clearSelectionOnPointerUp=false;
+  CANVAS_PAN.pointerId=null;
+  getCanvasViewport()?.classList.remove('panning');
+  selectNode(nodeId);
+  NODE_DRAG.active=true;
   NODE_DRAG.engaged=false;\r
   NODE_DRAG.pointerId=event.pointerId;\r
   NODE_DRAG.nodeId=nodeId;\r
@@ -2774,23 +2897,36 @@ function syncConfigTargets(preferredId=''){\r
   sel.value=nodes.some(node=>node.id===currentValue)?currentValue:nodes[0].id;\r
 }\r
 \r
-function markFaultTarget(targetId){\r
-  S.faultedBlks=targetId?[targetId]:[];\r
-  renderModelNodes();\r
-  if(S.selBlk&&getNode(S.selBlk)){renderPropertyPanel(getNode(S.selBlk));}\r
-  else if(S.selEdge&&getEdge(S.selEdge)){renderPropertyPanel(getEdge(S.selEdge));}\r
-}\r
-\r
+function markFaultTarget(targetId){
+  S.faultedBlks=targetId?[targetId]:[];
+  renderModelNodes();
+  if(S.selBlk&&getNode(S.selBlk)){renderPropertyPanel(getNode(S.selBlk));}
+  else if(S.selEdge&&getEdge(S.selEdge)){renderPropertyPanel(getEdge(S.selEdge));}
+}
+
+function isFaultLibraryDirectInjectionEnabled(){
+  return window.__GZ_ENABLE_FAULT_LIBRARY_DIRECT_INJECTION===true;
+}
+
+function getFaultInjectorDragProfile(type){
+  if(!isFaultLibraryDirectInjectionEnabled()) return null;
+  if(type==='fault_tag') return {targetKind:'node'};
+  if(type==='edge_fault_tag') return {targetKind:'edge'};
+  if(type==='physical_fault_injector') return {targetKind:'node',layer:'physical',componentType:type};
+  if(type==='electrical_fault_injector') return {targetKind:'any',layer:'electrical',componentType:type};
+  if(type==='protocol_fault_injector') return {targetKind:'edge',layer:'protocol',componentType:type};
+  return null;
+}
+
+function getTargetKindForFaultDropTarget(target){
+  return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+}
+
 function createNode(type,rawX,rawY){
   const meta=COMPONENT_LIBRARY[type];
   if(!meta){return;}
   if(type==='fault_tag'||type==='edge_fault_tag'){
-    const handler=type==='edge_fault_tag'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
-    if(handler){
-      handler({x:rawX,y:rawY});
-    }else{
-      toast(type==='edge_fault_tag'?'请将连线故障组件拖到可注入故障的连线上':'请将故障组件拖到可注入故障的目标对象上','w');
-    }
+    toast('当前版本已关闭故障库拖拽注入，请使用物理层/电气层/协议层注入组件先放置，再通过“绑定目标”完成绑定。','w');
     return;
   }
   const props=cloneDefaults(meta.defaults);
@@ -2821,13 +2957,14 @@ function createNode(type,rawX,rawY){
     pythonBinding:type==='simulation_block'?createDefaultPythonBinding():null\r
   });\r
   markTopologyDirty(getMutationScopeForType(type));\r
-  const node=S.modelNodes[S.modelNodes.length-1];\r
-  renderModelNodes();\r
-  syncConfigTargets(node.id);\r
-  selectNode(node.id);\r
-  updateUI();\r
-  toast(\`\${meta.label} 已加入画布\`,'s');\r
-}\r
+  const node=S.modelNodes[S.modelNodes.length-1];
+  renderModelNodes();
+  syncConfigTargets(node.id);
+  selectNode(node.id);
+  updateUI();
+  toast(\`\${meta.label} 已加入画布\`,'s');
+  return node;
+}
 \r
 function initPaletteDrag(){\r
   document.querySelectorAll('.citem-draggable').forEach(item=>{\r
@@ -2835,8 +2972,9 @@ function initPaletteDrag(){\r
       const type=item.dataset.component||'';
       S.dragType=type;
       item.classList.add('citem-dragging');
-      if((type==='fault_tag'||type==='edge_fault_tag')&&window.showCompatibleFaultDropTargets){
-        window.showCompatibleFaultDropTargets({targetKind:type==='edge_fault_tag'?'edge':'node'});
+      const faultProfile=getFaultInjectorDragProfile(type);
+      if(faultProfile&&window.showCompatibleFaultDropTargets){
+        window.showCompatibleFaultDropTargets(faultProfile);
       }
       event.dataTransfer.effectAllowed='copy';
       event.dataTransfer.setData('text/plain',type);
@@ -2861,8 +2999,9 @@ function initCanvasDrop(){\r
     event.preventDefault();
     diagram.classList.add('dragover');
     const dragType=S.dragType||event.dataTransfer?.getData?.('text/plain');
-    if((dragType==='fault_tag'||dragType==='edge_fault_tag')&&window.showCompatibleFaultDropTargets){
-      window.showCompatibleFaultDropTargets({targetKind:dragType==='edge_fault_tag'?'edge':'node'});
+    const faultProfile=getFaultInjectorDragProfile(dragType);
+    if(faultProfile&&window.showCompatibleFaultDropTargets){
+      window.showCompatibleFaultDropTargets(faultProfile);
     }
     event.dataTransfer.dropEffect='copy';
   });
@@ -2876,13 +3015,30 @@ function initCanvasDrop(){\r
     const type=event.dataTransfer.getData('text/plain')||S.dragType;
     if(!COMPONENT_LIBRARY[type]){return;}
     const point=clientToStagePoint(event.clientX,event.clientY);
-    if((type==='fault_tag'||type==='edge_fault_tag')&&(window.handleFaultComponentDrop||window.handleLineFaultComponentDrop)){
+    const faultProfile=getFaultInjectorDragProfile(type);
+    if(faultProfile&&(window.handleFaultComponentDrop||window.handleLineFaultComponentDrop)){
       const target=window.getFaultComponentDropTargetFromClientPoint
-        ?window.getFaultComponentDropTargetFromClientPoint(event.clientX,event.clientY,{targetKind:type==='edge_fault_tag'?'edge':'node'})
+        ?window.getFaultComponentDropTargetFromClientPoint(event.clientX,event.clientY,faultProfile)
         :null;
-      const handler=type==='edge_fault_tag'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
-      handler?.({x:point.x,y:point.y,target,clientX:event.clientX,clientY:event.clientY});
-      return;
+      if(target){
+        const kind=getTargetKindForFaultDropTarget(target);
+        const handler=kind==='edge'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
+        const result=handler?.({
+          ...faultProfile,
+          x:point.x,
+          y:point.y,
+          target,
+          clientX:event.clientX,
+          clientY:event.clientY
+        });
+        if(result?.ok||type==='fault_tag'||type==='edge_fault_tag'){
+          return;
+        }
+      }else if(type==='fault_tag'||type==='edge_fault_tag'){
+        const handler=type==='edge_fault_tag'?window.handleLineFaultComponentDrop:window.handleFaultComponentDrop;
+        handler?.({x:point.x,y:point.y,target,clientX:event.clientX,clientY:event.clientY,...faultProfile});
+        return;
+      }
     }
     createNode(type,point.x,point.y);
   });
@@ -3905,7 +4061,7 @@ const SIM = {\r
   duration:10,\r
   stepSize:0.1,\r
   datasetName:'test',\r
-  realtime:false,\r
+  realtime:true,
   activeScopeId:'',\r
   scopeWindows:{},\r
   scopeWindowZ:10,\r
@@ -3989,17 +4145,19 @@ function listOpenScopeWindows(){\r
 \r
 function ensureScopeWindow(scopeId){\r
   ensureScopeWindowStore();\r
-  const existing=SIM.scopeWindows[scopeId];\r
-  if(existing){\r
-    existing.open=true;\r
-    return existing;\r
-  }\r
+  const existing=SIM.scopeWindows[scopeId];
+  if(existing){
+    existing.open=true;
+    existing.windowSeconds=normalizeScopeWindowSeconds(existing.windowSeconds);
+    return existing;
+  }
   const index=Object.keys(SIM.scopeWindows).length;\r
   const created={\r
-    scopeId,\r
-    open:true,\r
-    mode:'overlay',\r
-    x:SCOPE_WINDOW_LAYOUT.gutter+index*SCOPE_WINDOW_LAYOUT.cascadeX,\r
+    scopeId,
+    open:true,
+    mode:'overlay',
+    windowSeconds:SCOPE_WINDOW_DEFAULT_SECONDS,
+    x:SCOPE_WINDOW_LAYOUT.gutter+index*SCOPE_WINDOW_LAYOUT.cascadeX,
     y:SCOPE_WINDOW_LAYOUT.reservedTop+index*SCOPE_WINDOW_LAYOUT.cascadeY,\r
     z:++SIM.scopeWindowZ\r
   };\r
@@ -4556,19 +4714,19 @@ function updateScopeChrome(){\r
   return scopeNode;\r
 }\r
 \r
-function drawScopeGrid(ctx,width,height){\r
-  ctx.clearRect(0,0,width,height);\r
-  ctx.fillStyle='#f9fbfe';\r
-  ctx.fillRect(0,0,width,height);\r
-  ctx.strokeStyle='#eaf2fb';\r
-  ctx.lineWidth=0.5;\r
+function drawScopeGrid(ctx,width,height){
+  ctx.clearRect(0,0,width,height);
+  ctx.fillStyle='#f8fbff';
+  ctx.fillRect(0,0,width,height);
+  ctx.strokeStyle='#e2ecf7';
+  ctx.lineWidth=0.65;
   for(let x=0;x<width;x+=40){\r
     ctx.beginPath();\r
     ctx.moveTo(x,0);\r
     ctx.lineTo(x,height);\r
     ctx.stroke();\r
   }\r
-  ctx.strokeStyle='#e2eef8';\r
+  ctx.strokeStyle='#d6e4f0';
   for(let y=0;y<height;y+=25){\r
     ctx.beginPath();\r
     ctx.moveTo(0,y);\r
@@ -4577,9 +4735,9 @@ function drawScopeGrid(ctx,width,height){\r
   }\r
 }\r
 \r
-function drawScopeEmpty(ctx,width,height,message){\r
-  drawScopeGrid(ctx,width,height);\r
-  ctx.fillStyle='#b3c8da';\r
+function drawScopeEmpty(ctx,width,height,message){
+  drawScopeGrid(ctx,width,height);
+  ctx.fillStyle='#8ba8c2';
   ctx.font='12px "Microsoft YaHei UI","Segoe UI",sans-serif';\r
   ctx.textAlign='center';\r
   ctx.fillText(message,width/2,height/2);\r
@@ -7768,16 +7926,60 @@ function getScopeChannelKey(portIndex=0){\r
   return Number(portIndex)===1?'ch2':'ch1';\r
 }\r
 \r
-function getSampleValue(sample){\r
-  if(sample&&Number.isFinite(sample.actual)){return sample.actual;}\r
-  if(sample&&Number.isFinite(sample.v)){return sample.v;}\r
-  return 0;\r
-}\r
-\r
-function formatScopeMetric(value){\r
-  const numeric=Number(value);\r
-  return Number.isFinite(numeric)?numeric.toFixed(2):'--';\r
-}\r
+function getSampleValue(sample){
+  if(sample&&Number.isFinite(sample.actual)){return sample.actual;}
+  if(sample&&Number.isFinite(sample.v)){return sample.v;}
+  return 0;
+}
+
+function normalizeScopeWindowSeconds(value){
+  if(value==='all'){return 'all';}
+  const numeric=Number(value);
+  return SCOPE_WINDOW_SIZE_OPTIONS.some(option=>option.value===numeric)
+    ?numeric
+    :SCOPE_WINDOW_DEFAULT_SECONDS;
+}
+
+function getScopeWindowSeconds(scopeWindow){
+  const normalized=normalizeScopeWindowSeconds(scopeWindow?.windowSeconds);
+  if(scopeWindow&&scopeWindow.windowSeconds!==normalized){
+    scopeWindow.windowSeconds=normalized;
+  }
+  return normalized;
+}
+
+function getScopeWindowEndTime(bucket){
+  const allSamples=[...(bucket?.ch1||[]),...(bucket?.ch2||[])];
+  const latestSampleTime=allSamples.reduce((latest,sample)=>{
+    const t=Number(sample?.t);
+    return Number.isFinite(t)?Math.max(latest,t):latest;
+  },Number.NEGATIVE_INFINITY);
+  if(Number.isFinite(latestSampleTime)){return latestSampleTime;}
+  return Number.isFinite(SIM.time)?SIM.time:0;
+}
+
+function filterScopeSamplesByWindow(series,endTime,windowSeconds){
+  const samples=Array.isArray(series)?series:[];
+  if(windowSeconds==='all'){return samples.slice();}
+  const seconds=Math.max(Number(windowSeconds)||SCOPE_WINDOW_DEFAULT_SECONDS,SIM.stepSize||0.001);
+  const startTime=Math.max(0,endTime-seconds);
+  return samples.filter(sample=>{
+    const t=Number(sample?.t);
+    return Number.isFinite(t)&&t>=startTime&&t<=endTime;
+  });
+}
+
+function buildScopeWindowSizeButtons(scopeWindow){
+  const current=getScopeWindowSeconds(scopeWindow);
+  return SCOPE_WINDOW_SIZE_OPTIONS.map(option=>\`
+    <button type="button" class="scope-window__segment scope-window__size\${current===option.value?' is-active':''}" data-scope-window-size="\${option.value}" data-scope-id="\${scopeWindow.scopeId}">\${option.label}</button>
+  \`).join('');
+}
+
+function formatScopeMetric(value){
+  const numeric=Number(value);
+  return Number.isFinite(numeric)?numeric.toFixed(2):'--';
+}
 \r
 function summarizeScopeChannel(samples){\r
   if(!samples?.length){\r
@@ -7821,10 +8023,10 @@ function prepareScopeCanvas(canvas){\r
   return {ctx,width,height};\r
 }\r
 \r
-function drawScopeTrace(ctx,series,color,getX,getY){\r
-  if(!ctx||!series.length){return;}\r
-  ctx.strokeStyle=color;\r
-  ctx.lineWidth=1.5;\r
+function drawScopeTrace(ctx,series,color,getX,getY){
+  if(!ctx||!series.length){return;}
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2;
   ctx.beginPath();\r
   series.forEach((sample,index)=>{\r
     const x=getX(sample.t,index,series.length);\r
@@ -7840,16 +8042,18 @@ function drawScopeWindow(scopeId){\r
   const canvas=scopeEl.querySelector('[data-scope-role="wave-canvas"]');\r
   if(!canvas){return;}\r
   const {ctx,width,height}=prepareScopeCanvas(canvas);\r
-  if(!ctx){return;}\r
-  const scopeWindow=ensureScopeWindow(scopeId);\r
-  const samples=ensureScopeChannelBucket(SIM.actual,scopeId);\r
-  const ch1Series=samples.ch1.slice(-240);\r
-  const ch2Series=samples.ch2.slice(-240);\r
-  const visibleSeries=scopeWindow.mode==='ch1'\r
-    ?ch1Series\r
-    :scopeWindow.mode==='ch2'\r
-      ?ch2Series\r
-      :ch1Series.concat(ch2Series);\r
+  if(!ctx){return;}
+  const scopeWindow=ensureScopeWindow(scopeId);
+  const samples=ensureScopeChannelBucket(SIM.actual,scopeId);
+  const windowSeconds=getScopeWindowSeconds(scopeWindow);
+  const windowEndTime=getScopeWindowEndTime(samples);
+  const ch1Series=filterScopeSamplesByWindow(samples.ch1,windowEndTime,windowSeconds);
+  const ch2Series=filterScopeSamplesByWindow(samples.ch2,windowEndTime,windowSeconds);
+  const visibleSeries=scopeWindow.mode==='ch1'
+    ?ch1Series
+    :scopeWindow.mode==='ch2'
+      ?ch2Series
+      :ch1Series.concat(ch2Series);
   if(!visibleSeries.length){\r
     drawScopeEmpty(ctx,width,height,'连接 CH1 或 CH2 后开始仿真');\r
     return;\r
@@ -7866,8 +8070,12 @@ function drawScopeWindow(scopeId){\r
     maxValue+=padding;\r
     minValue-=padding;\r
   }\r
-  const startTime=Math.min(...visibleSeries.map(sample=>sample.t||0));\r
-  const endTime=Math.max(...visibleSeries.map(sample=>sample.t||0),startTime+SIM.stepSize);\r
+  const startTime=windowSeconds==='all'
+    ?Math.min(...visibleSeries.map(sample=>sample.t||0))
+    :Math.max(0,windowEndTime-Number(windowSeconds));
+  const endTime=windowSeconds==='all'
+    ?Math.max(...visibleSeries.map(sample=>sample.t||0),startTime+SIM.stepSize)
+    :Math.max(windowEndTime,startTime+SIM.stepSize);
   const span=Math.max(endTime-startTime,SIM.stepSize,0.001);\r
   const getX=time=>18+((time-startTime)/span)*(width-36);\r
   const getY=value=>14+(maxValue-value)/(maxValue-minValue)*(height-28);\r
@@ -7880,25 +8088,31 @@ function drawScopeWindow(scopeId){\r
     ctx.lineTo(width,zeroY);\r
     ctx.stroke();\r
   }\r
-  if(scopeWindow.mode!=='ch2'){\r
-    drawScopeTrace(ctx,ch1Series,'#1d6fbf',getX,getY);\r
-  }\r
-  if(scopeWindow.mode!=='ch1'){\r
-    drawScopeTrace(ctx,ch2Series,'#16a34a',getX,getY);\r
-  }\r
+  if(scopeWindow.mode!=='ch2'){
+    drawScopeTrace(ctx,ch1Series,'#0f62fe',getX,getY);
+  }
+  if(scopeWindow.mode!=='ch1'){
+    drawScopeTrace(ctx,ch2Series,'#24a148',getX,getY);
+  }
   ctx.fillStyle='#7a9ab8';\r
   ctx.font='10px JetBrains Mono,monospace';\r
   ctx.fillText(\`\${startTime.toFixed(1)}s\`,6,height-6);\r
   ctx.fillText(\`\${endTime.toFixed(1)}s\`,Math.max(width-44,6),height-6);\r
 }\r
 \r
-function setScopeDisplayMode(scopeId,mode){\r
-  const scopeWindow=ensureScopeWindow(scopeId);\r
-  scopeWindow.mode=mode;\r
-  renderScopeWindows();\r
-}\r
-\r
-function startScopeWindowDrag(event,scopeId){\r
+function setScopeDisplayMode(scopeId,mode){
+  const scopeWindow=ensureScopeWindow(scopeId);
+  scopeWindow.mode=mode;
+  renderScopeWindows();
+}
+
+function setScopeWindowSize(scopeId,value){
+  const scopeWindow=ensureScopeWindow(scopeId);
+  scopeWindow.windowSeconds=normalizeScopeWindowSeconds(value);
+  renderScopeWindows();
+}
+
+function startScopeWindowDrag(event,scopeId){
   const scopeWindow=ensureScopeWindow(scopeId);\r
   focusScopeWindow(scopeId);\r
   SCOPE_WINDOW_DRAG.active=true;\r
@@ -8013,11 +8227,13 @@ renderScopeWindows = function(){\r
   host.innerHTML=listOpenScopeWindows()\r
     .sort((left,right)=>left.z-right.z)\r
     .map(scopeWindow=>{\r
-      clampScopeWindowPosition(scopeWindow);\r
-      const node=getNode(scopeWindow.scopeId);\r
-      const bucket=ensureScopeChannelBucket(SIM.actual,scopeWindow.scopeId);\r
-      const ch1=summarizeScopeChannel(bucket.ch1);\r
-      const ch2=summarizeScopeChannel(bucket.ch2);\r
+      clampScopeWindowPosition(scopeWindow);
+      const node=getNode(scopeWindow.scopeId);
+      const bucket=ensureScopeChannelBucket(SIM.actual,scopeWindow.scopeId);
+      const windowSeconds=getScopeWindowSeconds(scopeWindow);
+      const windowEndTime=getScopeWindowEndTime(bucket);
+      const ch1=summarizeScopeChannel(filterScopeSamplesByWindow(bucket.ch1,windowEndTime,windowSeconds));
+      const ch2=summarizeScopeChannel(filterScopeSamplesByWindow(bucket.ch2,windowEndTime,windowSeconds));
       const ch1Metrics={\r
         current:formatScopeMetric(ch1.current),\r
         min:formatScopeMetric(ch1.min),\r
@@ -8037,20 +8253,31 @@ renderScopeWindows = function(){\r
       const mode=scopeWindow.mode||'overlay';\r
       return \`\r
         <section class="scope-window" data-scope-id="\${scopeWindow.scopeId}" style="left:\${scopeWindow.x}px;top:\${scopeWindow.y}px;z-index:\${scopeWindow.z}">\r
-          <header class="scope-window__header" data-scope-drag-handle="\${scopeWindow.scopeId}">\r
-            <div class="scope-window__header-main">\r
-              <div class="scope-window__identity">\r
-                <div class="scope-window__title">\${escapeHtml(node?.props?.name||node?.name||'示波器')}</div>\r
-              </div>\r
-              <div class="scope-window__toolbar">\r
-                <button type="button" class="scope-window__mode\${mode==='overlay'?' is-active':''}" data-scope-mode="overlay" data-scope-id="\${scopeWindow.scopeId}">叠加</button>\r
-                <button type="button" class="scope-window__mode\${mode==='ch1'?' is-active':''}" data-scope-mode="ch1" data-scope-id="\${scopeWindow.scopeId}">CH1</button>\r
-                <button type="button" class="scope-window__mode\${mode==='ch2'?' is-active':''}" data-scope-mode="ch2" data-scope-id="\${scopeWindow.scopeId}">CH2</button>\r
-                <button type="button" class="scope-window__close" data-scope-close="\${scopeWindow.scopeId}">关闭 ×</button>\r
-              </div>\r
-            </div>\r
-          </header>\r
-          <div class="scope-window__signal-band">\r
+          <header class="scope-window__header" data-scope-drag-handle="\${scopeWindow.scopeId}">
+            <div class="scope-window__header-main">
+              <div class="scope-window__identity">
+                <div class="scope-window__title">\${escapeHtml(node?.props?.name||node?.name||'示波器')}</div>
+              </div>
+              <button type="button" class="scope-window__close" data-scope-close="\${scopeWindow.scopeId}">关闭 ×</button>
+            </div>
+          </header>
+          <div class="scope-window__toolbar" data-scope-toolbar>
+            <div class="scope-window__control-group">
+              <span class="scope-window__group-label">显示模式</span>
+              <div class="scope-window__segmented" data-scope-mode-group>
+                <button type="button" class="scope-window__segment\${mode==='overlay'?' is-active':''}" data-scope-mode="overlay" data-scope-id="\${scopeWindow.scopeId}">叠加</button>
+                <button type="button" class="scope-window__segment\${mode==='ch1'?' is-active':''}" data-scope-mode="ch1" data-scope-id="\${scopeWindow.scopeId}">CH1</button>
+                <button type="button" class="scope-window__segment\${mode==='ch2'?' is-active':''}" data-scope-mode="ch2" data-scope-id="\${scopeWindow.scopeId}">CH2</button>
+              </div>
+            </div>
+            <div class="scope-window__control-group">
+              <span class="scope-window__group-label">时间窗口</span>
+              <div class="scope-window__segmented scope-window__segmented--window" data-scope-window-group>
+              \${buildScopeWindowSizeButtons(scopeWindow)}
+              </div>
+            </div>
+          </div>
+          <div class="scope-window__signal-band">
             <div class="scope-window__signals">\r
               <span class="scope-window__tag" data-scope-tag="ch1" data-connected="\${ch1.connected}" title="\${escapeHtml(ch1TagLabel)}">\r
                 <span class="scope-window__tag-prefix">CH1:</span>\r
@@ -8086,7 +8313,7 @@ renderScopeWindows = function(){\r
     .join('');\r
   host.querySelectorAll('.scope-window').forEach(el=>{\r
     el.addEventListener('pointerdown',event=>{\r
-      if(event.target.closest('[data-scope-close],[data-scope-mode],[data-scope-drag-handle]')){return;}\r
+      if(event.target.closest('[data-scope-close],[data-scope-mode],[data-scope-window-size],[data-scope-drag-handle]')){return;}
       const scopeWindow=focusScopeWindow(el.dataset.scopeId||'');\r
       el.style.zIndex=scopeWindow.z;\r
     });\r
@@ -8102,14 +8329,20 @@ renderScopeWindows = function(){\r
       closeScopeWindow(btn.dataset.scopeClose||'');\r
     });\r
   });\r
-  host.querySelectorAll('[data-scope-mode]').forEach(btn=>{\r
-    btn.addEventListener('click',event=>{\r
-      event.stopPropagation();\r
-      setScopeDisplayMode(btn.dataset.scopeId||'',btn.dataset.scopeMode||'overlay');\r
-    });\r
-  });\r
-  listOpenScopeWindows().forEach(scopeWindow=>drawScopeWindow(scopeWindow.scopeId));\r
-};\r
+  host.querySelectorAll('[data-scope-mode]').forEach(btn=>{
+    btn.addEventListener('click',event=>{
+      event.stopPropagation();
+      setScopeDisplayMode(btn.dataset.scopeId||'',btn.dataset.scopeMode||'overlay');
+    });
+  });
+  host.querySelectorAll('[data-scope-window-size]').forEach(btn=>{
+    btn.addEventListener('click',event=>{
+      event.stopPropagation();
+      setScopeWindowSize(btn.dataset.scopeId||'',btn.dataset.scopeWindowSize||SCOPE_WINDOW_DEFAULT_SECONDS);
+    });
+  });
+  listOpenScopeWindows().forEach(scopeWindow=>drawScopeWindow(scopeWindow.scopeId));
+};
 \r
 renderModelNodes = function(){\r
   __dualScopeRenderModelNodes();\r
@@ -8415,8 +8648,9 @@ Object.assign(window,{\r
   goToRootCanvas,\r
   navigateToCanvas,\r
   syncSubsystemInterfaceCounts,\r
-  refreshMiddleAssignEditor,\r
-  startScopeWindowDrag,\r
+  refreshMiddleAssignEditor,
+  setScopeWindowSize,
+  startScopeWindowDrag,
   __GZ_STATE__:S,\r
   __GZ_SIM__:SIM\r
 });\r
@@ -10959,7 +11193,8 @@ Object.assign(window,{\r
 \r
 // --- Typed property panel, fault cancellation, and edge signal metadata ---\r
 (function(){\r
-  const PANEL_TABS=['overview','parameters','faults','outputs'];\r
+  const PANEL_TABS=['overview','parameters','faults','outputs'];
+  const SCOPE_TAB_LABELS={overview:'\\u5c5e\\u6027',parameters:'\\u91c7\\u6837\\u4e0e\\u901a\\u9053',outputs:'\\u5bfc\\u51fa\\u8bbe\\u7f6e'};
   const TAB_LABELS={overview:'属性',parameters:'参数配置',faults:'故障设置',outputs:'输出配置'};\r
   S.propertyPanelTab=PANEL_TABS.includes(S.propertyPanelTab)?S.propertyPanelTab:'overview';\r
 \r
@@ -10976,26 +11211,75 @@ Object.assign(window,{\r
     return Boolean(target?.sourceNodeId&&target?.targetNodeId&&!target?.type);\r
   }\r
 \r
-  function getSelectedPropertyTarget(){\r
-    if(S.selEdge){return getEdge(S.selEdge);}\r
-    if(S.selBlk){return getNode(S.selBlk);}\r
-    return null;\r
-  }\r
-\r
-  function syncPropertyTabs(){\r
-    document.querySelectorAll('.props-tab').forEach((button,index)=>{\r
-      const tab=button.dataset.propsTab||PANEL_TABS[index]||'overview';\r
-      button.dataset.propsTab=tab;\r
-      button.classList.toggle('is-active',tab===S.propertyPanelTab);\r
-      button.setAttribute('aria-selected',tab===S.propertyPanelTab?'true':'false');\r
-      if(!button.getAttribute('type')){button.setAttribute('type','button');}\r
-      if(!button.dataset.tabListenerBound){\r
-        button.addEventListener('click',()=>setPropertyPanelTab(tab));\r
-        button.dataset.tabListenerBound='true';\r
-      }\r
-      if(TAB_LABELS[tab]&&!button.textContent.trim()){button.textContent=TAB_LABELS[tab];}\r
-    });\r
-  }\r
+  function getSelectedPropertyTarget(){
+    if(S.selEdge){return getEdge(S.selEdge);}
+    if(S.selBlk){return getNode(S.selBlk);}
+    return null;
+  }
+
+  function getSelectedFaultTag(){
+    if(!S.selFaultTag||!Array.isArray(S.faultTags)){return null;}
+    return S.faultTags.find(tag=>tag&&tag.id===S.selFaultTag)||null;
+  }
+
+  function isLayeredFaultInjectorPanelTarget(target){
+    return Boolean(target&&[
+      'physical_fault_injector',
+      'electrical_fault_injector',
+      'protocol_fault_injector'
+    ].includes(target.type));
+  }
+
+  function getCurrentPropertyPanelKind(target=getSelectedPropertyTarget()){
+    if(getSelectedFaultTag()){return 'fault-tag';}
+    if(!target){return 'empty';}
+    if(isEdgeTarget(target)){return 'edge';}
+    if(target.type==='instrument_scope'){return 'scope';}
+    if(['instrument_logger','instrument_spectrum','instrument_signal_flow'].includes(target.type)){return 'instrument';}
+    if(isLayeredFaultInjectorPanelTarget(target)){return 'fault-injector';}
+    return 'component';
+  }
+
+  function getAvailablePropertyTabs(kind){
+    if(kind==='fault-tag'){return ['overview','parameters'];}
+    if(kind==='fault-injector'){return ['overview'];}
+    if(kind==='scope'){return ['overview','parameters','outputs'];}
+    if(kind==='empty'){return ['overview'];}
+    return PANEL_TABS.slice();
+  }
+
+  function getPropertyTabLabel(tab,kind){
+    if(kind==='scope'&&SCOPE_TAB_LABELS[tab]){return SCOPE_TAB_LABELS[tab];}
+    return TAB_LABELS[tab]||tab;
+  }
+
+  function syncPropertyTabs(){
+    const kind=getCurrentPropertyPanelKind();
+    const availableTabs=getAvailablePropertyTabs(kind);
+    if(!availableTabs.includes(S.propertyPanelTab)){
+      S.propertyPanelTab=availableTabs[0]||'overview';
+    }
+    document.querySelectorAll('.props-tab').forEach((button,index)=>{ 
+      const tab=button.dataset.propsTab||PANEL_TABS[index]||'overview';
+      const enabled=availableTabs.includes(tab);
+      button.dataset.propsTab=tab;
+      button.hidden=!enabled;
+      button.classList.toggle('is-active',enabled&&tab===S.propertyPanelTab);
+      button.classList.toggle('is-disabled',!enabled);
+      button.setAttribute('aria-selected',enabled&&tab===S.propertyPanelTab?'true':'false');
+      button.setAttribute('aria-disabled',enabled?'false':'true');
+      button.disabled=!enabled;
+      if(!button.getAttribute('type')){button.setAttribute('type','button');}
+      if(!button.dataset.tabListenerBound){
+        button.addEventListener('click',()=>{
+          if(button.disabled){return;}
+          setPropertyPanelTab(tab);
+        });
+        button.dataset.tabListenerBound='true';
+      }
+      button.textContent=getPropertyTabLabel(tab,kind);
+    });
+  }
 \r
   function setHeaderSub(target){\r
     const sub=document.querySelector('.ph-sub');\r
@@ -11509,47 +11793,708 @@ Object.assign(window,{\r
       </div>\`;\r
   }\r
 \r
-  function renderFaultBinding(binding,targetKind,targetId,index){\r
-    const params=binding.parameters||binding.injectedFault?.parameters||{};\r
-    const paramText=Object.keys(params).length\r
-      ?Object.entries(params).map(([key,value])=>\`\${key}=\${value}\`).join(', ')\r
-      :'No parameters';\r
-    const bindingId=binding.bindingId||\`legacy-\${binding.faultModelId||index}\`;\r
-    return \`\r
-      <div class="props-fault-card" data-fault-binding-id="\${text(bindingId)}">\r
-        <div class="props-fault-card__top">\r
-          <div>\r
-            <strong>\${text(binding.name||binding.injectedFault?.name||binding.faultModelId||'Fault')}</strong>\r
-            <span>\${text(binding.layer||binding.injectedFault?.layer||'layer')} · \${text(binding.propagationMode||'signalTransform')}</span>\r
-          </div>\r
-          <button type="button" class="props-secondary props-fault-remove" onclick="removeFaultBinding('\${targetKind}','\${jsString(targetId)}','\${jsString(bindingId)}')">取消</button>\r
-        </div>\r
-        <div class="props-help">\${text(paramText)}</div>\r
-      </div>\`;\r
-  }\r
-\r
-  function renderFaults(target){\r
+  function getFaultBindingPayload(binding){
+    return binding?.injectedFault||binding||{};
+  }
+
+  function getFaultBindingLayer(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.layer||payload.layer||'';
+  }
+
+  function getFaultBindingMode(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.propagationMode||payload.propagationMode||'signalTransform';
+  }
+
+  function getFaultBindingRuntimeBehavior(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.runtimeBehavior||payload.runtimeBehavior||'runtime';
+  }
+
+  function getFaultBindingInjectionForm(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.injectionForm||payload.injectionForm||'';
+  }
+
+  function getFaultBindingObject(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.bindingObject||payload.bindingObject||payload.targetVariable||binding?.targetVariable||'';
+  }
+
+  function getFaultBindingTargetField(binding){
+    const payload=getFaultBindingPayload(binding);
+    return binding?.targetField||payload.targetField||'';
+  }
+
+  function getFaultObjectLabelForPanel(binding,target,targetKind){
+    const layer=getFaultBindingLayer(binding);
+    const mode=getFaultBindingMode(binding);
+    const form=getFaultBindingInjectionForm(binding);
+    if(targetKind==='edge'){
+      return layer==='protocol'||mode==='protocolEdge'||form==='protocol-bus'
+        ?'连接线传递数据'
+        :'连线连续信号';
+    }
+    return layer==='physical'||form==='module-variable'
+      ?'模块参数/变量'
+      :'模块变量';
+  }
+
+  function renderFaultBindingTargetMap(binding,target,targetKind){
+    const bindingObject=getFaultBindingObject(binding);
+    const targetField=getFaultBindingTargetField(binding);
+    const rows=[
+      ['故障对象',getFaultObjectLabelForPanel(binding,target,targetKind)],
+      ['绑定信号',bindingObject||'未设置']
+    ];
+    let help='故障会作用于当前目标声明的绑定对象。';
+    if(targetKind==='edge'){
+      const source=getNode(target?.sourceNodeId);
+      const dest=getNode(target?.targetNodeId);
+      const signal=edgePrimarySignal(target)||{};
+      rows.push(['作用连线',\`\${source?.props?.name||target?.sourceNodeId||'源端'} -> \${dest?.props?.name||target?.targetNodeId||'目标端'}\`]);
+      rows.push(['通道ID',signal.channelId||target?.channelId||'未设置']);
+      rows.push(['CAN报文',signal.messageId||target?.messageId||'未设置']);
+      rows.push(['载荷类型',signal.payloadKind||target?.payloadKind||'未设置']);
+      help=getFaultObjectLabelForPanel(binding,target,targetKind)==='连接线传递数据'
+        ?'协议层故障作用于当前连接线传递的数据，包括该连线的信号、通道、报文和载荷。'
+        :'电气层故障作用于当前连线上的连续信号。';
+    }else{
+      rows.push(['目标字段',targetField||'按槽位定义']);
+      help='模块故障作用于组件自身声明的参数、输入、输出或中间变量。';
+    }
+    if(targetField&&targetKind==='edge'){
+      rows.push(['目标字段',targetField]);
+    }
+    return \`
+      <div class="props-fault-target-map" data-fault-binding-target>
+        <div class="pglbl">绑定对象</div>
+        \${renderRows(rows)}
+        <div class="props-help">\${text(help)}</div>
+      </div>\`;
+  }
+
+  function renderFaultBinding(binding,target,targetKind,index){
+    const params=binding.parameters||binding.injectedFault?.parameters||{};
+    const paramRows=Object.keys(params).length
+      ?Object.entries(params).map(([key,value])=>\`
+        <span class="props-fault-param">
+          <em>\${text(key)}</em>
+          <b>\${text(value)}</b>
+        </span>\`).join('')
+      :'<div class="props-empty-state props-empty-state--compact">No parameters</div>';
+    const bindingId=binding.bindingId||\`legacy-\${binding.faultModelId||index}\`;
+    const layer=getFaultBindingLayer(binding)||'layer';
+    const mode=getFaultBindingMode(binding);
+    const behavior=getFaultBindingRuntimeBehavior(binding);
+    return \`
+      <div class="props-fault-card" data-fault-binding-id="\${text(bindingId)}">
+        <div class="props-fault-card__top">
+          <div>
+            <strong>\${text(binding.name||binding.injectedFault?.name||binding.faultModelId||'Fault')}</strong>
+            <span>\${text(getLayerLabel(layer))} · \${text(mode)} · \${text(behavior)}</span>
+          </div>
+          <button type="button" class="props-secondary props-fault-remove" onclick="removeFaultBinding('\${targetKind}','\${jsString(target.id)}','\${jsString(bindingId)}')">取消</button>
+        </div>
+        \${renderFaultBindingTargetMap(binding,target,targetKind)}
+        <div class="props-fault-param-grid">\${paramRows}</div>
+      </div>\`;
+  }
+
+  const FAULT_SLOT_CONFIG_LAYERS=['physical','electrical','protocol'];
+  const FAULT_SLOT_CONFIG_LABELS={physical:'物理层',electrical:'电气层',protocol:'协议层'};
+  const FAULT_SLOT_CONFIG_MODELS={
+    physical:['bias','drift','step','degradation','freeze','random'],
+    electrical:['bias','noise','freeze','intermittent'],
+    protocol:['delay','dropout','tamper','stale']
+  };
+
+  function list(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function plainValue(value,fallback=''){
+    const raw=value===undefined||value===null||value===''?fallback:value;
+    const result=String(raw??'').trim();
+    return result||fallback;
+  }
+
+  function stableFaultVariableKey(value,fallback='slot'){
+    return plainValue(value,fallback).replace(/\\s+/g,'_');
+  }
+
+  function defaultFaultVariableField(role,key){
+    if(role==='parameter') return \`params.\${key}\`;
+    if(role==='input') return \`inputs.\${key}\`;
+    if(role==='output') return \`outputs.\${key}\`;
+    if(role==='middle') return \`middleVars.\${key}\`;
+    if(role==='protocol') return \`protocol.\${key}\`;
+    return key;
+  }
+
+  function hasDefaultFaultParameterValue(item){
+    return !!item
+      && typeof item==='object'
+      && Object.prototype.hasOwnProperty.call(item,'default')
+      && item.default!==null
+      && item.default!==undefined;
+  }
+
+  function getPythonBindingFaultParameters(node){
+    const binding=node?.pythonBinding||{};
+    const parsedInputs=list(binding.parsedInterface?.inputs);
+    const source=parsedInputs.length?parsedInputs:list(binding.portMapping?.inputs);
+    return source.filter(hasDefaultFaultParameterValue);
+  }
+
+  function getPythonBindingFaultInterfaceItems(node,group){
+    const binding=node?.pythonBinding||{};
+    const parsedItems=list(binding.parsedInterface?.[group]);
+    return parsedItems.length?parsedItems:list(binding.portMapping?.[group]);
+  }
+
+  function pushFaultConfigVariable(result,seen,role,item,index){
+    if(!item||typeof item!=='object') return;
+    const rawKey=plainValue(item.key||item.id||item.varName||item.name,\`\${role}_\${index+1}\`);
+    const key=stableFaultVariableKey(rawKey,\`\${role}_\${index+1}\`);
+    const identity=key;
+    if(!key||seen.has(identity)) return;
+    const bindingObject=plainValue(item.bindingObject||item.targetVariable||item.varName||item.key||item.id||item.name,key);
+    seen.add(identity);
+    result.push({
+      key,
+      role,
+      name:plainValue(item.displayName||item.name||item.label||item.varName||item.key||item.id,key),
+      targetField:plainValue(item.targetField,defaultFaultVariableField(role,key)),
+      bindingObject,
+      targetVariable:plainValue(item.targetVariable,bindingObject),
+      signalId:plainValue(item.signalId,''),
+      unit:plainValue(item.unit,''),
+      type:plainValue(item.type||item.format,''),
+      parameterKey:role==='parameter'?key:''
+    });
+  }
+
+  function pushFaultConfigDeclaredVariable(result,seen,node,layer,item,index){
+    const existingSlot=list(node?.faultSlots).find(slot=>slotLayer(slot)===layer&&slotVariableKey(slot,index)===stableFaultVariableKey(item&&typeof item==='object'?(item.variableKey||item.key||item.id||item.varName||item.name):item,\`slot_\${index+1}\`));
+    const source=item&&typeof item==='object'?item:(existingSlot||{key:item});
+    const role=plainValue(source.variableRole||source.role||source.kind,layer);
+    const key=stableFaultVariableKey(source.variableKey||source.key||source.id||source.varName||source.name,\`slot_\${index+1}\`);
+    if(result.some(variable=>variable.key===key)) return;
+    pushFaultConfigVariable(result,seen,role,{
+      key,
+      name:source.slotName||source.displayName||source.name||source.label,
+      targetField:source.targetField||defaultFaultVariableField(role,key),
+      bindingObject:source.bindingObject||source.targetVariable||source.varName||source.key||source.id||source.name||key,
+      targetVariable:source.targetVariable||source.bindingObject||source.varName||source.key||source.id||source.name||key,
+      signalId:source.signalId,
+      unit:source.unit,
+      type:source.type||source.format
+    },index);
+  }
+
+  function pushFaultConfigDeclarationVariables(result,seen,node){
+    const source=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    if(!source||typeof source!=='object'||Array.isArray(source)) return;
+    FAULT_SLOT_CONFIG_LAYERS.forEach(layer=>{
+      const value=source[layer];
+      if(Array.isArray(value)){
+        value
+          .filter(item=>item&&typeof item==='object')
+          .forEach((item,index)=>pushFaultConfigDeclaredVariable(result,seen,node,layer,item,index));
+      }
+    });
+  }
+
+  function getFaultConfigVariables(node){
+    const props=node?.props||{};
+    const result=[];
+    const seen=new Set();
+    [
+      ['parameter',list(props.parameters)],
+      ['parameter',list(props.modelParameters)],
+      ['parameter',list(props.physicalParameters)],
+      ['parameter',list(node?.parameters)],
+      ['parameter',list(node?.physicalParameters)],
+      ['parameter',getPythonBindingFaultParameters(node)],
+      ['input',list(props.inputs)],
+      ['input',getPythonBindingFaultInterfaceItems(node,'inputs')],
+      ['output',list(props.outputs)],
+      ['output',getPythonBindingFaultInterfaceItems(node,'outputs')],
+      ['middle',list(props.middleVars)],
+      ['middle',getPythonBindingFaultInterfaceItems(node,'middleVars')]
+    ].forEach(([role,items])=>items.forEach((item,index)=>pushFaultConfigVariable(result,seen,role,item,index)));
+    pushFaultConfigDeclarationVariables(result,seen,node);
+    return result;
+  }
+
+  function slotLayer(slot){
+    const layer=plainValue(slot?.layer||slot?.layerKey,'electrical');
+    return FAULT_SLOT_CONFIG_LAYERS.includes(layer)?layer:'electrical';
+  }
+
+  function slotVariableKey(slot,index=0){
+    const direct=slot?.variableKey||slot?.parameterKey;
+    if(direct) return stableFaultVariableKey(direct,\`slot_\${index+1}\`);
+    const slotId=plainValue(slot?.slotId||slot?.id,'');
+    if(slotId.includes(':')) return stableFaultVariableKey(slotId.split(':').pop(),\`slot_\${index+1}\`);
+    return stableFaultVariableKey(slotId||slot?.name||slot?.slotName,\`slot_\${index+1}\`);
+  }
+
+  const FAULT_SLOT_ROLE_LABELS={
+    parameter:'参数',
+    input:'输入',
+    output:'输出',
+    middle:'中间量',
+    protocol:'协议'
+  };
+
+  function faultSlotRoleLabel(role){
+    return FAULT_SLOT_ROLE_LABELS[role]||role||'变量';
+  }
+
+  function normalizeFaultInjectionDeclaration(node,variables=[]){
+    const source=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    const declaration={physical:[],electrical:[],protocol:[]};
+    const allowedKeys=new Set(list(variables).map(variable=>variable.key));
+    const keepKey=key=>!allowedKeys.size||allowedKeys.has(key);
+    if(source&&typeof source==='object'&&!Array.isArray(source)){
+      FAULT_SLOT_CONFIG_LAYERS.forEach(layer=>{
+        const value=source[layer];
+        if(Array.isArray(value)){
+          declaration[layer]=value.map((item,index)=>stableFaultVariableKey(
+            item&&typeof item==='object'?(item.variableKey||item.key||item.id||item.varName||item.name):item,
+            \`slot_\${index+1}\`
+          )).filter(keepKey);
+        }else if(typeof value==='string'){
+          declaration[layer]=[stableFaultVariableKey(value,'slot')].filter(keepKey);
+        }else if(value&&typeof value==='object'){
+          declaration[layer]=Object.entries(value)
+            .filter(([,enabled])=>!!enabled)
+            .map(([key])=>stableFaultVariableKey(key,'slot'))
+            .filter(keepKey);
+        }
+      });
+      return declaration;
+    }
+    list(node?.faultSlots).forEach((slot,index)=>{
+      const layer=slotLayer(slot);
+      const key=slotVariableKey(slot,index);
+      if(key&&keepKey(key)&&!declaration[layer].includes(key)) declaration[layer].push(key);
+    });
+    return declaration;
+  }
+
+  function buildFaultSlotsFromPanelDeclaration(node,declaration){
+    const variablesByKey=new Map(getFaultConfigVariables(node).map(variable=>[variable.key,variable]));
+    return FAULT_SLOT_CONFIG_LAYERS.flatMap(layer=>list(declaration[layer]).map(key=>{
+      const variable=variablesByKey.get(key)||{};
+      return {
+        slotId:\`\${layer}:\${key}\`,
+        slotName:variable.name||key,
+        layer,
+        targetField:variable.targetField||defaultFaultVariableField(variable.role||layer,key),
+        bindingObject:variable.bindingObject||key,
+        targetVariable:variable.targetVariable||variable.bindingObject||key,
+        allowedModels:FAULT_SLOT_CONFIG_MODELS[layer].slice(),
+        variableKey:key,
+        variableRole:variable.role||layer,
+        signalId:variable.signalId||'',
+        unit:variable.unit||'',
+        parameterKey:variable.parameterKey||''
+      };
+    }));
+  }
+
+  function renderFaultSlotEditor(target){
+    if(isEdgeTarget(target)||target?.type?.startsWith('fault_')||target?.type?.startsWith('instrument_')){
+      return '';
+    }
+    const variables=getFaultConfigVariables(target);
+    const declaration=normalizeFaultInjectionDeclaration(target,variables);
+    const selectedCount=FAULT_SLOT_CONFIG_LAYERS.reduce((count,layer)=>count+list(declaration[layer]).length,0);
+    const rows=variables.map(variable=>{
+      const layerChecks=FAULT_SLOT_CONFIG_LAYERS.map(layer=>{
+        const checked=declaration[layer].includes(variable.key)?'checked':'';
+        return \`
+          <label class="props-layer-toggle">
+            <input type="checkbox" data-fault-slot-layer="\${text(layer)}" data-fault-slot-var="\${text(variable.key)}" \${checked}>
+            <span>\${text(FAULT_SLOT_CONFIG_LABELS[layer]||layer)}</span>
+          </label>\`;
+      }).join('');
+      return \`
+        <div class="props-fault-slot-row" data-fault-slot-variable="\${text(variable.key)}">
+          <div class="props-fault-variable">
+            <strong>\${text(variable.name)}</strong>
+            <span><b>\${text(faultSlotRoleLabel(variable.role))}</b><code>\${text(variable.key)}</code></span>
+          </div>
+          <div class="props-fault-slot-layers">\${layerChecks}</div>
+        </div>\`;
+    }).join('');
+    return \`
+      <div class="pgroup props-fault-section" data-fault-slot-editor>
+        <div class="props-section-head">
+          <div>
+            <div class="pglbl">可注入变量声明</div>
+            <p>选择组件变量可被哪些故障层级关联。</p>
+          </div>
+          <span class="props-section-count">\${text(selectedCount)} / \${text(variables.length*FAULT_SLOT_CONFIG_LAYERS.length)}</span>
+        </div>
+        <div class="props-fault-slot-table">
+          <div class="props-fault-slot-head">
+            <span>变量</span>
+            <span>故障层级</span>
+          </div>
+          \${rows||'<div class="props-empty-state">No component variables</div>'}
+        </div>
+        <div class="props-help">组件自己声明哪些参数、输入、输出或中间变量允许被物理层、电气层、协议层故障关联。</div>
+      </div>\`;
+  }
+
+  function cloneFaultPanelData(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function syncFaultSlotPackageState(node){
+    const pkg=S.activeModelPackage;
+    if(!pkg||typeof pkg!=='object') return;
+    if(!Array.isArray(pkg.faultCapabilityMap)) pkg.faultCapabilityMap=[];
+    const index=pkg.faultCapabilityMap.findIndex(entry=>entry?.targetKind==='node'&&entry?.targetId===node.id);
+    const previous=index>=0?pkg.faultCapabilityMap[index]:null;
+    const previousSlots=list(previous?.faultSlots);
+    const slots=list(node.faultSlots).map(slot=>{
+      const existing=previousSlots.find(item=>(item?.slotId||item?.id)===slot.slotId&&slotLayer(item)===slot.layer)||{};
+      return {
+        ...existing,
+        ...slot,
+        allowedFaultIds:list(existing.allowedFaultIds),
+        allowedFaultTypeIds:list(existing.allowedFaultTypeIds)
+      };
+    });
+    const entry={
+      ...(previous||{}),
+      targetKind:'node',
+      targetId:node.id,
+      targetName:node.props?.name||node.id,
+      faultSlots:slots
+    };
+    if(index>=0) pkg.faultCapabilityMap.splice(index,1,entry);
+    else pkg.faultCapabilityMap.push(entry);
+
+    [
+      pkg.systemModel?.nodes,
+      pkg.workbenchSnapshot?.modelNodes
+    ].forEach(nodes=>{
+      const packageNode=list(nodes).find(item=>item?.id===node.id);
+      if(!packageNode) return;
+      packageNode.props={...(packageNode.props||{}),faultInjection:cloneFaultPanelData(node.props.faultInjection)};
+      packageNode.faultSlots=cloneFaultPanelData(node.faultSlots);
+    });
+  }
+
+  function pruneFaultBindingsForSlots(node){
+    const validSlotIds=new Set(list(node.faultSlots).map(slot=>slot.slotId));
+    const isInvalidSlotRef=(slotId)=>slotId&&validSlotIds.size&&!validSlotIds.has(slotId);
+    let changed=false;
+    if(Array.isArray(node.faultBindings)){
+      node.faultBindings=node.faultBindings.map(binding=>{
+        const slotId=binding?.slotId||binding?.targetSlotId||binding?.injectedFault?.slotId||binding?.target?.slotId||'';
+        if(!isInvalidSlotRef(slotId)||binding.active===false) return binding;
+        changed=true;
+        return {...binding,active:false,disabledAt:new Date().toISOString(),disabledReason:'fault-slot-removed'};
+      });
+    }
+    const injectedSlotId=node.injectedFault?.slotId||node.injectedFault?.targetSlotId||'';
+    if(isInvalidSlotRef(injectedSlotId)){
+      delete node.injectedFault;
+      changed=true;
+    }
+    const pkg=S.activeModelPackage;
+    if(Array.isArray(pkg?.faultInstances)){
+      pkg.faultInstances=pkg.faultInstances.map(instance=>{
+        const targetId=instance?.targetId||instance?.target?.targetId||instance?.target?.id;
+        const targetKind=instance?.targetKind||instance?.target?.kind||instance?.target?.targetKind||'node';
+        if(targetKind!=='node'||targetId!==node.id||!isInvalidSlotRef(instance?.slotId)) return instance;
+        changed=true;
+        return {...instance,enabled:false,active:false,disabledAt:new Date().toISOString(),disabledReason:'fault-slot-removed'};
+      });
+    }
+    return changed;
+  }
+
+  function savePropertyPanelFaultSlots(){
+    const node=getSelectedPropertyTarget();
+    if(!node||isEdgeTarget(node)) return false;
+    const editor=document.querySelector('[data-fault-slot-editor]');
+    if(!editor) return false;
+    const declaration={physical:[],electrical:[],protocol:[]};
+    editor.querySelectorAll('[data-fault-slot-layer][data-fault-slot-var]').forEach(input=>{
+      if(!input.checked) return;
+      const layer=input.dataset.faultSlotLayer;
+      const key=input.dataset.faultSlotVar;
+      if(!declaration[layer]||!key||declaration[layer].includes(key)) return;
+      declaration[layer].push(key);
+    });
+    node.props=node.props||{};
+    const nextFaultSlots=buildFaultSlotsFromPanelDeclaration(node,declaration);
+    node.props.faultInjection=declaration;
+    node.faultSlots=nextFaultSlots;
+    pruneFaultBindingsForSlots(node);
+    syncFaultSlotPackageState(node);
+    markTopologyDirty('fault');
+    renderModelNodes();
+    renderEdges();
+    renderTypedPropertyPanel(node);
+    syncConfigTargets(node.id);
+    updateUI();
+    toast('故障槽位已保存','s');
+    return true;
+  }
+
+  function getPropertyPanelFaultCatalog(){
+    const pkg=S.activeModelPackage||{};
+    const catalog=Array.isArray(pkg.faultTypeCatalog)&&pkg.faultTypeCatalog.length
+      ?pkg.faultTypeCatalog
+      :(Array.isArray(pkg.faultLibrary)&&pkg.faultLibrary.length?pkg.faultLibrary:S.availableFaultModels);
+    const globalCatalog=Array.isArray(window.__GZ_FAULT_TYPE_CATALOG__?.faultTypes)
+      ?window.__GZ_FAULT_TYPE_CATALOG__.faultTypes
+      :Array.isArray(window.__GZ_FAULT_TYPE_CATALOG__)?window.__GZ_FAULT_TYPE_CATALOG__:[];
+    return (Array.isArray(catalog)&&catalog.length?catalog:globalCatalog).map(model=>({
+      ...model,
+      id:model.id||model.faultTypeId||'',
+      displayName:model.displayName||model.name||model.id||model.faultTypeId||'Fault'
+    })).filter(model=>model.id);
+  }
+
+  function getPropertyPanelCapability(target){
+    const kind=isEdgeTarget(target)?'edge':'node';
+    const pkg=S.activeModelPackage||{};
+    const capability=list(pkg.faultCapabilityMap).find(entry=>entry?.targetId===target?.id&&(entry.targetKind||kind)===kind);
+    if(capability) return capability;
+    if(list(target?.faultSlots).length) return {targetKind:kind,targetId:target.id,faultSlots:target.faultSlots};
+    return null;
+  }
+
+  function getPropertyPanelAllowedFaultIds(slot){
+    return list(slot?.allowedFaultIds).length?list(slot.allowedFaultIds):list(slot?.allowedFaultTypeIds);
+  }
+
+  function getPropertyPanelSlotId(slot,index=0){
+    return plainValue(slot?.slotId||slot?.id,\`slot-\${index+1}\`);
+  }
+
+  function getPropertyPanelSlotLayer(slot){
+    return plainValue(slot?.layer||slot?.layerKey,'electrical');
+  }
+
+  function propertyPanelFaultModelMatchesSlot(model,slot){
+    const allowedIds=getPropertyPanelAllowedFaultIds(slot);
+    if(allowedIds.length) return allowedIds.includes(model.id);
+    return getPropertyPanelSlotLayer(slot)===(model.layer||model.layerKey||'electrical');
+  }
+
+  function getPropertyPanelFaultOptions(target){
+    const capability=getPropertyPanelCapability(target);
+    const slots=list(capability?.faultSlots);
+    const models=getPropertyPanelFaultCatalog();
+    const seen=new Set();
+    return slots.flatMap((slot,index)=>{
+      const slotId=getPropertyPanelSlotId(slot,index);
+      return models.filter(model=>propertyPanelFaultModelMatchesSlot(model,slot)).map(model=>{
+        const key=\`\${model.id}::\${slotId}\`;
+        if(seen.has(key)) return null;
+        seen.add(key);
+        return {model,slot,slotId};
+      }).filter(Boolean);
+    });
+  }
+
+  function readPropertyPanelFaultParameterDraft(panel){
+    const draft={};
+    panel?.querySelectorAll?.('[data-target-fault-param]')?.forEach(input=>{
+      const key=input.getAttribute('data-target-fault-param');
+      if(key) draft[key]=input.value;
+    });
+    return draft;
+  }
+
+  function createPropertyPanelFallbackFault(target,model,slot,parameters){
+    const targetKind=isEdgeTarget(target)?'edge':'node';
+    const slotId=getPropertyPanelSlotId(slot);
+    const bindingObject=plainValue(slot?.bindingObject||slot?.targetVariable||slot?.variableKey||slot?.parameterKey||slotId,slotId);
+    const instance={
+      instanceId:\`fault-inst-\${Date.now()}-\${Math.random().toString(16).slice(2,8)}\`,
+      faultTypeId:model.id,
+      targetKind,
+      targetId:target.id,
+      slotId,
+      slotName:slot?.slotName||slot?.name||slotId,
+      layer:model.layer||slot?.layer||'electrical',
+      bindingObject,
+      targetVariable:bindingObject,
+      targetField:slot?.targetField||'',
+      displayName:model.displayName||model.name||model.id,
+      parameters:{...(model.defaultParameters||{}),...(parameters||{})},
+      active:true
+    };
+    if(!Array.isArray(S.faultInstances)) S.faultInstances=[];
+    S.faultInstances.push(instance);
+    if(S.activeModelPackage) S.activeModelPackage.faultInstances=cloneFaultPanelData(S.faultInstances);
+    const payload={
+      modelId:model.id,
+      faultTypeId:model.id,
+      instanceId:instance.instanceId,
+      name:instance.displayName,
+      layer:instance.layer,
+      runtimeBehavior:model.runtimeBehavior||'',
+      parameters:cloneFaultPanelData(instance.parameters),
+      slotId,
+      slotName:instance.slotName,
+      bindingObject,
+      targetVariable:bindingObject,
+      targetField:instance.targetField
+    };
+    target.injectedFault=payload;
+    target.faultBindings=list(target.faultBindings);
+    const binding={
+      bindingId:\`\${model.id}::\${target.id}::\${slotId}\`,
+      faultModelId:model.id,
+      faultTypeId:model.id,
+      name:instance.displayName,
+      layer:instance.layer,
+      runtimeBehavior:payload.runtimeBehavior,
+      parameters:cloneFaultPanelData(instance.parameters),
+      targetKind,
+      targetId:target.id,
+      slotId,
+      slotName:instance.slotName,
+      bindingObject,
+      targetVariable:bindingObject,
+      targetField:instance.targetField,
+      active:true,
+      injectedFault:payload
+    };
+    const existingIndex=target.faultBindings.findIndex(item=>item.bindingId===binding.bindingId);
+    if(existingIndex>=0) target.faultBindings[existingIndex]=binding;
+    else target.faultBindings.push(binding);
+    if(targetKind==='node'&&Array.isArray(S.faultedBlks)&&!S.faultedBlks.includes(target.id)) S.faultedBlks.push(target.id);
+    markTopologyDirty('fault');
+    renderModelNodes();
+    renderEdges();
+    renderTypedPropertyPanel(target);
+    updateUI();
+    return {ok:true,instance,model,slot};
+  }
+
+  function showPropertyPanelFaultParameters(box,target,model,slot,slotId){
+    box.querySelector('[data-target-fault-parameters]')?.remove();
+    box.querySelectorAll('.target-fault-choice.is-selected').forEach(choice=>choice.classList.remove('is-selected'));
+    box.querySelector(\`[data-activate-compatible-fault="\${jsString(model.id)}"][data-activate-fault-slot="\${jsString(slotId)}"]\`)?.classList.add('is-selected');
+    const entries=Object.entries(model.defaultParameters||{});
+    const panel=document.createElement('form');
+    panel.className='target-fault-parameters';
+    panel.dataset.targetFaultParameters='true';
+    panel.innerHTML=\`
+      <div class="target-fault-parameters__head">
+        <span>参数确认</span>
+        <strong>\${text(model.displayName||model.name||model.id)}</strong>
+        <small>\${text(slot?.slotName||slot?.name||slotId)} · \${text(slot?.bindingObject||slot?.targetVariable||slot?.variableKey||slotId)}</small>
+      </div>
+      <div class="target-fault-parameters__grid">
+        \${entries.length?entries.map(([key,value])=>\`
+          <label class="target-fault-param-row">
+            <span>\${text(getFaultParameterLabel(key))}</span>
+            \${renderFaultParameterControl(key,value,'data-target-fault-param')}
+          </label>\`).join(''):'<div class="target-fault-param-empty">No parameters</div>'}
+      </div>
+      <div class="target-fault-parameters__actions">
+        <button type="button" data-cancel-target-fault>取消</button>
+        <button type="submit" data-confirm-target-fault>确认注入</button>
+      </div>\`;
+    panel.addEventListener('submit',event=>{
+      event.preventDefault();
+      createPropertyPanelFallbackFault(target,model,slot,readPropertyPanelFaultParameterDraft(panel));
+      box.remove();
+    });
+    panel.querySelector('[data-cancel-target-fault]')?.addEventListener('click',()=>panel.remove());
+    box.querySelector('.target-fault-dialog__body')?.appendChild(panel);
+  }
+
+  function openPropertyPanelFallbackFaultDialog(target){
+    document.querySelector('[data-target-fault-dialog]')?.remove();
+    const options=getPropertyPanelFaultOptions(target);
+    const box=document.createElement('div');
+    box.className='target-fault-dialog';
+    box.dataset.targetFaultDialog='true';
+    box.innerHTML=\`
+      <div class="target-fault-dialog__head">
+        <strong>\${text(target?.props?.name||target?.label||target?.id||'Target')}</strong>
+        <button type="button" data-close-target-fault-dialog>关闭</button>
+      </div>
+      <div class="target-fault-dialog__body">
+        \${options.length?options.map(({model,slot,slotId})=>\`
+          <button type="button" class="target-fault-choice" data-activate-compatible-fault="\${text(model.id)}" data-activate-fault-slot="\${text(slotId)}">
+            <span>\${text(model.displayName||model.name||model.id)}</span>
+            <small class="target-fault-choice__slot">\${text(slot?.slotName||slot?.name||slotId)} · \${text(slot?.bindingObject||slot?.targetVariable||slot?.variableKey||slotId)}</small>
+            <small>\${text(model.layer||'electrical')} · \${text(model.runtimeBehavior||model.modelClass||'fault')}</small>
+          </button>\`).join(''):'<div class="target-fault-empty">该对象没有可添加的故障</div>'}
+      </div>\`;
+    document.body.appendChild(box);
+    box.querySelector('[data-close-target-fault-dialog]')?.addEventListener('click',()=>box.remove());
+    box.querySelectorAll('[data-activate-compatible-fault]').forEach(button=>{
+      button.addEventListener('click',()=>{
+        const faultId=button.dataset.activateCompatibleFault||'';
+        const slotId=button.dataset.activateFaultSlot||'';
+        const option=options.find(item=>item.model.id===faultId&&item.slotId===slotId);
+        if(option) showPropertyPanelFaultParameters(box,target,option.model,option.slot,option.slotId);
+      });
+    });
+    return box;
+  }
+
+  function openPropertyPanelTargetFaultDialog(){
+    if(typeof window.openTargetFaultActivationDialog==='function') return window.openTargetFaultActivationDialog();
+    const target=getSelectedPropertyTarget();
+    if(!target) return false;
+    openPropertyPanelFallbackFaultDialog(target);
+    return true;
+  }
+  window.openPropertyPanelTargetFaultDialog=openPropertyPanelTargetFaultDialog;
+
+  function renderFaults(target){
     const targetKind=isEdgeTarget(target)?'edge':'node';\r
     const bindings=activeFaultBindingsForPanel(target);\r
     const injectButton=isEdgeTarget(target)\r
       ?(isProtocolInjectableEdge(target)?'<button type="button" class="props-secondary props-protocol-action" onclick="openProtocolFaultImport()">注入协议故障</button>':'')\r
-      :(!target.type?.startsWith('instrument_')?'<button type="button" class="props-secondary props-fault-action" onclick="openElectricalFaultImport()">注入故障</button>':'');\r
-    const body=bindings.length\r
-      ?bindings.map((binding,index)=>renderFaultBinding(binding,targetKind,target.id,index)).join('')\r
-      :'<div class="props-empty-state">No active faults</div>';\r
-    return \`\r
-      \${renderTargetHeader(target)}\r
-      <div class="pgroup">\r
-        <div class="pglbl">故障实例</div>\r
-        <div class="props-fault-stack">\${body}</div>\r
-        <div class="props-help">一个组件或一条 CAN 边可以挂载多个故障实例；取消后会清除红色故障态，并重新渲染多信号流图。</div>\r
-      </div>\r
-      <div class="props-actions">\r
-        \${injectButton}\r
-        \${bindings.length?\`<button type="button" class="props-danger" data-fault-clear onclick="clearFaultBindings('\${targetKind}','\${jsString(target.id)}')">清空故障</button>\`:''}\r
-        \${isEdgeTarget(target)?'<button type="button" class="props-danger" onclick="deleteSelectedEdge()">删除连线</button>':'<button type="button" class="props-danger" onclick="deleteSelectedNode()">删除模块</button>'}\r
-      </div>\`;\r
-  }\r
+      :(!target.type?.startsWith('instrument_')?'<button type="button" class="props-secondary props-fault-action" data-open-property-fault-dialog>注入故障</button>':'');
+    const body=bindings.length
+      ?bindings.map((binding,index)=>renderFaultBinding(binding,target,targetKind,index)).join('')
+      :'<div class="props-empty-state">No active faults</div>';
+    window.savePropertyPanelFaultSlots=savePropertyPanelFaultSlots;
+    return \`
+      <div class="props-fault-panel">
+        \${renderTargetHeader(target)}
+        \${renderFaultSlotEditor(target)}
+        <div class="pgroup props-fault-section">
+          <div class="props-section-head">
+            <div>
+              <div class="pglbl">故障实例</div>
+              <p>当前目标上已经绑定的故障模型。</p>
+            </div>
+            <span class="props-section-count">\${text(bindings.length)}</span>
+          </div>
+          <div class="props-fault-stack">\${body}</div>
+          <div class="props-help">一个组件或一条 CAN 边可以挂载多个故障实例；取消后会清除红色故障态，并重新渲染多信号流图。</div>
+        </div>
+        <div class="props-actions props-fault-actions">
+          \${!isEdgeTarget(target)?'<button type="button" class="props-save" data-save-fault-slots>保存槽位</button>':''}
+          \${injectButton}
+          \${bindings.length?\`<button type="button" class="props-secondary props-fault-clear" data-fault-clear onclick="clearFaultBindings('\${targetKind}','\${jsString(target.id)}')">清空故障</button>\`:''}
+          \${isEdgeTarget(target)?'<button type="button" class="props-danger" onclick="deleteSelectedEdge()">删除连线</button>':'<button type="button" class="props-danger" onclick="deleteSelectedNode()">删除模块</button>'}
+        </div>
+      </div>\`;
+  }
 \r
   function renderNodeOutputs(node){\r
     const ports=getNodePorts(node);\r
@@ -11648,7 +12593,7 @@ Object.assign(window,{\r
       </div>\`;\r
   }\r
 \r
-  function bindLegacyOverviewActions(target,host){\r
+  function bindLegacyOverviewActions(target,host){
     if(S.propertyPanelTab!=='overview'||!needsLegacyOverviewCompat(target)){return;}\r
     if(target.type==='instrument_scope'){\r
       host.querySelector('[data-scope-action="open"]')?.addEventListener('click',event=>{\r
@@ -11668,12 +12613,244 @@ Object.assign(window,{\r
       event.preventDefault();\r
       event.stopPropagation();\r
       window.__GZ_CLEAR_INSTRUMENT_SAMPLES__?.(target);\r
-    });\r
-  }\r
-\r
-  function renderTypedPropertyPanel(target){\r
-    const pe=document.getElementById('pe');\r
-    const pd=document.getElementById('pd');\r
+    });
+  }
+
+  function bindFaultSlotEditorActions(host){
+    const saveButton=host?.querySelector?.('[data-save-fault-slots]');
+    if(!saveButton||saveButton.dataset.saveFaultSlotsBound){return;}
+    saveButton.addEventListener('click',event=>{
+      event.preventDefault();
+      savePropertyPanelFaultSlots();
+    });
+    saveButton.dataset.saveFaultSlotsBound='true';
+    const injectButton=host?.querySelector?.('[data-open-property-fault-dialog]');
+    if(injectButton&&!injectButton.dataset.openPropertyFaultDialogBound){
+      injectButton.addEventListener('click',event=>{
+        event.preventDefault();
+        openPropertyPanelTargetFaultDialog();
+      });
+      injectButton.dataset.openPropertyFaultDialogBound='true';
+    }
+  }
+
+  function renderScopeOverviewCompact(node){
+    const incoming=typeof getIncomingEdgesForNode==='function'?getIncomingEdgesForNode(node.id):[];
+    const configuredChannelLabel=(index)=>{
+      const raw=String(node.props?.signal||'').trim();
+      if(!raw){return '';}
+      const part=raw.replace(/\\|/g,'/').split('/')[index]||'';
+      return part.replace(new RegExp(\`^\\\\s*CH\\\\s*\${index+1}\\\\s*[:\\\\uFF1A_-]?\\\\s*\`,'i'),'').trim();
+    };
+    const channelCard=(index)=>{
+      const edge=incoming[index];
+      const channelKey=index===1?'ch2':'ch1';
+      const configuredState=typeof getScopePanelChannelState==='function'
+        ?getScopePanelChannelState(node,channelKey)
+        :null;
+      const source=edge&&typeof getNode==='function'?getNode(edge.sourceNodeId):null;
+      let label=configuredState?.label||(edge
+        ?\`\${source?.props?.name||edge.sourceNodeId} / \${getPortLabelForPanel(source,'output',edge.sourcePortIndex||0)}\`
+        :'未接入');
+      const configuredLabel=configuredChannelLabel(index);
+      if(configuredLabel){label=\`\${configuredLabel} · \${label}\`;}
+      return \`
+        <div class="scope-mini-channel \${edge?'is-connected':''}" data-scope-mini-channel="\${index+1}" data-scope-panel-channel="\${channelKey}">
+          <span>CH\${index+1}</span>
+          <strong>\${text(label)}</strong>
+        </div>\`;
+    };
+    return \`
+      <div class="scope-overview-compact" data-scope-overview-panel="\${text(node.id)}" data-scope-panel="oscilloscope">
+        <span class="props-visually-hidden">&#x793a;&#x6ce2;&#x5668;&#x914d;&#x7f6e; &#x6a21;&#x5757;&#x540d;&#x79f0; &#x91c7;&#x6837;&#x7387; &#x901a;&#x9053;&#x8bf4;&#x660e;</span>
+        <button type="button" class="scope-overview-open" data-scope-action="open">查看波形</button>
+        <div class="scope-mini-channel-list">
+          \${channelCard(0)}
+          \${channelCard(1)}
+        </div>
+      </div>\`;
+  }
+
+  const SCOPE_EXPORT_CHANNELS=[
+    {key:'ch1',label:'CH1',fallback:'\\u901a\\u9053 1'},
+    {key:'ch2',label:'CH2',fallback:'\\u901a\\u9053 2'}
+  ];
+  const SCOPE_EXPORT_FIELDS=[
+    {key:'time',label:'\\u65f6\\u95f4'},
+    {key:'actual',label:'\\u5f53\\u524d\\u503c'},
+    {key:'reference',label:'\\u53c2\\u8003\\u503c'},
+    {key:'residual',label:'\\u6b8b\\u5dee'}
+  ];
+
+  function normalizeScopeExportSettings(node){
+    const raw=node?.props?.scopeExport&&typeof node.props.scopeExport==='object'?node.props.scopeExport:{};
+    const allowedChannels=new Set(SCOPE_EXPORT_CHANNELS.map(item=>item.key));
+    const allowedFields=new Set(SCOPE_EXPORT_FIELDS.map(item=>item.key));
+    const channels=Array.isArray(raw.channels)
+      ?raw.channels.filter(item=>allowedChannels.has(item))
+      :SCOPE_EXPORT_CHANNELS.map(item=>item.key);
+    const fields=Array.isArray(raw.fields)
+      ?raw.fields.filter(item=>allowedFields.has(item))
+      :['time','actual','reference','residual'];
+    return {
+      format:'csv',
+      channels:channels.length?channels:SCOPE_EXPORT_CHANNELS.map(item=>item.key),
+      fields:fields.length?fields:['time','actual']
+    };
+  }
+
+  function getScopeExportBucket(scopeId,mode='actual'){
+    const source=mode==='reference'?SIM?.reference:SIM?.actual;
+    if(source&&typeof ensureScopeChannelBucket==='function'){
+      return ensureScopeChannelBucket(source,scopeId);
+    }
+    const samples=source?.scopeSamples?.[scopeId];
+    if(samples&&!Array.isArray(samples)){return samples;}
+    return {ch1:[],ch2:[]};
+  }
+
+  function getScopeChannelDisplayLabel(node,channelKey,index){
+    const state=typeof getScopePanelChannelState==='function'
+      ?getScopePanelChannelState(node,channelKey)
+      :null;
+    const raw=String(node.props?.signal||'').trim();
+    const configured=raw?((raw.replace(/\\|/g,'/').split('/')[index]||'').replace(new RegExp(\`^\\\\s*CH\\\\s*\${index+1}\\\\s*[:\\\\uFF1A_-]?\\\\s*\`,'i'),'').trim()):'';
+    return configured||state?.label||SCOPE_EXPORT_CHANNELS[index]?.fallback||channelKey;
+  }
+
+  function renderScopeExportSettings(node){
+    const settings=normalizeScopeExportSettings(node);
+    const actualBucket=getScopeExportBucket(node.id,'actual');
+    const channelOption=(item,index)=>{
+      const count=Array.isArray(actualBucket[item.key])?actualBucket[item.key].length:0;
+      const checked=settings.channels.includes(item.key)?' checked':'';
+      return \`
+        <label class="scope-export-option">
+          <input type="checkbox" data-scope-export-channel="\${item.key}"\${checked}>
+          <span>
+            <strong>\${text(item.label)}</strong>
+            <em>\${text(getScopeChannelDisplayLabel(node,item.key,index))} · \${count} \${'\\u6761\\u6837\\u672c'}</em>
+          </span>
+        </label>\`;
+    };
+    const fieldOption=(item)=>{
+      const checked=settings.fields.includes(item.key)?' checked':'';
+      return \`
+        <label class="scope-export-chip">
+          <input type="checkbox" data-scope-export-field="\${item.key}"\${checked}>
+          <span>\${text(item.label)}</span>
+        </label>\`;
+    };
+    return \`
+      <div class="scope-export-panel" data-scope-export-settings="\${text(node.id)}">
+        <div class="scope-export-summary">
+          <div>
+            <div class="scope-export-kicker">\\u5bfc\\u51fa\\u683c\\u5f0f</div>
+            <strong>CSV</strong>
+          </div>
+          <span>\${text(settings.channels.length)} \${'\\u4e2a\\u901a\\u9053'} · \${text(settings.fields.length)} \${'\\u4e2a\\u5b57\\u6bb5'}</span>
+        </div>
+        <div class="pgroup">
+          <div class="pglbl">\\u5bfc\\u51fa\\u901a\\u9053</div>
+          <div class="scope-export-options">
+            \${SCOPE_EXPORT_CHANNELS.map(channelOption).join('')}
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pglbl">\\u5bfc\\u51fa\\u5b57\\u6bb5</div>
+          <div class="scope-export-fields">
+            \${SCOPE_EXPORT_FIELDS.map(fieldOption).join('')}
+          </div>
+          <div class="props-help">\\u5bfc\\u51fa\\u65f6\\u4f1a\\u6309\\u901a\\u9053\\u5206\\u884c\\u5199\\u5165 CSV\\uff0c\\u9002\\u5408\\u540e\\u7eed\\u5bf9\\u6bd4\\u6545\\u969c\\u524d\\u540e\\u6ce2\\u5f62\\u3002</div>
+        </div>
+        <div class="props-actions scope-export-actions">
+          <button type="button" class="props-secondary" data-scope-export-save>\\u4fdd\\u5b58\\u5bfc\\u51fa\\u8bbe\\u7f6e</button>
+          <button type="button" class="props-save" data-scope-export-csv>\\u5bfc\\u51fa CSV</button>
+        </div>
+      </div>\`;
+  }
+
+  function readScopeExportSettings(host,node){
+    const channels=[...host.querySelectorAll('[data-scope-export-channel]')]
+      .filter(input=>input.checked)
+      .map(input=>input.dataset.scopeExportChannel)
+      .filter(Boolean);
+    const fields=[...host.querySelectorAll('[data-scope-export-field]')]
+      .filter(input=>input.checked)
+      .map(input=>input.dataset.scopeExportField)
+      .filter(Boolean);
+    return {
+      ...normalizeScopeExportSettings(node),
+      channels:channels.length?channels:['ch1'],
+      fields:fields.length?fields:['time','actual']
+    };
+  }
+
+  function formatScopeCsvValue(value){
+    const numeric=Number(value);
+    return Number.isFinite(numeric)?numeric.toFixed(6):'';
+  }
+
+  function createScopeExportCsv(node,settings){
+    const actualBucket=getScopeExportBucket(node.id,'actual');
+    const referenceBucket=getScopeExportBucket(node.id,'reference');
+    const lines=[['channel',...settings.fields].join(',')];
+    settings.channels.forEach(channelKey=>{
+      const actualSamples=Array.isArray(actualBucket[channelKey])?actualBucket[channelKey]:[];
+      const referenceSamples=Array.isArray(referenceBucket[channelKey])?referenceBucket[channelKey]:[];
+      actualSamples.forEach((sample,index)=>{
+        const reference=referenceSamples[index]||{};
+        const actualValue=sample?.actual??sample?.v;
+        const referenceValue=reference?.reference??reference?.actual??reference?.v;
+        const row={time:sample?.t,actual:actualValue,reference:referenceValue,residual:Number(actualValue)-Number(referenceValue)};
+        lines.push([channelKey,...settings.fields.map(field=>formatScopeCsvValue(row[field]))].join(','));
+      });
+    });
+    return lines.join('\\n');
+  }
+
+  function exportScopeCsv(node,settings){
+    const csv=createScopeExportCsv(node,settings);
+    const safeName=String(node.props?.name||node.id).replace(/[^\\w\\u4e00-\\u9fa5-]+/g,'_');
+    const filename=\`\${safeName||node.id}_scope.csv\`;
+    window.__GZ_LAST_SCOPE_EXPORT__={nodeId:node.id,filename,csv,settings};
+    window.__GZ_LAST_INSTRUMENT_EXPORT__={nodeId:node.id,filename,csv};
+    const userAgent=String(navigator?.userAgent||'');
+    if(typeof Blob!=='undefined'&&typeof URL!=='undefined'&&!/jsdom/i.test(userAgent)){
+      const blob=new Blob([\`\\uFEFF\${csv}\`],{type:'text/csv;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement('a');
+      link.href=url;
+      link.download=filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),200);
+    }
+    toast('\\u793a\\u6ce2\\u5668\\u6570\\u636e\\u5df2\\u5bfc\\u51fa','s');
+  }
+
+  function bindScopeExportActions(node,host){
+    if(!node||node.type!=='instrument_scope'||!host){return;}
+    const saveButton=host.querySelector('[data-scope-export-save]');
+    const exportButton=host.querySelector('[data-scope-export-csv]');
+    saveButton?.addEventListener('click',event=>{
+      event.preventDefault();
+      node.props.scopeExport=readScopeExportSettings(host,node);
+      renderPropertyPanel(node);
+      toast('\\u793a\\u6ce2\\u5668\\u5bfc\\u51fa\\u8bbe\\u7f6e\\u5df2\\u4fdd\\u5b58','s');
+    });
+    exportButton?.addEventListener('click',event=>{
+      event.preventDefault();
+      const settings=readScopeExportSettings(host,node);
+      node.props.scopeExport=settings;
+      exportScopeCsv(node,settings);
+    });
+  }
+
+  function renderTypedPropertyPanel(target){
+    const pe=document.getElementById('pe');
+    const pd=document.getElementById('pd');
     if(!pe||!pd){return;}\r
     syncPropertyTabs();\r
     setHeaderSub(target);\r
@@ -11685,18 +12862,23 @@ Object.assign(window,{\r
     }\r
     pe.style.display='none';\r
     pd.style.display='block';\r
-    if(isEdgeTarget(target)){\r
-      if(S.propertyPanelTab==='parameters'){pd.innerHTML=renderEdgeParameters(target);}\r
-      else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}\r
-      else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderEdgeOutputs(target);}\r
-      else{pd.innerHTML=renderEdgeOverview(target);}\r
-      return;\r
-    }\r
-    if(S.propertyPanelTab==='parameters'){pd.innerHTML=renderNodeParameters(target);}\r
-    else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}\r
-    else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderNodeOutputs(target);}\r
-    else{pd.innerHTML=renderNodeOverview(target);}\r
-    bindLegacyOverviewActions(target,pd);\r
+    if(isEdgeTarget(target)){
+      if(S.propertyPanelTab==='parameters'){pd.innerHTML=renderEdgeParameters(target);}
+      else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}
+      else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderEdgeOutputs(target);}
+      else{pd.innerHTML=renderEdgeOverview(target);}
+      bindFaultSlotEditorActions(pd);
+      return;
+    }
+    if(S.propertyPanelTab==='parameters'){pd.innerHTML=renderNodeParameters(target);}
+    else if(S.propertyPanelTab==='faults'){pd.innerHTML=renderFaults(target);}
+    else if(target.type==='instrument_scope'&&S.propertyPanelTab==='outputs'){pd.innerHTML=renderScopeExportSettings(target);}
+    else if(S.propertyPanelTab==='outputs'){pd.innerHTML=renderNodeOutputs(target);}
+    else if(target.type==='instrument_scope'){pd.innerHTML=renderScopeOverviewCompact(target);}
+    else{pd.innerHTML=renderNodeOverview(target);}
+    bindFaultSlotEditorActions(pd);
+    bindScopeExportActions(target,pd);
+    bindLegacyOverviewActions(target,pd);
     if(target.type==='simulation_block'){\r
       updateModelPackageStatus(target);\r
     }\r
@@ -11713,11 +12895,26 @@ Object.assign(window,{\r
     return result;\r
   };\r
 \r
-  function setPropertyPanelTab(tab){\r
-    S.propertyPanelTab=PANEL_TABS.includes(tab)?tab:'overview';\r
-    syncPropertyTabs();\r
-    renderPropertyPanel(getSelectedPropertyTarget());\r
-  }\r
+  function setPropertyPanelTab(tab){
+    const target=getSelectedPropertyTarget();
+    const kind=getCurrentPropertyPanelKind(target);
+    const availableTabs=getAvailablePropertyTabs(kind);
+    const nextTab=PANEL_TABS.includes(tab)&&availableTabs.includes(tab)
+      ?tab
+      :(availableTabs[0]||'overview');
+    S.propertyPanelTab=nextTab;
+    syncPropertyTabs();
+    const selectedFaultTag=getSelectedFaultTag();
+    if(kind==='fault-tag'&&selectedFaultTag&&typeof window.__GZ_RENDER_FAULT_TAG_PANEL__==='function'){
+      window.__GZ_RENDER_FAULT_TAG_PANEL__(selectedFaultTag);
+      return;
+    }
+    if(kind==='fault-injector'&&target&&typeof window.__GZ_RENDER_LAYERED_FAULT_INJECTOR_PANEL__==='function'){
+      window.__GZ_RENDER_LAYERED_FAULT_INJECTOR_PANEL__(target);
+      return;
+    }
+    renderPropertyPanel(target);
+  }
 \r
   function saveSelectedEdgeMetadata(){\r
     const edge=getEdge(S.selEdge);\r
@@ -11759,9 +12956,9 @@ Object.assign(window,{\r
     if(S.selBlk){saveSelectedNode();}\r
   }\r
 \r
-  function syncFaultPayloadFromBindings(target){\r
-    const active=Array.isArray(target.faultBindings)\r
-      ?target.faultBindings.filter((binding)=>binding&&binding.active!==false)\r
+  function syncFaultPayloadFromBindings(target){
+    const active=Array.isArray(target.faultBindings)
+      ?target.faultBindings.filter((binding)=>binding&&binding.active!==false)
       :[];\r
     if(active.length>0){\r
       target.injectedFault=active[0].injectedFault||target.injectedFault||{\r
@@ -11773,10 +12970,142 @@ Object.assign(window,{\r
       };\r
       return;\r
     }\r
-    delete target.injectedFault;\r
-  }\r
-\r
-  function refreshFaultCancellation(targetKind,target){\r
+    delete target.injectedFault;
+  }
+
+  function getFaultRemovalId(value){
+    return value?.faultModelId
+      || value?.faultTypeId
+      || value?.modelId
+      || value?.faultId
+      || value?.id
+      || value?.injectedFault?.faultModelId
+      || value?.injectedFault?.faultTypeId
+      || value?.injectedFault?.modelId
+      || value?.injectedFault?.faultId
+      || '';
+  }
+
+  function getFaultRemovalInstanceId(value){
+    return value?.instanceId||value?.injectedFault?.instanceId||'';
+  }
+
+  function getFaultRemovalSlotId(value){
+    return value?.slotId||value?.targetSlotId||value?.injectedFault?.slotId||value?.target?.slotId||'';
+  }
+
+  function getFaultRemovalTargetKind(value,fallback='node'){
+    return value?.targetKind||value?.target?.targetKind||value?.target?.kind||value?.injectedFault?.targetKind||fallback;
+  }
+
+  function getFaultRemovalTargetId(value,fallback=''){
+    return value?.targetId
+      || value?.target?.targetId
+      || value?.target?.id
+      || value?.injectedFault?.targetId
+      || value?.targetNodeId
+      || value?.targetEdgeId
+      || fallback;
+  }
+
+  function makeFaultRemovalRef(targetKind,target,binding=null,index=0){
+    const source=binding||target?.injectedFault||{};
+    const bindingId=binding?(binding.bindingId||\`legacy-\${binding.faultModelId||index}\`):'';
+    return {
+      targetKind,
+      targetId:target?.id||'',
+      bindingId,
+      instanceId:getFaultRemovalInstanceId(source),
+      faultId:getFaultRemovalId(source),
+      slotId:getFaultRemovalSlotId(source)
+    };
+  }
+
+  function faultRecordMatchesRemovalRef(record,ref){
+    if(!record||!ref) return false;
+    const recordTargetKind=getFaultRemovalTargetKind(record,ref.targetKind);
+    const recordTargetId=getFaultRemovalTargetId(record,ref.targetId);
+    if(recordTargetId&&recordTargetId!==ref.targetId) return false;
+    if(recordTargetKind&&recordTargetKind!==ref.targetKind) return false;
+    const recordInstanceId=getFaultRemovalInstanceId(record);
+    if(ref.instanceId&&recordInstanceId&&recordInstanceId===ref.instanceId) return true;
+    const recordFaultId=getFaultRemovalId(record);
+    if(ref.faultId&&recordFaultId&&recordFaultId===ref.faultId){
+      const recordSlotId=getFaultRemovalSlotId(record);
+      return !ref.slotId||!recordSlotId||recordSlotId===ref.slotId;
+    }
+    return false;
+  }
+
+  function faultRecordMatchesAnyRemoval(record,refs){
+    return (refs||[]).some(ref=>faultRecordMatchesRemovalRef(record,ref));
+  }
+
+  function hasRemainingActiveFaultId(state,faultId){
+    if(!faultId) return false;
+    return [
+      ...(Array.isArray(state.faultInstances)?state.faultInstances:[]),
+      ...(Array.isArray(state.activeFaults)?state.activeFaults:[]),
+      ...(Array.isArray(state.injectedFaults)?state.injectedFaults:[]),
+      ...(Array.isArray(state.appliedFaults)?state.appliedFaults:[])
+    ].some(item=>item?.active!==false&&getFaultRemovalId(item)===faultId);
+  }
+
+  function removeFaultRuntimeArtifacts(targetKind,target,refs){
+    const normalizedRefs=(refs||[]).filter(ref=>ref&&(ref.instanceId||ref.faultId||ref.bindingId));
+    if(!normalizedRefs.length) return false;
+    let changed=false;
+    ['activeFaults','injectedFaults','appliedFaults','selectedFaults','faultInjectionResults'].forEach(key=>{
+      if(!Array.isArray(S[key])) return;
+      const before=S[key].length;
+      S[key]=S[key].filter(item=>!faultRecordMatchesAnyRemoval(item,normalizedRefs));
+      changed=changed||before!==S[key].length;
+    });
+    if(Array.isArray(S.faultInstances)){
+      S.faultInstances=S.faultInstances.map(instance=>{
+        if(!faultRecordMatchesAnyRemoval(instance,normalizedRefs)||instance.active===false) return instance;
+        changed=true;
+        return {
+          ...instance,
+          active:false,
+          enabled:false,
+          disabledAt:new Date().toISOString(),
+          disabledReason:'fault-cleared-from-property-panel'
+        };
+      });
+      if(S.activeModelPackage){
+        S.activeModelPackage.faultInstances=cloneFaultPanelData(S.faultInstances);
+      }
+    }
+    if(Array.isArray(S.faultTags)){
+      const removedTagIds=new Set(S.faultTags.filter(tag=>faultRecordMatchesAnyRemoval(tag,normalizedRefs)).map(tag=>tag.id).filter(Boolean));
+      const before=S.faultTags.length;
+      S.faultTags=S.faultTags.filter(tag=>!faultRecordMatchesAnyRemoval(tag,normalizedRefs));
+      changed=changed||before!==S.faultTags.length;
+      if(removedTagIds.size&&Array.isArray(S.faultInjectionLinks)){
+        const beforeLinks=S.faultInjectionLinks.length;
+        S.faultInjectionLinks=S.faultInjectionLinks.filter(link=>{
+          if(removedTagIds.has(link.sourceTagId)) return false;
+          if(link.targetNodeId===target?.id||link.targetEdgeId===target?.id){
+            return !normalizedRefs.some(ref=>ref.faultId&&getFaultRemovalId(link)===ref.faultId);
+          }
+          return true;
+        });
+        changed=changed||beforeLinks!==S.faultInjectionLinks.length;
+      }
+    }
+    if(S.injectedFaultMap&&typeof S.injectedFaultMap==='object'){
+      normalizedRefs.forEach(ref=>{
+        if(ref.faultId&&!hasRemainingActiveFaultId(S,ref.faultId)){
+          delete S.injectedFaultMap[ref.faultId];
+          changed=true;
+        }
+      });
+    }
+    return changed;
+  }
+
+  function refreshFaultCancellation(targetKind,target){
     if(!target){return;}\r
     syncFaultPayloadFromBindings(target);\r
     if(targetKind==='node'&&!hasActiveFaultForPanel(target)){\r
@@ -11799,37 +13128,51 @@ Object.assign(window,{\r
     return targetKind==='edge'?getEdge(targetId):getNode(targetId);\r
   }\r
 \r
-  function removeFaultBinding(targetKind,targetId,bindingId){\r
-    const target=resolveFaultTarget(targetKind,targetId);\r
-    if(!target){return false;}\r
-    let changed=false;\r
-    if(Array.isArray(target.faultBindings)){\r
+  function removeFaultBinding(targetKind,targetId,bindingId){
+    const target=resolveFaultTarget(targetKind,targetId);
+    if(!target){return false;}
+    let changed=false;
+    const removedRefs=[];
+    if(Array.isArray(target.faultBindings)){
       target.faultBindings=target.faultBindings.map((binding,index)=>{\r
-        const id=binding?.bindingId||\`legacy-\${binding?.faultModelId||index}\`;\r
-        if(id===bindingId||binding?.faultModelId===bindingId){\r
-          changed=true;\r
-          return {...binding,active:false,disabledAt:new Date().toISOString()};\r
-        }\r
+        const id=binding?.bindingId||\`legacy-\${binding?.faultModelId||index}\`;
+        if(id===bindingId||binding?.faultModelId===bindingId){
+          changed=true;
+          removedRefs.push(makeFaultRemovalRef(targetKind,target,binding,index));
+          return {...binding,active:false,disabledAt:new Date().toISOString()};
+        }
         return binding;\r
       });\r
-    }\r
-    if(!changed&&target.injectedFault){\r
-      delete target.injectedFault;\r
-      changed=true;\r
-    }\r
-    refreshFaultCancellation(targetKind,target);\r
+    }
+    if(!changed&&target.injectedFault){
+      removedRefs.push(makeFaultRemovalRef(targetKind,target,target.injectedFault));
+      delete target.injectedFault;
+      changed=true;
+    }
+    if(changed) removeFaultRuntimeArtifacts(targetKind,target,removedRefs);
+    refreshFaultCancellation(targetKind,target);
     if(changed){toast('已取消故障注入','s');}\r
     return changed;\r
   }\r
 \r
-  function clearFaultBindings(targetKind,targetId){\r
-    const target=resolveFaultTarget(targetKind,targetId);\r
-    if(!target){return false;}\r
-    if(Array.isArray(target.faultBindings)){\r
-      target.faultBindings=target.faultBindings.map((binding)=>({...binding,active:false,disabledAt:new Date().toISOString()}));\r
-    }\r
-    delete target.injectedFault;\r
-    refreshFaultCancellation(targetKind,target);\r
+  function clearFaultBindings(targetKind,targetId){
+    const target=resolveFaultTarget(targetKind,targetId);
+    if(!target){return false;}
+    const removedRefs=[];
+    if(Array.isArray(target.faultBindings)){
+      target.faultBindings=target.faultBindings.map((binding,index)=>{
+        if(binding&&binding.active!==false){
+          removedRefs.push(makeFaultRemovalRef(targetKind,target,binding,index));
+        }
+        return {...binding,active:false,disabledAt:new Date().toISOString()};
+      });
+    }
+    if(target.injectedFault){
+      removedRefs.push(makeFaultRemovalRef(targetKind,target,target.injectedFault));
+    }
+    delete target.injectedFault;
+    removeFaultRuntimeArtifacts(targetKind,target,removedRefs);
+    refreshFaultCancellation(targetKind,target);
     toast('已清空故障注入','s');\r
     return true;\r
   }\r
@@ -11859,10 +13202,11 @@ Object.assign(window,{\r
 \r
   syncPropertyTabs();\r
   Object.assign(window,{\r
-    clearFaultBindings,\r
-    removeFaultBinding,\r
-    renderPropertyPanel,\r
-    savePropertyPanelTarget,\r
+    clearFaultBindings,
+    removeFaultBinding,
+    renderPropertyPanel,
+    savePropertyPanelFaultSlots,
+    savePropertyPanelTarget,
     saveSelectedEdgeMetadata,\r
     setPropertyPanelTab\r
   });\r
@@ -16630,14 +17974,27 @@ function decorateDataflowEdges(){\r
     });\r
   }\r
 \r
-  function readFaultParameterValues(hostId){\r
-    const host=document.getElementById(hostId);\r
-    const values={};\r
-    host?.querySelectorAll?.('[data-fault-param-key]').forEach(input=>{\r
-      values[input.dataset.faultParamKey||'']=input.value;\r
-    });\r
-    return values;\r
-  }\r
+  function readFaultParameterValues(hostId){
+    const host=document.getElementById(hostId);
+    const values={};
+    host?.querySelectorAll?.('[data-fault-param-key]').forEach(input=>{
+      const key=input.dataset.faultParamKey||'';
+      const raw=String(input.value??'').trim();
+      if(raw===''){
+        values[key]='';
+        return;
+      }
+      if(/^(true|false)$/i.test(raw)){
+        values[key]=raw.toLowerCase()==='true';
+        return;
+      }
+      const numeric=Number(raw);
+      values[key]=Number.isFinite(numeric)&&/^[+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[+-]?\\d+)?$/i.test(raw)
+        ?numeric
+        :input.value;
+    });
+    return values;
+  }
 \r
   function appendParameterEditor(hostId,model,scope,targetId=''){\r
     const host=document.getElementById(hostId);\r
@@ -16992,6 +18349,11 @@ function decorateDataflowEdges(){\r
     return ensureFaultTags().filter(tag=>tag.targetKind!=='edge'&&getFaultTagHostNodeId(tag)===nodeId);
   }
 
+  function getFaultTagsForEdge(edgeId){
+    if(!edgeId){return [];}
+    return ensureFaultTags().filter(tag=>tag.targetKind==='edge'&&tag.targetId===edgeId);
+  }
+
   function toggleFaultTagsForNode(nodeId){
     const tags=getFaultTagsForNode(nodeId);
     if(!tags.length){return 0;}
@@ -16999,6 +18361,19 @@ function decorateDataflowEdges(){\r
     tags.forEach(tag=>setFaultTagExpanded(tag,nextExpanded));
     renderModelNodes();
     renderEdges();
+    return tags.length;
+  }
+
+  function toggleFaultTagsForEdge(edgeId,options={}){
+    const tags=getFaultTagsForEdge(edgeId);
+    if(!tags.length){return 0;}
+    const nextExpanded=!tags.some(tag=>tag.expanded);
+    tags.forEach(tag=>setFaultTagExpanded(tag,nextExpanded));
+    renderModelNodes();
+    renderEdges();
+    if(nextExpanded&&options.openPanel){
+      selectFaultTag(tags[0].id);
+    }
     return tags.length;
   }
 
@@ -17103,7 +18478,7 @@ function decorateDataflowEdges(){\r
     const targetId=target?.id||model?.visualInjection?.targetId||'';
     const hostNodeId=getFaultTagHostNodeIdFromTarget(target);
     const hostAlreadyExpanded=hostNodeId?getFaultTagsForNode(hostNodeId).some(tag=>tag.expanded):false;
-    const expandedByDefault=targetKind==='edge'||hostAlreadyExpanded;
+    const expandedByDefault=targetKind==='edge'?false:hostAlreadyExpanded;
     const box=getFaultTagPosition(model,target);
     const tag={
       id:\`fault-tag-\${safeFaultTagId(model.id)}\`,
@@ -17148,6 +18523,7 @@ function decorateDataflowEdges(){\r
 
   function createManualFaultTag({x,y,target}={}){
     const id=\`manual-fault-tag-\${Date.now()}-\${Math.round(Math.random()*10000)}\`;
+    const targetKind=target?(target.sourceNodeId?'edge':'node'):'unbound';
     const box=target
       ?getFaultTagPosition({id,visualInjection:{}},target)
       :{
@@ -17165,14 +18541,14 @@ function decorateDataflowEdges(){\r
       layer:'飞控故障库',
       modelClass:'故障标签',
       runtimeBehavior:'manual',
-      targetKind:target?(target.sourceNodeId?'edge':'node'):'unbound',
+      targetKind,
       targetId:target?.id||'',
       hostNodeId:getFaultTagHostNodeIdFromTarget(target),
       targetName:target?getFaultTagTargetName({visualInjection:{}},target):'未绑定目标',
       active:false,
       positionMode:'manual',
-      expanded:instance.targetKind==='edge',
-      collapsed:instance.targetKind!=='edge',
+      expanded:targetKind==='node',
+      collapsed:targetKind!=='node',
       parameters:{},
       injectedFault:null,
       x:box.x,
@@ -17299,6 +18675,34 @@ function decorateDataflowEdges(){\r
         \`:''}
       </div>
     \`;
+    const originalInspector=pd.querySelector('[data-fault-tag-inspector]');
+    const originalParamPanel=pd.querySelector('[data-fault-tag-param-panel]');
+    if(S.propertyPanelTab==='parameters'){
+      originalInspector?.remove();
+    }else{
+      originalParamPanel?.remove();
+      if(originalInspector){
+        const targetKindLabel=tag.targetKind==='edge'?'杩炵嚎':'妯″潡';
+        originalInspector.classList.add('fault-tag-overview-panel');
+        originalInspector.innerHTML=\`
+          <div class="pglbl">缁戝畾瀵硅薄</div>
+          <div class="fault-tag-binding-card">
+            <div><span>鐩爣</span><strong>\${escapeHtml(targetName)}</strong></div>
+            <div><span>绫诲瀷</span><strong>\${targetKindLabel}</strong></div>
+            <div><span>琛屼负</span><strong>\${escapeHtml(tag.runtimeBehavior||'鎸夋晠闅滃簱瀹氫箟')}</strong></div>
+          </div>
+          <div class="fault-tag-param-preview">
+            <div class="pglbl">鍙傛暟鎽樿</div>
+            \${params.length?params.map(([key,value])=>\`
+              <div class="fault-tag-param-preview__row">
+                <span>\${escapeHtml(key)}</span>
+                <strong>\${escapeHtml(value)}</strong>
+              </div>
+            \`).join(''):'<div class="props-empty-inline">璇ユ晠闅滄病鏈夐澶栧弬鏁般€?/div>'}
+          </div>
+        \`;
+      }
+    }
     const inputs=Array.from(pd.querySelectorAll('[data-fault-tag-param]'));
     const applyButton=pd.querySelector('[data-fault-tag-apply]');
     const resetButton=pd.querySelector('[data-fault-tag-reset]');
@@ -17345,6 +18749,9 @@ function decorateDataflowEdges(){\r
     });
     setDirtyState();
     if(typeof syncPropertyTabs==='function'){syncPropertyTabs();}
+    if(typeof window.__GZ_DECORATE_PROPERTY_PANEL__==='function'){
+      window.__GZ_DECORATE_PROPERTY_PANEL__(null,{kind:'fault-tag',faultTag:tag,tab:S.propertyPanelTab});
+    }
   }
 
   function selectFaultTag(tagId){
@@ -17359,6 +18766,8 @@ function decorateDataflowEdges(){\r
     renderFaultTagPropertyPanel(tag);
     updateUI();
   }
+
+  window.__GZ_RENDER_FAULT_TAG_PANEL__=renderFaultTagPropertyPanel;
 
   const FAULT_TAG_DRAG={
     active:false,
@@ -17514,6 +18923,151 @@ function decorateDataflowEdges(){\r
     });
   }
 
+  function getFaultEdgeTogglePoint(edge){
+    if(!edge){return null;}
+    const path=Array.from(document.querySelectorAll('.edge-path[data-edge-id]'))
+      .find(item=>item.dataset.edgeId===edge.id);
+    if(path&&typeof path.getTotalLength==='function'&&typeof path.getPointAtLength==='function'){
+      try{
+        const point=path.getPointAtLength(path.getTotalLength()*0.5);
+        if(Number.isFinite(point.x)&&Number.isFinite(point.y)){
+          return {x:point.x,y:point.y-20};
+        }
+      }catch(error){}
+    }
+    const sourceNode=getNode(edge.sourceNodeId);
+    const targetNode=getNode(edge.targetNodeId);
+    const sourcePort=sourceNode?getPortInfo(sourceNode,'output',edge.sourcePortIndex||0):null;
+    const targetPort=targetNode?getPortInfo(targetNode,'input',edge.targetPortIndex||0):null;
+    if(isFiniteCanvasPoint(sourcePort)&&isFiniteCanvasPoint(targetPort)){
+      return {
+        x:Math.round((sourcePort.x+targetPort.x)/2),
+        y:Math.round((sourcePort.y+targetPort.y)/2)-24
+      };
+    }
+    return null;
+  }
+
+  const edgeFaultToggleClickGuards=new Map();
+
+  function ensureCanvasEdgeControlLayer(){
+    const stage=document.getElementById('canvas-stage');
+    if(!stage||!stage.ownerDocument||typeof stage.ownerDocument.createElementNS!=='function') return null;
+    document.getElementById('fault-edge-toggle-layer')?.remove();
+    let layer=document.getElementById('canvas-edge-control-layer');
+    if(layer&&layer.parentNode!==stage){
+      layer.remove();
+      layer=null;
+    }
+    const nodeLayer=document.getElementById('node-layer');
+    const scopeLayer=document.getElementById('scope-window-layer');
+    if(!layer){
+      layer=stage.ownerDocument.createElementNS('http://www.w3.org/2000/svg','svg');
+      layer.id='canvas-edge-control-layer';
+      layer.setAttribute('class','canvas-edge-control-layer');
+      layer.setAttribute('viewBox','0 0 2400 1500');
+      layer.setAttribute('preserveAspectRatio','none');
+      layer.setAttribute('aria-hidden','true');
+    }
+    if(scopeLayer&&scopeLayer.parentNode===stage){
+      if(layer.nextSibling!==scopeLayer){
+        stage.insertBefore(layer,scopeLayer);
+      }
+    }else if(nodeLayer&&nodeLayer.parentNode===stage){
+      if(nodeLayer.nextSibling!==layer){
+        stage.insertBefore(layer,nodeLayer.nextSibling);
+      }
+    }else if(layer.parentNode!==stage){
+      stage.appendChild(layer);
+    }
+    return layer;
+  }
+  if(typeof window!=='undefined'){
+    window.ensureCanvasEdgeControlLayer=ensureCanvasEdgeControlLayer;
+  }
+
+  function renderFaultEdgeToggles(){
+    document.getElementById('fault-edge-toggle-group')?.remove();
+    const edgeIds=[...new Set(ensureFaultTags()
+      .filter(tag=>tag.targetKind==='edge'&&tag.targetId)
+      .map(tag=>tag.targetId))];
+    if(!edgeIds.length){return;}
+    const toggleLayer=ensureCanvasEdgeControlLayer();
+    if(!toggleLayer){return;}
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.id='fault-edge-toggle-group';
+    edgeIds.forEach(edgeId=>{
+      const edge=getEdge(edgeId);
+      const tags=getFaultTagsForEdge(edgeId);
+      const point=getFaultEdgeTogglePoint(edge);
+      if(!edge||!tags.length||!point){return;}
+      const expanded=tags.some(tag=>tag.expanded);
+      const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
+      marker.setAttribute('class',\`edge-fault-toggle\${expanded?' is-open':''}\`);
+      marker.setAttribute('data-edge-fault-toggle','true');
+      marker.setAttribute('data-edge-id',edgeId);
+      marker.setAttribute('transform',\`translate(\${Math.round(point.x)} \${Math.round(point.y)})\`);
+      marker.dataset.edgeId=edgeId;
+
+      const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent=expanded?'收起连线故障':'打开连线故障';
+      const hit=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      hit.setAttribute('class','edge-fault-toggle__hit');
+      hit.setAttribute('x',tags.length>1?'-26':'-23');
+      hit.setAttribute('y','-18');
+      hit.setAttribute('width',tags.length>1?'58':'46');
+      hit.setAttribute('height','36');
+      hit.setAttribute('rx','9');
+      const pill=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      pill.setAttribute('class','edge-fault-toggle__pill');
+      pill.setAttribute('x','-18');
+      pill.setAttribute('y','-11');
+      pill.setAttribute('width',tags.length>1?'44':'34');
+      pill.setAttribute('height','22');
+      pill.setAttribute('rx','5');
+      const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('class','edge-fault-toggle__label');
+      label.setAttribute('x',tags.length>1?'-7':'0');
+      label.setAttribute('y','1');
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('dominant-baseline','central');
+      label.textContent='F';
+      marker.append(title,hit,pill,label);
+      if(tags.length>1){
+        const count=document.createElementNS('http://www.w3.org/2000/svg','text');
+        count.setAttribute('class','edge-fault-toggle__count');
+        count.setAttribute('x','12');
+        count.setAttribute('y','1');
+        count.setAttribute('text-anchor','middle');
+        count.setAttribute('dominant-baseline','central');
+        count.textContent=String(tags.length);
+        marker.appendChild(count);
+      }
+      const consumeEdgeFaultToggleEvent=event=>{
+        event.preventDefault();
+        event.stopPropagation();
+      };
+      const activateEdgeFaultToggle=event=>{
+        consumeEdgeFaultToggleEvent(event);
+        toggleFaultTagsForEdge(edgeId,{openPanel:true});
+      };
+      marker.addEventListener('pointerdown',consumeEdgeFaultToggleEvent);
+      marker.addEventListener('pointerup',event=>{
+        edgeFaultToggleClickGuards.set(edgeId,Date.now()+350);
+        activateEdgeFaultToggle(event);
+      });
+      marker.addEventListener('click',event=>{
+        if(Date.now()<(edgeFaultToggleClickGuards.get(edgeId)||0)){
+          consumeEdgeFaultToggleEvent(event);
+          return;
+        }
+        activateEdgeFaultToggle(event);
+      });
+      group.appendChild(marker);
+    });
+    toggleLayer.appendChild(group);
+  }
+
   renderVisualFaultInjectionLinks=function(){
     const edgeGroup=document.getElementById('edge-group');
     if(!edgeGroup){return;}
@@ -17571,6 +19125,7 @@ function decorateDataflowEdges(){\r
   renderEdges=function(){
     const result=__visualInjectionRenderEdges();
     renderVisualFaultInjectionLinks();
+    renderFaultEdgeToggles();
     return result;
   };
   window.renderEdges=renderEdges;
@@ -17663,12 +19218,13 @@ function decorateDataflowEdges(){\r
     }\r
     const imported=ensureImportedFaultModel(selected);\r
     const api=getFaultRuntimeApi();\r
-    const target=api?.findCompatibleFaultTarget?.(imported,{\r
-      nodes:collectAllCanvasItems('nodes'),\r
-      edges:collectAllCanvasItems('edges'),\r
-      selectedNodeId:S.selBlk,\r
-      selectedEdgeId:S.selEdge\r
-    });\r
+    const target=api?.findCompatibleFaultTarget?.(imported,{
+      nodes:collectAllCanvasItems('nodes'),
+      edges:collectAllCanvasItems('edges'),
+      selectedNodeId:S.selBlk,
+      selectedEdgeId:S.selEdge,
+      faultCapabilityMap:S.activeModelPackage?.faultCapabilityMap||[]
+    });
     const parameterOverrides=readFaultParameterValues('fault-type-detail');\r
     let injectedTarget=null;\r
     if(target?.kind==='edge'){
@@ -18235,6 +19791,250 @@ function decorateDataflowEdges(){\r
   }\r
 })();
 
+// --- Property panel chrome: typed shells for component / fault / instrument / edge ---
+(function(){
+  function h(value,fallback=''){
+    const raw=value===undefined||value===null||value===''?fallback:value;
+    return typeof escapeHtml==='function'
+      ?escapeHtml(String(raw))
+      :String(raw);
+  }
+
+  function isEdgeLike(target){
+    return Boolean(target?.sourceNodeId&&target?.targetNodeId&&!target?.type);
+  }
+
+  function getSelectedFaultTagForChrome(){
+    if(!S?.selFaultTag||!Array.isArray(S?.faultTags)){return null;}
+    return S.faultTags.find(tag=>tag&&tag.id===S.selFaultTag)||null;
+  }
+
+  function classifyPropertyPanelKind(target,options={}){
+    if(options.kind){return options.kind;}
+    if(getSelectedFaultTagForChrome()){return 'fault-tag';}
+    if(!target){return 'empty';}
+    if(isEdgeLike(target)){return 'edge';}
+    if(target.type==='instrument_scope'){return 'scope';}
+    if(['instrument_logger','instrument_spectrum','instrument_signal_flow'].includes(target.type)){return 'instrument';}
+    if(['physical_fault_injector','electrical_fault_injector','protocol_fault_injector'].includes(target.type)){return 'fault-injector';}
+    return 'component';
+  }
+
+  function getPanelHeader(kind){
+    if(kind==='fault-tag'){return {title:'故障标签',sub:'当前选择 · 故障实例'};}
+    if(kind==='scope'){return {title:'示波器面板',sub:'当前选择 · 观测与波形'};}
+    if(kind==='instrument'){return {title:'测量仪器',sub:'当前选择 · 记录与分析'};}
+    if(kind==='edge'){return {title:'连接属性',sub:'当前选择 · 连线与信号链路'};}
+    if(kind==='fault-injector'){return {title:'故障注入器',sub:'当前选择 · 分层故障绑定'};}
+    if(kind==='component'){return {title:'组件属性',sub:'当前选择 · 模块配置'};}
+    return {title:'属性面板',sub:'当前选择 · 组件属性'};
+  }
+
+  function getComponentPortSummary(target){
+    try{
+      const ports=typeof getNodePorts==='function'?getNodePorts(target):null;
+      return {
+        inputs:(ports?.inputs||[]).length,
+        outputs:(ports?.outputs||[]).length
+      };
+    }catch(error){
+      return {
+        inputs:Array.isArray(target?.props?.inputs)?target.props.inputs.length:0,
+        outputs:Array.isArray(target?.props?.outputs)?target.props.outputs.length:0
+      };
+    }
+  }
+
+  function getNodeTypeLabel(target){
+    return COMPONENT_LIBRARY?.[target?.type]?.label||target?.type||'组件';
+  }
+
+  function getNodeStatusLabel(target){
+    const hasBindings=Array.isArray(target?.faultBindings)&&target.faultBindings.some(binding=>binding&&binding.active!==false);
+    const isFaulted=Boolean(target?.injectedFault)||hasBindings||Boolean(Array.isArray(S?.faultedBlks)&&target?.id&&S.faultedBlks.includes(target.id));
+    return isFaulted?'故障已注入':'正常';
+  }
+
+  function getEdgeSummary(target){
+    const source=typeof getNode==='function'?getNode(target?.sourceNodeId):null;
+    const dest=typeof getNode==='function'?getNode(target?.targetNodeId):null;
+    const signal=Array.isArray(target?.signalChannels)&&target.signalChannels.length?target.signalChannels[0]:target||{};
+    return {
+      title:\`\${source?.props?.name||target?.sourceNodeId||'源'} → \${dest?.props?.name||target?.targetNodeId||'目标'}\`,
+      rows:[
+        ['连接类型',target?.lineType==='can'?'CAN 总线':'普通连线'],
+        ['信号标识',signal?.signalId||target?.signalId||'未声明'],
+        ['通道 / 报文',\`\${signal?.channelId||target?.channelId||'--'} / \${signal?.messageId||target?.messageId||'--'}\`]
+      ]
+    };
+  }
+
+  function getFaultTagSummary(tag){
+    return {
+      title:tag?.name||'故障实例',
+      rows:[
+        ['故障层级',tag?.layer||'未定义'],
+        ['目标对象',tag?.targetName||tag?.targetId||'未绑定'],
+        ['运行方式',tag?.runtimeBehavior||'按模型定义']
+      ]
+    };
+  }
+
+  function getInjectorSummary(target){
+    const config=typeof getLayeredFaultInjectorConfig==='function'
+      ?getLayeredFaultInjectorConfig(target?.type)
+      :null;
+    return {
+      title:target?.props?.name||config?.label||'故障注入器',
+      rows:[
+        ['注入层级',config?.layerLabel||'未定义'],
+        ['绑定目标',config?.layer==='protocol'?'连接线 / 总线数据':'模块变量 / 参数'],
+        ['匹配规则',config?.faultType||'模型参数故障']
+      ]
+    };
+  }
+
+  function getScopeSummary(target){
+    const ports=getComponentPortSummary(target);
+    return {
+      title:target?.props?.name||'示波器',
+      rows:[
+        ['输入通道',String(ports.inputs||0)],
+        ['查看方式',target?.props?.openMode||'双击波形查看'],
+        ['状态',getNodeStatusLabel(target)]
+      ]
+    };
+  }
+
+  function getInstrumentSummary(target){
+    const ports=getComponentPortSummary(target);
+    return {
+      title:target?.props?.name||'测量仪器',
+      rows:[
+        ['仪器类型',getNodeTypeLabel(target)],
+        ['输入通道',String(ports.inputs||0)],
+        ['状态',getNodeStatusLabel(target)]
+      ]
+    };
+  }
+
+  function getComponentSummary(target){
+    const ports=getComponentPortSummary(target);
+    return {
+      title:target?.props?.name||target?.id||'组件',
+      rows:[
+        ['组件类型',getNodeTypeLabel(target)],
+        ['输入 / 输出',\`\${ports.inputs||0} / \${ports.outputs||0}\`],
+        ['运行状态',getNodeStatusLabel(target)]
+      ]
+    };
+  }
+
+  function getPanelSummary(kind,target,options={}){
+    if(kind==='fault-tag'){return getFaultTagSummary(options.faultTag||getSelectedFaultTagForChrome());}
+    if(kind==='scope'){return getScopeSummary(target);}
+    if(kind==='instrument'){return getInstrumentSummary(target);}
+    if(kind==='edge'){return getEdgeSummary(target);}
+    if(kind==='fault-injector'){return getInjectorSummary(target);}
+    return getComponentSummary(target);
+  }
+
+  function renderPanelHero(kind,target,options={}){
+    const summary=getPanelSummary(kind,target,options);
+    const faultTag=options.faultTag||getSelectedFaultTagForChrome();
+    /* const heroRows=kind==='fault-tag'
+      ?[
+        ['鐘舵€?,'宸叉敞鍏?],
+        ['灞傜骇',faultTag?.layer||'--'],
+        ['鍙傛暟',String(Object.keys(faultTag?.parameters||{}).length)]
+      ]
+      :kind==='scope'
+        ?[
+          [(summary?.rows||[])[0]?.[0]||'閫氶亾',(summary?.rows||[])[0]?.[1]||'0'],
+          ['鐘舵€?,getNodeStatusLabel(target)]
+        ]
+        :(summary?.rows||[]); */
+    const heroRows=kind==='fault-tag'
+      ?[
+        ['\\u72b6\\u6001','\\u5df2\\u6ce8\\u5165'],
+        ['\\u5c42\\u7ea7',faultTag?.layer||'--'],
+        ['\\u53c2\\u6570',String(Object.keys(faultTag?.parameters||{}).length)]
+      ]
+      :kind==='scope'
+        ?[
+          ['\\u901a\\u9053',(summary?.rows||[])[0]?.[1]||'0'],
+          ['\\u72b6\\u6001',getNodeStatusLabel(target)]
+        ]
+        :(summary?.rows||[]);
+    const badgeMap={
+      component:'组件',
+      scope:'示波器',
+      instrument:'仪器',
+      edge:'链路',
+      'fault-tag':'故障',
+      'fault-injector':'注入器'
+    };
+    return \`
+      <header class="props-panel-hero props-panel-hero--\${h(kind)}">
+        <div class="props-panel-hero__main">
+          <div class="props-panel-hero__eyebrow">\${h(badgeMap[kind]||'属性')}</div>
+          <div class="props-panel-hero__title">\${h(summary?.title||'属性面板')}</div>
+        </div>
+        <div class="props-panel-hero__meta">
+          \${heroRows.map(([label,value])=>\`
+            <div class="props-panel-hero__pill">
+              <span>\${h(label)}</span>
+              <strong>\${h(value,'--')}</strong>
+            </div>
+          \`).join('')}
+        </div>
+      </header>
+    \`;
+  }
+
+  function decoratePropertyPanel(target,options={}){
+    const pd=document.getElementById('pd');
+    const pe=document.getElementById('pe');
+    const panel=document.querySelector('.rpanel');
+    const kind=classifyPropertyPanelKind(target,options);
+    const header=getPanelHeader(kind);
+    const titleEl=document.querySelector('.ph-title');
+    const subEl=document.querySelector('.ph-sub');
+    if(titleEl){titleEl.textContent=header.title;}
+    if(subEl){subEl.textContent=header.sub;}
+    if(panel){panel.dataset.propsPanelKind=kind;}
+    if(!pd||pd.style.display==='none'||!pd.innerHTML.trim()||pe?.style.display==='block'){return;}
+    if(pd.querySelector('[data-props-panel-shell="true"]')){return;}
+    const shell=document.createElement('section');
+    shell.className=\`props-panel-shell props-panel-shell--\${kind}\`;
+    shell.dataset.propsPanelShell='true';
+    shell.dataset.propsPanelKind=kind;
+
+    const heroHost=document.createElement('div');
+    heroHost.innerHTML=renderPanelHero(kind,target,options).trim();
+    if(heroHost.firstElementChild){
+      shell.appendChild(heroHost.firstElementChild);
+    }
+
+    const content=document.createElement('div');
+    content.className='props-panel-shell__content';
+    while(pd.firstChild){
+      content.appendChild(pd.firstChild);
+    }
+    shell.appendChild(content);
+    pd.appendChild(shell);
+  }
+
+  window.__GZ_DECORATE_PROPERTY_PANEL__=decoratePropertyPanel;
+
+  const __panelChromeRenderPropertyPanel=renderPropertyPanel;
+  renderPropertyPanel=function(target){
+    const result=__panelChromeRenderPropertyPanel(target);
+    decoratePropertyPanel(target,{});
+    return result;
+  };
+})();
+
 ;(function installComponentFaultCapabilityModel(){
   if(typeof window==='undefined') return;
 
@@ -18287,6 +20087,110 @@ function decorateDataflowEdges(){\r
       :arr(slot?.allowedFaultTypeIds);
   }
 
+  function getCapabilitySlotId(slot,index=0){
+    return String(slot?.slotId||slot?.id||\`slot-\${index+1}\`).trim();
+  }
+
+  function getCapabilitySlotLayer(slot){
+    const layer=String(slot?.layer||slot?.layerKey||'').trim();
+    return layer||'electrical';
+  }
+
+  function normalizeFaultLayer(value){
+    const raw=String(value||'').trim();
+    if(raw==='physical'||raw==='electrical'||raw==='protocol') return raw;
+    return '';
+  }
+
+  function normalizeFaultTargetKindFilter(value){
+    const raw=String(value||'').trim();
+    if(raw==='edge'||raw==='line') return 'edge';
+    if(raw==='node'||raw==='module'||raw==='component') return 'node';
+    return raw==='any'?'any':'';
+  }
+
+  function normalizeFaultOptionFilters(filters={}){
+    const source=typeof filters==='string'?{layer:filters}:(filters||{});
+    return {
+      layer:normalizeFaultLayer(source.layer||source.layerKey||source.injectorLayer||source.faultLayer),
+      targetKind:normalizeFaultTargetKindFilter(source.targetKind||source.kind||source.targetKindFilter)
+    };
+  }
+
+  function faultOptionMatchesFilters(option,target,filters={}){
+    const normalized=normalizeFaultOptionFilters(filters);
+    if(normalized.targetKind&&normalized.targetKind!=='any'&&inferFaultTargetKind(target)!==normalized.targetKind){
+      return false;
+    }
+    if(normalized.layer){
+      const slotLayer=normalizeFaultLayer(getCapabilitySlotLayer(option?.slot));
+      const modelLayer=normalizeFaultLayer(option?.model?.layer||option?.model?.layerKey||slotLayer);
+      return slotLayer===normalized.layer&&(!modelLayer||modelLayer===normalized.layer);
+    }
+    return true;
+  }
+
+  function getFaultInjectionForm(target,layer){
+    const targetKind=inferFaultTargetKind(target);
+    const normalizedLayer=normalizeFaultLayer(layer);
+    if(targetKind==='edge'&&normalizedLayer==='protocol') return 'protocol-bus';
+    if(targetKind==='edge') return 'signal-edge';
+    return 'module-variable';
+  }
+
+  function normalizedFaultText(value){
+    return String(value||'').trim().toLowerCase();
+  }
+
+  function getCapabilitySlotModelTokens(slot){
+    return [
+      ...arr(slot?.allowedModels),
+      ...arr(slot?.allowedFaultModels),
+      ...arr(slot?.runtimeBehaviors)
+    ].map(normalizedFaultText).filter(Boolean);
+  }
+
+  function getFaultModelTokens(model){
+    const tokens=[
+      model?.id,
+      model?.faultTypeId,
+      model?.runtimeBehavior,
+      model?.modelClass,
+      model?.faultClass,
+      model?.faultKind
+    ].map(normalizedFaultText).filter(Boolean);
+    if(tokens.includes('additive_bias')||tokens.includes('parameter_bias')) tokens.push('bias');
+    if(tokens.includes('packet_loss')) tokens.push('dropout');
+    if(tokens.includes('fixed_delay')||tokens.includes('jitter_delay')) tokens.push('delay');
+    if(tokens.includes('freeze')) tokens.push('stale');
+    if(tokens.includes('tamper')) tokens.push('tamper');
+    return [...new Set(tokens)];
+  }
+
+  function capabilitySlotAllowsModel(slot,model){
+    const modelId=model?.id||model?.faultTypeId||'';
+    const allowedIds=getAllowedFaultIds(slot);
+    if(allowedIds.length) return allowedIds.includes(modelId);
+    const slotLayer=getCapabilitySlotLayer(slot);
+    const modelLayer=model?.layer||model?.layerKey||'electrical';
+    if(slotLayer!==modelLayer) return false;
+    const allowedModelTokens=getCapabilitySlotModelTokens(slot);
+    if(!allowedModelTokens.length) return true;
+    const modelTokens=getFaultModelTokens(model);
+    return allowedModelTokens.some(token=>modelTokens.includes(token));
+  }
+
+  function getFaultSlotBindingObject(slot){
+    const value=slot?.bindingObject
+      || slot?.targetVariable
+      || slot?.variableKey
+      || slot?.parameterKey
+      || slot?.varName
+      || slot?.key
+      || '';
+    return String(value||'').trim();
+  }
+
   function getActiveFaultTypeCatalog(){
     const state=getState();
     const pkg=state.activeModelPackage||{};
@@ -18316,14 +20220,37 @@ function decorateDataflowEdges(){\r
     };
   }
 
-  function getCompatibleFaultModelsForTarget(target){
+  function getCompatibleFaultOptionsForTarget(target,filters={}){
     const capability=getFaultCapabilityForTarget(target);
     if(!capability) return [];
-    const allowedIds=new Set(getCapabilitySlots(capability).flatMap(getAllowedFaultIds));
-    return getActiveFaultTypeCatalog()
-      .filter(model=>allowedIds.has(model?.id||model?.faultTypeId))
+    const slots=getCapabilitySlots(capability);
+    const models=getActiveFaultTypeCatalog()
       .map(normalizeCapabilityFaultModel)
       .filter(Boolean);
+    const seen=new Set();
+    return slots.flatMap((slot,index)=>{
+      const slotId=getCapabilitySlotId(slot,index);
+      return models
+        .filter(model=>capabilitySlotAllowsModel(slot,model))
+        .map(model=>{
+          const key=\`\${model.id}::\${slotId}\`;
+          if(seen.has(key)) return null;
+          seen.add(key);
+          return {model,slot,slotId};
+        })
+        .filter(Boolean);
+    }).filter(option=>faultOptionMatchesFilters(option,target,filters));
+  }
+
+  function getCompatibleFaultModelsForTarget(target,filters={}){
+    const seen=new Set();
+    return getCompatibleFaultOptionsForTarget(target,filters)
+      .map(option=>option.model)
+      .filter(model=>{
+        if(!model?.id||seen.has(model.id)) return false;
+        seen.add(model.id);
+        return true;
+      });
   }
 
   function ensureFaultInstances(){
@@ -18332,9 +20259,17 @@ function decorateDataflowEdges(){\r
     return state.faultInstances;
   }
 
-  function getFirstCompatibleSlotForFault(target,faultTypeId){
-    const capability=getFaultCapabilityForTarget(target);
-    return getCapabilitySlots(capability).find(slot=>getAllowedFaultIds(slot).includes(faultTypeId))||null;
+  function getCompatibleSlotForFault(target,faultTypeId,slotId='',filters={}){
+    const options=getCompatibleFaultOptionsForTarget(target,filters)
+      .filter(option=>option.model?.id===faultTypeId);
+    if(slotId){
+      return options.find(option=>option.slotId===slotId)?.slot||null;
+    }
+    return options[0]?.slot||null;
+  }
+
+  function getFirstCompatibleSlotForFault(target,faultTypeId,filters={}){
+    return getCompatibleSlotForFault(target,faultTypeId,'',filters);
   }
 
   function getCapabilityFaultModel(faultTypeId){
@@ -18346,7 +20281,8 @@ function decorateDataflowEdges(){\r
   function findExistingFaultInstanceForTarget(target,faultTypeId,slot=null){
     if(!target?.id||!faultTypeId) return null;
     const targetKind=inferFaultTargetKind(target);
-    const slotId=slot?.slotId||getFirstCompatibleSlotForFault(target,faultTypeId)?.slotId||'';
+    const fallbackSlot=getFirstCompatibleSlotForFault(target,faultTypeId);
+    const slotId=slot?getCapabilitySlotId(slot):(fallbackSlot?getCapabilitySlotId(fallbackSlot):'');
     return ensureFaultInstances().find(instance=>(
       instance?.active!==false
       && instance.targetKind===targetKind
@@ -18356,13 +20292,15 @@ function decorateDataflowEdges(){\r
     ))||null;
   }
 
-  function createFaultInstanceForTarget(target,faultTypeId,parameterOverrides={}){
+  function createFaultInstanceForTarget(target,faultTypeId,parameterOverrides={},options={}){
     const model=getCapabilityFaultModel(faultTypeId);
-    const slot=getFirstCompatibleSlotForFault(target,faultTypeId);
+    const optionFilters=normalizeFaultOptionFilters(options);
+    const slot=options.slot||getCompatibleSlotForFault(target,faultTypeId,options.slotId||'',optionFilters);
     if(!target||!model||!slot){
       return {ok:false,error:'incompatible-target'};
     }
     const targetKind=inferFaultTargetKind(target);
+    const slotId=getCapabilitySlotId(slot);
     const duplicate=findExistingFaultInstanceForTarget(target,model.id,slot);
     if(duplicate){
       return {ok:false,error:'duplicate-fault-instance',instance:duplicate,model,slot};
@@ -18371,12 +20309,19 @@ function decorateDataflowEdges(){\r
       ...(model.defaultParameters||{}),
       ...(parameterOverrides||{})
     };
+    const bindingObject=getFaultSlotBindingObject(slot);
     const instance={
       instanceId:\`fault-inst-\${Date.now()}-\${Math.random().toString(16).slice(2,8)}\`,
       faultTypeId:model.id,
       targetKind,
       targetId:target.id,
-      slotId:slot.slotId,
+      slotId,
+      slotName:slot.slotName||slot.name||'',
+      layer:model.layer||slot.layer||'electrical',
+      injectionForm:getFaultInjectionForm(target,model.layer||slot.layer||optionFilters.layer),
+      bindingObject,
+      targetVariable:bindingObject,
+      targetField:slot.targetField||'',
       displayName:model.displayName||model.name||model.id,
       parameters:cloneCapabilityValue(parameters),
       active:true,
@@ -18430,6 +20375,12 @@ function decorateDataflowEdges(){\r
         targetId:target.id||'',
         targetKind
       });
+      binding.slotId=payload.slotId||binding.slotId||'';
+      binding.slotName=payload.slotName||binding.slotName||'';
+      binding.bindingObject=payload.bindingObject||binding.bindingObject||'';
+      binding.targetVariable=payload.targetVariable||binding.targetVariable||binding.bindingObject||'';
+      binding.targetField=payload.targetField||binding.targetField||'';
+      binding.injectionForm=payload.injectionForm||binding.injectionForm||'';
       api.appendFaultBinding(target,binding);
       return;
     }
@@ -18444,6 +20395,12 @@ function decorateDataflowEdges(){\r
       parameters:cloneCapabilityValue(payload.parameters||{}),
       targetKind,
       targetId:target.id||'',
+      slotId:payload.slotId||'',
+      slotName:payload.slotName||'',
+      bindingObject:payload.bindingObject||'',
+      targetVariable:payload.targetVariable||payload.bindingObject||'',
+      targetField:payload.targetField||'',
+      injectionForm:payload.injectionForm||getFaultInjectionForm(target,payload.layer||model?.layer),
       visualRole:'fault-source',
       propagationMode,
       canPropagate:propagationMode!=='localOnly',
@@ -18527,6 +20484,12 @@ function decorateDataflowEdges(){\r
       targetId:instance.targetId,
       hostNodeId,
       targetName:getCapabilityTargetName(target),
+      slotId:instance.slotId||'',
+      slotName:instance.slotName||'',
+      bindingObject:instance.bindingObject||'',
+      targetVariable:instance.targetVariable||instance.bindingObject||'',
+      targetField:instance.targetField||'',
+      injectionForm:instance.injectionForm||getFaultInjectionForm(target,instance.layer),
       active:true,
       positionMode:'manual',
       expanded:false,
@@ -18564,6 +20527,12 @@ function decorateDataflowEdges(){\r
     payload.instanceId=instance.instanceId;
     payload.name=instance.displayName||model.displayName||model.name||model.id;
     payload.parameters=cloneCapabilityValue(instance.parameters||{});
+    payload.slotId=instance.slotId||'';
+    payload.slotName=instance.slotName||'';
+    payload.bindingObject=instance.bindingObject||'';
+    payload.targetVariable=instance.targetVariable||instance.bindingObject||'';
+    payload.targetField=instance.targetField||'';
+    payload.injectionForm=instance.injectionForm||getFaultInjectionForm(target,payload.layer);
     target.injectedFault=payload;
     appendCapabilityRuntimeBinding(target,model,payload,instance.targetKind);
     if(instance.targetKind==='node'&&!S.faultedBlks.includes(target.id)){
@@ -18579,8 +20548,8 @@ function decorateDataflowEdges(){\r
     return payload;
   }
 
-  function activateFaultForTarget(target,faultTypeId,parameterOverrides={}){
-    const created=createFaultInstanceForTarget(target,faultTypeId,parameterOverrides);
+  function activateFaultForTarget(target,faultTypeId,parameterOverrides={},options={}){
+    const created=createFaultInstanceForTarget(target,faultTypeId,parameterOverrides,options);
     if(!created.ok) return created;
     mirrorFaultInstanceToRuntimeTarget(created.instance,created.model,target);
     markTopologyDirty('fault');
@@ -18610,8 +20579,8 @@ function decorateDataflowEdges(){\r
     }
     return entries.map(([key,value])=>\`
       <label class="target-fault-param-row">
-        <span>\${capabilityHtml(key)}</span>
-        <input data-target-fault-param="\${capabilityHtml(key)}" value="\${capabilityHtml(value)}">
+        <span>\${capabilityHtml(getFaultParameterLabel(key))}</span>
+        \${renderFaultParameterControl(key,value,'data-target-fault-param')}
       </label>
     \`).join('');
   }
@@ -18625,18 +20594,31 @@ function decorateDataflowEdges(){\r
     return draft;
   }
 
-  function markSelectedTargetFaultChoice(box,modelId){
+  function getFaultSlotDisplayName(slot){
+    return slot?.slotName||slot?.name||slot?.label||getCapabilitySlotId(slot);
+  }
+
+  function getFaultSlotVariableName(slot){
+    return getFaultSlotBindingObject(slot)||slot?.variableKey||slot?.targetVariable||getCapabilitySlotId(slot);
+  }
+
+  function markSelectedTargetFaultChoice(box,modelId,slotId=''){
     box.querySelectorAll('.target-fault-choice.is-selected').forEach(choice=>choice.classList.remove('is-selected'));
     box.querySelectorAll('[data-activate-compatible-fault]').forEach(choice=>{
-      if(choice.getAttribute('data-activate-compatible-fault')===modelId){
+      const matchesModel=choice.getAttribute('data-activate-compatible-fault')===modelId;
+      const matchesSlot=!slotId||choice.getAttribute('data-activate-fault-slot')===slotId;
+      if(matchesModel&&matchesSlot){
         choice.classList.add('is-selected');
       }
     });
   }
 
-  function showTargetFaultParameterPanel(box,target,model){
+  function showTargetFaultParameterPanel(box,target,model,slot=null,filters={}){
     if(!box||!target||!model) return;
-    markSelectedTargetFaultChoice(box,model.id);
+    const slotId=slot?getCapabilitySlotId(slot):'';
+    const slotName=slot?getFaultSlotDisplayName(slot):'';
+    const bindingObject=slot?getFaultSlotVariableName(slot):'';
+    markSelectedTargetFaultChoice(box,model.id,slotId);
     box.querySelector('[data-target-fault-parameters]')?.remove();
     const panel=document.createElement('form');
     panel.className='target-fault-parameters';
@@ -18645,6 +20627,7 @@ function decorateDataflowEdges(){\r
       <div class="target-fault-parameters__head">
         <span>参数确认</span>
         <strong>\${capabilityHtml(model.displayName||model.name||model.id)}</strong>
+        \${slot?\`<small>\${capabilityHtml(slotName)} 路 \${capabilityHtml(bindingObject)}</small>\`:''}
         <small>\${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · \${capabilityHtml(model.runtimeBehavior||model.faultClass||model.modelClass||'故障')}</small>
       </div>
       <div class="target-fault-parameters__grid">
@@ -18657,7 +20640,11 @@ function decorateDataflowEdges(){\r
     \`;
     panel.addEventListener('submit',event=>{
       event.preventDefault();
-      const result=activateFaultForTarget(target,model.id,readTargetFaultParameterDraft(panel));
+      const result=activateFaultForTarget(target,model.id,readTargetFaultParameterDraft(panel),{
+        ...normalizeFaultOptionFilters(filters),
+        slotId,
+        slot
+      });
       if(result?.ok){
         box.remove();
       }else if(result?.error==='duplicate-fault-instance'){
@@ -18670,9 +20657,10 @@ function decorateDataflowEdges(){\r
     box.querySelector('.target-fault-dialog__body')?.appendChild(panel);
   }
 
-  function renderTargetFaultActivationDialog(target){
+  function renderTargetFaultActivationDialog(target,filters={}){
     document.querySelector('[data-target-fault-dialog]')?.remove();
-    const models=getCompatibleFaultModelsForTarget(target);
+    const optionFilters=normalizeFaultOptionFilters(filters);
+    const options=getCompatibleFaultOptionsForTarget(target,optionFilters);
     const box=document.createElement('div');
     box.className='target-fault-dialog';
     box.dataset.targetFaultDialog='true';
@@ -18682,11 +20670,14 @@ function decorateDataflowEdges(){\r
         <button type="button" data-close-target-fault-dialog>关闭</button>
       </div>
       <div class="target-fault-dialog__body">
-        \${models.length?models.map(model=>{
-          const injected=Boolean(findExistingFaultInstanceForTarget(target,model.id));
+        \${options.length?options.map(option=>{
+          const {model,slot,slotId}=option;
+          const injected=Boolean(findExistingFaultInstanceForTarget(target,model.id,slot));
+          const bindingObject=getFaultSlotVariableName(slot);
           return \`
-          <button type="button" class="target-fault-choice\${injected?' is-injected':''}" data-activate-compatible-fault="\${capabilityHtml(model.id)}" \${injected?'disabled aria-disabled="true"':''}>
+          <button type="button" class="target-fault-choice\${injected?' is-injected':''}" data-activate-compatible-fault="\${capabilityHtml(model.id)}" data-activate-fault-slot="\${capabilityHtml(slotId)}" \${injected?'disabled aria-disabled="true"':''}>
             <span>\${capabilityHtml(model.displayName||model.name)}</span>
+            <small class="target-fault-choice__slot">\${capabilityHtml(getFaultSlotDisplayName(slot))} 路 \${capabilityHtml(bindingObject)}</small>
             <small>\${capabilityHtml(typeof getLayerLabel==='function'?getLayerLabel(model.layer):model.layer)} · \${capabilityHtml(model.faultClass||model.modelClass||model.runtimeBehavior||'故障')}</small>
             \${injected?'<em>已注入</em>':''}
           </button>
@@ -18697,20 +20688,21 @@ function decorateDataflowEdges(){\r
     box.querySelectorAll('[data-activate-compatible-fault]').forEach(button=>{
       button.addEventListener('click',()=>{
         const faultId=button.dataset.activateCompatibleFault||'';
-        const model=models.find(item=>item.id===faultId);
-        if(model) showTargetFaultParameterPanel(box,target,model);
+        const slotId=button.dataset.activateFaultSlot||'';
+        const option=options.find(item=>item.model?.id===faultId&&item.slotId===slotId);
+        if(option) showTargetFaultParameterPanel(box,target,option.model,option.slot,optionFilters);
       });
     });
     return box;
   }
 
-  function openTargetFaultActivationDialog(){
+  function openTargetFaultActivationDialog(filters={}){
     const target=getSelectedFaultActivationTarget();
     if(!target){
       toast('请先选择可添加故障的组件或连线','w');
       return false;
     }
-    renderTargetFaultActivationDialog(target);
+    renderTargetFaultActivationDialog(target,filters);
     return true;
   }
 
@@ -18829,6 +20821,7 @@ function decorateDataflowEdges(){\r
 
   Object.assign(window,{
     getFaultCapabilityForTarget,
+    getCompatibleFaultOptionsForTarget,
     getCompatibleFaultModelsForTarget,
     activateFaultForTarget,
     openTargetFaultActivationDialog
@@ -18869,11 +20862,26 @@ function decorateDataflowEdges(){\r
     return 'any';
   }
 
-  function targetAcceptsFaultComponent(target,expectedKind='any'){
+  function normalizeFaultDropLayer(value){
+    const raw=typeof value==='string'
+      ?value
+      :(value?.layer||value?.layerKey||value?.injectorLayer||value?.faultLayer||'');
+    if(raw==='physical'||raw==='electrical'||raw==='protocol') return raw;
+    return '';
+  }
+
+  function getFaultDropFilters(options={},expectedKind='any'){
+    return {
+      targetKind:normalizeFaultDropTargetKind(options?.targetKind?options:expectedKind),
+      layer:normalizeFaultDropLayer(options)
+    };
+  }
+
+  function targetAcceptsFaultComponent(target,expectedKind='any',filters={}){
     if(!target?.id||typeof window.getCompatibleFaultModelsForTarget!=='function') return false;
     const normalized=normalizeFaultDropTargetKind(expectedKind);
     if(normalized!=='any'&&targetKind(target)!==normalized) return false;
-    return window.getCompatibleFaultModelsForTarget(target).length>0;
+    return window.getCompatibleFaultModelsForTarget(target,filters).length>0;
   }
 
   function clearCompatibleFaultDropTargets(){
@@ -18891,6 +20899,7 @@ function decorateDataflowEdges(){\r
 
   function showCompatibleFaultDropTargets(options={targetKind:'node'}){
     const expectedKind=normalizeFaultDropTargetKind(options);
+    const filters=getFaultDropFilters(options,expectedKind);
     const diagram=document.getElementById('diagram');
     diagram?.classList.add('fault-drop-preview');
     diagram?.classList.toggle('fault-drop-preview--node',expectedKind==='node');
@@ -18898,13 +20907,13 @@ function decorateDataflowEdges(){\r
     getRuntimeNodes().forEach(node=>{
       const el=document.getElementById(\`b-\${node.id}\`);
       if(!el) return;
-      const compatible=expectedKind!=='edge'&&targetAcceptsFaultComponent(node,expectedKind);
+      const compatible=expectedKind!=='edge'&&targetAcceptsFaultComponent(node,expectedKind,filters);
       el.classList.toggle('fault-drop-compatible',compatible);
       el.classList.toggle('fault-drop-incompatible',!compatible);
       el.dataset.faultDropState=compatible?'compatible':'incompatible';
     });
     getRuntimeEdges().forEach(edge=>{
-      const compatible=expectedKind!=='node'&&targetAcceptsFaultComponent(edge,expectedKind);
+      const compatible=expectedKind!=='node'&&targetAcceptsFaultComponent(edge,expectedKind,filters);
       document.querySelectorAll(\`[data-edge-id="\${edge.id}"]\`).forEach(el=>{
         el.classList.toggle('is-fault-drop-compatible',compatible);
         el.classList.toggle('is-fault-drop-incompatible',!compatible);
@@ -18957,7 +20966,19 @@ function decorateDataflowEdges(){\r
     if(typeof selectNode==='function') selectNode(target.id);
   }
 
+  function isDirectFaultLibraryInjectionEnabled(){
+    return window.__GZ_ENABLE_FAULT_LIBRARY_DIRECT_INJECTION===true;
+  }
+
+  function blockFaultLibraryDrop(expectedKind='node'){
+    clearCompatibleFaultDropTargets();
+    document.querySelector('[data-target-fault-dialog]')?.remove();
+    toast('当前版本已关闭故障库拖拽注入，请先放置故障注入组件，再点击“绑定目标”完成绑定。','w');
+    return {ok:false,reason:'fault-library-disabled',targetKind:expectedKind};
+  }
+
   function handleFaultDropForKind(options={},expectedKind='node'){
+    const filters=getFaultDropFilters(options,expectedKind);
     const target=options.target||(
       Number.isFinite(options.clientX)&&Number.isFinite(options.clientY)
         ?getFaultComponentDropTargetFromClientPoint(options.clientX,options.clientY,{targetKind:expectedKind})
@@ -18973,13 +20994,13 @@ function decorateDataflowEdges(){\r
       toast(expectedKind==='edge'?'该对象不是可注入故障的连线':'该对象不是可注入故障的模块','w');
       return {ok:false,reason:'incompatible-target-kind',targetId:target.id,targetKind:kind,expectedKind};
     }
-    if(!targetAcceptsFaultComponent(target,expectedKind)){
+    if(!targetAcceptsFaultComponent(target,expectedKind,filters)){
       toast('该对象没有匹配的故障形式','w');
       return {ok:false,reason:'incompatible-target',targetId:target.id};
     }
     selectFaultDropTarget(target);
     const opened=typeof window.openTargetFaultActivationDialog==='function'
-      ?window.openTargetFaultActivationDialog()
+      ?window.openTargetFaultActivationDialog(filters)
       :false;
     return {
       ok:opened!==false,
@@ -18990,10 +21011,16 @@ function decorateDataflowEdges(){\r
   }
 
   function handleFaultComponentDrop(options={}){
+    if(!isDirectFaultLibraryInjectionEnabled()){
+      return blockFaultLibraryDrop('node');
+    }
     return handleFaultDropForKind(options,'node');
   }
 
   function handleLineFaultComponentDrop(options={}){
+    if(!isDirectFaultLibraryInjectionEnabled()){
+      return blockFaultLibraryDrop('edge');
+    }
     return handleFaultDropForKind(options,'edge');
   }
 
@@ -19035,6 +21062,29 @@ function decorateDataflowEdges(){\r
   function getRuntimeEdges(){
     const state=getState();
     return arr(state.edges).length?arr(state.edges):arr(state.modelEdges);
+  }
+
+  function getVisualFaultTagModels(){
+    const state=getState();
+    return arr(state.faultTags).map(tag=>{
+      const targetKind=tag.targetKind||tag.target?.kind||'';
+      const targetId=tag.targetId||tag.target?.id||'';
+      return {
+        ...tag,
+        id:tag.faultModelId||tag.faultTypeId||tag.modelId||tag.faultId||tag.id,
+        name:tag.faultModelName||tag.name||tag.label||tag.faultModelId||tag.id,
+        layer:tag.layer||tag.layerKey||tag.injectedFault?.layer,
+        category:tag.category||tag.modelClass||tag.injectedFault?.category,
+        targetNodeId:tag.targetNodeId||(targetKind==='node'?targetId:''),
+        targetEdgeId:tag.targetEdgeId||(targetKind==='edge'?targetId:''),
+        affectedEdges:arr(tag.affectedEdges).concat(tag.targetEdgeId||(targetKind==='edge'?targetId:'')||[])
+      };
+    }).filter(model=>model.id);
+  }
+
+  function getActiveRuntimeFaultModels(){
+    const activeFaults=typeof getInjectedFaults==='function'?getInjectedFaults():[];
+    return activeFaults.concat(getVisualFaultTagModels());
   }
 
   function getRootDiagnosticCanvasId(){
@@ -19137,13 +21187,21 @@ function decorateDataflowEdges(){\r
     {id:'diagnostic_spectrum_drift',name:'频谱诊断漂移',category:'诊断/残差型',type:'diagnostic',targetNodeId:'node-spectrum',targetEdgeId:'edge-error-spectrum',affectedEdges:['edge-error-spectrum']}\r
   ];\r
 \r
-  function getRuntimeFaultLibrary(){\r
-    const state=getState();\r
-    const library=[\r
-      ...(arr(state.faultLibrary).length?arr(state.faultLibrary):arr(state.availableFaultModels)),\r
-      ...arr(state.importedFaultModels),\r
-      ...((arr(state.faultLibrary).length||arr(state.availableFaultModels).length)?[]:DEMO_FAULT_LIBRARY)\r
-    ];\r
+  function getRuntimeFaultLibrary(){
+    const state=getState();
+    const configuredModels=arr(state.faultLibrary).length?arr(state.faultLibrary):arr(state.availableFaultModels);
+    const importedModels=arr(state.importedFaultModels);
+    const activeRuntimeModels=getActiveRuntimeFaultModels();
+    const shouldUseDemoFallback=!configuredModels.length
+      && !importedModels.length
+      && !activeRuntimeModels.length
+      && state.workspaceSource!=='blank';
+    const library=[
+      ...configuredModels,
+      ...importedModels,
+      ...activeRuntimeModels,
+      ...(shouldUseDemoFallback?DEMO_FAULT_LIBRARY:[])
+    ];
     const merged=new Map();\r
     library.forEach(model=>{\r
       const id=model.id||model.modelId||model.faultModelId||model.faultId||model.name;\r
@@ -19156,8 +21214,9 @@ function decorateDataflowEdges(){\r
       id:model.id||model.modelId||model.faultModelId||model.faultId||model.name,\r
       name:model.name||model.label||model.title||model.id||'故障',\r
       category:model.category||model.layer||model.domain||model.faultLayer||'故障库',\r
-      targetNodeId:model.targetNodeId||model.recommendedModuleId||model.injectionDesign?.targetNodeId||model.injectionDesign?.targetId||model.injectionTarget?.nodeId,\r
-      targetEdgeId:model.targetEdgeId||model.injectionDesign?.targetEdgeId||model.injectionTarget?.edgeId,\r
+      targetNodeId:model.targetNodeId||(model.targetKind==='node'?model.targetId:'')||model.recommendedModuleId||model.injectionDesign?.targetNodeId||model.injectionDesign?.targetId||model.injectionTarget?.nodeId,
+      targetEdgeId:model.targetEdgeId||(model.targetKind==='edge'?model.targetId:'')||model.injectionDesign?.targetEdgeId||model.injectionTarget?.edgeId,
+      affectedEdges:arr(model.affectedEdges).concat(model.targetEdgeId||(model.targetKind==='edge'?model.targetId:'')||[]),
       detects:arr(model.detects)\r
     })).filter(model=>model.id);\r
   }\r
@@ -19169,10 +21228,10 @@ function decorateDataflowEdges(){\r
     return node?.props?.name||node?.name||node?.label||NODE_NAME_ZH[id]||id||'未连接';\r
   }\r
 \r
-  function pointForEdge(edge,index){\r
-    const label=EDGE_NAME_ZH[edge.id]||edge.label||edge.signalLabel||edge.name||\`\${edgeEndpointName(edge,'source')} -> \${edgeEndpointName(edge,'target')}\`;\r
-    return {\r
-      pointId:edge.testPointId||\`tp-\${edge.id||index}\`,\r
+  function pointForEdge(edge,index){
+    const label=EDGE_NAME_ZH[edge.id]||edge.label||edge.signalLabel||edge.name||\`\${edgeEndpointName(edge,'source')} -> \${edgeEndpointName(edge,'target')}\`;
+    return {
+      pointId:edge.testPointId||\`tp-\${edge.id||index}\`,
       shortName:\`M\${index+1}\`,\r
       name:label,\r
       edgeId:edge.id||\`edge-\${index}\`,\r
@@ -19180,11 +21239,55 @@ function decorateDataflowEdges(){\r
       channelId:edge.channelId||edge.channelID||edge.channel||'',\r
       sourceName:edgeEndpointName(edge,'source'),\r
       targetName:edgeEndpointName(edge,'target'),\r
-      detects:arr(edge.detects)\r
-    };\r
-  }\r
-\r
-  function edgeSourceId(edge){\r
+      detects:arr(edge.detects)
+    };
+  }
+
+  function invalidateConfiguredDiagnosticPoints(){
+    const state=getState();
+    delete state.compactDiagnosticFixedPoints;
+    delete state.compactDiagnosticFixedPointSignature;
+    delete state.compactDiagnosticPointSignature;
+  }
+
+  function createManualPointForEdge(edge,index=0,options={}){
+    const base=pointForEdge(edge,index);
+    return {
+      ...base,
+      ...options,
+      pointId:options.pointId||base.pointId||\`tp-\${edge.id||index}\`,
+      shortName:options.shortName||base.shortName||\`M\${index+1}\`,
+      name:options.name||base.name,
+      edgeId:edge.id,
+      sourceName:options.sourceName||base.sourceName,
+      targetName:options.targetName||base.targetName,
+      manuallyAdded:true
+    };
+  }
+
+  function getManualDiagnosticPoints(){
+    const state=getState();
+    if(!Array.isArray(state.manualDiagnosticTestPoints)){
+      state.manualDiagnosticTestPoints=[];
+    }
+    return state.manualDiagnosticTestPoints;
+  }
+
+  function getCandidateDiagnosticEdges(points=[]){
+    const definedEdges=new Set(points.map(point=>point.edgeId).filter(Boolean));
+    return getActiveDiagnosticEdges()
+      .filter(edge=>edge?.id&&!definedEdges.has(edge.id))
+      .map(edge=>({
+        id:edge.id,
+        label:EDGE_NAME_ZH[edge.id]||edge.label||edge.signalLabel||edge.name||\`\${edgeEndpointName(edge,'source')} -> \${edgeEndpointName(edge,'target')}\`,
+        signalId:edge.signalId||edge.signalID||edge.signal||'',
+        sourceName:edgeEndpointName(edge,'source'),
+        targetName:edgeEndpointName(edge,'target'),
+        lineType:edge.lineType||edge.bus||''
+      }));
+  }
+
+  function edgeSourceId(edge){
     return edge?.source||edge?.from||edge?.sourceNodeId||edge?.sourceId||'';\r
   }\r
 \r
@@ -19286,12 +21389,15 @@ function decorateDataflowEdges(){\r
     const runtimeEdges=getActiveDiagnosticEdges();
     const runtimeNodes=getActiveDiagnosticNodes();
     const activeCanvasId=getActiveDiagnosticCanvasId();
-    const edgeSignature=[activeCanvasId,runtimeEdges.map(edge=>edge.id).join('|'),runtimeNodes.map(node=>node.id).join('|')].join('::');
+    const configured=arr(state.diagnosticTestPoints).length?arr(state.diagnosticTestPoints):arr(state.testPoints);
+    const manualConfigured=getManualDiagnosticPoints();
+    const explicitSignature=configured.map(point=>\`\${point.pointId||point.id||''}:\${point.edgeId||point.edgeID||point.targetEdgeId||''}\`).join('|');
+    const manualSignature=manualConfigured.map(point=>\`\${point.pointId||point.id||''}:\${point.edgeId||point.edgeID||point.targetEdgeId||''}\`).join('|');
+    const edgeSignature=[activeCanvasId,runtimeEdges.map(edge=>edge.id).join('|'),runtimeNodes.map(node=>node.id).join('|'),explicitSignature,manualSignature].join('::');
     if(Array.isArray(state.compactDiagnosticFixedPoints)&&state.compactDiagnosticFixedPointSignature===edgeSignature){
       return state.compactDiagnosticFixedPoints;
     }
-    const configured=arr(state.diagnosticTestPoints).length?arr(state.diagnosticTestPoints):arr(state.testPoints);\r
-    let points;\r
+    let points;
     if(configured.length){\r
       points=configured.map((point,index)=>({\r
         ...point,\r
@@ -19301,16 +21407,26 @@ function decorateDataflowEdges(){\r
         edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',\r
         detects:arr(point.detects)\r
       }));\r
+    }else if(manualConfigured.length){
+      points=manualConfigured.map((point,index)=>({
+        ...point,
+        pointId:point.pointId||point.id||\`tp-manual-\${index}\`,
+        shortName:point.shortName||point.code||\`M\${index+1}\`,
+        name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId||point.edgeID||point.targetEdgeId]||point.name||point.label||point.position||\`M\${index+1}\`,
+        edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',
+        detects:arr(point.detects),
+        manuallyAdded:true
+      }));
     }else{
       const existing=typeof window.getSemanticTestPoints==='function'?arr(window.getSemanticTestPoints()):[];
-      points=existing.length?existing.map((point,index)=>({
+      points=state.workspaceSource!=='blank'&&existing.length?existing.map((point,index)=>({
         ...point,\r
         pointId:point.pointId||point.id||\`tp-semantic-\${index}\`,\r
         shortName:point.shortName||point.code||\`M\${index+1}\`,\r
         name:point.nameZh||point.labelZh||EDGE_NAME_ZH[point.edgeId||point.edgeID||point.targetEdgeId]||point.name||point.label||point.position||\`测点 \${index+1}\`,\r
         edgeId:point.edgeId||point.edgeID||point.targetEdgeId||'',\r
         detects:arr(point.detects)
-      })):runtimeEdges.map(pointForEdge);
+      })):[];
     }
     points=points.filter(point=>diagnosticPointBelongsToActiveCanvas(point,runtimeEdges,runtimeNodes));
     const faultLibrary=getRuntimeFaultLibrary();
@@ -19484,10 +21600,11 @@ function decorateDataflowEdges(){\r
 \r
   function renderCompactDiagnosisConsole(){\r
     const points=getConfiguredPoints();\r
-    const installedIds=new Set(getInstalledPointIds(points));\r
-    const installed=points.filter(point=>installedIds.has(point.pointId));\r
-    const faults=getInjectedFaults();\r
-    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));\r
+    const installedIds=new Set(getInstalledPointIds(points));
+    const installed=points.filter(point=>installedIds.has(point.pointId));
+    const faults=getInjectedFaults();
+    const candidateEdges=getCandidateDiagnosticEdges(points);
+    const scanByPoint=new Map(arr(getState().diagnosticScanResults).map(result=>[result.pointId,result]));
     return \`\r
       <section class="tp-console dataflow-workspace" data-dataflow-view="testpoint-diagnosis" data-testpoint-workbench>\r
         <header class="tp-console-header">\r
@@ -19498,17 +21615,23 @@ function decorateDataflowEdges(){\r
           <div class="tp-console-stats">\r
             <span><b>\${points.length}</b> 固定测点</span>\r
             <span><b>\${installed.length}</b> 已安装</span>\r
-            <span><b>\${getRuntimeEdges().length}</b> 模型连线</span>\r
+            <span><b>\${candidateEdges.length}</b> 候选连线</span>
             <span><b>\${faults.length}</b> 当前故障</span>\r
           </div>\r
         </header>\r
         <div class="tp-console-body">\r
           <section class="tp-console-panel tp-console-panel--points">\r
-            <div class="tp-panel-head">\r
-              <strong>固定测点</strong>\r
-              <button type="button" data-clear-testpoints>全部移除</button>\r
-            </div>\r
-            <select class="tp-hidden-select" data-testpoint-position-select aria-hidden="true" tabindex="-1">\r
+            <div class="tp-panel-head">
+              <strong>固定测点</strong>
+              <button type="button" data-clear-testpoints>全部移除</button>
+            </div>
+            <div class="tp-manual-point-add">
+              <select data-testpoint-edge-select \${candidateEdges.length?'':'disabled'}>
+                \${candidateEdges.length?candidateEdges.map(edge=>\`<option value="\${html(edge.id)}">\${html(edge.label)}\${edge.signalId?\` · \${html(edge.signalId)}\`:''}</option>\`).join(''):\`<option value="">暂无可添加连线</option>\`}
+              </select>
+              <button type="button" data-add-testpoint-from-edge \${candidateEdges.length?'':'disabled'}>添加测点</button>
+            </div>
+            <select class="tp-hidden-select" data-testpoint-position-select aria-hidden="true" tabindex="-1">
               \${points.map(point=>\`<option value="\${html(point.pointId)}">\${html(point.name)}</option>\`).join('')}\r
             </select>\r
             <div class="tp-point-grid">
@@ -19566,8 +21689,9 @@ function decorateDataflowEdges(){\r
       positions,\r
       semanticPoints:positions,\r
       available:positions.filter(point=>!point.installed),\r
-      installed:positions.filter(point=>point.installed),\r
-      injectedFaults:getInjectedFaults(),\r
+      installed:positions.filter(point=>point.installed),
+      candidateEdges:getCandidateDiagnosticEdges(positions),
+      injectedFaults:getInjectedFaults(),
       faultLibrary:getRuntimeFaultLibrary()
     };
   };
@@ -19950,10 +22074,36 @@ function decorateDataflowEdges(){\r
     clearDiagnosticScanState(state);
     refreshDiagnosisViews();
     return true;\r
-  };\r
-  window.installDiagnosticTestPoint=window.addDiagnosticTestPoint;\r
-\r
-  window.removeDiagnosticTestPoint=function(pointId){\r
+  };
+  window.installDiagnosticTestPoint=window.addDiagnosticTestPoint;
+
+  window.addDiagnosticTestPointFromEdge=function(edgeId,options={}){
+    const edge=getActiveDiagnosticEdges().find(item=>item.id===edgeId)||getRuntimeEdges().find(item=>item.id===edgeId);
+    if(!edge) return {ok:false,reason:'edge-not-found',edgeId};
+    const state=getState();
+    const manual=getManualDiagnosticPoints();
+    const configured=arr(state.diagnosticTestPoints).length?arr(state.diagnosticTestPoints):arr(state.testPoints);
+    const existing=getConfiguredPoints().find(point=>point.edgeId===edge.id)
+      ||manual.find(point=>point.edgeId===edge.id)
+      ||configured.find(point=>(point.edgeId||point.edgeID||point.targetEdgeId)===edge.id);
+    if(existing){
+      state.selectedDiagnosticTestPointId=existing.pointId||existing.id||null;
+      return {ok:true,existed:true,point:existing};
+    }
+    const point=createManualPointForEdge(edge,getConfiguredPoints().length+manual.length,options);
+    if(manual.some(item=>(item.pointId||item.id)===point.pointId)){
+      point.pointId=\`tp-\${edge.id}-\${manual.length+1}\`;
+    }
+    manual.push(point);
+    state.selectedDiagnosticTestPointId=point.pointId;
+    state.diagnosticTestPointManualCleared=false;
+    invalidateConfiguredDiagnosticPoints();
+    clearDiagnosticScanState(state);
+    refreshDiagnosisViews();
+    return {ok:true,point};
+  };
+
+  window.removeDiagnosticTestPoint=function(pointId){
     const points=getConfiguredPoints();\r
     const state=getState();\r
     const before=getInstalledPointIds(points).length;\r
@@ -20386,12 +22536,13 @@ function decorateDataflowEdges(){\r
     const nodes=getRuntimeNodes();\r
     const edges=getRuntimeEdges();\r
     const api=window.__GZ_FAULT_INJECTION_RUNTIME__;\r
-    const compatible=api?.findCompatibleFaultTarget?.(model,{\r
-      nodes,\r
-      edges,\r
-      selectedNodeId:getState().selBlk,\r
-      selectedEdgeId:getState().selEdge\r
-    });\r
+    const compatible=api?.findCompatibleFaultTarget?.(model,{
+      nodes,
+      edges,
+      selectedNodeId:getState().selBlk,
+      selectedEdgeId:getState().selEdge,
+      faultCapabilityMap:getState().activeModelPackage?.faultCapabilityMap||[]
+    });
     if(compatible?.kind==='edge'&&edges.some(edge=>edge.id===compatible.id)){\r
       return {kind:'edge',id:compatible.id};\r
     }\r
@@ -20706,7 +22857,16 @@ function decorateDataflowEdges(){\r
         if(located&&typeof toast==='function') toast('已在画布中标出注入位置','s');\r
         return;\r
       }\r
-      const install=event.target.closest?.('[data-install-testpoint]');\r
+      const addFromEdge=event.target.closest?.('[data-add-testpoint-from-edge]');
+      if(addFromEdge){
+        event.preventDefault();
+        const root=addFromEdge.closest('[data-testpoint-workbench]')||document;
+        const select=root.querySelector('[data-testpoint-edge-select]');
+        const edgeId=addFromEdge.getAttribute('data-add-testpoint-from-edge')||select?.value||'';
+        window.addDiagnosticTestPointFromEdge(edgeId);
+        return;
+      }
+      const install=event.target.closest?.('[data-install-testpoint]');
       if(install){\r
         event.preventDefault();\r
         const id=install.getAttribute('data-install-testpoint');\r
@@ -20818,7 +22978,7 @@ function decorateDataflowEdges(){\r
   }\r
 })();\r
 \r
-;(function installCanvasVisualSemanticsAfterAllOverrides(){\r
+;(function installCanvasVisualSemanticsAfterAllOverrides(){
   if(typeof window==='undefined') return;\r
 \r
   function getState(){\r
@@ -20889,8 +23049,2018 @@ function decorateDataflowEdges(){\r
   }\r
 \r
   window.decorateCanvasNodesByVisualKind=decorateCanvasNodes;\r
-  setTimeout(decorateCanvasNodes,0);\r
-})();\r
-`,iu=`canvas-root`,au=`顶层`;function ou(e){return JSON.parse(JSON.stringify(e))}function su(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Y(e){return Array.isArray(e)?e:[]}function cu(e){let t=ou(e??{});return{inputs:Array.isArray(t.inputs)?ou(t.inputs):[],outputs:Array.isArray(t.outputs)?ou(t.outputs):[],middleVars:Array.isArray(t.middleVars)?ou(t.middleVars):[]}}function lu(e){let t=ou(e??{});return{...qo().executionConfig,...t}}function uu(e){if(!e||typeof e!=`object`)return qo();let t={...qo(),...ou(e)};return t.executionConfig=lu(e.executionConfig),t.portMapping={...qo().portMapping,...cu(e.portMapping)},t}function du(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function fu(e,t){return Object.values(su(e)?e:{}).flatMap(e=>su(e)?Y(e[t]):[])}function pu(e,t,n){return du(fu(e,t),n)}function mu(e){let t=su(e)?ou(e):{};return{...t,pythonBinding:t.type===`simulation_block`?uu(t.pythonBinding):t.pythonBinding??null}}function hu(e){return su(e)?ou(e):{}}function gu(e=iu,t=au){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function _u(e,t=iu){let n=su(e)?ou(e):{};return{id:n.id??t,name:n.name??(t===iu?au:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:Y(n.nodes).map(mu),edges:Y(n.edges).map(hu)}}function vu(e){let t=su(e)?e:{},n=su(t.canvases)?t.canvases:null;if(!n){let e=gu();return e.nodes=Y(t.modelNodes).map(mu),e.edges=Y(t.modelEdges).map(hu),{rootCanvasId:iu,activeCanvasId:iu,canvasTrail:[iu],canvases:{[iu]:e}}}let r=t.rootCanvasId??iu,i={};Object.entries(n).forEach(([e,t])=>{i[e]=_u(t,e)}),i[r]||(i[r]=gu(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=Y(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function yu(e){let t=su(e)?ou(e):{},n=vu(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??gu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?au:`未命名画布`),a=i.nodes,o=i.edges;return ou({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??pu(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??pu(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}function bu(e){let t=su(e)?ou(e):{},n=vu(t),r=n.canvases[n.activeCanvasId]??gu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?au:`未命名画布`),i=r.nodes,a=r.edges;return ou({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??pu(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??pu(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:Y(t.faultedBlks),importedFaultModels:Y(t.importedFaultModels),faultTags:Y(t.faultTags),faultInjectionLinks:Y(t.faultInjectionLinks)})}var xu=new Set([1,`2.0`]),Su=`flight-control-model`;function X(e){return JSON.parse(JSON.stringify(e))}function Cu(e){let t=X(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function wu(e){let t=new Map;return e.forEach(e=>{let n=Cu(e);Z(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),Z(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function Tu(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Q(e)){t.push(e);return}let r=Z(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Q(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function Eu(e,t){let n=X(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Q(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Q(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function Du(e){return!!(e?.bound&&Z(e.entryFunction)&&Z(e.rawSource??e.source)&&Q(e.parsedInterface))}function Ou(e,t){if(!e?.bound||!t||!Q(t.parsedInterface)||Du(e))return e;let n=Jo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...X(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??X(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Q(e.executionConfig)?e.executionConfig:n.executionConfig}}function ku(e,t){let n=wu(t),r=[];return{snapshot:Eu(e,e=>{if(!Q(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!Du(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=Ou(t,i);if(!Du(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function Au(e){if(!Q(e))return e;if(e?.type!==`simulation_block`)return X(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...X(e),pythonBinding:t?X(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=Z(n)&&Z(r)&&Z(i)&&Z(a);return{...X(e),pythonBinding:o?X(t):null}}function ju(e){return Tu(e).reduce((e,t)=>{if(!Q(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!Z(r)||!Z(i)||!Z(a)||!Z(o)||e.has(r)||e.set(r,Cu({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function Z(e){return typeof e==`string`&&e.trim().length>0}function Q(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function Mu(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Q(t)||e.push(`${n}[${r}] must be an object.`)})}function Nu(e){let t=[],n=new Set,r=new Set;if(!Q(e))return{ok:!1,errors:[`Package must be an object.`]};if(xu.has(e.schemaVersion)||t.push(`schemaVersion must be 1 or 2.0.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${Su}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Q(e)){t.push(`pythonModules[${i}] must be an object.`);return}Z(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),Z(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),Z(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),Z(e.source)||t.push(`pythonModules[${i}].source is required.`),Z(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),Z(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Q(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Q(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?Mu(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?Mu(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Q(e)&&Z(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Q(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&Mu(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&Mu(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),Tu(e.workbenchSnapshot).forEach((e,n)=>{if(!Q(e)||!Q(e.injectedFault))return;let r=Z(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!Z(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function Pu(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function Fu(e){let t=Nu(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=X(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=ku(bu(e.workbenchSnapshot),n);return r.errors.length>0?{ok:!1,errors:r.errors}:{ok:!0,snapshot:r.snapshot,descriptor:Pu(e),faultLibrary:X(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Q(e.diagnosticModel)?X(e.diagnosticModel):null,pythonModules:n}}function Iu({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=yu(t),i=Eu(r,Au),a=ju(r);return{schemaVersion:1,packageType:Su,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?X(e.supportedFaultLibraries):[],capabilities:Q(e.capabilities)?X(e.capabilities):{},source:X(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:X(n??[]),workbenchSnapshot:i}}function Lu({meta:e={},state:t={},faultLibrary:n=[]}={}){return Iu({meta:e,snapshot:t,faultLibrary:n})}var Ru={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},zu=!1,Bu=`model-packages/evtol_closed_loop_fault_demo.json`,Vu=`gz-workbench-system-model`;function Hu(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function Uu(){let e=Hu(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function Wu(){return new URL(Bu,Uu()).toString()}function Gu(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Ku(){return Gu()?{publicDemo:!0}:{}}function qu(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(Vu)}catch{}}function Ju({force:e=!1}={}){if(e)return!1;if(!window.__GZ_AUTO_LOAD_DEFAULT_MODEL__||window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Yu(e={}){if(Ju(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,qu(e);try{let n=e.packageObject??await Xu(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??Wu(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??Wu(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Xu(e=Wu()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function Zu(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function Qu(e={}){return yu(e)}function $u(){zu||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:yu,restoreWorkbenchSnapshot:bu},window.__GZ_FAULT_TYPE_CATALOG__=Ru,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return Nu(e)},importObject(e){let t=Fu(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return Lu({meta:Zu(e),state:Qu(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Yu,window.eval(`${ru}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Ku();Yu(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:Wu(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,zu=!0)}var ed=[`all`,`info`,`ok`,`warn`,`error`],td={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},nd={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},rd={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},id=null,ad=null,od=null,sd=!1;function cd(){return document.querySelector(`.sbar`)}function ld(e=cd()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function ud(e=cd()){return e?.querySelector(`.sbar-log-table`)||null}function dd(e=cd()){return e?.querySelector(`[data-status-empty]`)||null}function fd(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function pd(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function md(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(fd(t)),e.append(n)}function hd(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function gd(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function _d(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),md(e,t),hd(e,`组件`),gd(e),md(e,n),hd(e,`连线`))}function vd(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),md(e,t),hd(e,`故障`))}function yd(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function bd(){let e=pd(document.getElementById(`sblk`)?.textContent||``),t=pd(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function xd(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function Sd(e={}){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=bd(),r={components:fd(e.components,n.components),links:fd(e.links,n.links),faults:fd(e.faults,n.faults),state:e.state,time:e.time};_d(document.getElementById(`sblk`),r.components,r.links),vd(document.getElementById(`sflt`),r.faults),yd(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function Cd(){sd||(sd=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{sd=!1,xd()&&Sd(bd())}))}function wd(e){if(od?.disconnect(),od=null,Sd(bd()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){od=new MutationObserver(Cd);for(let e of t)od.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function Td(e,t,n){let r=dd(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function Ed(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=td[t]||td.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function Dd(e=cd()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of ld(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:rd[t]||rd.log;return Td(e,i===0,a),Ed(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function Od(e=`all`){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=ed.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...Dd(t)}}function kd(){let e=cd();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return Od(ed[(ed.indexOf(t)+1)%ed.length]||`all`)}function Ad(e=`log`){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...Dd(t)}}function jd(){let e=cd();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...Dd(e)}}function Md(e={}){let t=cd();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of ld(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
-`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function Nd(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function Pd(e={}){let t=cd(),n=ud(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=td[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||Nd();let s=document.createElement(`span`);s.className=`sbar-badge ${nd[r]||nd.info}`,s.textContent=td[r]||td.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=dd(t);n.insertBefore(a,u||null);let d=ld(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,Dd(t),{ok:!0,row:a}}function Fd(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Id(e={}){let t=Fd(e.duration,2),n=Fd(e.elapsedSeconds??e.time??0,2),r=Fd(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:fd(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:fd(e.stepIndex,0),stepSize:r}}function Ld(e={}){let t=Id(e),n=Pd({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=Pd({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function Rd(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){Ad(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?jd():n.dataset.statusAction===`level`?kd():n.dataset.statusAction===`export`&&Md())}function zd(){let e=cd();!e||e===id||(Bd(),id=e,ad=Rd,id.addEventListener(`click`,ad),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,wd(e),Dd(e),window.__GZ_STATUS_BAR__={applyLevelFilter:Od,bind:zd,clear:jd,cycleLevelFilter:kd,exportLog:Md,formatMetrics:Sd,pushEntry:Pd,publishSimulationSummary:Ld,refresh:Dd,selectView:Ad,unbind:Bd})}function Bd(){id&&ad&&id.removeEventListener(`click`,ad),od?.disconnect(),od=null,id=null,ad=null}function Vd(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function Hd({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Vd(t)}async function Ud({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Vd(n)}function Wd(e){return String(e??`any`).trim().toLowerCase()}function Gd(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Kd(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function qd(e){let t=Wd(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Kd(n)}function Jd({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=Hd,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?qd(e):Kd(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Kd(Gd(h.outputs,e,t))),_=f.map((e,t)=>Kd(Gd(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Kd(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Yd=Jd;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var Xd=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Zd=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Qd=new Set(Object.values(Zd)),$d=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),ef=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),tf=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function nf(e){return JSON.parse(JSON.stringify(e??null))}function rf(e){return typeof e==`string`&&e.trim().length>0}function af(e){return String(e??``).trim().toLowerCase()}function $(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function of(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function sf(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function cf(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function lf(e=1,t=0,n=0){return cf(e,t,n)*2-1}function uf(e){return Array.isArray(e)?e:[]}function df(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function ff(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function pf(e={}){if(rf(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return e.runtimeBehavior;if(rf(e.id)&&Xd[e.id])return Xd[e.id];if(rf(e.faultTypeId)&&Xd[e.faultTypeId])return Xd[e.faultTypeId];if(rf(e.faultCode)&&ef[e.faultCode])return ef[e.faultCode];let t=[e.name,e.modelClass,e.faultKind,...uf(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function mf(e){return Qd.has(e)?e:``}function hf(e={},t={}){let n=mf(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=pf(e)||pf(t);if(Pf(r)||i===`protocol_edge_fault`)return Zd.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Zd.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Zd.signalTransform:Zd.localOnly}function gf(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function _f(e={},t=0){let n=$(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+$(r,1/0)}function vf(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??gf(n,r),a=t.behavior||pf(n)||pf(r),o=t.state??{},s=$(t.time,0),c=Math.max($(t.dt,.1),1e-4),l=$(t.seed,1),u=$(t.stepIndex,0),d=$(e,0);if(!a||!_f(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+$(ff(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*$(i.scale,1);if(a===`parameter_drift`){let e=$(i.rate,0),t=i.max_delta===void 0?null:Math.abs($(i.max_delta,0)),n=Math.max(s-$(i.start,0),0)*e;return t!==null&&(n=sf(n,-t,t)),d+n}if(a===`parameter_step`)return d+$(i.step_value,$(i.jump,0));if(a===`lock`)return $(i.lock_value,0);if(a===`saturation`)return sf(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:$(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:$(i.upper,1/0));if(a===`noise`){let e=af(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&cf(l,u,s)>1-$(i.probability,.03))return d+Math.sign(lf(l+17,u,s)||1)*$(i.amplitude,.2);let t=e.includes(`white`)?$(i.amplitude,.2):$(i.std,.08);return d+lf(l,u,s)*t}if(a===`colored_noise`){let e=sf($(i.alpha,.92),0,.999),t=$(i.std,.03);return o.previousNoise=e*$(o.previousNoise,0)+lf(l,u,s)*t,d+o.previousNoise}if(a===`freeze`)return o.hasHoldValue||=(o.holdValue=d,!0),$(o.holdValue,d);if(a===`jump_or_invert`)return(of(i.invert,!0)?-d:d)+$(i.jump,0);if(a===`intermittent`){let e=Math.max($(i.period,4),c),n=sf($(i.duty,.25),0,1);if((s-$(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return vf(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round($(ff(i,`delay_steps`,$(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return $(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,$(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round($(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs($(i.jitter_steps,1))),0),r=Math.round(cf(l,u,s)*n);return vf(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=sf($(ff(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return cf(l,u,s)<=e?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round($(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:$(o.previousValue,0);let e=sf($(i.start_probability,.02),0,1);return cf(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round($(i.burst_length,5))-1,0),i.strategy===`zero`?0:$(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*$(i.scale,1)+$(i.bias,0);return of(i.invert,!1)?-e:e}if(a===`interrupt`)return of(i.enable,!0)?i.strategy===`zero`?0:$(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round($(i.replay_depth,6)),1),t=Math.max(Math.round($(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,$(n,d)}return d}function yf(e={},t={}){let n=gf(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:nf(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:pf(e),parameters:n}}function bf(e){return df(e)&&(rf(e.modelId)||rf(e.faultModelId)||rf(e.runtimeBehavior)||df(e.parameters))}function xf(e={},t={}){return bf(t)?{...yf(e,t.parameters??{}),...t,parameters:gf(e,t)}:yf(e,t)}function Sf(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function Cf(e={},t={},n={}){let r=xf(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(Pf(r.layer)?`edge`:`node`),o=mf(n.propagationMode)||hf(e,r);return{bindingId:n.bindingId||Sf(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||pf(e),parameters:nf(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Zd.localOnly,active:n.active??!0,injectedFault:r}}function wf(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function Tf(e={},t={}){let n=wf(e),r=wf(t);return n&&r&&n===r?!0:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function Ef(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:nf(e.parameters??{})},i=mf(e.propagationMode)||hf(e,r),a={...e,bindingId:e.bindingId||Sf(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:nf(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Zd.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,parameters:nf(a.parameters)},a}function Df(e={},t={}){if(!e||!df(e))return[];let n=Ef(t,e),r=uf(e.faultBindings).map(t=>Ef(t,e)),i=r.findIndex(e=>Tf(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function Of(e={},t={}){let n=uf(e.faultBindings).map(t=>Ef(t,e));return n.length===0&&e.injectedFault&&n.push(Ef({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function kf(e={}){return Of(e,{activeOnly:!0}).length>0}function Af(e,t={}){let n=Of(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=df(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||pf(o)||pf(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=df(r.bindingStates[c])?r.bindingStates[c]:{},vf(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:$(t.seed,1)+a})},e)}function jf(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(rf).map(af)}function Mf(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function Nf(e={}){let t=e.id??e.faultTypeId,n=uf(e.moduleTargets),r=t?$d[t]??[]:[];return[...new Set([...n,...r].map(af).filter(Boolean))]}function Pf(e){return e===`protocol`||e===`communication`}function Ff(e,t){if(!Mf(e))return!1;let n=Nf(t);if(n.length===0)return!0;let r=jf(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function If(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...uf(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(rf).map(af)}function Lf(e,t){if(e?.lineType!==`can`)return!1;let n=Nf(t);if(n.length===0)return!1;let r=If(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Rf(e={},t={}){let n=uf(t.nodes),r=uf(t.edges);if(Pf(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=r.find(t=>Lf(t,e));if(i)return{kind:`edge`,id:i.id,reason:`module-target-can-edge`};let a=r.find(e=>e.lineType===`can`);return a?{kind:`edge`,id:a.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&Ff(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let a=n.find(t=>Ff(t,e));return a?{kind:`node`,id:a.id,reason:`module-target`}:null}function zf(e={}){let t=pf(e)||`additive_bias`,n=tf[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=gf(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
-`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var Bf=`uav-flight-control`,Vf=`uav-flight-control-faults`,Hf=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Uf(e){return typeof e==`string`&&e.trim().length>0}function Wf(e){return Uf(e)?e.trim():``}function Gf(e){return Array.isArray(e)?Array.from(new Set(e.map(Wf).filter(Boolean))):[]}function Kf(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Uf).join(` `).toLowerCase()}function qf(e={}){let t=Kf(e);return Hf.some(e=>t.includes(e.toLowerCase()))}function Jf(e={}){let t=Wf(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Uf).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Vf:``}function Yf(e={}){let t=Wf(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Uf).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Bf:``}function Xf(e={}){return Wf(e.systemFamily??e.modelFamily)||(qf(e)?Bf:``)}function Zf(e={}){return Array.isArray(e.supportedFaultLibraries)?Gf(e.supportedFaultLibraries):Xf(e)===`uav-flight-control`?[Vf]:[]}function Qf(e={},t=null){return Wf(e.libraryId)||Jf(t??e)}function $f(e={},t=null){return Wf(e.systemFamily??e.modelFamily)||Yf(t??e)}function ep(e,t={}){let n=typeof e==`string`?Wf(e):Qf(e),r=typeof e==`string`?``:$f(e),i=Zf(t),a=Xf(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function tp(e,t={},n=null){let r=Qf(e,n),i=$f(e,n),a=Zf(t),o=Xf(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function np(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>tp(e,t,r)):[]}function rp(e={},t=null){let n=Zf(e),r=Xf(e),i=t?np(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:Ud,executePythonBindingSync:Hd,executeFlowBlockPythonBindingSync:Jd,executeSimulationBlockPythonBindingSync:Yd,getPythonBindingDefaultValue:qd},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:vf,applyScalarFaultBindings:Af,appendFaultBinding:Df,buildFaultPythonModuleSpec:zf,createFaultBinding:Cf,createInjectedFaultPayload:yf,findCompatibleFaultTarget:Rf,getFaultBindings:Of,getFaultRuntimeBehavior:pf,hasActiveFaultBinding:kf,inferFaultPropagationMode:hf,isFaultActive:_f,resolveFaultParameters:gf,compatibility:{describeModelFaultCompatibility:rp,filterCompatibleFaultTypes:np,getModelFaultLibraryIds:Zf,getModelSystemFamily:Xf,isFaultCompatibleWithModel:tp,isFaultLibraryCompatibleWithModel:ep}});var ip=[`data-runtime-ready`],ap={class:`workbench-main`},op=`gz.layoutSizes`;ho({__name:`App`,setup(e){let t=Yo(),n=Jt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(op)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(op,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return ir(async()=>{u(s(),{persist:!1}),await vn(),$u(),zd(),t.markReady()}),sr(()=>{f(),Bd()}),(e,r)=>(B(),V(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":N(t).runtimeReady?`true`:`false`},[U(bo),H(`main`,ap,[U(Gs),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),U(Js),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),U(Zs),H(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),U(ec)]),U(rc),U(oc),U(lc),U(fc),U(hc),U(vc),U(ul),U(Ml),U($l),U(nu)],8,ip))}}).mount(`#app`);
+  setTimeout(decorateCanvasNodes,0);
+})();
+
+;(function installLayeredFaultInjectionRuntime(){
+  if(typeof window==='undefined') return;
+
+  const LAYERED_FAULT_INJECTOR_TYPES={
+    physical_fault_injector:{
+      layer:'physical',
+      layerLabel:'物理层',
+      label:'物理层注入',
+      faultType:'模型参数故障',
+      defaultModel:'bias',
+      targetKind:'node'
+    },
+    electrical_fault_injector:{
+      layer:'electrical',
+      layerLabel:'电气层',
+      label:'电气层注入',
+      faultType:'连续信号故障',
+      defaultModel:'noise',
+      targetKind:'any'
+    },
+    protocol_fault_injector:{
+      layer:'protocol',
+      layerLabel:'协议层',
+      label:'协议层注入',
+      faultType:'数字协议故障',
+      defaultModel:'tamper',
+      targetKind:'edge'
+    }
+  };
+
+  Object.entries(LAYERED_FAULT_INJECTOR_TYPES).forEach(([type,config])=>{
+    COMPONENT_LIBRARY[type]={
+      label:config.label,
+      badge:'故障',
+      className:'b-fault',
+      width:196,
+      height:96,
+      defaults:{
+        name:config.label,
+        faultType:config.faultType,
+        layer:config.layerLabel,
+        layerKey:config.layer
+      }
+    };
+  });
+
+  function arr(value){
+    return Array.isArray(value)?value:[];
+  }
+
+  function cloneValue(value){
+    return JSON.parse(JSON.stringify(value==null?null:value));
+  }
+
+  function getState(){
+    return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});
+  }
+
+  function isLayeredFaultInjectorType(type){
+    return Object.prototype.hasOwnProperty.call(LAYERED_FAULT_INJECTOR_TYPES,type);
+  }
+
+  function getLayeredFaultInjectorConfig(type){
+    return LAYERED_FAULT_INJECTOR_TYPES[type]||null;
+  }
+
+  function getLayeredFaultInjectorTargetKind(injector){
+    const type=typeof injector==='string'?injector:injector?.type;
+    return getLayeredFaultInjectorConfig(type)?.targetKind||'any';
+  }
+
+  function getTargetKind(target){
+    return target?.sourceNodeId&&target?.targetNodeId?'edge':'node';
+  }
+
+  function canLayeredInjectorUseTargetKind(injector,target){
+    const requiredKind=getLayeredFaultInjectorTargetKind(injector);
+    return requiredKind==='any'||requiredKind===getTargetKind(target);
+  }
+
+  function getLayeredInjectionForm(target,layer){
+    const kind=getTargetKind(target);
+    if(kind==='edge'&&layer==='protocol') return 'protocol-bus';
+    if(kind==='edge') return 'signal-edge';
+    return 'module-variable';
+  }
+
+  function getRuntimeNode(id){
+    return getState().modelNodes?.find(node=>node.id===id)||null;
+  }
+
+  function getRuntimeEdge(id){
+    return getState().modelEdges?.find(edge=>edge.id===id)||null;
+  }
+
+  function getRuntimeNodeName(id){
+    const node=getRuntimeNode(id);
+    return plainText(node?.props?.name||node?.label||node?.id,'');
+  }
+
+  function getEdgeEndpointLabel(edge){
+    const source=getRuntimeNodeName(edge?.sourceNodeId);
+    const target=getRuntimeNodeName(edge?.targetNodeId);
+    if(source&&target) return \`\${source} -> \${target}\`;
+    return source||target||'';
+  }
+
+  function getEdgeDisplayName(edge){
+    return plainText(edge?.label||edge?.signalName||edge?.name||edge?.signalId,getEdgeEndpointLabel(edge)||edge?.id||'连接');
+  }
+
+  function getTargetByRef(ref={}){
+    if(ref.targetKind==='edge'||ref.kind==='edge'){
+      return getRuntimeEdge(ref.targetId||ref.id);
+    }
+    if(ref.targetKind==='node'||ref.kind==='node'){
+      return getRuntimeNode(ref.targetId||ref.id);
+    }
+    return getRuntimeNode(ref.targetId||ref.id)||getRuntimeEdge(ref.targetId||ref.id)||null;
+  }
+
+  function getFaultSlotBindingObject(slot){
+    const value=slot?.bindingObject
+      || slot?.targetVariable
+      || slot?.variableKey
+      || slot?.parameterKey
+      || slot?.varName
+      || slot?.key
+      || '';
+    return String(value||'').trim();
+  }
+
+  function stableSlotKey(value,index){
+    return String(value?.key||value?.id||value?.name||value?.varName||\`slot-\${index}\`).replace(/\\s+/g,'_');
+  }
+
+  const COMPONENT_FAULT_LAYERS=['physical','electrical','protocol'];
+  const COMPONENT_LAYER_MODELS={
+    physical:['bias','drift','step','degradation','freeze','random'],
+    electrical:['bias','noise','freeze','intermittent'],
+    protocol:['delay','dropout','tamper','stale']
+  };
+
+  function plainText(value,fallback=''){
+    const raw=value===undefined||value===null||value===''?fallback:value;
+    const result=String(raw??'').trim();
+    return result||fallback;
+  }
+
+  function stableVariableKey(value,fallback='slot'){
+    return plainText(value,fallback).replace(/\\s+/g,'_');
+  }
+
+  function rawSlotBindingName(value,index){
+    return plainText(value?.bindingObject||value?.targetVariable||value?.varName||value?.key||value?.id||value?.name,\`slot_\${index+1}\`);
+  }
+
+  function defaultComponentVariableField(role,key){
+    if(role==='parameter') return \`params.\${key}\`;
+    if(role==='input') return \`inputs.\${key}\`;
+    if(role==='output') return \`outputs.\${key}\`;
+    if(role==='middle') return \`middleVars.\${key}\`;
+    if(role==='protocol') return \`protocol.\${key}\`;
+    return key;
+  }
+
+  function getComponentFaultDeclaration(node){
+    const declaration=node?.props?.faultInjection||node?.faultInjection||node?.props?.injectableFaultVariables||node?.injectableFaultVariables;
+    return declaration&&typeof declaration==='object'&&!Array.isArray(declaration)?declaration:null;
+  }
+
+  function hasComponentFaultDeclaration(node){
+    const declaration=getComponentFaultDeclaration(node);
+    return !!declaration&&COMPONENT_FAULT_LAYERS.some(layer=>Object.prototype.hasOwnProperty.call(declaration,layer));
+  }
+
+  function pushComponentFaultVariable(result,seen,role,item,index){
+    if(!item||typeof item!=='object') return;
+    const rawKey=plainText(item.key||item.id||item.varName||item.name,\`\${role}_\${index+1}\`);
+    const key=stableVariableKey(rawKey,\`\${role}_\${index+1}\`);
+    if(!key||seen.has(key)) return;
+    const bindingObject=plainText(item.bindingObject||item.targetVariable||item.varName||item.key||item.id||item.name,key);
+    seen.add(key);
+    result.push({
+      key,
+      role,
+      name:plainText(item.displayName||item.name||item.label||item.varName||item.key||item.id,key),
+      targetField:plainText(item.targetField,defaultComponentVariableField(role,key)),
+      bindingObject,
+      targetVariable:plainText(item.targetVariable,bindingObject),
+      signalId:plainText(item.signalId,''),
+      unit:plainText(item.unit,''),
+      type:plainText(item.type||item.format,''),
+      parameterKey:role==='parameter'?key:''
+    });
+  }
+
+  function getComponentFaultVariables(node){
+    const props=node?.props||{};
+    const result=[];
+    const seen=new Set();
+    [
+      ['parameter',arr(props.parameters)],
+      ['parameter',arr(props.modelParameters)],
+      ['parameter',arr(props.physicalParameters)],
+      ['parameter',arr(node?.parameters)],
+      ['parameter',arr(node?.physicalParameters)],
+      ['input',arr(props.inputs)],
+      ['output',arr(props.outputs)],
+      ['middle',arr(props.middleVars)],
+      ['protocol',arr(props.protocolParameters)],
+      ['protocol',arr(node?.protocolParameters)]
+    ].forEach(([role,items])=>items.forEach((item,index)=>pushComponentFaultVariable(result,seen,role,item,index)));
+    return result;
+  }
+
+  function declarationVariableKey(item,index){
+    if(item&&typeof item==='object'){
+      return stableVariableKey(item.variableKey||item.key||item.id||item.varName||item.name,\`slot_\${index+1}\`);
+    }
+    return stableVariableKey(item,\`slot_\${index+1}\`);
+  }
+
+  function declarationItemsForLayer(declaration,layer){
+    const value=declaration?.[layer];
+    if(Array.isArray(value)) return value;
+    if(typeof value==='string') return [value];
+    if(value&&typeof value==='object'){
+      return Object.entries(value).filter(([,enabled])=>!!enabled).map(([key])=>key);
+    }
+    return [];
+  }
+
+  function getComponentDeclaredFaultSlots(node){
+    const declaration=getComponentFaultDeclaration(node);
+    if(!declaration) return [];
+    const variables=new Map(getComponentFaultVariables(node).map(variable=>[variable.key,variable]));
+    return COMPONENT_FAULT_LAYERS.flatMap(layer=>declarationItemsForLayer(declaration,layer).map((item,index)=>{
+      const extra=item&&typeof item==='object'?item:{};
+      const key=declarationVariableKey(item,index);
+      const variable=variables.get(key)||{};
+      const id=plainText(extra.slotId||extra.id,\`\${layer}:\${key}\`);
+      return makeSlot(
+        layer,
+        id,
+        plainText(extra.slotName||extra.displayName,variable.name||key),
+        node,
+        {
+          ...extra,
+          slotId:id,
+          slotName:plainText(extra.slotName||extra.displayName,variable.name||key),
+          targetField:plainText(extra.targetField,variable.targetField||defaultComponentVariableField(variable.role||'parameter',key)),
+          bindingObject:plainText(extra.bindingObject||extra.targetVariable,variable.bindingObject||key),
+          targetVariable:plainText(extra.targetVariable,extra.bindingObject||variable.targetVariable||variable.bindingObject||key),
+          allowedModels:arr(extra.allowedModels).length?arr(extra.allowedModels):COMPONENT_LAYER_MODELS[layer].slice(),
+          variableKey:key,
+          variableRole:variable.role||extra.variableRole||'',
+          signalId:plainText(extra.signalId,variable.signalId||''),
+          unit:plainText(extra.unit,variable.unit||''),
+          parameterKey:plainText(extra.parameterKey,variable.parameterKey||'')
+        }
+      );
+    }));
+  }
+
+  function mergeComponentDeclaredSlots(componentSlots,target){
+    const declared=getDeclaredFaultSlots(target);
+    return componentSlots.map(slot=>{
+      const match=declared.find(item=>item.layer===slot.layer&&(item.id===slot.id||item.slotId===slot.id));
+      if(!match) return slot;
+      return {
+        ...match,
+        ...slot,
+        allowedFaultIds:match.allowedFaultIds||slot.allowedFaultIds,
+        allowedFaultTypeIds:match.allowedFaultTypeIds||slot.allowedFaultTypeIds
+      };
+    });
+  }
+
+  function makeSlot(layer,id,name,target,extra={}){
+    return {
+      id,
+      layer,
+      name,
+      targetKind:getTargetKind(target),
+      targetId:target?.id||'',
+      ...extra
+    };
+  }
+
+  function getNodePhysicalSlots(node){
+    return [
+      ...arr(node?.props?.modelParameters),
+      ...arr(node?.props?.physicalParameters),
+      ...arr(node?.physicalParameters)
+    ].map((param,index)=>makeSlot(
+      'physical',
+      \`physical:\${stableSlotKey(param,index)}\`,
+      param?.name||param?.label||param?.key||\`模型参数 \${index+1}\`,
+      node,
+      {
+        parameterKey:param?.key||param?.id||param?.name||'',
+        variableKey:stableVariableKey(param?.key||param?.id||param?.varName||param?.name,\`parameter_\${index+1}\`),
+        variableRole:'parameter',
+        bindingObject:rawSlotBindingName(param,index),
+        targetVariable:rawSlotBindingName(param,index),
+        unit:param?.unit||''
+      }
+    ));
+  }
+
+  function getNodeElectricalSlots(node){
+    if(!node||isLayeredFaultInjectorType(node.type)) return [];
+    const groups=[
+      ['input',arr(node.props?.inputs)],
+      ['output',arr(node.props?.outputs)],
+      ['middle',arr(node.props?.middleVars)]
+    ];
+    const slots=[];
+    groups.forEach(([role,items])=>{
+      items.forEach((item,index)=>{
+        slots.push(makeSlot(
+          'electrical',
+          \`electrical:\${role}:\${stableSlotKey(item,index)}\`,
+          item?.name||item?.label||\`\${role} \${index+1}\`,
+          node,
+          {
+            signalRole:role,
+            signalType:item?.type||item?.format||'',
+            variableKey:stableVariableKey(item?.key||item?.id||item?.varName||item?.name,\`\${role}_\${index+1}\`),
+            variableRole:role,
+            bindingObject:rawSlotBindingName(item,index),
+            targetVariable:rawSlotBindingName(item,index)
+          }
+        ));
+      });
+    });
+    if(!slots.length&&typeof getNodePorts==='function'){
+      const ports=getNodePorts(node);
+      arr(ports.inputs).forEach((port,index)=>slots.push(makeSlot(
+        'electrical',
+        \`electrical:input:\${stableSlotKey(port,index)}\`,
+        port.label||\`输入 \${index+1}\`,
+        node,
+        {
+          signalRole:'input',
+          variableKey:stableVariableKey(port?.key||port?.id||port?.varName||port?.name||port?.label,\`input_\${index+1}\`),
+          variableRole:'input',
+          bindingObject:rawSlotBindingName(port,index),
+          targetVariable:rawSlotBindingName(port,index)
+        }
+      )));
+      arr(ports.outputs).forEach((port,index)=>slots.push(makeSlot(
+        'electrical',
+        \`electrical:output:\${stableSlotKey(port,index)}\`,
+        port.label||\`输出 \${index+1}\`,
+        node,
+        {
+          signalRole:'output',
+          variableKey:stableVariableKey(port?.key||port?.id||port?.varName||port?.name||port?.label,\`output_\${index+1}\`),
+          variableRole:'output',
+          bindingObject:rawSlotBindingName(port,index),
+          targetVariable:rawSlotBindingName(port,index)
+        }
+      )));
+    }
+    return slots;
+  }
+
+  function getNodeProtocolSlots(node){
+    return [
+      ...arr(node?.props?.protocolParameters),
+      ...arr(node?.protocolParameters)
+    ].map((param,index)=>makeSlot(
+      'protocol',
+      \`protocol:\${stableSlotKey(param,index)}\`,
+      param?.name||param?.label||param?.key||\`协议字段 \${index+1}\`,
+      node,
+      {
+        parameterKey:param?.key||param?.id||param?.name||'',
+        variableKey:stableVariableKey(param?.key||param?.id||param?.varName||param?.name,\`protocol_\${index+1}\`),
+        variableRole:'protocol',
+        bindingObject:rawSlotBindingName(param,index),
+        targetVariable:rawSlotBindingName(param,index)
+      }
+    ));
+  }
+
+  function getEdgeElectricalSlots(edge){
+    if(!edge?.id) return [];
+    return [makeSlot(
+      'electrical',
+      \`electrical:\${edge.id}:signal\`,
+      edge.label||edge.signalName||edge.signalId||'连接信号',
+      edge,
+      {signalId:edge.signalId||'', signalRole:edge.signalRole||''}
+    )];
+  }
+
+  function edgeHasProtocolCapability(edge){
+    return edge?.lineType==='can'
+      || !!edge?.canMessageId
+      || !!edge?.messageId
+      || !!edge?.channelId
+      || !!edge?.protocol
+      || edge?.bus==='CAN';
+  }
+
+  function getEdgeProtocolSlots(edge){
+    if(!edgeHasProtocolCapability(edge)) return [];
+    const bindingObject=plainText(edge.signalId||edge.signalName||edge.name||edge.label||edge.messageId||edge.canMessageId||edge.channelId,edge.id);
+    const allowedModels=[...new Set(arr(edge.faultSlots)
+      .filter(slot=>(slot?.layer||slot?.layerKey)==='protocol'||String(slot?.slotId||slot?.id||'').includes('protocol'))
+      .flatMap(slot=>arr(slot.allowedModels)))];
+    return [makeSlot(
+      'protocol',
+      \`protocol:\${edge.id}:can\`,
+      bindingObject,
+      edge,
+      {
+        channelId:edge.channelId||'',
+        messageId:edge.canMessageId||edge.messageId||'',
+        signalId:edge.signalId||'',
+        targetField:'can.payload',
+        bindingObject,
+        targetVariable:bindingObject,
+        variableKey:stableVariableKey(bindingObject,\`protocol_\${edge.id}\`),
+        variableRole:'protocol',
+        allowedModels
+      }
+    )];
+  }
+
+  function getDeclaredFaultSlots(target){
+    const state=getState();
+    const targetKind=getTargetKind(target);
+    const pkg=state.activeModelPackage||{};
+    const capability=arr(pkg.faultCapabilityMap).find(entry=>
+      entry?.targetId===target?.id&&(entry.targetKind||targetKind)===targetKind
+    );
+    const slots=[
+      ...arr(target?.faultSlots),
+      ...arr(capability?.faultSlots)
+    ];
+    const seen=new Set();
+    return slots
+      .map((slot,index)=>{
+        const layer=inferCapabilitySlotLayer(slot,target);
+        const slotKey=slot.slotId||slot.id||\`\${layer}:\${stableSlotKey(slot,index)}\`;
+        return makeSlot(
+          layer,
+          slotKey.includes(':')?slotKey:\`\${layer}:\${slotKey}\`,
+          slot.slotName||slot.name||slot.label||slot.id||slot.slotId||\`故障槽位 \${index+1}\`,
+          target,
+          slot
+        );
+      })
+      .filter(slot=>{
+        const key=\`\${slot.layer}:\${slot.id}\`;
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
+  function mergeLayeredFaultSlots(slots){
+    const seen=new Set();
+    return arr(slots).filter(slot=>{
+      const key=\`\${slot.layer||''}:\${slot.id||slot.slotId||''}:\${slot.targetField||''}\`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function hasLayeredFaultSlot(slots,layer){
+    return arr(slots).some(slot=>slot.layer===layer);
+  }
+
+  function getActiveFaultModels(){
+    const state=getState();
+    return [
+      ...arr(state.activeModelPackage?.faultLibrary),
+      ...arr(state.activeModelPackage?.faultTypeCatalog),
+      ...arr(state.availableFaultModels),
+      ...arr(window.__GZ_FAULT_TYPE_CATALOG__)
+    ];
+  }
+
+  function inferCapabilitySlotLayer(slot,target){
+    if(slot?.layer||slot?.layerKey) return slot.layer||slot.layerKey;
+    const allowedIds=[
+      ...arr(slot?.allowedFaultIds),
+      ...arr(slot?.allowedFaultTypeIds)
+    ];
+    if(allowedIds.length){
+      const models=getActiveFaultModels();
+      const layers=allowedIds
+        .map(id=>models.find(model=>(model?.id||model?.faultTypeId)===id)?.layer)
+        .filter(Boolean);
+      const unique=[...new Set(layers)];
+      if(unique.length===1) return unique[0];
+      if(unique.includes('protocol')) return 'protocol';
+      if(unique.includes('electrical')) return 'electrical';
+      if(unique.includes('physical')) return 'physical';
+    }
+    if(getTargetKind(target)==='edge'&&edgeHasProtocolCapability(target)) return 'protocol';
+    return 'electrical';
+  }
+
+  function getLayeredFaultSlotsForTarget(target){
+    if(!target?.id) return [];
+    const declared=getDeclaredFaultSlots(target);
+    if(getTargetKind(target)==='edge'){
+      const protocolSlots=getEdgeProtocolSlots(target);
+      const declaredEdgeSlots=declared.filter(slot=>slot.layer!=='protocol'||!protocolSlots.length);
+      const inferred=[];
+      if(!hasLayeredFaultSlot(declaredEdgeSlots,'electrical')) inferred.push(...getEdgeElectricalSlots(target));
+      return mergeLayeredFaultSlots([...declaredEdgeSlots,...inferred,...protocolSlots]);
+    }
+    if(hasComponentFaultDeclaration(target)){
+      return mergeLayeredFaultSlots(mergeComponentDeclaredSlots(getComponentDeclaredFaultSlots(target),target));
+    }
+    const inferred=[];
+    if(!hasLayeredFaultSlot(declared,'physical')) inferred.push(...getNodePhysicalSlots(target));
+    if(!hasLayeredFaultSlot(declared,'electrical')) inferred.push(...getNodeElectricalSlots(target));
+    if(!hasLayeredFaultSlot(declared,'protocol')) inferred.push(...getNodeProtocolSlots(target));
+    return mergeLayeredFaultSlots([...declared,...inferred]);
+  }
+
+  function resolveInjectorLayer(injector){
+    if(typeof injector==='string') return getLayeredFaultInjectorConfig(injector)?.layer||'';
+    return injector?.faultInjector?.layer
+      || injector?.props?.layerKey
+      || getLayeredFaultInjectorConfig(injector?.type)?.layer
+      || '';
+  }
+
+  function canBindLayeredFaultInjectorToTarget(injector,target){
+    const layer=resolveInjectorLayer(injector);
+    if(!layer||!target?.id) return false;
+    if(!canLayeredInjectorUseTargetKind(injector,target)) return false;
+    return getLayeredFaultSlotsForTarget(target).some(slot=>slot.layer===layer);
+  }
+
+  function defaultLayeredFaultParameters(layer,mathModel){
+    if(mathModel==='degradation'){
+      return {scale:0.85,start:0,duration:''};
+    }
+    if(mathModel==='random'){
+      return {std:0.08,seed:1,start:0,duration:''};
+    }
+    if(mathModel==='step'){
+      return {step:0.1,start:0,duration:''};
+    }
+    if(mathModel==='freeze'||mathModel==='stale'){
+      return {mode:'hold',value:'',start:0,duration:''};
+    }
+    if(mathModel==='delay'){
+      return {delay_steps:3,start:0,duration:''};
+    }
+    if(mathModel==='dropout'){
+      return {drop_rate:0.08,seed:1,start:0,duration:''};
+    }
+    if(mathModel==='noise'||layer==='electrical'){
+      return {std:0.08,start:0,duration:'',noise_type:'gaussian'};
+    }
+    if(mathModel==='tamper'||layer==='protocol'){
+      return {scale:1.5,bias:0,start:0,duration:''};
+    }
+    if(mathModel==='drift'){
+      return {rate:0.006,start:0,duration:''};
+    }
+    return {bias:0.1,start:0,duration:''};
+  }
+
+  function buildLayeredFaultPayload({model,layer,slot,target,parameters,mathModel}){
+    const bindingObject=getFaultSlotBindingObject(slot);
+    return {
+      instanceId:model.id,
+      modelId:model.id,
+      faultTypeId:model.id,
+      name:model.name,
+      layer,
+      layerKey:layer,
+      modelClass:model.modelClass,
+      runtimeBehavior:mathModel,
+      slotId:slot?.id||'',
+      slotName:slot?.name||'',
+      bindingObject,
+      targetVariable:bindingObject,
+      targetField:slot?.targetField||'',
+      targetKind:getTargetKind(target),
+      targetId:target?.id||'',
+      injectionForm:getLayeredInjectionForm(target,layer),
+      parameters:cloneValue(parameters||defaultLayeredFaultParameters(layer,mathModel))
+    };
+  }
+
+  function appendLayeredFaultRuntimeBinding(target,payload){
+    if(!target||!payload) return;
+    target.injectedFault=cloneValue(payload);
+    target.faultBindings=arr(target.faultBindings);
+    const binding={
+      bindingId:\`\${payload.modelId}::\${target.id}\`,
+      faultModelId:payload.modelId,
+      name:payload.name,
+      layer:payload.layer,
+      layerKey:payload.layerKey,
+      runtimeBehavior:payload.runtimeBehavior,
+      parameters:cloneValue(payload.parameters||{}),
+      targetKind:payload.targetKind,
+      targetId:target.id,
+      slotId:payload.slotId,
+      slotName:payload.slotName,
+      bindingObject:payload.bindingObject||'',
+      targetVariable:payload.targetVariable||payload.bindingObject||'',
+      targetField:payload.targetField||'',
+      injectionForm:payload.injectionForm||getLayeredInjectionForm(target,payload.layer),
+      visualRole:'fault-source',
+      propagationMode:payload.layer==='physical'?'localParameter':payload.layer==='protocol'?'protocolEdge':'signalTransform',
+      canPropagate:payload.layer!=='physical',
+      active:true,
+      injectedFault:cloneValue(payload)
+    };
+    const existingIndex=target.faultBindings.findIndex(item=>item.bindingId===binding.bindingId||item.faultModelId===binding.faultModelId);
+    if(existingIndex>=0) target.faultBindings[existingIndex]=binding;
+    else target.faultBindings.push(binding);
+    if(payload.targetKind==='node'&&Array.isArray(S.faultedBlks)&&!S.faultedBlks.includes(target.id)){
+      S.faultedBlks.push(target.id);
+    }
+    if(payload.targetKind==='edge'){
+      target.status='faulted';
+      target.faultSource=payload.name;
+    }
+  }
+
+  function appendLayeredFaultInstance(state,model,target,payload,slot){
+    if(!state||!model||!target||!payload) return null;
+    if(!Array.isArray(state.faultInstances)) state.faultInstances=[];
+    const instance={
+      instanceId:payload.instanceId||payload.modelId,
+      faultTypeId:payload.faultTypeId||payload.modelId,
+      targetKind:payload.targetKind,
+      targetId:payload.targetId,
+      slotId:payload.slotId||slot?.id||'',
+      slotName:payload.slotName||slot?.name||'',
+      layer:payload.layer,
+      injectionForm:payload.injectionForm||getLayeredInjectionForm(target,payload.layer),
+      bindingObject:payload.bindingObject||'',
+      targetVariable:payload.targetVariable||payload.bindingObject||'',
+      targetField:payload.targetField||'',
+      displayName:model.name||payload.name||payload.modelId,
+      parameters:cloneValue(payload.parameters||{}),
+      active:true,
+      visual:{expanded:false}
+    };
+    state.faultInstances=state.faultInstances.filter(item=>!(
+      item?.instanceId===instance.instanceId
+      || (
+        item?.faultTypeId===instance.faultTypeId
+        && item?.targetId===instance.targetId
+        && item?.slotId===instance.slotId
+      )
+    ));
+    state.faultInstances.push(instance);
+    if(state.activeModelPackage){
+      state.activeModelPackage.faultInstances=cloneValue(state.faultInstances);
+    }
+    return instance;
+  }
+
+  function ensureLayeredFaultTags(){
+    const state=getState();
+    if(!Array.isArray(state.faultTags)) state.faultTags=[];
+    return state.faultTags;
+  }
+
+  function ensureLayeredFaultLinks(){
+    const state=getState();
+    if(!Array.isArray(state.faultInjectionLinks)) state.faultInjectionLinks=[];
+    return state.faultInjectionLinks;
+  }
+
+  function getLayeredFaultTagPosition(target){
+    if(getTargetKind(target)==='edge'){
+      return {x:Math.round((target.x||420)-102),y:Math.round((target.y||240)-38),w:204,h:76};
+    }
+    return {
+      x:Math.round((target.x||420)+(target.w||174)+28),
+      y:Math.round(target.y||240),
+      w:204,
+      h:76
+    };
+  }
+
+  function createLayeredFaultTagFallback(model,target,payload,slot){
+    const state=getState();
+    const targetKind=getTargetKind(target);
+    const box=getLayeredFaultTagPosition(target);
+    const tag={
+      id:\`fault-tag-\${model.id}\`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      type:'fault_tag',
+      faultModelId:model.id,
+      faultModelName:model.name,
+      name:model.name,
+      layer:model.layer,
+      layerKey:model.layerKey||model.layer,
+      modelClass:model.modelClass,
+      runtimeBehavior:model.runtimeBehavior,
+      targetKind,
+      targetId:target.id,
+      hostNodeId:targetKind==='node'?target.id:(target.sourceNodeId||''),
+      targetName:target.props?.name||target.label||target.id,
+      active:true,
+      positionMode:'manual',
+      expanded:targetKind==='node',
+      collapsed:targetKind!=='node',
+      slotId:slot?.id||'',
+      slotName:slot?.name||'',
+      bindingObject:payload.bindingObject||'',
+      targetVariable:payload.targetVariable||payload.bindingObject||'',
+      targetField:payload.targetField||'',
+      injectionForm:payload.injectionForm||getLayeredInjectionForm(target,payload.layer),
+      parameters:cloneValue(payload.parameters||{}),
+      injectedFault:cloneValue(payload),
+      ...box
+    };
+    const tags=ensureLayeredFaultTags();
+    const tagIndex=tags.findIndex(item=>item.id===tag.id||item.faultModelId===tag.faultModelId);
+    if(tagIndex>=0) tags[tagIndex]=tag;
+    else tags.push(tag);
+    const links=ensureLayeredFaultLinks();
+    const link={
+      id:\`fault-link-\${model.id}-target\`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      faultModelId:model.id,
+      sourceTagId:tag.id,
+      targetNodeId:targetKind==='node'?target.id:null,
+      targetEdgeId:targetKind==='edge'?target.id:null,
+      role:'fault-tag-attachment',
+      label:'故障注入'
+    };
+    const linkIndex=links.findIndex(item=>item.id===link.id);
+    if(linkIndex>=0) links[linkIndex]=link;
+    else links.push(link);
+    if(targetKind==='node'&&Array.isArray(state.faultedBlks)&&!state.faultedBlks.includes(target.id)){
+      state.faultedBlks.push(target.id);
+    }
+    return tag;
+  }
+
+  function bindLayeredFaultInjectorToTarget(injectorId,options={}){
+    const state=getState();
+    const injector=arr(state.modelNodes).find(node=>node.id===injectorId);
+    if(!injector||!isLayeredFaultInjectorType(injector.type)){
+      return {ok:false,reason:'injector-not-found'};
+    }
+    const config=getLayeredFaultInjectorConfig(injector.type);
+    const layer=config.layer;
+    const target=getTargetByRef(options);
+    if(!target){
+      return {ok:false,reason:'target-not-found'};
+    }
+    if(!canLayeredInjectorUseTargetKind(injector,target)){
+      return {ok:false,reason:'incompatible-target-kind',layer,targetId:target.id,targetKind:getTargetKind(target)};
+    }
+    const compatibleSlots=getLayeredFaultSlotsForTarget(target).filter(slot=>slot.layer===layer);
+    if(!compatibleSlots.length){
+      return {ok:false,reason:'incompatible-layer',layer,targetId:target.id};
+    }
+    const slot=compatibleSlots.find(item=>item.id===options.slotId)||compatibleSlots[0];
+    const mathModel=options.mathModel||config.defaultModel;
+    const model={
+      id:options.modelId||\`layered-\${injector.id}-\${target.id}-\${slot.id}\`.replace(/[^A-Za-z0-9_-]/g,'-'),
+      name:options.name||\`\${config.label} - \${target.props?.name||target.label||target.id}\`,
+      layer,
+      layerKey:layer,
+      modelClass:options.modelClass||config.faultType,
+      runtimeBehavior:mathModel,
+      defaultParameters:cloneValue(options.parameters||defaultLayeredFaultParameters(layer,mathModel)),
+      visualInjection:{targetId:target.id,targetKind:getTargetKind(target)}
+    };
+    const payload=buildLayeredFaultPayload({
+      model,
+      layer,
+      slot,
+      target,
+      parameters:options.parameters,
+      mathModel
+    });
+    appendLayeredFaultInstance(state,model,target,payload,slot);
+    appendLayeredFaultRuntimeBinding(target,payload);
+    state.modelNodes=arr(state.modelNodes).filter(node=>node.id!==injector.id);
+    if(S.selBlk===injector.id) S.selBlk=null;
+    let tag=null;
+    if(typeof createVisualFaultInjection==='function'){
+      tag=createVisualFaultInjection(model,target,payload);
+      if(tag){
+        tag.layerKey=layer;
+        tag.slotId=slot.id;
+        tag.slotName=slot.name;
+        tag.bindingObject=payload.bindingObject||'';
+        tag.targetVariable=payload.targetVariable||payload.bindingObject||'';
+        tag.targetField=payload.targetField||'';
+        tag.injectionForm=payload.injectionForm||getLayeredInjectionForm(target,layer);
+        tag.runtimeBehavior=mathModel;
+        tag.parameters=cloneValue(payload.parameters||{});
+        tag.injectedFault=cloneValue(payload);
+      }
+    }
+    if(!tag){
+      tag=createLayeredFaultTagFallback(model,target,payload,slot);
+    }
+    if(typeof markTopologyDirty==='function') markTopologyDirty('fault');
+    if(typeof renderModelNodes==='function') renderModelNodes();
+    if(typeof renderEdges==='function') renderEdges();
+    if(typeof syncConfigTargets==='function') syncConfigTargets();
+    if(tag&&typeof selectFaultTag==='function') selectFaultTag(tag.id);
+    else if(typeof updateUI==='function') updateUI();
+    return {
+      ok:true,
+      targetId:target.id,
+      targetKind:getTargetKind(target),
+      layer,
+      injectionForm:payload.injectionForm||getLayeredInjectionForm(target,layer),
+      slotId:slot.id,
+      bindingObject:payload.bindingObject||'',
+      targetVariable:payload.targetVariable||payload.bindingObject||'',
+      tagId:tag?.id||''
+    };
+  }
+
+  const previousGetNodePorts=window.getNodePorts||(typeof getNodePorts!=='undefined'?getNodePorts:null);
+  if(previousGetNodePorts&&!window.__layeredFaultGetNodePortsWrapped){
+    window.__layeredFaultGetNodePortsWrapped=true;
+    window.getNodePorts=function(node){
+      if(isLayeredFaultInjectorType(node?.type)){
+        return {
+          inputs:[],
+          outputs:[{key:'fault-output',label:'故障绑定',kind:'fault',side:'right'}]
+        };
+      }
+      return previousGetNodePorts.apply(this,arguments);
+    };
+    if(typeof getNodePorts!=='undefined') getNodePorts=window.getNodePorts;
+  }
+
+  const previousBuildNodeSubtitle=window.buildNodeSubtitle||(typeof buildNodeSubtitle!=='undefined'?buildNodeSubtitle:null);
+  if(previousBuildNodeSubtitle&&!window.__layeredFaultSubtitleWrapped){
+    window.__layeredFaultSubtitleWrapped=true;
+    window.buildNodeSubtitle=function(node){
+      if(isLayeredFaultInjectorType(node?.type)){
+        const config=getLayeredFaultInjectorConfig(node.type);
+        return \`\${config.layerLabel} / \${node.faultInjector?.bound?'已绑定':'未绑定'}\`;
+      }
+      return previousBuildNodeSubtitle.apply(this,arguments);
+    };
+    if(typeof buildNodeSubtitle!=='undefined') buildNodeSubtitle=window.buildNodeSubtitle;
+  }
+
+  const previousCreateNode=window.createNode||(typeof createNode!=='undefined'?createNode:null);
+  if(previousCreateNode&&!window.__layeredFaultCreateNodeWrapped){
+    window.__layeredFaultCreateNodeWrapped=true;
+    window.createNode=function(type,rawX,rawY){
+      const beforeCount=arr(S.modelNodes).length;
+      const result=previousCreateNode.apply(this,arguments);
+      const nodes=arr(S.modelNodes);
+      const node=result||nodes[nodes.length-1]||[...nodes].reverse().find(item=>item.type===type);
+      if(isLayeredFaultInjectorType(type)&&node){
+        const config=getLayeredFaultInjectorConfig(type);
+        node.faultInjector={
+          layer:config.layer,
+          layerLabel:config.layerLabel,
+          bound:false,
+          targetId:'',
+          slotId:'',
+          mathModel:config.defaultModel
+        };
+        node.props={...(node.props||{}),layerKey:config.layer,layer:config.layerLabel,faultType:config.faultType};
+        if(typeof renderModelNodes==='function') renderModelNodes();
+        if(S.selBlk===node.id&&typeof renderPropertyPanel==='function') renderPropertyPanel(node);
+        if(typeof updateUI==='function') updateUI();
+        return node;
+      }
+      return result||node;
+    };
+    if(typeof createNode!=='undefined') createNode=window.createNode;
+  }
+
+  function clearLayeredFaultBindingTargets(){
+    arr(window.__layeredFaultTargetCleanups).forEach(cleanup=>{
+      try{ cleanup(); }catch{}
+    });
+    window.__layeredFaultTargetCleanups=[];
+    const diagram=document.getElementById('diagram');
+    diagram?.classList.remove('fault-drop-preview','fault-drop-preview--node','fault-drop-preview--edge','fault-drop-preview--protocol');
+    document.querySelectorAll('[data-layered-fault-edge-marker]').forEach(el=>el.remove());
+    document.querySelectorAll('.fault-drop-compatible,.fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('fault-drop-compatible','fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+    document.querySelectorAll('.is-fault-drop-compatible,.is-fault-drop-incompatible').forEach(el=>{
+      el.classList.remove('is-fault-drop-compatible','is-fault-drop-incompatible');
+      delete el.dataset.faultDropState;
+    });
+  }
+
+  function getLayeredFaultEdgeMarkerPoint(edge){
+    const path=Array.from(document.querySelectorAll('.edge-path[data-edge-id]'))
+      .find(el=>el.dataset.edgeId===edge?.id);
+    if(path&&typeof path.getTotalLength==='function'&&typeof path.getPointAtLength==='function'){
+      try{
+        const point=path.getPointAtLength(path.getTotalLength()*0.5);
+        if(Number.isFinite(point.x)&&Number.isFinite(point.y)){
+          return {x:point.x,y:point.y};
+        }
+      }catch{}
+    }
+    const sourceNode=getRuntimeNode(edge?.sourceNodeId);
+    const targetNode=getRuntimeNode(edge?.targetNodeId);
+    const sourcePort=sourceNode?getPortInfo(sourceNode,'output',edge.sourcePortIndex||0):null;
+    const targetPort=targetNode?getPortInfo(targetNode,'input',edge.targetPortIndex||0):null;
+    if(isFiniteCanvasPoint(sourcePort)&&isFiniteCanvasPoint(targetPort)){
+      return {
+        x:(sourcePort.x+targetPort.x)/2,
+        y:(sourcePort.y+targetPort.y)/2-12
+      };
+    }
+    return null;
+  }
+
+  function renderLayeredFaultEdgeMarker(edge){
+    const edgeControlLayer=typeof window.ensureCanvasEdgeControlLayer==='function'?window.ensureCanvasEdgeControlLayer():null;
+    if(!edgeControlLayer||!edge?.id) return;
+    const point=getLayeredFaultEdgeMarkerPoint(edge);
+    if(!point) return;
+    const marker=document.createElementNS('http://www.w3.org/2000/svg','g');
+    marker.setAttribute('class','layered-fault-edge-marker');
+    marker.setAttribute('data-layered-fault-edge-marker','true');
+    marker.setAttribute('data-edge-id',edge.id);
+    marker.setAttribute('transform',\`translate(\${Math.round(point.x)} \${Math.round(point.y)})\`);
+    const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent='协议层故障注入目标';
+    const halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    halo.setAttribute('class','layered-fault-edge-marker__halo');
+    halo.setAttribute('r','15');
+    const pin=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    pin.setAttribute('class','layered-fault-edge-marker__pin');
+    pin.setAttribute('x','-10');
+    pin.setAttribute('y','-10');
+    pin.setAttribute('width','20');
+    pin.setAttribute('height','20');
+    pin.setAttribute('rx','4');
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('class','layered-fault-edge-marker__label');
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('dominant-baseline','central');
+    label.textContent='F';
+    marker.append(title,halo,pin,label);
+    attachLayeredFaultTargetHandlers(marker,edge);
+    edgeControlLayer.appendChild(marker);
+  }
+
+  function getPendingLayeredFaultInjector(){
+    const pendingId=S.pendingLayeredFaultInjectorId||'';
+    return getRuntimeNode(pendingId);
+  }
+
+  function openLayeredFaultBindingTarget(event,target){
+    const injector=getPendingLayeredFaultInjector();
+    if(!injector||!target||target.id===injector.id) return;
+    if(event.target?.closest?.('[data-layered-fault-binding-dialog],[data-layered-fault-bind]')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(!canBindLayeredFaultInjectorToTarget(injector,target)){
+      if(typeof toast==='function') toast('该故障层与目标对象能力不匹配','w');
+      showLayeredFaultBindingTargets(injector);
+      return;
+    }
+    openLayeredFaultBindingDialog(injector,target);
+  }
+
+  function attachLayeredFaultTargetHandlers(el,target){
+    if(!el||!target) return;
+    const stopTargetDrag=event=>{
+      if(!getPendingLayeredFaultInjector()) return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    const selectTarget=event=>openLayeredFaultBindingTarget(event,target);
+    el.addEventListener('pointerdown',stopTargetDrag,true);
+    el.addEventListener('pointerup',selectTarget,true);
+    window.__layeredFaultTargetCleanups=window.__layeredFaultTargetCleanups||[];
+    window.__layeredFaultTargetCleanups.push(()=>{
+      el.removeEventListener('pointerdown',stopTargetDrag,true);
+      el.removeEventListener('pointerup',selectTarget,true);
+    });
+  }
+
+  function showLayeredFaultBindingTargets(injector){
+    clearLayeredFaultBindingTargets();
+    if(!injector||!isLayeredFaultInjectorType(injector.type)) return;
+    const diagram=document.getElementById('diagram');
+    const config=getLayeredFaultInjectorConfig(injector.type);
+    const protocolMode=config?.layer==='protocol';
+    diagram?.classList.add('fault-drop-preview');
+    diagram?.classList.toggle('fault-drop-preview--protocol',protocolMode);
+    let compatibleNodeCount=0;
+    let compatibleEdgeCount=0;
+    arr(S.modelNodes).forEach(node=>{
+      if(node.id===injector.id) return;
+      const el=document.getElementById(\`b-\${node.id}\`);
+      if(!el) return;
+      const compatible=canBindLayeredFaultInjectorToTarget(injector,node);
+      if(compatible){
+        compatibleNodeCount+=1;
+        el.classList.add('fault-drop-compatible');
+        el.dataset.faultDropState='compatible';
+        attachLayeredFaultTargetHandlers(el,node);
+      }
+    });
+    arr(S.modelEdges).forEach(edge=>{
+      const compatible=canBindLayeredFaultInjectorToTarget(injector,edge);
+      if(!compatible) return;
+      compatibleEdgeCount+=1;
+      document.querySelectorAll(\`[data-edge-id="\${edge.id}"]\`).forEach(el=>{
+        el.classList.add('is-fault-drop-compatible');
+        el.dataset.faultDropState='compatible';
+        attachLayeredFaultTargetHandlers(el,edge);
+      });
+      if(protocolMode){
+        renderLayeredFaultEdgeMarker(edge);
+      }
+    });
+    diagram?.classList.toggle('fault-drop-preview--node',compatibleNodeCount>0);
+    diagram?.classList.toggle('fault-drop-preview--edge',compatibleEdgeCount>0);
+  }
+
+  function beginLayeredFaultBinding(injectorId){
+    const injector=getRuntimeNode(injectorId);
+    if(!injector||!isLayeredFaultInjectorType(injector.type)) return false;
+    S.pendingLayeredFaultInjectorId=injector.id;
+    closeLayeredFaultBindingDialog();
+    showLayeredFaultBindingTargets(injector);
+    renderLayeredFaultInjectorControls();
+    return true;
+  }
+
+  function cancelLayeredFaultBinding(){
+    S.pendingLayeredFaultInjectorId='';
+    clearLayeredFaultBindingTargets();
+    renderLayeredFaultInjectorControls();
+  }
+
+  function eventOriginatesFromCanvas(event){
+    const target=event?.target;
+    if(!target?.closest) return false;
+    return Boolean(target.closest('#canvas-viewport,#canvas-stage,#diagram,#node-layer,#edge-group'));
+  }
+
+  function targetFromLayeredBindingEvent(event,injector=null){
+    const nodeEl=event.target?.closest?.('.blk');
+    if(nodeEl?.id){
+      const nodeId=nodeEl.id.replace(/^b-/,'');
+      return getRuntimeNode(nodeId);
+    }
+    const edgeEl=event.target?.closest?.('[data-edge-id]');
+    if(edgeEl?.dataset?.edgeId){
+      return getRuntimeEdge(edgeEl.dataset.edgeId);
+    }
+    if(eventOriginatesFromCanvas(event)&&Number.isFinite(event.clientX)&&Number.isFinite(event.clientY)&&typeof findNearestEdgeIdByClientPoint==='function'){
+      const edgeId=findNearestEdgeIdByClientPoint(event.clientX,event.clientY,32);
+      const edge=edgeId?getRuntimeEdge(edgeId):null;
+      if(edge&&(!injector||canBindLayeredFaultInjectorToTarget(injector,edge))){
+        return edge;
+      }
+    }
+    return null;
+  }
+
+  function handleLayeredFaultBindingClick(event){
+    const injector=getPendingLayeredFaultInjector();
+    if(!injector) return;
+    if(event.target?.closest?.('[data-layered-fault-binding-dialog],[data-layered-fault-bind]')) return;
+    const target=targetFromLayeredBindingEvent(event,injector);
+    if(!target||target.id===injector.id) return;
+    openLayeredFaultBindingTarget(event,target);
+  }
+
+  function removeLayeredFaultBindingDialog(){
+    document.querySelectorAll('[data-layered-fault-binding-dialog]').forEach(el=>{
+      if(typeof el.__layeredFaultDragCleanup==='function') el.__layeredFaultDragCleanup();
+      el.remove();
+    });
+  }
+
+  function closeLayeredFaultBindingDialog(){
+    removeLayeredFaultBindingDialog();
+  }
+
+  function makeLayeredFaultBindingDialogDraggable(dialog){
+    if(!dialog) return;
+    const handle=dialog.querySelector('[data-layered-fault-dialog-handle]');
+    if(!handle) return;
+    let dragState=null;
+    const clampDialog=()=>{
+      const rect=dialog.getBoundingClientRect();
+      const margin=12;
+      const maxLeft=Math.max(margin,window.innerWidth-rect.width-margin);
+      const maxTop=Math.max(margin,window.innerHeight-rect.height-margin);
+      const left=clamp(Number.parseFloat(dialog.style.left)||rect.left||margin,margin,maxLeft);
+      const top=clamp(Number.parseFloat(dialog.style.top)||rect.top||margin,margin,maxTop);
+      dialog.style.left=\`\${Math.round(left)}px\`;
+      dialog.style.top=\`\${Math.round(top)}px\`;
+      dialog.style.right='auto';
+    };
+    handle.addEventListener('pointerdown',event=>{
+      if(event.target?.closest?.('button,input,select,textarea')) return;
+      const rect=dialog.getBoundingClientRect();
+      dialog.style.left=\`\${Math.round(rect.left)}px\`;
+      dialog.style.top=\`\${Math.round(rect.top)}px\`;
+      dialog.style.right='auto';
+      dragState={
+        pointerId:event.pointerId||1,
+        startX:event.clientX,
+        startY:event.clientY,
+        left:rect.left,
+        top:rect.top
+      };
+      dialog.classList.add('is-dragging');
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    const move=event=>{
+      if(!dragState) return;
+      const dx=event.clientX-dragState.startX;
+      const dy=event.clientY-dragState.startY;
+      const rect=dialog.getBoundingClientRect();
+      const margin=12;
+      const maxLeft=Math.max(margin,window.innerWidth-rect.width-margin);
+      const maxTop=Math.max(margin,window.innerHeight-rect.height-margin);
+      dialog.style.left=\`\${Math.round(clamp(dragState.left+dx,margin,maxLeft))}px\`;
+      dialog.style.top=\`\${Math.round(clamp(dragState.top+dy,margin,maxTop))}px\`;
+      dialog.style.right='auto';
+      event.preventDefault();
+    };
+    const up=()=>{
+      if(!dragState) return;
+      dragState=null;
+      dialog.classList.remove('is-dragging');
+      clampDialog();
+    };
+    window.addEventListener('pointermove',move);
+    window.addEventListener('pointerup',up);
+    dialog.__layeredFaultDragCleanup=()=>{
+      window.removeEventListener('pointermove',move);
+      window.removeEventListener('pointerup',up);
+    };
+  }
+
+  function getTargetDisplayName(target){
+    if(getTargetKind(target)==='edge') return getEdgeDisplayName(target);
+    return target?.props?.name||target?.label||target?.id||'目标对象';
+  }
+
+  function getLayeredMathModels(layer){
+    if(layer==='physical'){
+      return [
+        {value:'bias',label:'偏置模型'},
+        {value:'drift',label:'漂移模型'},
+        {value:'step',label:'突变模型'},
+        {value:'degradation',label:'衰减模型'},
+        {value:'freeze',label:'卡死模型'},
+        {value:'random',label:'随机模型'}
+      ];
+    }
+    if(layer==='protocol'){
+      return [
+        {value:'tamper',label:'篡改模型'},
+        {value:'dropout',label:'丢包模型'},
+        {value:'delay',label:'延迟模型'},
+        {value:'stale',label:'陈旧模型'}
+      ];
+    }
+    return [
+      {value:'noise',label:'随机噪声'},
+      {value:'bias',label:'偏置叠加'},
+      {value:'freeze',label:'卡死保持'},
+      {value:'intermittent',label:'间歇异常'}
+    ];
+  }
+
+  function getLayeredMathModelsForSlot(layer,slot){
+    const models=getLayeredMathModels(layer);
+    const allowed=arr(slot?.allowedModels);
+    if(!allowed.length) return models;
+    const filtered=models.filter(model=>allowed.includes(model.value));
+    return filtered.length?filtered:models;
+  }
+
+  function findLayeredSlot(slots,slotId){
+    return arr(slots).find(slot=>slot.id===slotId||slot.slotId===slotId)||arr(slots)[0]||null;
+  }
+
+  function getLayeredOptionLabel(options,value){
+    return arr(options).find(option=>String(option.value)===String(value))?.label||String(value||'');
+  }
+
+  function renderLayeredDropdown(kind,value,options){
+    const safeKind=escapeHtml(kind);
+    const selected=arr(options).some(option=>String(option.value)===String(value))
+      ?String(value)
+      :String(arr(options)[0]?.value||'');
+    const label=getLayeredOptionLabel(options,selected);
+    const inputAttr=kind==='slot'?'data-layered-fault-slot':'data-layered-fault-model';
+    return \`
+      <details class="layered-fault-select" data-layered-fault-dropdown="\${safeKind}">
+        <summary data-layered-fault-dropdown-button="\${safeKind}">
+          <span data-layered-fault-dropdown-label="\${safeKind}">\${escapeHtml(label)}</span>
+          <span class="layered-fault-select__caret">⌄</span>
+        </summary>
+        <div class="layered-fault-select__menu">
+          \${arr(options).map(option=>\`
+            <button type="button" data-layered-fault-option="\${safeKind}" data-layered-fault-option-value="\${escapeHtml(option.value)}" aria-selected="\${String(option.value)===selected?'true':'false'}">\${escapeHtml(option.label)}</button>
+          \`).join('')}
+        </div>
+        <input type="hidden" \${inputAttr} value="\${escapeHtml(selected)}">
+      </details>
+    \`;
+  }
+
+  function getLayeredDropdownValue(dialog,kind){
+    const selector=kind==='slot'?'[data-layered-fault-slot]':'[data-layered-fault-model]';
+    return dialog?.querySelector(selector)?.value||'';
+  }
+
+  function setLayeredDropdownValue(dialog,kind,value){
+    const dropdown=dialog?.querySelector(\`[data-layered-fault-dropdown="\${kind}"]\`);
+    if(!dropdown) return;
+    const input=dropdown.querySelector(kind==='slot'?'[data-layered-fault-slot]':'[data-layered-fault-model]');
+    if(input) input.value=value;
+    const label=dropdown.querySelector(\`[data-layered-fault-dropdown-label="\${kind}"]\`);
+    const options=kind==='slot'
+      ?arr(dialog.__layeredFaultDialogState?.slotOptions)
+      :arr(dialog.__layeredFaultDialogState?.modelOptions);
+    if(label) label.textContent=getLayeredOptionLabel(options,value);
+    dropdown.querySelectorAll(\`[data-layered-fault-option="\${kind}"]\`).forEach(option=>{
+      option.setAttribute('aria-selected',option.getAttribute('data-layered-fault-option-value')===String(value)?'true':'false');
+    });
+    dropdown.removeAttribute('open');
+  }
+
+  function refreshLayeredFaultDialogParameters(dialog){
+    const state=dialog?.__layeredFaultDialogState;
+    if(!state) return;
+    const paramsHost=dialog.querySelector('[data-layered-fault-params]');
+    renderDialogParameterFields(paramsHost,state.config.layer,getLayeredDropdownValue(dialog,'model')||state.config.defaultModel);
+  }
+
+  function refreshLayeredFaultDialogModels(dialog){
+    const state=dialog?.__layeredFaultDialogState;
+    if(!state) return;
+    const selectedSlot=findLayeredSlot(state.slots,getLayeredDropdownValue(dialog,'slot'));
+    const nextModels=getLayeredMathModelsForSlot(state.config.layer,selectedSlot);
+    state.modelOptions=nextModels;
+    const current=getLayeredDropdownValue(dialog,'model');
+    const nextValue=nextModels.some(model=>model.value===current)?current:(nextModels[0]?.value||state.config.defaultModel);
+    const modelHost=dialog.querySelector('[data-layered-fault-model-host]');
+    if(modelHost) modelHost.innerHTML=renderLayeredDropdown('model',nextValue,nextModels);
+    refreshLayeredFaultDialogParameters(dialog);
+  }
+
+  function setLayeredFaultDropdownChoice(button){
+    const dropdown=button?.closest?.('[data-layered-fault-dropdown]');
+    const dialog=button?.closest?.('[data-layered-fault-binding-dialog]');
+    if(!dropdown||!dialog) return;
+    const kind=dropdown.getAttribute('data-layered-fault-dropdown')||'';
+    const value=button.getAttribute('data-layered-fault-option-value')||'';
+    setLayeredDropdownValue(dialog,kind,value);
+    if(kind==='slot') refreshLayeredFaultDialogModels(dialog);
+    if(kind==='model') refreshLayeredFaultDialogParameters(dialog);
+  }
+  window.setLayeredFaultDropdownChoice=setLayeredFaultDropdownChoice;
+
+  function renderLayeredMathModelOptions(select,models){
+    if(!select) return;
+    select.innerHTML=arr(models).map(model=>\`<option value="\${escapeHtml(model.value)}">\${escapeHtml(model.label)}</option>\`).join('');
+  }
+
+  function getDialogParameters(layer,mathModel){
+    return defaultLayeredFaultParameters(layer,mathModel);
+  }
+
+  function renderDialogParameterFields(host,layer,mathModel){
+    const params=getDialogParameters(layer,mathModel);
+    const fields=Object.entries(params).map(([key,value])=>\`
+      <label class="layered-fault-dialog__field">
+        <span>\${escapeHtml(getFaultParameterLabel(key))}</span>
+        \${renderFaultParameterControl(key,value,'data-layered-fault-param')}
+      </label>
+    \`).join('');
+    host.innerHTML=fields;
+  }
+
+  function readLayeredDialogParameters(host){
+    const params={};
+    host.querySelectorAll('[data-layered-fault-param]').forEach(input=>{
+      const key=input.dataset.layeredFaultParam||'';
+      if(!key) return;
+      const raw=input.value;
+      const numeric=Number(raw);
+      params[key]=raw!==''&&Number.isFinite(numeric)?numeric:raw;
+    });
+    return params;
+  }
+
+  function openLayeredFaultBindingDialog(injector,target){
+    const config=getLayeredFaultInjectorConfig(injector.type);
+    if(!config) return;
+    const slots=getLayeredFaultSlotsForTarget(target).filter(slot=>slot.layer===config.layer);
+    if(!slots.length) return;
+    removeLayeredFaultBindingDialog();
+    const dialog=document.createElement('div');
+    dialog.className='layered-fault-dialog';
+    dialog.dataset.layeredFaultBindingDialog='true';
+    const initialSlot=slots[0];
+    const models=getLayeredMathModelsForSlot(config.layer,initialSlot);
+    const slotFieldLabel=config.layer==='protocol'&&getTargetKind(target)==='edge'?'协议链路/报文':'关联参数/信号';
+    dialog.innerHTML=\`
+      <div class="layered-fault-dialog__head" data-layered-fault-dialog-handle>
+        <div>
+          <div class="layered-fault-dialog__eyebrow">\${escapeHtml(config.layerLabel)}注入</div>
+          <strong>确认绑定目标</strong>
+        </div>
+        <button type="button" data-layered-fault-cancel aria-label="取消绑定">×</button>
+      </div>
+      <div class="layered-fault-dialog__body">
+        <div class="layered-fault-dialog__target">
+          <span>目标对象</span>
+          <b>\${escapeHtml(getTargetDisplayName(target))}</b>
+        </div>
+        <label class="layered-fault-dialog__field">
+          <span>\${escapeHtml(slotFieldLabel)}</span>
+          <div data-layered-fault-slot-host>
+            \${renderLayeredDropdown('slot',initialSlot.id,slots.map(slot=>({value:slot.id,label:getFaultSlotBindingObject(slot)||slot.name||slot.id})))}
+          </div>
+        </label>
+        <label class="layered-fault-dialog__field">
+          <span>数学模型</span>
+          <div data-layered-fault-model-host>
+            \${renderLayeredDropdown('model',models[0]?.value||config.defaultModel,models)}
+          </div>
+        </label>
+        <div class="layered-fault-dialog__params" data-layered-fault-params></div>
+      </div>
+      <div class="layered-fault-dialog__actions">
+        <button type="button" data-layered-fault-cancel>取消</button>
+        <button type="button" class="primary" data-layered-fault-confirm>确认绑定</button>
+      </div>
+    \`;
+    const paramsHost=dialog.querySelector('[data-layered-fault-params]');
+    dialog.__layeredFaultDialogState={
+      config,
+      slots,
+      slotOptions:slots.map(slot=>({value:slot.id,label:getFaultSlotBindingObject(slot)||slot.name||slot.id})),
+      modelOptions:models
+    };
+    renderDialogParameterFields(paramsHost,config.layer,getLayeredDropdownValue(dialog,'model')||models[0]?.value||config.defaultModel);
+    makeLayeredFaultBindingDialogDraggable(dialog);
+    dialog.addEventListener('click',event=>{
+      const option=event.target?.closest?.('[data-layered-fault-option]');
+      if(!option) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setLayeredFaultDropdownChoice(option);
+    });
+    dialog.querySelectorAll('[data-layered-fault-cancel]').forEach(button=>{
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+      });
+    });
+    dialog.querySelector('[data-layered-fault-confirm]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const slotId=getLayeredDropdownValue(dialog,'slot')||slots[0].id;
+      const selectedSlot=findLayeredSlot(slots,slotId);
+      const availableModels=getLayeredMathModelsForSlot(config.layer,selectedSlot);
+      const mathModel=getLayeredDropdownValue(dialog,'model')||availableModels[0]?.value||config.defaultModel;
+      const result=bindLayeredFaultInjectorToTarget(injector.id,{
+        targetKind:getTargetKind(target),
+        targetId:target.id,
+        slotId,
+        mathModel,
+        parameters:readLayeredDialogParameters(paramsHost)
+      });
+      if(result?.ok){
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+        if(typeof toast==='function') toast('故障已绑定到目标对象','s');
+      }
+    });
+    document.body.appendChild(dialog);
+  }
+
+  function renderLayeredFaultInjectorControls(){
+    arr(S.modelNodes).forEach(node=>{
+      if(!isLayeredFaultInjectorType(node.type)) return;
+      const el=document.getElementById(\`b-\${node.id}\`);
+      if(!el) return;
+      const active=S.pendingLayeredFaultInjectorId===node.id;
+      el.classList.add('has-layered-fault-actions');
+      el.classList.toggle('is-layered-fault-binding-source',active);
+      const existingButton=el.querySelector('[data-layered-fault-bind]');
+      if(existingButton){
+        existingButton.textContent=active?'取消绑定':'绑定目标';
+        existingButton.classList.toggle('is-active',active);
+        existingButton.setAttribute('aria-pressed',active?'true':'false');
+        return;
+      }
+      const actions=document.createElement('div');
+      actions.className='layered-fault-node-actions';
+      const button=document.createElement('button');
+      button.type='button';
+      button.dataset.layeredFaultBind=node.id;
+      button.textContent=S.pendingLayeredFaultInjectorId===node.id?'取消绑定':'绑定目标';
+      button.classList.toggle('is-active',S.pendingLayeredFaultInjectorId===node.id);
+      button.setAttribute('aria-pressed',S.pendingLayeredFaultInjectorId===node.id?'true':'false');
+      button.addEventListener('pointerdown',event=>event.stopPropagation());
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        if(S.pendingLayeredFaultInjectorId===node.id){
+          cancelLayeredFaultBinding();
+          closeLayeredFaultBindingDialog();
+          return;
+        }
+        if(typeof selectNode==='function') selectNode(node.id);
+        beginLayeredFaultBinding(node.id);
+      });
+      actions.appendChild(button);
+      el.appendChild(actions);
+    });
+  }
+
+  function getLayeredFaultInjectorTargetLabel(config){
+    if(config.layer==='physical') return '仿真模块';
+    if(config.layer==='electrical') return '仿真模块 / 信号连线';
+    if(config.layer==='protocol') return 'CAN/协议连线';
+    return '兼容目标';
+  }
+
+  function getLayeredFaultInjectorObjectLabel(config){
+    if(config.layer==='physical') return '模块参数';
+    if(config.layer==='electrical') return '模块变量或信号连线';
+    if(config.layer==='protocol') return '连接线传递数据';
+    return '目标变量';
+  }
+
+  function getLayeredFaultInjectorHelp(config,active){
+    if(active){
+      return config.layer==='protocol'
+        ?'请选择画布中高亮的 CAN/协议连线；确认后故障会作用于该连接线传递的数据。'
+        :'请选择画布中高亮的兼容对象；再次点击可取消绑定选择。';
+    }
+    if(config.layer==='protocol'){
+      return '点击后只高亮可兼容的 CAN/协议连线，确认后才会生成协议层故障标签。';
+    }
+    if(config.layer==='physical'){
+      return '点击后只高亮声明了模型参数槽位的模块，确认后才会生成物理层故障标签。';
+    }
+    return '点击后只高亮可兼容的模块或信号连线，确认后才会生成电气层故障标签。';
+  }
+
+  function renderLayeredFaultInjectorPropertyPanel(node){
+    const pd=document.getElementById('pd');
+    const pe=document.getElementById('pe');
+    if(!pd||!pe) return;
+    const config=getLayeredFaultInjectorConfig(node.type);
+    if(!config) return;
+    pe.style.display='none';
+    pd.style.display='block';
+    const active=S.pendingLayeredFaultInjectorId===node.id;
+    pd.innerHTML=\`
+      <div class="pgroup">
+        <div class="props-title">\${escapeHtml(node.props?.name||config.label)}</div>
+        <div class="props-sub">未绑定故障块 · \${escapeHtml(config.layerLabel)}</div>
+      </div>
+      <div class="pgroup">
+        <div class="pglbl">绑定状态</div>
+        <div class="prow"><span class="pk">故障层级</span><span class="pv">\${escapeHtml(config.layerLabel)}</span></div>
+        <div class="prow"><span class="pk">作用对象</span><span class="pv">尚未绑定</span></div>
+        <div class="prow"><span class="pk">绑定对象</span><span class="pv">\${escapeHtml(getLayeredFaultInjectorTargetLabel(config))}</span></div>
+        <div class="prow"><span class="pk">故障对象</span><span class="pv">\${escapeHtml(getLayeredFaultInjectorObjectLabel(config))}</span></div>
+        <div class="prow"><span class="pk">匹配规则</span><span class="pv">\${escapeHtml(config.faultType)}</span></div>
+      </div>
+      <div class="pgroup">
+        <button type="button" class="props-primary-action\${active?' is-active':''}" data-layered-fault-bind="\${escapeHtml(node.id)}" aria-pressed="\${active?'true':'false'}">\${active?'取消绑定':'绑定目标'}</button>
+        <div class="props-help">\${escapeHtml(getLayeredFaultInjectorHelp(config,active))}</div>
+      </div>
+    \`;
+    pd.querySelector('[data-layered-fault-bind]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      if(S.pendingLayeredFaultInjectorId===node.id){
+        cancelLayeredFaultBinding();
+        closeLayeredFaultBindingDialog();
+        renderLayeredFaultInjectorPropertyPanel(node);
+        return;
+      }
+      beginLayeredFaultBinding(node.id);
+      renderLayeredFaultInjectorPropertyPanel(node);
+    });
+    if(typeof window.__GZ_DECORATE_PROPERTY_PANEL__==='function'){
+      window.__GZ_DECORATE_PROPERTY_PANEL__(node,{kind:'fault-injector',tab:S.propertyPanelTab});
+    }
+  }
+
+  window.__GZ_RENDER_LAYERED_FAULT_INJECTOR_PANEL__=renderLayeredFaultInjectorPropertyPanel;
+
+  const previousSelectNode=window.selectNode||(typeof selectNode!=='undefined'?selectNode:null);
+  if(previousSelectNode&&!window.__layeredFaultSelectNodeWrapped){
+    window.__layeredFaultSelectNodeWrapped=true;
+    window.selectNode=function(id){
+      const result=previousSelectNode.apply(this,arguments);
+      const node=getRuntimeNode(id);
+      if(isLayeredFaultInjectorType(node?.type)){
+        renderLayeredFaultInjectorPropertyPanel(node);
+        renderLayeredFaultInjectorControls();
+      }
+      else if(!S.pendingLayeredFaultInjectorId) clearLayeredFaultBindingTargets();
+      return result;
+    };
+    if(typeof selectNode!=='undefined') selectNode=window.selectNode;
+  }
+
+  const previousRenderModelNodes=window.renderModelNodes||(typeof renderModelNodes!=='undefined'?renderModelNodes:null);
+  if(previousRenderModelNodes&&!window.__layeredFaultRenderModelNodesWrapped){
+    window.__layeredFaultRenderModelNodesWrapped=true;
+    window.renderModelNodes=function(){
+      const result=previousRenderModelNodes.apply(this,arguments);
+      renderLayeredFaultInjectorControls();
+      const injector=getPendingLayeredFaultInjector();
+      if(injector) showLayeredFaultBindingTargets(injector);
+      return result;
+    };
+    if(typeof renderModelNodes!=='undefined') renderModelNodes=window.renderModelNodes;
+  }
+
+  const previousRenderEdges=window.renderEdges||(typeof renderEdges!=='undefined'?renderEdges:null);
+  if(previousRenderEdges&&!window.__layeredFaultRenderEdgesWrapped){
+    window.__layeredFaultRenderEdgesWrapped=true;
+    window.renderEdges=function(){
+      const result=previousRenderEdges.apply(this,arguments);
+      return result;
+    };
+    if(typeof renderEdges!=='undefined') renderEdges=window.renderEdges;
+  }
+
+  const previousHandlePortClick=window.handlePortClick||(typeof handlePortClick!=='undefined'?handlePortClick:null);
+  if(previousHandlePortClick&&!window.__layeredFaultPortClickWrapped){
+    window.__layeredFaultPortClickWrapped=true;
+    window.handlePortClick=function(event,nodeId,direction,index){
+      const node=getRuntimeNode(nodeId);
+      if(direction==='output'&&isLayeredFaultInjectorType(node?.type)){
+        event?.stopPropagation?.();
+        beginLayeredFaultBinding(nodeId);
+        if(typeof toast==='function') toast('请选择可注入该层故障的目标对象','i');
+        return;
+      }
+      return previousHandlePortClick.apply(this,arguments);
+    };
+    if(typeof handlePortClick!=='undefined') handlePortClick=window.handlePortClick;
+  }
+
+  if(!window.__layeredFaultBindingClickHandler){
+    window.__layeredFaultBindingClickHandler=handleLayeredFaultBindingClick;
+    document.addEventListener('click',handleLayeredFaultBindingClick,true);
+  }
+
+  Object.assign(window,{
+    isLayeredFaultInjectorType,
+    getLayeredFaultInjectorConfig,
+    getLayeredFaultSlotsForTarget,
+    canBindLayeredFaultInjectorToTarget,
+    bindLayeredFaultInjectorToTarget,
+    beginLayeredFaultBinding,
+    cancelLayeredFaultBinding,
+    showLayeredFaultBindingTargets,
+    clearLayeredFaultBindingTargets
+  });
+})();
+
+;(function disableLegacyFaultLibraryWorkflow(){
+  if(typeof window==='undefined') return;
+
+  function syncLegacyFaultLibraryButton(){
+    const button=document.getElementById('btn-imp-flt');
+    if(button){
+      button.disabled=true;
+      button.setAttribute('aria-disabled','true');
+      button.classList.add('tbtn-disabled');
+      button.classList.remove('ready');
+      button.title='当前版本已关闭故障库注入，请使用左侧三类故障注入组件先放置再绑定目标。';
+    }
+    clearLegacyFaultLibraryContent();
+  }
+
+  function clearLegacyFaultLibraryContent(){
+    const container=document.getElementById('ifm-list-container');
+    if(container){
+      container.innerHTML='<div class="ifm-empty">当前版本已关闭故障库注入。请使用左侧三类故障注入组件先放置，再通过“绑定目标”完成绑定。</div>';
+    }
+    const detail=document.getElementById('fault-type-detail');
+    if(detail){
+      detail.innerHTML='<div class="ifm-detail-empty">当前版本不使用故障库直注流程。</div>';
+    }
+    ['ifm-total-count','ifm-physical-count','ifm-electrical-count','ifm-protocol-count','ifm-visible-count'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent='0';
+    });
+  }
+
+  window.doImportFault=function(){
+    document.getElementById('ov-ifm')?.classList.remove('open');
+    syncLegacyFaultLibraryButton();
+    if(typeof toast==='function'){
+      toast('当前版本已关闭故障库注入，请使用左侧故障注入组件先放置，再通过“绑定目标”完成绑定。','w');
+    }
+    return {ok:false,reason:'fault-library-disabled'};
+  };
+  if(typeof doImportFault!=='undefined') doImportFault=window.doImportFault;
+
+  const previousUpdateUI=window.updateUI||(typeof updateUI!=='undefined'?updateUI:null);
+  if(previousUpdateUI){
+    window.updateUI=function(){
+      const result=previousUpdateUI.apply(this,arguments);
+      syncLegacyFaultLibraryButton();
+      return result;
+    };
+    if(typeof updateUI!=='undefined') updateUI=window.updateUI;
+  }
+
+  syncLegacyFaultLibraryButton();
+  setTimeout(syncLegacyFaultLibraryButton,0);
+  window.__GZ_LEGACY_FAULT_LIBRARY_DISABLED__=true;
+})();
+
+;(function installFaultTaskLoaderWorkflow(){
+  if(typeof window==='undefined') return;
+
+  const STORAGE_KEY='gz-0526-fault-task-package';
+  const TASK_PRESETS=[
+    {
+      id:'gyro-bias',
+      title:'陀螺仪零偏故障',
+      summary:'IMU 陀螺仪角速度叠加偏差 5，作用时间 1-3s。',
+      tasks:[
+        {
+          injectorType:'electrical_fault_injector',
+          modelId:'gyro_zero_bias_offset',
+          targetKind:'node',
+          targetId:'node-imu',
+          slotId:'electrical:测量角速度',
+          mathModel:'bias',
+          parameters:{bias:5,start:1,duration:2},
+          x:360,
+          y:520
+        }
+      ]
+    },
+    {
+      id:'motor-stuck',
+      title:'单电机卡死故障',
+      summary:'1号电机最大输出卡到 0，作用时间 1-3s。',
+      tasks:[
+        {
+          injectorType:'physical_fault_injector',
+          modelId:'motor_1_stuck_position',
+          targetKind:'node',
+          targetId:'node-motor-1',
+          slotId:'physical:motor_max_output',
+          mathModel:'freeze',
+          parameters:{mode:'zero',value:0,start:1,duration:2},
+          x:940,
+          y:600
+        }
+      ]
+    },
+    {
+      id:'command-tamper',
+      title:'控制指令篡改',
+      summary:'指令整形到姿态控制器前的 CAN 链路放大 50%，作用时间 1-3s。',
+      tasks:[
+        {
+          injectorType:'protocol_fault_injector',
+          modelId:'control_command_tamper',
+          targetKind:'edge',
+          targetId:'edge-shaper-error',
+          slotId:'protocol:edge-shaper-error:can',
+          mathModel:'tamper',
+          parameters:{scale:1.5,bias:0,start:1,duration:2},
+          x:520,
+          y:660
+        }
+      ]
+    },
+    {
+      id:'combined-0526',
+      title:'组合注入展示',
+      summary:'同时注入陀螺仪零偏、单电机卡死、控制指令篡改。',
+      tasks:[
+        {
+          injectorType:'electrical_fault_injector',
+          modelId:'gyro_zero_bias_offset',
+          targetKind:'node',
+          targetId:'node-imu',
+          slotId:'electrical:测量角速度',
+          mathModel:'bias',
+          parameters:{bias:5,start:1,duration:2},
+          x:360,
+          y:520
+        },
+        {
+          injectorType:'physical_fault_injector',
+          modelId:'motor_1_stuck_position',
+          targetKind:'node',
+          targetId:'node-motor-1',
+          slotId:'physical:motor_max_output',
+          mathModel:'freeze',
+          parameters:{mode:'zero',value:0,start:1,duration:2},
+          x:940,
+          y:600
+        },
+        {
+          injectorType:'protocol_fault_injector',
+          modelId:'control_command_tamper',
+          targetKind:'edge',
+          targetId:'edge-shaper-error',
+          slotId:'protocol:edge-shaper-error:can',
+          mathModel:'tamper',
+          parameters:{scale:1.5,bias:0,start:1,duration:2},
+          x:520,
+          y:660
+        }
+      ]
+    }
+  ];
+
+  function arr(value){return Array.isArray(value)?value:[];}
+  function clone(value){return JSON.parse(JSON.stringify(value??null));}
+  function getState(){return window.__GZ_STATE__||(typeof S!=='undefined'?S:{});}
+  function getNodes(){return arr(getState().modelNodes);}
+  function getEdges(){return arr(getState().modelEdges);}
+  function getTarget(task){
+    return task.targetKind==='edge'
+      ?getEdges().find(edge=>edge.id===task.targetId)
+      :getNodes().find(node=>node.id===task.targetId);
+  }
+  function html(value){
+    return String(value??'')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+  function safeId(value){return String(value||'task').replace(/[^A-Za-z0-9_-]/g,'-');}
+
+  function syncFaultTaskButton(){
+    const button=document.getElementById('btn-imp-flt');
+    if(!button) return;
+    const ready=Boolean(getState().sysLoaded&&(getNodes().length||getEdges().length));
+    button.textContent='加载故障模型';
+    button.disabled=!ready;
+    button.setAttribute('aria-disabled',ready?'false':'true');
+    button.classList.toggle('tbtn-disabled',!ready);
+    button.classList.toggle('ready',ready);
+    button.title=ready
+      ?'加载 0526 已实现故障任务，或保存/恢复当前故障模型配置。'
+      :'请先导入包含模块和连线的系统模型，再加载故障模型任务。';
+  }
+
+  function removeFaultTaskLoader(){
+    document.querySelector('[data-fault-task-loader]')?.remove();
+  }
+
+  function savedPackageAvailable(){
+    try{
+      return Boolean(window.localStorage?.getItem(STORAGE_KEY));
+    }catch{
+      return false;
+    }
+  }
+
+  function clearLegacyFaultLibraryPanel(){
+    const container=document.getElementById('ifm-list-container');
+    if(container){
+      container.innerHTML='<div class="ifm-empty">当前版本使用“加载故障模型”选择已实现任务，不再显示故障库直接注入列表。</div>';
+    }
+    const detail=document.getElementById('fault-type-detail');
+    if(detail){
+      detail.innerHTML='<div class="ifm-detail-empty">请从顶部“加载故障模型”入口选择 0526 故障任务。</div>';
+    }
+    ['ifm-total-count','ifm-physical-count','ifm-electrical-count','ifm-protocol-count','ifm-visible-count'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent='0';
+    });
+  }
+
+  function renderFaultTaskLoader(){
+    removeFaultTaskLoader();
+    const modal=document.createElement('div');
+    modal.className='fault-task-loader';
+    modal.dataset.faultTaskLoader='true';
+    modal.innerHTML=\`
+      <div class="fault-task-loader__panel">
+        <div class="fault-task-loader__head">
+          <div>
+            <span>0526 故障模型</span>
+            <strong>加载故障任务</strong>
+          </div>
+          <button type="button" data-fault-task-close aria-label="关闭">×</button>
+        </div>
+        <div class="fault-task-loader__body">
+          <p>选择已实现的故障任务后，平台会自动放置对应注入组件并完成目标绑定；随后可直接初始化仿真并打开示波器展示。</p>
+          <div class="fault-task-loader__grid">
+            \${TASK_PRESETS.map(preset=>\`
+              <button type="button" class="fault-task-card" data-fault-task-preset="\${html(preset.id)}">
+                <b>\${html(preset.title)}</b>
+                <span>\${html(preset.summary)}</span>
+              </button>
+            \`).join('')}
+          </div>
+        </div>
+        <div class="fault-task-loader__foot">
+          <button type="button" data-fault-task-save>保存当前故障模型</button>
+          <button type="button" data-fault-task-load-saved \${savedPackageAvailable()?'':'disabled'}>加载已保存模型</button>
+          <button type="button" class="primary" data-fault-task-close>关闭</button>
+        </div>
+      </div>
+    \`;
+    modal.addEventListener('click',event=>{
+      if(event.target===modal||event.target?.closest?.('[data-fault-task-close]')){
+        removeFaultTaskLoader();
+        return;
+      }
+      const presetButton=event.target?.closest?.('[data-fault-task-preset]');
+      if(presetButton){
+        const result=applyFaultTaskPreset(presetButton.dataset.faultTaskPreset||'');
+        if(result?.ok) removeFaultTaskLoader();
+        return;
+      }
+      if(event.target?.closest?.('[data-fault-task-save]')){
+        saveCurrentFaultTaskPackage();
+        renderFaultTaskLoader();
+        return;
+      }
+      if(event.target?.closest?.('[data-fault-task-load-saved]')){
+        const result=loadSavedFaultTaskPackage();
+        if(result?.ok) removeFaultTaskLoader();
+      }
+    });
+    document.body.appendChild(modal);
+  }
+
+  function doImportFaultTask(){
+    document.getElementById('ov-ifm')?.classList.remove('open');
+    syncFaultTaskButton();
+    clearLegacyFaultLibraryPanel();
+    if(!getState().sysLoaded||(!getNodes().length&&!getEdges().length)){
+      if(typeof toast==='function') toast('请先导入包含模块和连线的系统模型，再加载故障模型任务。','w');
+      return {ok:false,reason:'system-not-loaded'};
+    }
+    renderFaultTaskLoader();
+    return {ok:true};
+  }
+
+  function applyTaskBinding(preset,task,index){
+    if(typeof window.createNode!=='function'||typeof window.bindLayeredFaultInjectorToTarget!=='function'){
+      return {ok:false,reason:'runtime-not-ready'};
+    }
+    const target=getTarget(task);
+    if(!target) return {ok:false,reason:'target-not-found',targetId:task.targetId};
+    const injector=window.createNode(task.injectorType,task.x||420,task.y||520);
+    if(!injector?.id) return {ok:false,reason:'injector-create-failed',injectorType:task.injectorType};
+    return window.bindLayeredFaultInjectorToTarget(injector.id,{
+      targetKind:task.targetKind,
+      targetId:task.targetId,
+      slotId:task.slotId,
+      mathModel:task.mathModel,
+      modelId:task.modelId||\`fault-task-\${safeId(preset.id)}-\${index+1}\`,
+      name:preset.title,
+      parameters:clone(task.parameters)
+    });
+  }
+
+  function applyFaultTaskPreset(presetId){
+    const preset=TASK_PRESETS.find(item=>item.id===presetId);
+    if(!preset) return {ok:false,reason:'preset-not-found'};
+    if(!getState().sysLoaded) return {ok:false,reason:'system-not-loaded'};
+    const results=preset.tasks.map((task,index)=>applyTaskBinding(preset,task,index));
+    const failed=results.filter(result=>!result?.ok);
+    if(failed.length){
+      if(typeof toast==='function') toast(\`故障任务加载失败：\${failed[0].reason||'unknown'}\`,'w');
+      return {ok:false,reason:'task-apply-failed',results};
+    }
+    if(typeof updateUI==='function') updateUI();
+    if(typeof toast==='function') toast(\`已加载故障任务：\${preset.title}\`,'s');
+    return {ok:true,presetId:preset.id,applied:results.length,results};
+  }
+
+  function runFaultTaskPresetDemo(presetId){
+    const result=applyFaultTaskPreset(presetId);
+    if(!result?.ok) return result;
+    const dur=document.getElementById('sim-dur');
+    const step=document.getElementById('sim-step');
+    if(dur) dur.value='4';
+    if(step) step.value='0.1';
+    if(typeof simInit==='function') simInit(true);
+    if(typeof runSimulationTick==='function'&&typeof SIM!=='undefined'){
+      while(SIM.inited&&SIM.time<SIM.duration){
+        runSimulationTick();
+      }
+      if(typeof simStop==='function') simStop('completed');
+    }
+    if(typeof openScope==='function') openScope('node-scope');
+    return {...result,demo:true};
+  }
+
+  function saveCurrentFaultTaskPackage(){
+    const packageApi=window.__GZ_FLIGHT_MODEL_PACKAGE__;
+    if(typeof packageApi?.exportCurrent!=='function'){
+      if(typeof toast==='function') toast('当前运行时不支持导出故障模型。','w');
+      return {ok:false,reason:'export-not-ready'};
+    }
+    const pkg=packageApi.exportCurrent();
+    try{
+      window.localStorage?.setItem(STORAGE_KEY,JSON.stringify(pkg));
+      if(typeof toast==='function') toast('当前故障模型已保存，可通过加载已保存模型恢复。','s');
+      return {ok:true};
+    }catch(error){
+      if(typeof toast==='function') toast('保存失败：浏览器存储不可用。','w');
+      return {ok:false,reason:'storage-error',error};
+    }
+  }
+
+  function loadSavedFaultTaskPackage(){
+    const packageApi=window.__GZ_FLIGHT_MODEL_PACKAGE__;
+    if(typeof packageApi?.importObject!=='function'){
+      return {ok:false,reason:'import-not-ready'};
+    }
+    try{
+      const raw=window.localStorage?.getItem(STORAGE_KEY);
+      if(!raw) return {ok:false,reason:'saved-package-not-found'};
+      const result=packageApi.importObject(JSON.parse(raw));
+      if(result?.ok){
+        if(typeof toast==='function') toast('已加载保存的故障模型。','s');
+        if(typeof updateUI==='function') updateUI();
+        removeFaultTaskLoader();
+      }
+      return result;
+    }catch(error){
+      if(typeof toast==='function') toast('加载失败：保存内容不可用。','w');
+      return {ok:false,reason:'saved-package-invalid',error};
+    }
+  }
+
+  window.doImportFault=doImportFaultTask;
+  if(typeof doImportFault!=='undefined') doImportFault=window.doImportFault;
+
+  const previousUpdateUI=window.updateUI||(typeof updateUI!=='undefined'?updateUI:null);
+  if(previousUpdateUI&&!window.__faultTaskLoaderUpdateWrapped){
+    window.__faultTaskLoaderUpdateWrapped=true;
+    window.updateUI=function(){
+      const result=previousUpdateUI.apply(this,arguments);
+      syncFaultTaskButton();
+      return result;
+    };
+    if(typeof updateUI!=='undefined') updateUI=window.updateUI;
+  }
+
+  const previousApplyPackage=window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__;
+  if(typeof previousApplyPackage==='function'&&!window.__faultTaskLoaderApplyWrapped){
+    window.__faultTaskLoaderApplyWrapped=true;
+    window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__=function(pkg,prepared){
+      const result=previousApplyPackage.apply(this,arguments);
+      syncFaultTaskButton();
+      clearLegacyFaultLibraryPanel();
+      setTimeout(syncFaultTaskButton,0);
+      setTimeout(clearLegacyFaultLibraryPanel,0);
+      return result;
+    };
+  }
+
+  Object.assign(window,{
+    __GZ_FAULT_TASK_PRESETS__:TASK_PRESETS,
+    applyFaultTaskPreset,
+    runFaultTaskPresetDemo,
+    saveCurrentFaultTaskPackage,
+    loadSavedFaultTaskPackage
+  });
+
+  syncFaultTaskButton();
+  clearLegacyFaultLibraryPanel();
+  setTimeout(syncFaultTaskButton,0);
+  setTimeout(clearLegacyFaultLibraryPanel,0);
+  setTimeout(syncFaultTaskButton,20);
+  setTimeout(clearLegacyFaultLibraryPanel,20);
+})();
+`,cu=`canvas-root`,lu=`顶层`;function uu(e){return JSON.parse(JSON.stringify(e))}function du(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function G(e){return Array.isArray(e)?e:[]}function fu(e){let t=uu(e??{});return{inputs:Array.isArray(t.inputs)?uu(t.inputs):[],outputs:Array.isArray(t.outputs)?uu(t.outputs):[],middleVars:Array.isArray(t.middleVars)?uu(t.middleVars):[]}}function pu(e){let t=uu(e??{});return{...Xo().executionConfig,...t}}function mu(e){if(!e||typeof e!=`object`)return Xo();let t={...Xo(),...uu(e)};return t.executionConfig=pu(e.executionConfig),t.portMapping={...Xo().portMapping,...fu(e.portMapping)},t}function hu(e,t){return e.reduce((e,n)=>{let r=Number(String(n?.id??``).replace(`${t}-`,``));return Number.isFinite(r)?Math.max(e,r):e},0)}function gu(e,t){return Object.values(du(e)?e:{}).flatMap(e=>du(e)?G(e[t]):[])}function _u(e,t,n){return hu(gu(e,t),n)}function vu(e){let t=du(e)?uu(e):{};return{...t,pythonBinding:t.type===`simulation_block`?mu(t.pythonBinding):t.pythonBinding??null}}function yu(e){return du(e)?uu(e):{}}function bu(e=cu,t=lu){return{id:e,name:t,parentSubsystemNodeId:null,viewport:{scale:1,offsetX:0,offsetY:0},nodes:[],edges:[]}}function xu(e,t=cu){let n=du(e)?uu(e):{};return{id:n.id??t,name:n.name??(t===cu?lu:`未命名画布`),parentSubsystemNodeId:n.parentSubsystemNodeId??null,viewport:{scale:n.viewport?.scale??1,offsetX:n.viewport?.offsetX??0,offsetY:n.viewport?.offsetY??0},nodes:G(n.nodes).map(vu),edges:G(n.edges).map(yu)}}function Su(e){let t=du(e)?e:{},n=du(t.canvases)?t.canvases:null;if(!n){let e=bu();return e.nodes=G(t.modelNodes).map(vu),e.edges=G(t.modelEdges).map(yu),{rootCanvasId:cu,activeCanvasId:cu,canvasTrail:[cu],canvases:{[cu]:e}}}let r=t.rootCanvasId??cu,i={};Object.entries(n).forEach(([e,t])=>{i[e]=xu(t,e)}),i[r]||(i[r]=bu(r));let a=i[t.activeCanvasId]?t.activeCanvasId:r,o=G(t.canvasTrail).filter(e=>typeof e==`string`&&i[e]),s=o.length>0?o:[r];return s[s.length-1]!==a&&s.push(a),{rootCanvasId:r,activeCanvasId:a,canvasTrail:s,canvases:i}}function Cu(e){let t=du(e)?uu(e):{},n=Su(t),r=n.canvases[n.activeCanvasId]?.viewport??{};n.canvases[n.activeCanvasId]&&(n.canvases[n.activeCanvasId].viewport={scale:Number.isFinite(t.canvasScale)?t.canvasScale:r.scale??1,offsetX:Number.isFinite(t.canvasOffsetX)?t.canvasOffsetX:r.offsetX??0,offsetY:Number.isFinite(t.canvasOffsetY)?t.canvasOffsetY:r.offsetY??0});let i=n.canvases[n.activeCanvasId]??bu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?lu:`未命名画布`),a=i.nodes,o=i.edges;return uu({version:t.version??1,modelNodes:a,modelEdges:o,nodeSeq:t.nodeSeq??_u(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??_u(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:G(t.faultedBlks),importedFaultModels:G(t.importedFaultModels),faultInstances:G(t.faultInstances),faultTags:G(t.faultTags),faultInjectionLinks:G(t.faultInjectionLinks)})}function wu(e){let t=du(e)?uu(e):{},n=Su(t),r=n.canvases[n.activeCanvasId]??bu(n.activeCanvasId,n.activeCanvasId===n.rootCanvasId?lu:`未命名画布`),i=r.nodes,a=r.edges;return uu({version:t.version??1,modelNodes:i,modelEdges:a,nodeSeq:t.nodeSeq??_u(n.canvases,`nodes`,`node`),edgeSeq:t.edgeSeq??_u(n.canvases,`edges`,`edge`),rootCanvasId:n.rootCanvasId,activeCanvasId:n.activeCanvasId,canvasTrail:n.canvasTrail,canvases:n.canvases,activeLineType:t.activeLineType??`normal`,workspaceSource:typeof t.workspaceSource==`string`?t.workspaceSource:``,faultedBlks:G(t.faultedBlks),importedFaultModels:G(t.importedFaultModels),faultInstances:G(t.faultInstances),faultTags:G(t.faultTags),faultInjectionLinks:G(t.faultInjectionLinks)})}var Tu=Object.freeze({physical:[{id:`bias`,name:`偏置模型`,formula:`p_fault = p + bias`,defaultParameters:{bias:.1,start:0,duration:``}},{id:`drift`,name:`漂移模型`,formula:`p_fault = p + rate * max(t - start, 0)`,defaultParameters:{rate:.006,start:0,duration:``}},{id:`step`,name:`突变模型`,formula:`p_fault = p + step`,defaultParameters:{step:.1,start:0,duration:``}},{id:`degradation`,name:`衰减模型`,formula:`p_fault = p * scale(t)`,defaultParameters:{scale:.85,start:0,duration:``}},{id:`freeze`,name:`卡死模型`,formula:`p_fault = hold(p, start)`,defaultParameters:{start:0,duration:``}},{id:`random`,name:`随机模型`,formula:`p_fault = p + noise(seed, std)`,defaultParameters:{seed:1,std:.08,start:0,duration:``}}],electrical:[{id:`bias`,name:`信号偏置`,formula:`y_fault = y + bias`,defaultParameters:{bias:.1,start:0,duration:``}},{id:`noise`,name:`随机噪声`,formula:`y_fault = y + noise(seed, std)`,defaultParameters:{seed:1,std:.08,start:0,duration:``}},{id:`freeze`,name:`信号卡死`,formula:`y_fault = hold(y, start)`,defaultParameters:{start:0,duration:``}},{id:`intermittent`,name:`间歇异常`,formula:`y_fault = f(y) when gate(t) else y`,defaultParameters:{period:4,duty:.25,start:0,duration:``}}],protocol:[{id:`delay`,name:`报文延迟`,formula:`payload_fault[k] = payload[k - d]`,defaultParameters:{delay_steps:3,start:0,duration:``}},{id:`dropout`,name:`报文丢失`,formula:`payload_fault = previous(payload) when drop(seed, rate)`,defaultParameters:{drop_rate:.08,seed:1,start:0,duration:``}},{id:`tamper`,name:`报文篡改`,formula:`payload_fault = tamper(payload)`,defaultParameters:{bias:.1,scale:1,start:0,duration:``}},{id:`stale`,name:`陈旧报文`,formula:`payload_fault = hold(payload, start)`,defaultParameters:{start:0,duration:``}}]}),Eu=Object.freeze([`bias`,`noise`,`freeze`,`intermittent`]),Du=Object.freeze([`delay`,`dropout`,`tamper`,`stale`]),Ou=Object.freeze([`physical`,`electrical`,`protocol`]),ku=Object.freeze({physical:Tu.physical.map(e=>e.id),electrical:Eu.slice(),protocol:Du.slice()});function Au(e){return JSON.parse(JSON.stringify(e??null))}function K(e){return Array.isArray(e)?e:[]}function q(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function J(e,t=``){return typeof e==`string`&&e.trim()?e.trim():t}function ju(e,t=``){return String((e==null||e===``?t:e)??``).trim()||t}function Mu(e){return J(e).toLowerCase()}function Nu(e){return Array.from(new Set(K(e).map(e=>J(e)).filter(Boolean)))}function Pu(e={},t=`electrical`){let n=J(e.layer??e.layerKey,t);return Ou.includes(n)?n:t}function Fu(e={},t={},n={}){let r=Pu(e,n.layer??(t.sourceNodeId&&t.targetNodeId&&ed(t)?`protocol`:`electrical`)),i=J(e.slotId??e.id,n.slotId??`${r}:${t.id||`target`}:${n.index??0}`),a=Nu(e.allowedModels).length?Nu(e.allowedModels):Nu(n.allowedModels);return{...Au(e),slotId:i,slotName:J(e.slotName??e.name??e.label,n.slotName??i),layer:r,targetField:J(e.targetField,n.targetField??``),allowedModels:a}}function Iu(e,t,n={},r=0){let i=J(n.key??n.id??n.name??n.varName,`${t}_${r+1}`).replace(/\s+/g,`_`);return{slotId:`${e}:${t}:${i}`,slotName:J(n.name??n.label??n.varName,`${t} ${r+1}`),layer:e,targetField:`${t}.${i}`,allowedModels:e===`physical`?Tu.physical.map(e=>e.id):Eu.slice(),parameterKey:J(n.key??n.id??n.name??n.varName),unit:J(n.unit)}}function Lu(e,t=``){return ju(e,t).replace(/\s+/g,`_`)}function Ru(e,t){return e===`parameter`?`params.${t}`:e===`input`?`inputs.${t}`:e===`output`?`outputs.${t}`:e===`middle`?`middleVars.${t}`:e===`protocol`?`protocol.${t}`:t}function zu(e,t={},n=0){let r=q(t)?t:{},i=Lu(ju(r.key??r.id??r.varName??r.name,`${e}_${n+1}`),`${e}_${n+1}`),a=J(r.displayName??r.name??r.label??r.varName??r.key??r.id,i),o=ju(r.bindingObject??r.targetVariable??r.varName??r.key??r.id??r.name,i);return{key:i,name:a,role:e,targetField:J(r.targetField,Ru(e,i)),bindingObject:o,targetVariable:ju(r.targetVariable,o),signalId:J(r.signalId),unit:J(r.unit),type:J(r.type??r.format),parameterKey:e===`parameter`?i:``}}function Bu(e,t,n,r,i){if(!q(r))return;let a=zu(n,r,i),o=a.key;!a.key||t.has(o)||(t.add(o),e.push(a))}function Vu(e={}){return q(e)&&Object.prototype.hasOwnProperty.call(e,`default`)&&e.default!==null&&e.default!==void 0}function Hu(e={}){let t=q(e.pythonBinding)?e.pythonBinding:{},n=K(t.parsedInterface?.inputs);return(n.length?n:K(t.portMapping?.inputs)).filter(Vu)}function Uu(e={},t=`inputs`){let n=q(e.pythonBinding)?e.pythonBinding:{},r=K(n.parsedInterface?.[t]);return r.length?r:K(n.portMapping?.[t])}function Wu(e={}){let t=q(e.props)?e.props:{},n=[],r=new Set;return[[`parameter`,K(t.parameters)],[`parameter`,K(t.modelParameters)],[`parameter`,K(t.physicalParameters)],[`parameter`,K(e.parameters)],[`parameter`,K(e.physicalParameters)],[`parameter`,Hu(e)],[`input`,K(t.inputs)],[`input`,Uu(e,`inputs`)],[`output`,K(t.outputs)],[`output`,Uu(e,`outputs`)],[`middle`,K(t.middleVars)],[`middle`,Uu(e,`middleVars`)]].forEach(([e,t])=>{t.forEach((t,i)=>Bu(n,r,e,t,i))}),n}function Gu(e={}){let t=q(e.props)?e.props:{},n=t.faultInjection??e.faultInjection??t.injectableFaultVariables??e.injectableFaultVariables;return q(n)?n:null}function Ku(e={}){let t=Gu(e);return!!(t&&Ou.some(e=>Object.prototype.hasOwnProperty.call(t,e)))}function qu(e,t=0){return q(e)?Lu(e.variableKey??e.key??e.id??e.varName??e.name,`slot_${t+1}`):Lu(e,`slot_${t+1}`)}function Ju(e={},t=`electrical`){let n=e[t];return Array.isArray(n)?n:typeof n==`string`?[n]:q(n)?Object.entries(n).filter(([,e])=>!!e).map(([e])=>e):[]}function Yu(e,t,n,r){let i=q(t)?Au(t):{},a=n?.key||qu(t,r),o=n?.role||J(i.variableRole??i.role??i.kind,``),s=o||e,c=Nu(i.allowedModels).length?Nu(i.allowedModels):ku[e].slice();return{...i,slotId:J(i.slotId??i.id,`${e}:${a}`),slotName:J(i.slotName??i.displayName??i.name??i.label,n?.name||a),layer:e,targetField:J(i.targetField,n?.targetField||Ru(s,a)),bindingObject:J(i.bindingObject??i.targetVariable,n?.bindingObject||a),targetVariable:J(i.targetVariable,i.bindingObject||n?.targetVariable||n?.bindingObject||a),allowedModels:c,variableKey:a,variableRole:o,signalId:J(i.signalId,n?.signalId||``),unit:J(i.unit,n?.unit||``),parameterKey:J(i.parameterKey,n?.parameterKey||``)}}function Xu(e=[],t,n){let r=q(t)?J(t.variableRole??t.role??t.kind,``):``;if(r){let t=e.find(e=>e.key===n&&e.role===r);if(t)return t}let i=e.filter(e=>e.key===n);return i.length===1?i[0]:i[0]||null}function Zu(e={}){let t=Gu(e);if(!t)return[];let n=Wu(e);return Ou.flatMap(e=>Ju(t,e).map((t,r)=>{let i=Xu(n,t,qu(t,r));return!i&&!q(t)?null:Yu(e,t,i,r)}).filter(Boolean))}function Qu(e={}){return`${e.layer||``}:${e.slotId||e.id||``}`}function $u(e=[],t=[],n={}){let r=new Map;return t.forEach((e,t)=>{if(!q(e))return;let i=Fu(e,n,{index:t});r.set(Qu(i),i)}),e.map((e,t)=>{let i=Fu(e,n,{index:t}),a=r.get(Qu(i));return a?Fu({...a,...i,allowedFaultIds:Nu(i.allowedFaultIds).length?i.allowedFaultIds:a.allowedFaultIds,allowedFaultTypeIds:Nu(i.allowedFaultTypeIds).length?i.allowedFaultTypeIds:a.allowedFaultTypeIds},n,{index:t}):i})}function ed(e={}){return!!(Mu(e.lineType??e.type)===`can`||Mu(e.bus)===`can`||Mu(e.protocol)===`can`||J(e.channelId).toUpperCase().includes(`CAN`)||J(e.messageId)||J(e.canMessageId))}function td(e={}){let t=[{slotId:`electrical:signal_value`,slotName:J(e.label??e.signalName??e.signalId,`信号值`),layer:`electrical`,targetField:`signal.value`,allowedModels:Eu.slice(),signalId:J(e.signalId),lineType:J(e.lineType??e.type,`normal`)}];return ed(e)&&t.push({slotId:`protocol:can_message`,slotName:J(e.messageId??e.canMessageId??e.channelId,`CAN 报文`),layer:`protocol`,targetField:`can.payload`,allowedModels:Du.slice(),signalId:J(e.signalId),channelId:J(e.channelId),messageId:J(e.messageId??e.canMessageId)}),t}function nd(e={},t={}){let n=q(e.props)?e.props:{},r=t.skipPhysical?[]:[...K(n.modelParameters),...K(n.physicalParameters),...K(e.physicalParameters)],i=[...K(n.inputs).map((e,t)=>({role:`input`,item:e,index:t})),...K(n.outputs).map((e,t)=>({role:`output`,item:e,index:t})),...K(n.middleVars).map((e,t)=>({role:`middle`,item:e,index:t}))];return[...r.map((e,t)=>Iu(`physical`,`parameter`,e,t)),...i.map(({role:e,item:t,index:n})=>Iu(`electrical`,e,t,n))]}function rd(e={}){return`${e.layer||``}:${e.slotId||``}:${e.targetField||``}`}function id(e={},t=[]){let n=[],r=new Set;return[...K(e.faultSlots),...t].forEach((t,i)=>{if(!q(t))return;let a=Fu(t,e,{index:i}),o=rd(a);r.has(o)||(r.add(o),n.push(a))}),n}function ad(e={},t=`node`,n=[]){return K(K(n).find(n=>n?.targetId===e.id&&(n.targetKind||t)===t)?.faultSlots)}function od(e={},{faultCapabilityMap:t=[]}={}){let n=q(e)?Au(e):{};if(Ku(n))return{...n,faultSlots:$u(Zu(n),[...K(n.faultSlots),...ad(n,`node`,t)],n)};let r=K(n.faultSlots).some(e=>Pu(e)===`physical`),i=[...ad(n,`node`,t),...nd(n,{skipPhysical:r})];return{...n,faultSlots:id(n,i)}}function sd(e={},{faultCapabilityMap:t=[]}={}){let n=q(e)?Au(e):{},r=[...ad(n,`edge`,t),...td(n)];return{...n,lineType:J(n.lineType??n.type,`normal`),faultSlots:id(n,r)}}function cd(e={},t={}){let n=q(e)?Au(e):{},r=K(t.faultCapabilityMap),i=e=>K(e).map(e=>od(e,{faultCapabilityMap:r})),a=e=>K(e).map(e=>sd(e,{faultCapabilityMap:r}));return n.modelNodes=i(n.modelNodes),n.modelEdges=a(n.modelEdges),q(n.canvases)&&Object.entries(n.canvases).forEach(([e,t])=>{q(t)&&(n.canvases[e]={...t,nodes:i(t.nodes),edges:a(t.edges)})}),n}var ld=new Set([1,`2.0`]),ud=`flight-control-model`;function Y(e){return JSON.parse(JSON.stringify(e))}function dd(e){let t=Y(e??{});return{moduleId:t.moduleId??null,fileName:t.fileName??null,entryFunction:t.entryFunction??null,category:t.category??`uncategorized`,sourcePackageId:t.sourcePackageId??null,sourcePackageName:t.sourcePackageName??null,source:t.source??``,parsedInterface:t.parsedInterface??null}}function fd(e){let t=new Map;return e.forEach(e=>{let n=dd(e);X(n.moduleId)&&!t.has(n.moduleId)&&t.set(n.moduleId,n),X(n.fileName)&&!t.has(n.fileName)&&t.set(n.fileName,n)}),t}function pd(e){let t=[],n=new Set,r=e=>{Array.isArray(e)&&e.forEach(e=>{if(!Z(e)){t.push(e);return}let r=X(e.id)?e.id:null;r&&n.has(r)||(r&&n.add(r),t.push(e))})};return r(e?.modelNodes),Z(e?.canvases)&&Object.values(e.canvases).forEach(e=>{r(e?.nodes)}),t}function md(e,t){let n=Y(e??{});return n.modelNodes=Array.isArray(n.modelNodes)?n.modelNodes.map(t):[],Z(n.canvases)&&Object.entries(n.canvases).forEach(([e,r])=>{Z(r)&&(n.canvases[e]={...r,nodes:Array.isArray(r.nodes)?r.nodes.map(t):[]})}),n}function hd(e){return!!(e?.bound&&X(e.entryFunction)&&X(e.rawSource??e.source)&&Z(e.parsedInterface))}function gd(e,t){if(!e?.bound||!t||!Z(t.parsedInterface)||hd(e))return e;let n=Zo({...t.parsedInterface,rawSource:t.source},{moduleId:t.moduleId,moduleCategory:t.category,sourcePackageId:t.sourcePackageId,sourcePackageName:t.sourcePackageName,executionMode:e.executionMode});return{...n,...Y(e),bound:!0,moduleId:e.moduleId??t.moduleId,fileName:e.fileName??t.fileName,moduleName:e.moduleName??n.moduleName,moduleCategory:e.moduleCategory??t.category,sourcePackageId:e.sourcePackageId??t.sourcePackageId,sourcePackageName:e.sourcePackageName??t.sourcePackageName,description:e.description||n.description,entryFunction:e.entryFunction??t.entryFunction,parsedInterface:e.parsedInterface??Y(t.parsedInterface),rawSource:e.rawSource||t.source,portMapping:n.portMapping,executionConfig:Z(e.executionConfig)?e.executionConfig:n.executionConfig}}function _d(e,t){let n=fd(t),r=[];return{snapshot:md(e,e=>{if(!Z(e)||e.type!==`simulation_block`||!e?.pythonBinding?.bound)return e;let t=e.pythonBinding,i=n.get(t.moduleId)??n.get(t.fileName);if(!i){if(!hd(t)){let n=t.moduleId??t.fileName??`unknown-module`;r.push(`Simulation block "${e.id??`unknown-node`}" references missing python module "${n}".`)}return e}let a=gd(t,i);if(!hd(a)){let n=t.moduleId??t.fileName??i.moduleId??i.fileName??`unknown-module`;return r.push(`Simulation block "${e.id??`unknown-node`}" has an unusable python binding for module "${n}".`),e}return{...e,pythonBinding:a}}),errors:r}}function vd(e){if(!Z(e))return e;if(e?.type!==`simulation_block`)return Y(e);let t=e.pythonBinding??null;if(!t||!t.bound)return{...Y(e),pythonBinding:t?Y(t):null};let n=t.moduleId,r=t.fileName,i=t.entryFunction,a=t.rawSource??t.source??``,o=X(n)&&X(r)&&X(i)&&X(a);return{...Y(e),pythonBinding:o?Y(t):null}}function yd(e){return pd(e).reduce((e,t)=>{if(!Z(t)||t.type!==`simulation_block`||!t?.pythonBinding?.bound)return e;let n=t.pythonBinding,r=n.moduleId,i=n.fileName,a=n.entryFunction,o=n.rawSource??n.source??``;return!X(r)||!X(i)||!X(a)||!X(o)||e.has(r)||e.set(r,dd({moduleId:r,fileName:i,entryFunction:a,category:n.moduleCategory??`uncategorized`,sourcePackageId:n.sourcePackageId??null,sourcePackageName:n.sourcePackageName??null,source:o,parsedInterface:n.parsedInterface??null})),e},new Map)}function X(e){return typeof e==`string`&&e.trim().length>0}function Z(e){return!!e&&typeof e==`object`&&!Array.isArray(e)}function bd(e,t,n){if(!Array.isArray(t)){e.push(`${n} must be an array.`);return}t.forEach((t,r)=>{Z(t)||e.push(`${n}[${r}] must be an object.`)})}function xd(e){let t=[],n=new Set,r=new Set;if(!Z(e))return{ok:!1,errors:[`Package must be an object.`]};if(ld.has(e.schemaVersion)||t.push(`schemaVersion must be 1 or 2.0.`),e.packageType!==`flight-control-model`&&t.push(`packageType must be ${ud}.`),Array.isArray(e.pythonModules)?e.pythonModules.forEach((e,i)=>{if(!Z(e)){t.push(`pythonModules[${i}] must be an object.`);return}X(e.moduleId)||t.push(`pythonModules[${i}].moduleId is required.`),X(e.fileName)||t.push(`pythonModules[${i}].fileName is required.`),X(e.entryFunction)||t.push(`pythonModules[${i}].entryFunction is required.`),X(e.source)||t.push(`pythonModules[${i}].source is required.`),X(e.moduleId)&&(n.has(e.moduleId)?t.push(`Duplicate moduleId "${e.moduleId}" is not allowed.`):n.add(e.moduleId)),X(e.fileName)&&(r.has(e.fileName)?t.push(`Duplicate fileName "${e.fileName}" is not allowed.`):r.add(e.fileName))}):t.push(`pythonModules must be an array.`),!Z(e.workbenchSnapshot))t.push(`workbenchSnapshot must be an object.`);else{let n=Z(e.workbenchSnapshot.canvases);Array.isArray(e.workbenchSnapshot.modelNodes)?bd(t,e.workbenchSnapshot.modelNodes,`workbenchSnapshot.modelNodes`):n||t.push(`workbenchSnapshot.modelNodes must be an array.`),Array.isArray(e.workbenchSnapshot.modelEdges)?bd(t,e.workbenchSnapshot.modelEdges,`workbenchSnapshot.modelEdges`):n||t.push(`workbenchSnapshot.modelEdges must be an array.`)}let i=new Set,a=e=>{Array.isArray(e)&&e.forEach(e=>{Z(e)&&X(e.id)&&i.add(e.id)})};return a(e.faultLibrary),a(e.diagnosticModel?.faultCases),a(e.workbenchSnapshot?.importedFaultModels),e.diagnosticModel!==void 0&&(Z(e.diagnosticModel)?(e.diagnosticModel.testPoints!==void 0&&bd(t,e.diagnosticModel.testPoints,`diagnosticModel.testPoints`),e.diagnosticModel.faultCases!==void 0&&bd(t,e.diagnosticModel.faultCases,`diagnosticModel.faultCases`)):t.push(`diagnosticModel must be an object.`)),pd(e.workbenchSnapshot).forEach((e,n)=>{if(!Z(e)||!Z(e.injectedFault))return;let r=X(e.id)?e.id:`index-${n}`,a=e.injectedFault.modelId;if(!X(a)){t.push(`workbenchSnapshot.modelNodes node "${r}" has injectedFault without a modelId.`);return}i.has(a)||t.push(`workbenchSnapshot.modelNodes node "${r}" references unknown fault modelId "${a}".`)}),{ok:t.length===0,errors:t}}function Sd(e={}){return{modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,schemaVersion:e.schemaVersion??null,packageType:e.packageType??null,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?Y(e.supportedFaultLibraries):[],capabilities:Z(e.capabilities)?Y(e.capabilities):{},moduleCount:Array.isArray(e.pythonModules)?e.pythonModules.length:0,faultCount:Array.isArray(e.faultLibrary)?e.faultLibrary.length:0}}function Cd(e){let t=xd(e);if(!t.ok)return{ok:!1,errors:t.errors};let n=Y(Array.isArray(e.pythonModules)?e.pythonModules:[]),r=Array.isArray(e.faultInstances)?e.faultInstances:e.workbenchSnapshot?.faultInstances,i=_d(wu({...e.workbenchSnapshot,faultInstances:r}),n);return i.errors.length>0?{ok:!1,errors:i.errors}:{ok:!0,snapshot:cd(i.snapshot,{faultCapabilityMap:e.faultCapabilityMap}),descriptor:Sd(e),faultLibrary:Y(Array.isArray(e.faultLibrary)?e.faultLibrary:[]),diagnosticModel:Z(e.diagnosticModel)?Y(e.diagnosticModel):null,pythonModules:n}}function wd({meta:e={},snapshot:t={},faultLibrary:n=[]}={}){let r=cd(Cu(t),{faultCapabilityMap:e.faultCapabilityMap}),i=md(r,vd),a=yd(r);return{schemaVersion:1,packageType:ud,modelId:e.modelId??null,modelName:e.modelName??null,description:e.description??``,systemFamily:e.systemFamily??null,supportedFaultLibraries:Array.isArray(e.supportedFaultLibraries)?Y(e.supportedFaultLibraries):[],capabilities:Z(e.capabilities)?Y(e.capabilities):{},source:Y(e.source??{}),pythonModules:Array.from(a.values()),faultLibrary:Y(n??[]),faultInstances:Y(Array.isArray(r.faultInstances)?r.faultInstances:[]),workbenchSnapshot:i}}function Td({meta:e={},state:t={},faultLibrary:n=[]}={}){return wd({meta:e,snapshot:t,faultLibrary:n})}var Ed={schemaVersion:`1.0`,source:`无人机飞控系统故障.pdf`,modelFamily:`UAV flight-control fault injection`,faultTypes:[{id:`physical_parameter_bias`,name:`物理层参数偏置`,layer:`physical`,modelClass:`偏差故障`,formula:`p_fault = p_nominal + delta_p 或 p_fault = k * p_nominal`,typicalTargets:[`UAV_Mass`,`Ixx`,`Iyy`,`Izz`,`Cd`,`Controller_Gain`],defaultParameters:{delta_p:.1,scale:1.1,start:0,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_parameter_bias`,pythonFunction:`parameter_bias 或 parameter_scale`},observableSignals:[`attitude_error`,`altitude_error`,`control_output`,`residual`],displayPlan:`参数卡片显示 nominal/fault 值，画布支路显示正常模型与故障模型输出残差。`},{id:`physical_parameter_drift`,name:`物理层参数渐变`,layer:`physical`,modelClass:`渐变故障`,formula:`p_fault(t) = p0 + rate * max(t - t0, 0)`,typicalTargets:[`Motor_Efficiency_All`,`Battery_Voltage`,`Baro_Bias`],defaultParameters:{rate:-.02,start:30,rise_time:60},platformImplementation:{currentSupport:`partial`,existingModule:`fault_drift exists but needs numeric config`,recommendedModule:`fault_drift_ramp`,pythonFunction:`parameter_drift`},observableSignals:[`thrust`,`battery_voltage`,`altitude`,`residual_trend`],displayPlan:`趋势面板展示 drift rate、当前故障参数值和随时间增长的残差。`},{id:`physical_parameter_step`,name:`物理层参数突变`,layer:`physical`,modelClass:`突变故障`,formula:`p_fault(t) = p_nominal + step_value * I(t >= t0)`,typicalTargets:[`Motor_Max_Thrust`,`Alloc_Matrix`,`Cd`],defaultParameters:{step_value:-.35,start:20},platformImplementation:{currentSupport:`partial`,existingModule:`injectedFault on simulation_block`,recommendedModule:`fault_step_jump`,pythonFunction:`parameter_step`},observableSignals:[`attitude`,`control_output`,`thrust_margin`],displayPlan:`时间轴标注突变时刻，示波器显示突变前后响应差异。`},{id:`actuator_lock_or_failure`,name:`执行器卡死或失效`,layer:`physical`,modelClass:`卡位故障 / 信号阻塞故障`,formula:`u_fault(t) = lock_value, t >= t0`,typicalTargets:[`Motor_i_Lock_Value`,`Servo_i_Lock_Value`,`Throttle_i`],defaultParameters:{lock_value:0,start:10,duration:null},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck exists in library but needs left-panel and runtime config`,recommendedModule:`fault_freeze_or_lock`,pythonFunction:`actuator_lock`},observableSignals:[`motor_command`,`motor_thrust`,`roll_rate`,`yaw_rate`],displayPlan:`故障节点贴附在执行器支路，仪器展示锁定前后指令与实际输出。`},{id:`saturation_limit`,name:`饱和限制`,layer:`physical`,modelClass:`饱和限制`,formula:`u_fault = clamp(u, lower, upper_fault)`,typicalTargets:[`Throttle_UpperLimit`,`Motor_Max_Thrust`,`PWM_Max`],defaultParameters:{lower:0,upper:.65,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_saturation`,pythonFunction:`saturation_limit`},observableSignals:[`control_saturation`,`altitude`,`thrust_margin`],displayPlan:`控制量接近上限时用状态卡提示 saturation ratio。`},{id:`sensor_additive_bias`,name:`传感器加性偏置`,layer:`electrical`,modelClass:`偏差故障`,formula:`y_fault = y + b`,typicalTargets:[`Gyro_Bias_Z`,`Baro_Bias`,`GPS_Pos_Bias`,`Euler_Bias`],defaultParameters:{offset:.15,start:5},platformImplementation:{currentSupport:`partial`,existingModule:`fault_bias and injectedFault`,recommendedModule:`fault_sensor_bias`,pythonFunction:`parameter_bias`},observableSignals:[`gyro_z`,`baro_altitude`,`attitude_estimate`,`residual`],displayPlan:`传感器模块属性面板显示 bias、单位、作用轴。`},{id:`fault_bias_overlay`,name:`偏置叠加故障`,layer:`electrical`,modelClass:`偏置叠加`,formula:`y_fault = y + offset`,typicalTargets:[`Gyro_Bias_Z`,`IMU_Pitch_Rate`,`Feedback_Bias`,`Command_Bias`],defaultParameters:{offset:.15,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_bias`,recommendedModule:`fault_bias`,pythonFunction:`parameter_bias`},observableSignals:[`imu.pitch_rate`,`attitude_error`,`residual`],displayPlan:`故障库中作为偏置叠加块的直接故障类型，注入后在测点和D矩阵中按传感器反馈链路显示。`},{id:`fault_noise_injection`,name:`噪声注入故障`,layer:`electrical`,modelClass:`噪声注入`,formula:`y_fault = y + n(t)`,typicalTargets:[`Gyro_Noise_STD`,`IMU_Pitch_Rate`,`Feedback_Noise`,`Residual_Noise`],defaultParameters:{noise_type:`gaussian`,std:.08,amplitude:.2,probability:.03,start:0,duration:null},platformImplementation:{currentSupport:`supported`,existingModule:`fault_noise`,recommendedModule:`fault_noise`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`imu.pitch_rate`,`rms_noise`,`spectrum_peak`,`residual`],displayPlan:`故障库中作为噪声注入块的直接故障类型，注入后频谱诊断和残差测点可作为主要观测位置。`},{id:`sensor_scale_distortion`,name:`传感器比例失真`,layer:`electrical`,modelClass:`比例失真`,formula:`y_fault = scale * y`,typicalTargets:[`Accel_Scale_Z`,`Attitude_Scale`,`Velocity_Scale`],defaultParameters:{scale:1.25,start:5},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_gain_scale`,pythonFunction:`parameter_scale`},observableSignals:[`accel_z`,`velocity_estimate`,`altitude_estimate`],displayPlan:`波形对比显示斜率和幅值改变，属性面板显示 scale factor。`},{id:`noise_increase`,name:`噪声增强`,layer:`electrical`,modelClass:`高斯噪声 / 白噪声 / 脉冲噪声`,formula:`y_fault = y + n(t), n ~ N(0, sigma^2) 或 U(-a,a)`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`,`Euler_Noise_STD`],defaultParameters:{std:.08,amplitude:.2,probability:.03,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`fault_noise`,recommendedModule:`fault_noise_configurable`,pythonFunction:`gaussian_noise / white_noise / pulse_noise`},observableSignals:[`gyro`,`barometer`,`spectrum_peak`,`rms_noise`],displayPlan:`频谱分析仪展示高频能量上升，数据记录仪输出 RMS 噪声。`},{id:`colored_noise`,name:`有色噪声`,layer:`electrical`,modelClass:`有色噪声`,formula:`n[k] = alpha * n[k-1] + e[k], y_fault = y + n[k]`,typicalTargets:[`Gyro_Noise_STD`,`Baro_Noise_STD`],defaultParameters:{alpha:.92,std:.03,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_colored_noise`,pythonFunction:`colored_noise`},observableSignals:[`low_frequency_noise`,`spectrum_bins`],displayPlan:`频谱仪展示低频噪声抬升，属性面板给出 alpha 和 std。`},{id:`signal_freeze`,name:`信号阻塞 / 冻结`,layer:`electrical`,modelClass:`信号阻塞`,formula:`y_fault[k] = y_fault[k-1]`,typicalTargets:[`GPS_Pos_Freeze_Enable`,`GPS_Vel_Freeze_Enable`,`Command_Hold`],defaultParameters:{enable:!0,start:12},platformImplementation:{currentSupport:`partial`,existingModule:`protocol replay/hold behavior and fault_stuck`,recommendedModule:`fault_freeze_hold`,pythonFunction:`signal_freeze`},observableSignals:[`gps_position`,`gps_velocity`,`trajectory_error`],displayPlan:`冻结区间在波形上标注，残差曲线持续增大。`},{id:`state_jump_or_sign_flip`,name:`状态跳变或符号翻转`,layer:`electrical`,modelClass:`状态突变`,formula:`y_fault = y + jump 或 y_fault = -y`,typicalTargets:[`Phi_Sign_Fault`,`Theta_Sign_Fault`,`Yaw_Sign_Fault`],defaultParameters:{jump:.5,invert:!0,start:8},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_state_jump`,pythonFunction:`state_jump / sign_flip`},observableSignals:[`attitude_feedback`,`controller_error`,`divergence_flag`],displayPlan:`画布节点用红色状态突变标记，控制误差面板提示正反馈风险。`},{id:`intermittent_anomaly`,name:`间歇异常`,layer:`electrical`,modelClass:`间歇故障`,formula:`y_fault = f(y) when ((t - t0) mod T) / T <= duty else y`,typicalTargets:[`Noise_Burst_Enable`,`Sensor_Bias_Burst`,`Command_Block_Burst`],defaultParameters:{period:4,duty:.25,start:10},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_intermittent_gate`,pythonFunction:`intermittent_fault`},observableSignals:[`burst_flag`,`sensor_output`,`alert_log`],displayPlan:`状态日志记录每次触发窗口，波形上显示周期性高亮。`},{id:`fixed_delay`,name:`固定延迟传输`,layer:`protocol`,modelClass:`延迟传输故障`,formula:`y_fault[k] = y[k - d]`,typicalTargets:[`GPS_Delay`,`Gyro_Delay`,`Command_Delay`],defaultParameters:{delay_steps:3,delay_seconds:.3,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=delay`,recommendedModule:`fault_delay_buffer`,pythonFunction:`fixed_delay`},observableSignals:[`phase_lag`,`oscillation`,`settling_time`],displayPlan:`连接线属性显示 delay steps，示波器显示相位滞后。`},{id:`time_varying_delay`,name:`时变延迟`,layer:`protocol`,modelClass:`时延抖动`,formula:`y_fault[k] = y[k - d(k)], d(k)=base+jitter`,typicalTargets:[`Target_Update_Delay`,`Sensor_Update_Delay`],defaultParameters:{base_steps:2,jitter_steps:2,start:0},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_jitter_delay`,pythonFunction:`time_varying_delay`},observableSignals:[`latency_estimate`,`tracking_error`,`control_jitter`],displayPlan:`协议线显示当前时延，状态层统计 latency min/max。`},{id:`random_packet_loss`,name:`随机丢包`,layer:`protocol`,modelClass:`丢包故障`,formula:`y_fault = hold(y_prev) with probability drop_rate`,typicalTargets:[`GPS_Drop_Rate`,`Sensor_Drop_Rate`,`Command_Drop_Rate`],defaultParameters:{drop_rate:.08,strategy:`hold`,start:0},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge injectedFault faultCode=loss`,recommendedModule:`fault_packet_loss`,pythonFunction:`random_packet_loss`},observableSignals:[`packet_loss_rate`,`estimator_residual`,`trajectory_error`],displayPlan:`数据流视图显示丢包计数和有效帧率。`},{id:`burst_packet_loss`,name:`突发丢包`,layer:`protocol`,modelClass:`连续丢包`,formula:`连续 L 个采样周期输出 hold(y_prev)`,typicalTargets:[`Burst_Loss_Length`,`Data_Link_Burst_Loss`],defaultParameters:{start_probability:.02,burst_length:5,strategy:`hold`},platformImplementation:{currentSupport:`missing`,existingModule:null,recommendedModule:`fault_burst_loss`,pythonFunction:`burst_packet_loss`},observableSignals:[`burst_loss_flag`,`packet_gap`,`control_drop`],displayPlan:`协议边在突发窗口变红，日志记录 burst start/end。`},{id:`data_tamper`,name:`数据篡改`,layer:`protocol`,modelClass:`篡改故障`,formula:`payload_fault = scale * payload + bias 或 payload_fault = -payload`,typicalTargets:[`GPS_Pos_Bias`,`Cmd_Sign_Tamper`,`Sensor_Data_Tamper_Enable`],defaultParameters:{bias:1,scale:1,invert:!1,start:6},platformImplementation:{currentSupport:`partial`,existingModule:`CAN edge bitflip/replay but not full payload tamper`,recommendedModule:`fault_payload_tamper`,pythonFunction:`data_tamper`},observableSignals:[`payload_value`,`trajectory_error`,`yaw_error`],displayPlan:`数据流视图展示原始 payload 与篡改 payload 的差值。`},{id:`blocking_interrupt`,name:`阻塞或中断`,layer:`protocol`,modelClass:`阻塞 / 中断`,formula:`y_fault = hold(y_prev) 或 0 while interrupt_enable`,typicalTargets:[`Sensor_Data_Tamper_Enable`,`Command_Link_Enable`],defaultParameters:{enable:!0,strategy:`hold`,start:15,duration:4},platformImplementation:{currentSupport:`partial`,existingModule:`fault_stuck and protocol hold`,recommendedModule:`fault_link_interrupt`,pythonFunction:`blocking_interrupt`},observableSignals:[`link_status`,`sensor_age`,`control_latency`],displayPlan:`连接线显示断链状态，状态栏显示 sensor age 和控制延迟。`}]},Dd=!1,Od=`model-packages/evtol_closed_loop_fault_demo.json`,kd=`gz-workbench-system-model`;function Ad(e=`./`){return e.endsWith(`/`)?e:`${e}/`}function jd(){let e=Ad(`./`);if(e!==`./`)return new URL(e,window.location.origin).toString();let t=document.querySelector(`script[type="module"][src]`);return t?.src?new URL(t.src.includes(`/assets/`)?`../`:`./`,t.src).toString():new URL(`./`,window.location.href).toString()}function Md(){return new URL(Od,jd()).toString()}function Nd(){if(typeof window>`u`)return!1;let{hostname:e,pathname:t,search:n}=window.location;return new URLSearchParams(n).get(`demo`)===`1`||e===`blank1cheng.github.io`&&t.replace(/\/+$/,``).endsWith(`/uav-fault-platform`)}function Pd(){return Nd()?{publicDemo:!0}:{}}function Fd(e={}){if(e.resetStoredWorkbench)try{window.localStorage?.removeItem(kd)}catch{}}function Id({force:e=!1}={}){if(e)return!1;if(!window.__GZ_AUTO_LOAD_DEFAULT_MODEL__||window.__GZ_DISABLE_DEFAULT_MODEL__)return!0;let t=window.__GZ_STATE__;return!!(t?.sysLoaded||t?.modelNodes?.length||window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__)}async function Ld(e={}){if(Id(e))return{ok:!1,skipped:!0,reason:`default-model-load-skipped`};let t=window.__GZ_FLIGHT_MODEL_PACKAGE__;if(typeof t?.importObject!=`function`)return{ok:!1,errors:[`Flight model package bridge is not ready.`]};window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!0,Fd(e);try{let n=e.packageObject??await Rd(e.url),r=t.importObject(n);return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!!r?.ok,modelId:r?.descriptor?.modelId??n?.modelId??null,modelName:r?.descriptor?.modelName??n?.modelName??null,source:e.packageObject?`provided-object`:e.url??Md(),publicDemo:!!e.publicDemo,errors:r?.errors??[]},e.publicDemo&&(window.__GZ_PUBLIC_DEMO_MODE__=!0),r}catch(t){let n=t instanceof Error?t.message:`Failed to load default flight model package.`;return window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:e.url??Md(),errors:[n]},{ok:!1,errors:[n]}}finally{window.__GZ_DEFAULT_FLIGHT_MODEL_LOADING__=!1}}async function Rd(e=Md()){let t=await fetch(e);if(!t.ok)throw Error(`Failed to fetch default flight model package: ${t.status}`);return t.json()}function zd(e={}){let t=e.activeModelPackage??null;return t?{modelId:t.modelId??`workbench-export`,modelName:t.modelName??`Workbench Export`,description:t.description??``,source:t.source??{origin:`workbench-import`}}:{modelId:`workbench-export`,modelName:`Workbench Export`,description:``,source:{origin:`workbench-export`}}}function Bd(e={}){return Cu(e)}function Vd(){Dd||window.__GZ_LEGACY_RUNTIME_BOOTED__||(window.__GZ_WORKBENCH_SNAPSHOT__={createWorkbenchSnapshot:Cu,restoreWorkbenchSnapshot:wu},window.__GZ_FAULT_TYPE_CATALOG__=Ed,window.__GZ_FLIGHT_MODEL_PACKAGE__={validate(e){return xd(e)},importObject(e){let t=Cd(e);if(!t.ok)return t;try{typeof window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__==`function`&&window.__GZ_APPLY_FLIGHT_MODEL_PACKAGE__(e,t)}catch(e){return{ok:!1,errors:[e instanceof Error?e.message:`Failed to apply flight model package.`]}}return t},exportCurrent(){let e=window.__GZ_STATE__??{};return Td({meta:zd(e),state:Bd(e),faultLibrary:e.availableFaultModels??[]})}},window.__GZ_LOAD_DEFAULT_FLIGHT_MODEL__=Ld,window.eval(`${su}\n//# sourceURL=gz-legacy-runtime.js`),queueMicrotask(()=>{let e=Pd();Ld(e).catch(t=>{window.__GZ_DEFAULT_FLIGHT_MODEL_STATE__={loaded:!1,modelId:null,modelName:null,source:Md(),publicDemo:!!e.publicDemo,errors:[t instanceof Error?t.message:`Failed to load default flight model package.`]}})}),window.__GZ_LEGACY_RUNTIME_BOOTED__=!0,Dd=!0)}var Hd=[`all`,`info`,`ok`,`warn`,`error`],Ud={all:`全部级别`,info:`信息`,ok:`成功`,warn:`警告`,error:`错误`},Wd={info:`sbar-badge--info`,ok:`sbar-badge--ok`,warn:`sbar-badge--warn`,error:`sbar-badge--error`},Gd={log:`暂无匹配记录`,alerts:`暂无告警记录`,results:`暂无仿真结果`,performance:`暂无性能趋势`},Kd=null,qd=null,Jd=null,Yd=!1;function Xd(){return document.querySelector(`.sbar`)}function Zd(e=Xd()){return Array.from(e?.querySelectorAll(`[data-log-entry]`)||[])}function Qd(e=Xd()){return e?.querySelector(`.sbar-log-table`)||null}function $d(e=Xd()){return e?.querySelector(`[data-status-empty]`)||null}function ef(e,t=0){let n=Number(e);return Number.isFinite(n)?n:t}function tf(e=``){return Array.from(String(e).matchAll(/\d+/g)).map(e=>Number(e[0]))}function nf(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-number`,n.textContent=String(ef(t)),e.append(n)}function rf(e,t){let n=document.createElement(`span`);n.className=`sbar-metric-unit`,n.textContent=t,e.append(n)}function af(e){let t=document.createElement(`span`);t.className=`sbar-metric-sep`,t.textContent=`·`,e.append(t)}function of(e,t,n){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),nf(e,t),rf(e,`组件`),af(e),nf(e,n),rf(e,`连线`))}function sf(e,t){e&&(e.classList.add(`sbar-metric-line`),e.replaceChildren(),nf(e,t),rf(e,`故障`))}function cf(e){let t=document.querySelector(`.sbar-state`),n=document.getElementById(`sdot`);!t||typeof e!=`string`||(t.replaceChildren(),n&&t.append(n),t.append(document.createTextNode(e)))}function lf(){let e=tf(document.getElementById(`sblk`)?.textContent||``),t=tf(document.getElementById(`sflt`)?.textContent||``);return{components:e[0]??0,links:e[1]??0,faults:t[0]??0}}function uf(){let e=document.getElementById(`sblk`),t=document.getElementById(`sflt`);return!!(e&&t&&(!e.querySelector(`.sbar-metric-number`)||!t.querySelector(`.sbar-metric-number`)))}function df(e={}){let t=Xd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=lf(),r={components:ef(e.components,n.components),links:ef(e.links,n.links),faults:ef(e.faults,n.faults),state:e.state,time:e.time};of(document.getElementById(`sblk`),r.components,r.links),sf(document.getElementById(`sflt`),r.faults),cf(r.state);let i=t.querySelector(`.sbar-time`);return i&&typeof r.time==`string`&&(i.textContent=r.time),{ok:!0,metrics:r}}function ff(){Yd||(Yd=!0,(window.queueMicrotask||(e=>Promise.resolve().then(e)))(()=>{Yd=!1,uf()&&df(lf())}))}function pf(e){if(Jd?.disconnect(),Jd=null,df(lf()),typeof MutationObserver>`u`)return;let t=[document.getElementById(`sblk`),document.getElementById(`sflt`)].filter(Boolean);if(t.length!==0){Jd=new MutationObserver(ff);for(let e of t)Jd.observe(e,{childList:!0,characterData:!0,subtree:!0})}}function mf(e,t,n){let r=$d(e);r&&(r.textContent=n,r.classList.toggle(`is-hidden`,!t))}function hf(e,t){let n=e?.querySelector(`[data-status-action="level"]`);n&&(n.dataset.level=t,n.textContent=Ud[t]||Ud.all,n.setAttribute(`aria-label`,`日志级别过滤：${n.textContent}`))}function gf(e=Xd()){if(!e)return{visibleCount:0};let t=e.dataset.activeView||`log`,n=e.dataset.filterLevel||`all`,r=e.dataset.logCleared===`true`,i=0;for(let a of Zd(e)){let e=a.dataset.view||`log`,o=a.dataset.level||`info`,s=!r&&e===t&&(n===`all`||o===n);a.classList.toggle(`is-hidden`,!s),s&&(i+=1)}let a=r?`日志已清空 · 新事件会继续显示`:Gd[t]||Gd.log;return mf(e,i===0,a),hf(e,n),{visibleCount:i,view:t,level:n,cleared:r}}function _f(e=`all`){let t=Xd();if(!t)return{ok:!1,reason:`missing-statusbar`};let n=Hd.includes(e)?e:`all`;return t.dataset.filterLevel=n,{ok:!0,...gf(t)}}function vf(){let e=Xd();if(!e)return{ok:!1,reason:`missing-statusbar`};let t=e.dataset.filterLevel||`all`;return _f(Hd[(Hd.indexOf(t)+1)%Hd.length]||`all`)}function yf(e=`log`){let t=Xd();if(!t)return{ok:!1,reason:`missing-statusbar`};t.dataset.activeView=e,t.dataset.logCleared=`false`;for(let n of t.querySelectorAll(`[data-status-tab]`)){let t=n.dataset.statusTab===e;n.classList.toggle(`is-active`,t),n.setAttribute(`aria-pressed`,t?`true`:`false`)}return{ok:!0,...gf(t)}}function bf(){let e=Xd();if(!e)return{ok:!1,reason:`missing-statusbar`};e.dataset.logCleared=`true`;let t=document.getElementById(`stxt`);return t&&(t.textContent=`日志已清空 · 新事件会继续显示`),{ok:!0,...gf(e)}}function xf(e={}){let t=Xd();if(!t)return{ok:!1,reason:`missing-statusbar`,content:``};let n=[`时间,级别,来源,消息`];for(let e of Zd(t)){let t=Array.from(e.children).map(e=>`"${e.textContent.trim().replaceAll(`"`,`""`)}"`);n.push(t.join(`,`))}let r=n.join(`
+`),i=window.navigator?.userAgent||``;if(e.download!==!1&&!/jsdom/i.test(i)&&typeof Blob<`u`&&window.URL?.createObjectURL){let e=new Blob([r],{type:`text/csv;charset=utf-8`}),t=window.URL.createObjectURL(e),n=document.createElement(`a`);n.href=t,n.download=`gz-status-log.csv`,n.click(),window.setTimeout(()=>window.URL.revokeObjectURL(t),0)}return{ok:!0,content:r}}function Sf(e=new Date){return e.toLocaleTimeString(`zh-CN`,{hour12:!1,hour:`2-digit`,minute:`2-digit`,second:`2-digit`})}function Cf(e={}){let t=Xd(),n=Qd(t);if(!t||!n)return{ok:!1,reason:`missing-statusbar`};let r=Ud[e.level]&&e.level!==`all`?e.level:`info`,i=e.view||(r===`warn`||r===`error`?`alerts`:`log`),a=document.createElement(`div`);a.className=`sbar-row`,a.dataset.logEntry=``,a.dataset.level=r,a.dataset.view=i;let o=document.createElement(`span`);o.textContent=e.time||Sf();let s=document.createElement(`span`);s.className=`sbar-badge ${Wd[r]||Wd.info}`,s.textContent=Ud[r]||Ud.info;let c=document.createElement(`span`);c.textContent=e.source||`系统`;let l=document.createElement(`span`);l.textContent=e.message||`状态更新`,a.append(o,s,c,l);let u=$d(t);n.insertBefore(a,u||null);let d=Zd(t);for(let e of d.slice(60))e.remove();return t.dataset.logCleared=`false`,gf(t),{ok:!0,row:a}}function wf(e,t=2){let n=Number(e);return Number.isFinite(n)?Number(n.toFixed(t)).toString():`0`}function Tf(e={}){let t=wf(e.duration,2),n=wf(e.elapsedSeconds??e.time??0,2),r=wf(e.stepSize,4);return{datasetName:String(e.datasetName||e.name||`test`),duration:t,elapsedSeconds:n,faults:ef(e.faults,0),sampleRate:String(e.sampleRate||`-`),status:String(e.status||`updated`),stepIndex:ef(e.stepIndex,0),stepSize:r}}function Ef(e={}){let t=Tf(e),n=Cf({level:t.status===`completed`?`ok`:`info`,source:`仿真结果`,view:`results`,message:`${t.datasetName} · ${t.status} · ${t.stepIndex} steps · ${t.duration}s · faults ${t.faults}`}),r=Cf({level:`info`,source:`性能趋势`,view:`performance`,message:`${t.datasetName} · ${t.sampleRate} · elapsed ${t.elapsedSeconds}s · step ${t.stepSize}s · ${t.stepIndex} samples`});return{ok:n.ok&&r.ok,performance:r,result:n,summary:t}}function Df(e){let t=e.target.closest?.(`[data-status-tab]`);if(t){yf(t.dataset.statusTab||`log`);return}let n=e.target.closest?.(`[data-status-action]`);n&&(n.dataset.statusAction===`clear`?bf():n.dataset.statusAction===`level`?vf():n.dataset.statusAction===`export`&&xf())}function Of(){let e=Xd();!e||e===Kd||(kf(),Kd=e,qd=Df,Kd.addEventListener(`click`,qd),e.dataset.activeView=e.dataset.activeView||`log`,e.dataset.filterLevel=e.dataset.filterLevel||`all`,e.dataset.logCleared=e.dataset.logCleared||`false`,pf(e),gf(e),window.__GZ_STATUS_BAR__={applyLevelFilter:_f,bind:Of,clear:bf,cycleLevelFilter:vf,exportLog:xf,formatMetrics:df,pushEntry:Cf,publishSimulationSummary:Ef,refresh:gf,selectView:yf,unbind:kf})}function kf(){Kd&&qd&&Kd.removeEventListener(`click`,qd),Jd?.disconnect(),Jd=null,Kd=null,qd=null}function Af(e){let t=Object.values(e.inputs??{}),n=typeof t[0]==`number`?t[0]:Number(t[0]??0),r=t.reduce((e,t)=>e+Number(t??0),0);return{outputs:Object.fromEntries((e.outputNames??[]).map((e,t)=>[e,Number((n+r*.12+t*.1).toFixed(6))])),middleVars:Object.fromEntries((e.middleVarNames??[]).map((e,t)=>[e,Number(((r||n)*(t+1)*.1).toFixed(6))]))}}function jf({adapterMode:e=`mock`,payload:t}){return e===`backend`&&typeof window<`u`&&typeof window.__GZ_PYTHON_BACKEND_SYNC__==`function`?window.__GZ_PYTHON_BACKEND_SYNC__(t):Af(t)}async function Mf({adapterMode:e=`mock`,endpoint:t=`/api/python-flow/execute`,payload:n,fetchImpl:r=globalThis.fetch}){if(e===`backend`){if(typeof r!=`function`)throw Error(`PYTHON_EXECUTION_FAILED: fetch unavailable`);let e=await r(t,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(n)});if(!e.ok)throw Error(`PYTHON_EXECUTION_FAILED: ${e.status}`);return e.json()}return Af(n)}function Nf(e){return String(e??`any`).trim().toLowerCase()}function Pf(e,t,n){if(Array.isArray(e))return e[n];if(!(!e||typeof e!=`object`)){if(t?.varName&&Object.prototype.hasOwnProperty.call(e,t.varName))return e[t.varName];if(t?.displayName&&Object.prototype.hasOwnProperty.call(e,t.displayName))return e[t.displayName]}}function Ff(e){let t=Number(e);return Number.isNaN(t)||!Number.isFinite(t)?0:t}function If(e){let t=Nf(e?.type),n=e?.default;if(n==null||n===``)return 0;if(t===`bool`||t===`boolean`){if(typeof n==`boolean`)return+!!n;let e=String(n).trim().toLowerCase();return+!![`true`,`1`,`yes`,`on`].includes(e)}return t===`str`||t===`string`?n:Ff(n)}function Lf({nodeId:e,binding:t,inputValues:n=[],mode:r=`actual`,time:i=0,dt:a=.1,adapterMode:o,adapterEndpoint:s,executeSync:c=jf,applyElectricalFault:l}){let u=t?.portMapping?.inputs??[],d=t?.portMapping?.outputs??[],f=t?.portMapping?.middleVars??[],p=Object.fromEntries(u.map((e,t)=>{let r=n[t],i=r===void 0?If(e):Ff(r);return[e.varName,i]})),m={nodeId:e,moduleName:t?.moduleName??null,fileName:t?.fileName??null,entryFunction:t?.entryFunction??`process`,mode:r,time:i,dt:a,inputs:p,inputNames:u.map(e=>e.varName),outputNames:d.map(e=>e.varName),middleVarNames:f.map(e=>e.varName),source:t?.rawSource??``,endpoint:s},h=c({adapterMode:o??t?.executionMode??`mock`,endpoint:s??t?.executionConfig?.endpoint,payload:m})??{},g=d.map((e,t)=>Ff(Pf(h.outputs,e,t))),_=f.map((e,t)=>Ff(Pf(h.middleVars,e,t)));return r===`actual`&&typeof l==`function`&&g.length&&(g[0]=Ff(l(g[0],m))),{outputs:g,middleValues:_,payload:m,response:h}}var Rf=Lf;Object.freeze({physical:`物理层`,electrical:`电气层`,protocol:`协议层`});var zf=Object.freeze({physical_parameter_bias:`parameter_bias`,physical_parameter_drift:`parameter_drift`,physical_parameter_step:`parameter_step`,actuator_lock_or_failure:`lock`,saturation_limit:`saturation`,sensor_additive_bias:`additive_bias`,fault_bias_overlay:`additive_bias`,sensor_scale_distortion:`scale`,noise_increase:`noise`,fault_noise_injection:`noise`,colored_noise:`colored_noise`,signal_freeze:`freeze`,state_jump_or_sign_flip:`jump_or_invert`,intermittent_anomaly:`intermittent`,fixed_delay:`fixed_delay`,time_varying_delay:`jitter_delay`,random_packet_loss:`packet_loss`,burst_packet_loss:`burst_loss`,data_tamper:`tamper`,blocking_interrupt:`interrupt`}),Bf=Object.freeze({localOnly:`localOnly`,signalTransform:`signalTransform`,parameterInfluence:`parameterInfluence`,protocolEdge:`protocolEdge`,derivedResidual:`derivedResidual`}),Vf=new Set(Object.values(Bf)),Hf=Object.freeze({physical_parameter_bias:[`vehicle_dynamics`,`attitude_pid`,`control_allocation`],physical_parameter_drift:[`motor_model`,`barometer`],physical_parameter_step:[`motor_model`,`control_allocation`,`vehicle_dynamics`],actuator_lock_or_failure:[`motor_model`,`control_allocation`],saturation_limit:[`motor_model`],sensor_additive_bias:[`imu_gyro`,`barometer`,`gps_velocity`],fault_bias_overlay:[`imu_gyro`,`barometer`,`gps_velocity`],sensor_scale_distortion:[`imu_accel`,`gps_velocity`],noise_increase:[`imu_gyro`,`imu_accel`,`barometer`],fault_noise_injection:[`imu_gyro`,`imu_accel`,`barometer`],colored_noise:[`imu_gyro`,`barometer`],signal_freeze:[`gps_velocity`],state_jump_or_sign_flip:[`imu_gyro`,`attitude_pid`],intermittent_anomaly:[`imu_gyro`,`barometer`,`gps_velocity`],fixed_delay:[`gps_velocity`,`imu_gyro`,`barometer`],time_varying_delay:[`gps_velocity`,`imu_gyro`,`barometer`],random_packet_loss:[`gps_velocity`],burst_packet_loss:[`gps_velocity`],data_tamper:[`gps_velocity`,`attitude_pid`],blocking_interrupt:[`gps_velocity`,`imu_gyro`,`barometer`]}),Uf=Object.freeze({delay:`fixed_delay`,loss:`packet_loss`,bitflip:`bitflip`,replay:`replay`}),Wf=Object.freeze({bias:`additive_bias`,drift:`parameter_drift`,step:`parameter_step`,degradation:`scale`,random:`noise`,delay:`fixed_delay`,dropout:`packet_loss`,stale:`interrupt`}),Gf=Object.freeze({parameter_bias:`bias`,additive_bias:`bias`,parameter_drift:`drift`,parameter_step:`step`,lock:`lock`,saturation:`saturation`,scale:`scale`,noise:`gaussian_noise`,colored_noise:`colored_noise`,freeze:`freeze`,jump_or_invert:`sign_flip`,intermittent:`intermittent`,fixed_delay:`delay`,jitter_delay:`jitter_delay`,packet_loss:`packet_loss`,burst_loss:`burst_loss`,tamper:`tamper`,interrupt:`interrupt`,bitflip:`bitflip`,replay:`replay`});function Kf(e){return JSON.parse(JSON.stringify(e??null))}function qf(e){return typeof e==`string`&&e.trim().length>0}function Jf(e){return String(e??``).trim().toLowerCase()}function Yf(e){let t=Jf(e);return Wf[t]??t}function Q(e,t=0){if(typeof e==`number`&&Number.isFinite(e))return e;if(typeof e==`boolean`)return+!!e;let n=Number.parseFloat(String(e??``).replace(/[^\d+\-.eE]/g,``));return Number.isFinite(n)?n:t}function Xf(e,t=!1){return typeof e==`boolean`?e:e==null||e===``?t:[`true`,`1`,`yes`,`on`,`启用`].includes(String(e).trim().toLowerCase())}function Zf(e,t,n){let r=e;return Number.isFinite(t)&&(r=Math.max(t,r)),Number.isFinite(n)&&(r=Math.min(n,r)),r}function Qf(e=1,t=0,n=0){let r=Math.sin(e*12.9898+t*78.233+n*5.173)*43758.5453;return r-Math.floor(r)}function $f(e=1,t=0,n=0){return Qf(e,t,n)*2-1}function $(e){return Array.isArray(e)?e:[]}function ep(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function tp(e,t,n=null){let r=Array.isArray(t)?t:[t];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)){let n=e[t];if(n!=null&&n!==``)return n}return n}function np(e={}){if(qf(e.runtimeBehavior)&&e.runtimeBehavior!==`catalog_only`)return Yf(e.runtimeBehavior);if(qf(e.id)&&zf[e.id])return Yf(zf[e.id]);if(qf(e.faultTypeId)&&zf[e.faultTypeId])return Yf(zf[e.faultTypeId]);if(qf(e.faultCode)&&Uf[e.faultCode])return Yf(Uf[e.faultCode]);let t=[e.name,e.modelClass,e.faultKind,...$(e.tags)].join(` `);return/延迟|delay/i.test(t)?`fixed_delay`:/丢包|packet\s*loss|drop[_\s-]?rate|loss[_\s-]?rate/i.test(t)||e.layer===`protocol`&&/loss/i.test(t)?`packet_loss`:/翻转|bitflip/i.test(t)?`bitflip`:/重放|replay/i.test(t)?`replay`:/噪声|noise/i.test(t)?`noise`:/冻结|阻塞|freeze|interrupt/i.test(t)?e.layer===`protocol`?`interrupt`:`freeze`:/比例|scale|效率/i.test(t)?`scale`:/偏置|偏差|bias/i.test(t)?`additive_bias`:``}function rp(e){return Vf.has(e)?e:``}function ip(e={},t={}){let n=rp(t.propagationMode??e.propagationMode??e.injectionDesign?.propagationMode??e.injectionDesign?.propagation?.mode);if(n)return n;let r=t.layer??e.layer??``,i=e.injectionDesign?.targetKind??``,a=np(e)||np(t);if(Cp(r)||i===`protocol_edge_fault`)return Bf.protocolEdge;if(i===`parameter_patch`||/^parameter_/.test(a))return Bf.parameterInfluence;let o=[e.id,e.faultTypeId,e.name,e.parameter,e.faultKind,t.modelId,t.parameter].join(` `);return/motor|actuator|efficiency|lock|saturation|thrust/i.test(o)||a?Bf.signalTransform:Bf.localOnly}function ap(e={},t={}){return{...e.defaultParameters??{},...e.parameters??{},...t.parameters??{}}}function op(e={},t=0){let n=Q(e.start,0),r=e.duration;return t<n?!1:r==null||r===``?!0:t<=n+Q(r,1/0)}function sp(e,t={}){let n=t.faultModel??{},r=t.injectedFault??{},i=t.params??ap(n,r),a=Yf(t.behavior||np(n)||np(r)),o=t.state??{},s=Q(t.time,0),c=Math.max(Q(t.dt,.1),1e-4),l=Q(t.seed,1),u=Q(t.stepIndex,0),d=Q(e,0);if(!a||!op(i,s))return o.previousValue=d,o.holdValue=d,d;if(a===`parameter_bias`||a===`additive_bias`)return d+Q(tp(i,[`offset`,`delta_p`,`bias`],0),0);if(a===`scale`)return d*Q(i.scale,1);if(a===`parameter_drift`){let e=Q(i.rate,0),t=i.max_delta===void 0?null:Math.abs(Q(i.max_delta,0)),n=Math.max(s-Q(i.start,0),0)*e;return t!==null&&(n=Zf(n,-t,t)),d+n}if(a===`parameter_step`)return d+Q(tp(i,[`step_value`,`step`,`jump`],0),0);if(a===`lock`)return Q(tp(i,[`lock_value`,`value`,`fault_value`],0),0);if(a===`saturation`)return Zf(d,i.lower===null||i.lower===void 0||i.lower===``?-1/0:Q(i.lower,-1/0),i.upper===null||i.upper===void 0||i.upper===``?1/0:Q(i.upper,1/0));if(a===`noise`){let e=Jf(i.noise_type||i.kind||`gaussian`);if(e.includes(`pulse`)&&Qf(l,u,s)>1-Q(i.probability,.03))return d+Math.sign($f(l+17,u,s)||1)*Q(i.amplitude,.2);let t=e.includes(`white`)?Q(i.amplitude,.2):Q(i.std,.08);return d+$f(l,u,s)*t}if(a===`colored_noise`){let e=Zf(Q(i.alpha,.92),0,.999),t=Q(i.std,.03);return o.previousNoise=e*Q(o.previousNoise,0)+$f(l,u,s)*t,d+o.previousNoise}if(a===`freeze`){let e=Jf(tp(i,`mode`,`hold`)),t=tp(i,[`value`,`hold_value`,`fault_value`,`lock_value`],null);return e===`zero`?0:t!==null&&e!==`hold`?Q(t,d):(o.hasHoldValue||=(o.holdValue=Number.isFinite(o.previousValue)?o.previousValue:d,!0),Q(o.holdValue,d))}if(a===`jump_or_invert`)return(Xf(i.invert,!0)?-d:d)+Q(i.jump,0);if(a===`intermittent`){let e=Math.max(Q(i.period,4),c),n=Zf(Q(i.duty,.25),0,1);if((s-Q(i.start,0))%e/e>n)return o.previousValue=d,d;let r=i.inner_fault_type||i.inner_kind||`noise`;return sp(d,{...t,behavior:r===`bias`?`additive_bias`:r,params:{...i,start:0},state:o})}if(a===`fixed_delay`){let e=Math.max(Math.round(Q(tp(i,`delay_steps`,Q(i.delay_seconds,.3)/c),1)),0);if(o.delayQueue=Array.isArray(o.delayQueue)?o.delayQueue:[],o.delayQueue.push(d),o.delayQueue.length<=e)return Q(o.previousValue,0);let t=o.delayQueue.shift();return o.previousValue=t,Q(t,d)}if(a===`jitter_delay`){let e=Math.max(Math.round(Q(i.base_steps,1)),0),n=Math.max(Math.round(Math.abs(Q(i.jitter_steps,1))),0),r=Math.round(Qf(l,u,s)*n);return sp(d,{...t,behavior:`fixed_delay`,params:{...i,delay_steps:e+r},state:o})}if(a===`packet_loss`){let e=Zf(Q(tp(i,[`drop_rate`,`loss_rate`],.08),.08),0,1);return Qf(l,u,s)<=e?i.strategy===`zero`?0:Q(o.previousValue,0):(o.previousValue=d,d)}if(a===`burst_loss`){if(o.burstRemaining=Math.max(Math.round(Q(o.burstRemaining,0)),0),o.burstRemaining>0)return--o.burstRemaining,i.strategy===`zero`?0:Q(o.previousValue,0);let e=Zf(Q(i.start_probability,.02),0,1);return Qf(l,u,s)<=e?(o.burstRemaining=Math.max(Math.round(Q(i.burst_length,5))-1,0),i.strategy===`zero`?0:Q(o.previousValue,0)):(o.previousValue=d,d)}if(a===`tamper`){let e=d*Q(i.scale,1)+Q(i.bias,0);return Xf(i.invert,!1)?-e:e}if(a===`interrupt`)return Xf(i.enable,!0)?i.strategy===`zero`?0:Q(o.previousValue,0):(o.previousValue=d,d);if(a===`bitflip`)return(Math.round(d*256)^8)/256;if(a===`replay`){o.history=Array.isArray(o.history)?o.history:[];let e=Math.max(Math.round(Q(i.replay_depth,6)),1),t=Math.max(Math.round(Q(i.replay_period,10)),1),n=o.history.length>e&&u>e&&u%t===0?o.history[Math.max(0,o.history.length-e)]:d;return o.history.push(d),o.history.length>40&&o.history.shift(),o.previousValue=n,Q(n,d)}return d}function cp(e={},t={}){let n=ap(e,{parameters:t});return{modelId:e.id??e.faultTypeId??``,name:e.name??e.id??`Fault Model`,layer:e.layer??`electrical`,tags:Kf(e.tags??[]),desc:e.desc??``,faultKind:e.faultKind??e.modelClass??``,faultCode:e.faultCode??``,runtimeBehavior:np(e),parameters:n}}function lp(e){return ep(e)&&(qf(e.modelId)||qf(e.faultModelId)||qf(e.runtimeBehavior)||ep(e.parameters))}function up(e={},t={}){return lp(t)?{...cp(e,t.parameters??{}),...t,parameters:ap(e,t)}:cp(e,t)}function dp(e,t={},n={}){return[e||n.name||`fault`,t.targetId||n.targetId||``,t.slotId||n.slotId||n.targetSlotId||``,t.targetKind||n.targetKind||n.layer||`target`].filter(Boolean).join(`::`)}function fp(e={},t={},n={}){let r=up(e,t),i=r.modelId||r.faultModelId||e.id||e.faultTypeId||``,a=n.targetKind??e.injectionDesign?.targetKind??(Cp(r.layer)?`edge`:`node`),o=rp(n.propagationMode)||ip(e,r);return{bindingId:n.bindingId||dp(i,n,r),faultModelId:i,name:r.name||e.name||i||`Fault Model`,layer:r.layer||e.layer||`electrical`,runtimeBehavior:r.runtimeBehavior||np(e),parameters:Kf(r.parameters??{}),targetKind:a,targetId:n.targetId||r.targetId||``,slotId:n.slotId||r.slotId||r.targetSlotId||``,slotName:n.slotName||r.slotName||``,bindingObject:n.bindingObject||r.bindingObject||``,targetVariable:n.targetVariable||r.targetVariable||r.bindingObject||``,targetField:n.targetField||r.targetField||``,visualRole:n.visualRole||`fault-source`,propagationMode:o,canPropagate:o!==Bf.localOnly,active:n.active??!0,injectedFault:r}}function pp(e={}){return e.bindingId||[e.faultModelId||e.modelId||e.name||`fault`,e.targetId||``,e.targetKind||e.layer||`target`].join(`::`)}function mp(e={},t={}){let n=pp(e),r=pp(t);if(n&&r&&n===r)return!0;let i=e.slotId||e.targetSlotId||e.injectedFault?.slotId||``,a=t.slotId||t.targetSlotId||t.injectedFault?.slotId||``;return i||a?!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)&&i===a:!!(e.faultModelId&&t.faultModelId&&e.faultModelId===t.faultModelId)&&(e.targetKind||``)===(t.targetKind||``)&&(e.targetId||``)===(t.targetId||``)}function hp(e={},t={}){let n=e.targetKind||(t.sourceNodeId&&t.targetNodeId?`edge`:`node`),r=e.injectedFault??{modelId:e.faultModelId||e.modelId||``,name:e.name||e.faultModelId||`Fault Model`,layer:e.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||``,parameters:Kf(e.parameters??{})},i=rp(e.propagationMode)||ip(e,r),a={...e,bindingId:e.bindingId||dp(e.faultModelId||r.modelId,{targetId:e.targetId||t.id,targetKind:n,slotId:e.slotId||e.targetSlotId||r.slotId||``},r),faultModelId:e.faultModelId||r.modelId||r.faultModelId||``,name:e.name||r.name||`Fault Model`,layer:e.layer||r.layer||`electrical`,runtimeBehavior:e.runtimeBehavior||r.runtimeBehavior||``,parameters:Kf(e.parameters??r.parameters??{}),targetKind:n,targetId:e.targetId||t.id||``,slotId:e.slotId||e.targetSlotId||r.slotId||``,slotName:e.slotName||r.slotName||``,bindingObject:e.bindingObject||r.bindingObject||``,targetVariable:e.targetVariable||r.targetVariable||r.bindingObject||``,targetField:e.targetField||r.targetField||``,visualRole:e.visualRole||`fault-source`,propagationMode:i,canPropagate:e.canPropagate??i!==Bf.localOnly,active:e.active??!0,injectedFault:r};return a.injectedFault={...r,modelId:a.faultModelId||r.modelId||``,name:a.name,layer:a.layer,runtimeBehavior:a.runtimeBehavior,slotId:a.slotId,slotName:a.slotName,bindingObject:a.bindingObject,targetVariable:a.targetVariable,targetField:a.targetField,parameters:Kf(a.parameters)},a}function gp(e={},t={}){if(!e||!ep(e))return[];let n=hp(t,e),r=$(e.faultBindings).map(t=>hp(t,e)),i=r.findIndex(e=>mp(e,n));return i>=0?r[i]={...r[i],...n}:r.push(n),e.faultBindings=r,e.injectedFault=n.injectedFault,e.faultBindings}function _p(e={},t={}){let n=$(e.faultBindings).map(t=>hp(t,e));return n.length===0&&e.injectedFault&&n.push(hp({faultModelId:e.injectedFault.modelId||e.injectedFault.faultModelId||``,name:e.injectedFault.name,layer:e.injectedFault.layer,runtimeBehavior:e.injectedFault.runtimeBehavior,parameters:e.injectedFault.parameters,injectedFault:e.injectedFault},e)),t.activeOnly?n.filter(e=>e.active!==!1):n}function vp(e={}){return _p(e,{activeOnly:!0}).length>0}function yp(e,t={}){let n=_p(t.target??{},{activeOnly:!0});if(n.length===0)return e;let r=t.stateBucket??t.state??{};r.bindingStates=ep(r.bindingStates)?r.bindingStates:{};let i=typeof t.resolveFaultModel==`function`?t.resolveFaultModel:null;return n.reduce((e,n,a)=>{let o=i?.(n)??n.injectedFault??n,s=n.runtimeBehavior||np(o)||np(n.injectedFault);if(!s)return e;let c=n.bindingId||n.faultModelId||`fault-${a}`;return r.bindingStates[c]=ep(r.bindingStates[c])?r.bindingStates[c]:{},sp(e,{faultModel:o,injectedFault:n.injectedFault??n,params:n.parameters,behavior:s,state:r.bindingStates[c],time:t.time,dt:t.dt,stepIndex:t.stepIndex,seed:Q(t.seed,1)+a})},e)}function bp(e={}){let t=e.pythonBinding??{};return[e.id,e.type,e.props?.name,e.props?.moduleType,t.moduleId,t.moduleName,t.fileName,t.sourcePackageName].filter(qf).map(Jf)}function xp(e={}){return e.type===`simulation_block`||e.type===`flow_block`}function Sp(e={}){let t=e.id??e.faultTypeId,n=$(e.moduleTargets),r=t?Hf[t]??[]:[];return[...new Set([...n,...r].map(Jf).filter(Boolean))]}function Cp(e){return e===`protocol`||e===`communication`}function wp(e,t){if(!xp(e))return!1;let n=Sp(t);if(n.length===0)return!0;let r=bp(e);return n.some(e=>r.some(t=>e.startsWith(`node-`)?t===e:t.includes(e)||e.includes(t)))}function Tp(e={}){return[e.id,e.signalId,e.channelId,e.messageId,e.sourceNodeId,e.targetNodeId,e.sourceNodeId&&e.targetNodeId?`${e.sourceNodeId}-${e.targetNodeId}`:``,e.sourceNodeId&&e.targetNodeId?`${e.targetNodeId}-${e.sourceNodeId}`:``,...$(e.signalChannels).flatMap(e=>[e?.signalId,e?.channelId,e?.messageId])].filter(qf).map(Jf)}function Ep(e,t){if(e?.lineType!==`can`)return!1;let n=Sp(t);if(n.length===0)return!1;let r=Tp(e);return n.some(e=>r.some(t=>t.includes(e)||e.includes(t)))}function Dp(e={}){return[e.id,e.faultTypeId,e.modelId,e.faultModelId,e.catalogTypeId].filter(qf)}function Op(e={}){return[...$(e.allowedFaultIds),...$(e.allowedFaultTypeIds),...$(e.compatibleFaultIds),...$(e.compatibleFaultTypeIds)].filter(qf)}function kp(e={},t=`electrical`){let n=e.layer??e.layerKey??``;return!n||n===t||Cp(t)&&Cp(n)}function Ap(e={},t={}){let n=Op(e);if(n.length===0)return!1;let r=new Set(Dp(t));return n.some(e=>r.has(e))}function jp(e={}){return e.sourceNodeId&&e.targetNodeId?`edge`:`node`}function Mp(e={},t=`node`,n=[]){let r=$(e.faultSlots),i=$(n).find(n=>n?.targetId===e.id&&(n.targetKind||t)===t);return[...r,...$(i?.faultSlots)]}function Np(e={},t={},n={}){let r=jp(e),i=t.layer??`electrical`;return Mp(e,r,n.faultCapabilityMap).find(e=>kp(e,i)&&Ap(e,t))||null}function Pp(e=[],t={},n={}){for(let r of e){let e=Np(r,t,n);if(e)return{kind:jp(r),id:r.id,reason:`fault-slot`,slotId:e.slotId||e.id||``}}return null}function Fp(e={},t=`node`){let n=e.visualInjection??{},r=e.injectionDesign??{},i=e.injectionTarget??{},a=$(e.typicalTargets);e.moduleTargets;let o=t===`edge`?[e.targetEdgeId,e.targetEdgeID,r.targetEdgeId,r.edgeId,n.targetKind===`edge`?n.targetId:``,i.edgeId,...a.filter(e=>String(e).startsWith(`edge-`))]:[e.targetNodeId,e.targetNodeID,e.recommendedModuleId,r.targetNodeId,r.targetKind===`node`?r.targetId:``,n.targetKind===`node`?n.targetId:``,i.nodeId,...a.filter(e=>String(e).startsWith(`node-`))];return[...new Set(o.filter(qf))]}function Ip(e=[],t={},n=`node`){let r=Fp(t,n);if(r.length===0)return null;let i=e.find(e=>r.includes(e.id));return i?{kind:n,id:i.id,reason:`explicit-target`}:null}function Lp(e={},t={}){let n=$(t.nodes),r=$(t.edges);if(Cp(e.layer??`electrical`)){let n=r.find(e=>e.id===t.selectedEdgeId&&e.lineType===`can`);if(n&&Np(n,e,t))return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let i=Pp(r.filter(e=>e.lineType===`can`),e,t);if(i)return i;let a=Ip(r,e,`edge`);if(a)return a;if(n&&Fp(e,`edge`).length===0)return{kind:`edge`,id:n.id,reason:`selected-can-edge`};let o=r.find(t=>Ep(t,e));if(o)return{kind:`edge`,id:o.id,reason:`module-target-can-edge`};let s=r.find(e=>e.lineType===`can`);return s?{kind:`edge`,id:s.id,reason:`first-can-edge`}:null}let i=n.find(e=>e.id===t.selectedNodeId);if(i&&Np(i,e,t)){let n=Np(i,e,t);return{kind:`node`,id:i.id,reason:`selected-node`,slotId:n.slotId||n.id||``}}let a=Pp(n,e,t);if(a)return a;let o=Ip(n,e,`node`);if(o)return o;if(i&&wp(i,e))return{kind:`node`,id:i.id,reason:`selected-node`};let s=n.find(t=>wp(t,e));return s?{kind:`node`,id:s.id,reason:`module-target`}:null}function Rp(e={}){let t=np(e)||`additive_bias`,n=Gf[t]??t,r=`fault_${e.id??t}`.replace(/[^\w]+/g,`_`),i=ap(e),a=[`import json`,``,`PARAMS = json.loads(${JSON.stringify(JSON.stringify(i))})`,`KIND = ${JSON.stringify(n)}`,``,`def _num(value, fallback=0.0):`,`    try:`,`        return float(value)`,`    except (TypeError, ValueError):`,`        return fallback`,``,`def process(input_signal, time=0.0, dt=0.1):`,`    value = _num(input_signal)`,`    start = _num(PARAMS.get("start", 0.0))`,`    duration = PARAMS.get("duration", None)`,`    if time < start:`,`        return value`,`    if duration not in (None, "") and time > start + _num(duration):`,`        return value`,`    if KIND in ("bias", "parameter_bias", "additive_bias"):`,`        return value + _num(PARAMS.get("offset", PARAMS.get("delta_p", PARAMS.get("bias", 0.0))))`,`    if KIND == "scale":`,`        return value * _num(PARAMS.get("scale", 1.0), 1.0)`,`    if KIND == "drift":`,`        return value + max(time - start, 0.0) * _num(PARAMS.get("rate", 0.0))`,`    if KIND == "step":`,`        return value + _num(PARAMS.get("step_value", PARAMS.get("jump", 0.0)))`,`    if KIND == "lock":`,`        return _num(PARAMS.get("lock_value", 0.0))`,`    if KIND == "saturation":`,`        lower = PARAMS.get("lower", None)`,`        upper = PARAMS.get("upper", None)`,`        if lower not in (None, ""):`,`            value = max(value, _num(lower))`,`        if upper not in (None, ""):`,`            value = min(value, _num(upper))`,`        return value`,`    if KIND == "tamper":`,`        value = value * _num(PARAMS.get("scale", 1.0), 1.0) + _num(PARAMS.get("bias", 0.0))`,`        return -value if bool(PARAMS.get("invert", False)) else value`,`    if KIND in ("sign_flip", "jump_or_invert"):`,`        base = -value if bool(PARAMS.get("invert", True)) else value`,`        return base + _num(PARAMS.get("jump", 0.0))`,`    if KIND in ("gaussian_noise", "white_noise", "colored_noise"):`,`        return value + _num(PARAMS.get("std", PARAMS.get("amplitude", 0.0)))`,`    return value`,``].join(`
+`);return{moduleId:r,fileName:`${r}.py`,moduleName:r,entryFunction:`process`,source:a,parsedInterface:{fileName:`${r}.py`,moduleName:r,entryFunction:`process`,description:`${e.name??e.id??`Fault`} wrapper`,rawSource:a,inputs:[{name:`input_signal`,type:`float`,default:0,comment:`upstream signal`},{name:`time`,type:`float`,default:0,comment:`simulation time`},{name:`dt`,type:`float`,default:.1,comment:`simulation step`}],outputs:[{name:`output_signal`,type:`float`,comment:`faulted signal`}],middleVars:[]}}}var zp=`uav-flight-control`,Bp=`uav-flight-control-faults`,Vp=[`uav`,`evtol`,`eVTOL_Small_nonandlin_algorithm_validation`];function Hp(e){return typeof e==`string`&&e.trim().length>0}function Up(e){return Hp(e)?e.trim():``}function Wp(e){return Array.isArray(e)?Array.from(new Set(e.map(Up).filter(Boolean))):[]}function Gp(e={}){return[e.modelId,e.modelName,e.description,e.source?.slxFile,e.source?.origin,e.source?.notes].filter(Hp).join(` `).toLowerCase()}function Kp(e={}){let t=Gp(e);return Vp.some(e=>t.includes(e.toLowerCase()))}function qp(e={}){let t=Up(e.libraryId);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Hp).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?Bp:``}function Jp(e={}){let t=Up(e.systemFamily);if(t)return t;let n=[e.modelFamily,e.source,e.description,e.name].filter(Hp).join(` `).toLowerCase();return n.includes(`uav`)||n.includes(`flight-control`)||n.includes(`flight control`)?zp:``}function Yp(e={}){return Up(e.systemFamily??e.modelFamily)||(Kp(e)?zp:``)}function Xp(e={}){return Array.isArray(e.supportedFaultLibraries)?Wp(e.supportedFaultLibraries):Yp(e)===`uav-flight-control`?[Bp]:[]}function Zp(e={},t=null){return Up(e.libraryId)||qp(t??e)}function Qp(e={},t=null){return Up(e.systemFamily??e.modelFamily)||Jp(t??e)}function $p(e,t={}){let n=typeof e==`string`?Up(e):Zp(e),r=typeof e==`string`?``:Qp(e),i=Xp(t),a=Yp(t);return n&&i.includes(n)?!0:!!(r&&a&&r===a)}function em(e,t={},n=null){let r=Zp(e,n),i=Qp(e,n),a=Xp(t),o=Yp(t);return r&&a.includes(r)?!0:!!(i&&o&&i===o)}function tm(e,t={}){let n=Array.isArray(e)?e:e?.faultTypes,r=Array.isArray(e)?null:e;return Array.isArray(n)?n.filter(e=>em(e,t,r)):[]}function nm(e={},t=null){let n=Xp(e),r=Yp(e),i=t?tm(t,e):[];return{systemFamily:r,faultLibraryIds:n,compatible:t?i.length>0:n.length>0,compatibleFaultTypes:i,reason:n.length>0?`model declares compatible fault libraries`:`model has no compatible fault-library metadata`}}typeof window<`u`&&(window.__GZ_PYTHON_RUNTIME__={executePythonBinding:Mf,executePythonBindingSync:jf,executeFlowBlockPythonBindingSync:Lf,executeSimulationBlockPythonBindingSync:Rf,getPythonBindingDefaultValue:If},window.__GZ_FAULT_INJECTION_RUNTIME__={applyScalarFault:sp,applyScalarFaultBindings:yp,appendFaultBinding:gp,buildFaultPythonModuleSpec:Rp,createFaultBinding:fp,createInjectedFaultPayload:cp,findCompatibleFaultTarget:Lp,getFaultBindings:_p,getFaultRuntimeBehavior:np,hasActiveFaultBinding:vp,inferFaultPropagationMode:ip,isFaultActive:op,resolveFaultParameters:ap,compatibility:{describeModelFaultCompatibility:nm,filterCompatibleFaultTypes:tm,getModelFaultLibraryIds:Xp,getModelSystemFamily:Yp,isFaultCompatibleWithModel:em,isFaultLibraryCompatibleWithModel:$p}});var rm=[`data-runtime-ready`],im={class:`workbench-main`},am=`gz.layoutSizes.v3`;vo({__name:`App`,setup(e){let t=Qo(),n=Xt(null),r=Object.freeze({left:192,right:320,status:100}),i=Object.freeze({left:{min:168,max:360},right:{min:260,max:460},status:{min:100,max:180},canvasMin:560,splitterTotal:12}),a=null;function o(e,t,n){return Math.min(Math.max(e,t),n)}function s(){try{let e=JSON.parse(window.localStorage.getItem(am)||`{}`);return{left:Number.isFinite(e.left)?e.left:r.left,right:Number.isFinite(e.right)?e.right:r.right,status:Number.isFinite(e.status)?e.status:r.status}}catch{return{...r}}}function c(){let e=n.value;if(!e)return s();let t=(t,n)=>{let r=e.style.getPropertyValue(t).trim(),i=Number.parseFloat(r);return Number.isFinite(i)?i:n};return{left:t(`--workbench-left-w`,r.left),right:t(`--workbench-right-w`,r.right),status:t(`--workbench-status-h`,r.status)}}function l(e,t=document.querySelector(`.workbench-main`)?.getBoundingClientRect()){let n=t?.width?Math.max(0,t.width-i.canvasMin-i.splitterTotal):1/0,r=Math.min(i.right.max,Math.max(i.right.min,n-i.left.min)),a=o(e.right,i.right.min,r),s=Math.min(i.left.max,Math.max(i.left.min,n-a));return{left:o(e.left,i.left.min,s),right:a,status:o(e.status,i.status.min,i.status.max)}}function u(e,t={}){let r=l(e,t.mainRect),i=n.value;return i&&(i.style.setProperty(`--workbench-left-w`,`${r.left}px`),i.style.setProperty(`--workbench-right-w`,`${r.right}px`),i.style.setProperty(`--workbench-status-h`,`${r.status}px`)),t.persist!==!1&&window.localStorage.setItem(am,JSON.stringify(r)),r}function d(e){if(!a)return;let{target:t,startY:n,startSizes:r,mainRect:i}=a,o={...r};t===`left`?o.left=e.clientX-i.left:t===`right`?o.right=i.right-e.clientX:t===`bottom`&&(o.status=r.status+(n-e.clientY)),u(o,{mainRect:i})}function f(){a&&(a=null,document.body.classList.remove(`is-layout-resizing`),window.removeEventListener(`pointermove`,d),window.removeEventListener(`pointerup`,f))}function p(e,t){if(t.button!==0)return;let n=document.querySelector(`.workbench-main`)?.getBoundingClientRect();n&&(t.preventDefault(),a={target:e,startY:t.clientY,startSizes:c(),mainRect:n},document.body.classList.add(`is-layout-resizing`),t.currentTarget?.setPointerCapture?.(t.pointerId),window.addEventListener(`pointermove`,d),window.addEventListener(`pointerup`,f))}function m(e){let t=c();if(e===`all`){u({...r});return}u({...t,[e]:r[e]})}return sr(async()=>{u(s(),{persist:!1}),await bn(),Vd(),Of(),t.markReady()}),ur(()=>{f(),kf()}),(e,r)=>(L(),R(`div`,{ref_key:`rootEl`,ref:n,class:`gz-app`,"data-testid":`workbench-root`,"data-runtime-ready":j(t).runtimeReady?`true`:`false`},[B(Co),z(`main`,im,[B(Ys),z(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--left`,"data-layout-resizer":`left`,"aria-label":`拖动调整左侧组件库宽度`,title:`拖动调整左侧组件库宽度，双击恢复默认`,onPointerdown:r[0]||=e=>p(`left`,e),onDblclick:r[1]||=e=>m(`left`)},null,32),B(Qs),z(`button`,{type:`button`,class:`layout-resizer layout-resizer--vertical layout-resizer--right`,"data-layout-resizer":`right`,"aria-label":`拖动调整右侧属性面板宽度`,title:`拖动调整右侧属性面板宽度，双击恢复默认`,onPointerdown:r[2]||=e=>p(`right`,e),onDblclick:r[3]||=e=>m(`right`)},null,32),B(tc),z(`button`,{type:`button`,class:`layout-resizer layout-resizer--horizontal layout-resizer--bottom`,"data-layout-resizer":`bottom`,"aria-label":`拖动调整底部状态栏高度`,title:`拖动调整底部状态栏高度，双击恢复默认`,onPointerdown:r[4]||=e=>p(`bottom`,e),onDblclick:r[5]||=e=>m(`status`)},null,32),B(ic)]),B(sc),B(uc),B(pc),B(gc),B(yc),B(Sc),B(ml),B(Il),B(ru),B(ou)],8,rm))}}).mount(`#app`);
