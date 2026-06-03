@@ -388,6 +388,13 @@ describe('property panel interaction', () => {
     expect(document.querySelector('[data-props-panel-kind="fault-tag"]')).not.toBeNull();
     expect(document.querySelector(`[data-fault-tag-inspector="${tag.id}"]`)).not.toBeNull();
     expect(document.querySelector('.fault-tag-overview-panel')).not.toBeNull();
+    const overviewText = document.querySelector('.fault-tag-overview-panel')?.textContent || '';
+    expect(overviewText).toContain('绑定概览');
+    expect(overviewText).toContain('目标对象');
+    expect(overviewText).toContain('目标类型');
+    expect(overviewText).toContain('运行行为');
+    expect(overviewText).toContain('故障参数');
+    expect(overviewText).not.toMatch(/[缂鑱鐞閻鏉濡]/);
     expect(document.querySelector('[data-props-tab="faults"]')?.hidden).toBe(true);
     expect(document.querySelector('[data-props-tab="outputs"]')?.hidden).toBe(true);
     expect(document.querySelectorAll('.props-target-card')).toHaveLength(0);
