@@ -18727,12 +18727,24 @@ function decorateDataflowEdges(){\r
             <div><span>\\u8fd0\\u884c\\u884c\\u4e3a</span><strong>\${escapeHtml(runtimeLabel)}</strong></div>
           </div>
           <div class="fault-tag-param-preview">
-            <div class="pglbl">\\u6545\\u969c\\u53c2\\u6570</div>
+            <div class="fault-tag-param-preview__head">
+              <div class="pglbl">\\u6545\\u969c\\u53c2\\u6570</div>
+              <button type="button" class="props-secondary fault-tag-param-edit" data-fault-tag-edit-params>\\u4fee\\u6539\\u53c2\\u6570</button>
+            </div>
             \${paramPreview}
           </div>
         </div>
       \`;
     }
+    const editParamsButton=pd.querySelector('[data-fault-tag-edit-params]');
+    editParamsButton?.addEventListener('click',()=>{
+      if(typeof window.setPropertyPanelTab==='function'){
+        window.setPropertyPanelTab('parameters');
+        return;
+      }
+      S.propertyPanelTab='parameters';
+      renderFaultTagPropertyPanel(tag);
+    });
     const inputs=Array.from(pd.querySelectorAll('[data-fault-tag-param]'));
     const applyButton=pd.querySelector('[data-fault-tag-apply]');
     const resetButton=pd.querySelector('[data-fault-tag-reset]');
