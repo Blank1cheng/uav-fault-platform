@@ -406,7 +406,8 @@ describe('property panel interaction', () => {
     expect(document.querySelector('[data-props-tab="outputs"]')?.hidden).toBe(true);
     expect(document.querySelectorAll('.props-target-card')).toHaveLength(0);
 
-    window.setPropertyPanelTab('parameters');
+    expect(document.querySelector('[data-fault-tag-edit-params]')).not.toBeNull();
+    document.querySelector('[data-fault-tag-edit-params]').click();
     await flushRuntime();
 
     expect(document.querySelector('[data-props-tab="parameters"]')?.classList.contains('is-active')).toBe(true);
@@ -419,6 +420,23 @@ describe('property panel interaction', () => {
     expect(parameterText).toContain('\u6301\u7eed\u65f6\u95f4');
     expect(parameterText).toContain('\u5199\u5165\u65b9\u5f0f');
     expect(parameterText).not.toContain('\ufffd');
+
+    setFieldValue('[data-fault-tag-param="value"]', '9');
+    expect(document.querySelector('[data-fault-tag-apply]')?.disabled).toBe(false);
+    document.querySelector('[data-fault-tag-apply]').click();
+    await flushRuntime();
+
+    const updatedTag = window.__GZ_STATE__.faultTags.find((item) => item.id === tag.id);
+    const updatedEdge = window.__GZ_STATE__.modelEdges.find((item) => item.id === edge.id);
+    expect(updatedTag.parameters.value).toBe('9');
+    expect(updatedTag.injectedFault.parameters.value).toBe('9');
+    expect(updatedEdge.injectedFault.parameters.value).toBe('9');
+
+    window.setPropertyPanelTab('overview');
+    await flushRuntime();
+    const updatedOverviewText = document.querySelector('.fault-tag-overview-panel')?.textContent || '';
+    expect(updatedOverviewText).toContain('\u6545\u969c\u503c');
+    expect(updatedOverviewText).toContain('9');
     wrapper.unmount();
   });
 

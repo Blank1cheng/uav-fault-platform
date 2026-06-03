@@ -1825,6 +1825,28 @@ main{
   flex-direction:column;
   gap:7px;
 }
+.fault-tag-param-preview__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.fault-tag-param-preview__head .pglbl{
+  margin:0;
+}
+.fault-tag-param-edit{
+  flex:0 0 auto;
+  min-height:28px;
+  padding:0 10px;
+  border-color:#fecaca;
+  color:#b91c1c;
+  background:#fff7f7;
+}
+.fault-tag-param-edit:hover{
+  border-color:#ef4444;
+  color:#991b1b;
+  background:#fff1f1;
+}
 .scope-overview-compact{
   display:flex;
   flex-direction:column;
