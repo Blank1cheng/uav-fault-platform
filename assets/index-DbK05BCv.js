@@ -18675,6 +18675,18 @@ function decorateDataflowEdges(){\r
         \`:''}
       </div>
     \`;
+    if(title){title.textContent='\\u6545\\u969c\\u6807\\u7b7e';}
+    if(sub){sub.textContent='\\u5f53\\u524d\\u9009\\u62e9 \\u00b7 \\u6545\\u969c\\u5b9e\\u4f8b';}
+    const paramPanelTitle=pd.querySelector('[data-fault-tag-param-panel] .pglbl');
+    if(paramPanelTitle){paramPanelTitle.textContent='\\u6545\\u969c\\u53c2\\u6570';}
+    const paramEmpty=pd.querySelector('[data-fault-tag-param-panel] .props-empty-inline');
+    if(paramEmpty){paramEmpty.textContent='\\u8be5\\u6545\\u969c\\u6ca1\\u6709\\u989d\\u5916\\u53c2\\u6570\\u3002';}
+    const initialStatusText=pd.querySelector('[data-fault-tag-param-status]');
+    if(initialStatusText){initialStatusText.textContent='\\u53c2\\u6570\\u672a\\u4fee\\u6539';}
+    const initialResetButton=pd.querySelector('[data-fault-tag-reset]');
+    if(initialResetButton){initialResetButton.textContent='\\u53d6\\u6d88\\u4fee\\u6539';}
+    const initialApplyButton=pd.querySelector('[data-fault-tag-apply]');
+    if(initialApplyButton){initialApplyButton.textContent='\\u5e94\\u7528\\u4fee\\u6539';}
     const originalInspector=pd.querySelector('[data-fault-tag-inspector]');
     const originalParamPanel=pd.querySelector('[data-fault-tag-param-panel]');
     if(S.propertyPanelTab==='parameters'){
@@ -18702,6 +18714,49 @@ function decorateDataflowEdges(){\r
           </div>
         \`;
       }
+    }
+    if(S.propertyPanelTab!=='parameters'&&originalInspector){
+      const targetKindLabel=tag.targetKind==='edge'?'\\u8fde\\u63a5\\u7ebf':'\\u6a21\\u5757';
+      const runtimeLabelMap={
+        bias:'\\u504f\\u5dee\\u6545\\u969c',
+        stuck:'\\u5361\\u6b7b\\u6545\\u969c',
+        tamper:'\\u6570\\u636e\\u7be1\\u6539',
+        delay:'\\u5ef6\\u8fdf\\u6545\\u969c',
+        dropout:'\\u4e22\\u5305\\u6545\\u969c',
+        stale:'\\u65e7\\u503c\\u91cd\\u653e',
+        overwrite:'\\u8986\\u76d6\\u5199\\u5165'
+      };
+      const paramLabelMap={
+        scale:'\\u7be1\\u6539\\u500d\\u7387',
+        bias:'\\u504f\\u7f6e\\u503c',
+        value:'\\u6545\\u969c\\u503c',
+        start:'\\u5f00\\u59cb\\u65f6\\u95f4',
+        duration:'\\u6301\\u7eed\\u65f6\\u95f4',
+        mode:'\\u5199\\u5165\\u65b9\\u5f0f',
+        drop_rate:'\\u4e22\\u5305\\u7387',
+        delay:'\\u5ef6\\u8fdf\\u65f6\\u95f4',
+        seed:'\\u968f\\u673a\\u79cd\\u5b50'
+      };
+      const runtimeValue=tag.runtimeBehavior||tag.mathModel||tag.modelClass||'';
+      const runtimeLabel=runtimeLabelMap[String(runtimeValue)]||runtimeValue||'\\u6309\\u6545\\u969c\\u5e93\\u5b9a\\u4e49';
+      originalInspector.classList.add('fault-tag-overview-panel');
+      originalInspector.innerHTML=\`
+        <div class="pglbl">\\u7ed1\\u5b9a\\u6982\\u89c8</div>
+        <div class="fault-tag-binding-card">
+          <div><span>\\u76ee\\u6807\\u5bf9\\u8c61</span><strong>\${escapeHtml(targetName)}</strong></div>
+          <div><span>\\u76ee\\u6807\\u7c7b\\u578b</span><strong>\${targetKindLabel}</strong></div>
+          <div><span>\\u8fd0\\u884c\\u884c\\u4e3a</span><strong>\${escapeHtml(runtimeLabel)}</strong></div>
+        </div>
+        <div class="fault-tag-param-preview">
+          <div class="pglbl">\\u6545\\u969c\\u53c2\\u6570</div>
+          \${params.length?params.map(([key,value])=>\`
+            <div class="fault-tag-param-preview__row">
+              <span>\${escapeHtml(paramLabelMap[key]||key)}</span>
+              <strong>\${escapeHtml(value)}</strong>
+            </div>
+          \`).join(''):'<div class="props-empty-inline">\\u8be5\\u6545\\u969c\\u6ca1\\u6709\\u989d\\u5916\\u53c2\\u6570\\u3002</div>'}
+        </div>
+      \`;
     }
     const inputs=Array.from(pd.querySelectorAll('[data-fault-tag-param]'));
     const applyButton=pd.querySelector('[data-fault-tag-apply]');
