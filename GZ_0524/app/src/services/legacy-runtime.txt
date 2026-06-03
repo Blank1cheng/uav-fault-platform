@@ -7094,7 +7094,7 @@ getNodePorts = function(node){
 
 renderModelNodes = function(){
   __legacyOscilloscopeRenderModelNodes();
-  renderScopeWindows();
+  syncScopeWindowsAfterModelRender();
 };
 
 openScope = function(scopeId=''){
@@ -7269,6 +7269,7 @@ function getScopeChannelKey(portIndex=0){
 }
 
 function getSampleValue(sample){
+  if(sample?.dropped){return NaN;}
   if(sample&&Number.isFinite(sample.actual)){return sample.actual;}
   if(sample&&Number.isFinite(sample.v)){return sample.v;}
   return 0;
@@ -7327,7 +7328,10 @@ function summarizeScopeChannel(samples){
   if(!samples?.length){
     return {connected:false,current:'--',min:'--',max:'--',pp:'--'};
   }
-  const values=samples.map(getSampleValue);
+  const values=samples.map(getSampleValue).filter(Number.isFinite);
+  if(!values.length){
+    return {connected:false,current:'--',min:'--',max:'--',pp:'--'};
+  }
   const min=Math.min(...values);
   const max=Math.max(...values);
   return {
@@ -7370,10 +7374,21 @@ function drawScopeTrace(ctx,series,color,getX,getY){
   ctx.strokeStyle=color;
   ctx.lineWidth=2;
   ctx.beginPath();
+  let started=false;
   series.forEach((sample,index)=>{
+    const value=getSampleValue(sample);
+    if(sample?.dropped||!Number.isFinite(value)){
+      started=false;
+      return;
+    }
     const x=getX(sample.t,index,series.length);
-    const y=getY(getSampleValue(sample));
-    if(index===0){ctx.moveTo(x,y);}else{ctx.lineTo(x,y);}
+    const y=getY(value);
+    if(!started){
+      ctx.moveTo(x,y);
+      started=true;
+    }else{
+      ctx.lineTo(x,y);
+    }
   });
   ctx.stroke();
 }
@@ -7396,12 +7411,12 @@ function drawScopeWindow(scopeId){
     :scopeWindow.mode==='ch2'
       ?ch2Series
       :ch1Series.concat(ch2Series);
-  if(!visibleSeries.length){
+  const values=visibleSeries.map(getSampleValue).filter(Number.isFinite);
+  if(!values.length){
     drawScopeEmpty(ctx,width,height,'连接 CH1 或 CH2 后开始仿真');
     return;
   }
   drawScopeGrid(ctx,width,height);
-  const values=visibleSeries.map(getSampleValue);
   let minValue=Math.min(...values);
   let maxValue=Math.max(...values);
   if(Math.abs(maxValue-minValue)<1e-6){
@@ -7442,16 +7457,127 @@ function drawScopeWindow(scopeId){
   ctx.fillText(`${endTime.toFixed(1)}s`,Math.max(width-44,6),height-6);
 }
 
+function getScopeWindowRenderState(scopeId){
+  const scopeWindow=ensureScopeWindow(scopeId);
+  const node=getNode(scopeWindow.scopeId);
+  if(!node){return null;}
+  const bucket=ensureScopeChannelBucket(SIM.actual,scopeWindow.scopeId);
+  const windowSeconds=getScopeWindowSeconds(scopeWindow);
+  const windowEndTime=getScopeWindowEndTime(bucket);
+  const ch1=summarizeScopeChannel(filterScopeSamplesByWindow(bucket.ch1,windowEndTime,windowSeconds));
+  const ch2=summarizeScopeChannel(filterScopeSamplesByWindow(bucket.ch2,windowEndTime,windowSeconds));
+  return {
+    scopeWindow,
+    node,
+    windowSeconds,
+    ch1,
+    ch2,
+    ch1Signal:getScopeChannelSignalName(node,'ch1'),
+    ch2Signal:getScopeChannelSignalName(node,'ch2')
+  };
+}
+
+function syncScopeWindowControls(scopeId){
+  const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
+  const scopeWindow=SIM.scopeWindows?.[scopeId];
+  if(!scopeEl||!scopeWindow){return false;}
+  const mode=scopeWindow.mode||'overlay';
+  const windowSeconds=getScopeWindowSeconds(scopeWindow);
+  scopeEl.querySelectorAll('[data-scope-mode]').forEach(btn=>{
+    btn.classList.toggle('is-active',(btn.dataset.scopeMode||'overlay')===mode);
+  });
+  scopeEl.querySelectorAll('[data-scope-window-size]').forEach(btn=>{
+    btn.classList.toggle('is-active',normalizeScopeWindowSeconds(btn.dataset.scopeWindowSize)===windowSeconds);
+  });
+  return true;
+}
+
+function updateScopeWindowTag(scopeEl,channel,label,summary){
+  const tag=scopeEl.querySelector(`[data-scope-tag="${channel}"]`);
+  if(!tag){return;}
+  tag.dataset.connected=String(Boolean(summary.connected));
+  tag.title=`${channel.toUpperCase()}: ${label}`;
+  const text=tag.querySelector('.scope-window__tag-text');
+  if(text){text.textContent=label;}
+}
+
+function updateScopeWindowReadout(scopeEl,channel,summary){
+  const readout=scopeEl.querySelector(`[data-scope-channel="${channel}"]`);
+  if(!readout){return;}
+  readout.dataset.connected=String(Boolean(summary.connected));
+  const metrics={
+    current:formatScopeMetric(summary.current),
+    min:formatScopeMetric(summary.min),
+    max:formatScopeMetric(summary.max),
+    pp:formatScopeMetric(summary.pp)
+  };
+  Object.entries(metrics).forEach(([field,value])=>{
+    const target=readout.querySelector(`[data-field="${field}"]`);
+    if(target){target.textContent=value;}
+  });
+}
+
+function positionScopeWindowElement(scopeId){
+  const scopeWindow=SIM.scopeWindows?.[scopeId];
+  const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
+  if(!scopeWindow||!scopeEl){return false;}
+  scopeEl.style.left=`${scopeWindow.x}px`;
+  scopeEl.style.top=`${scopeWindow.y}px`;
+  scopeEl.style.zIndex=String(scopeWindow.z);
+  return true;
+}
+
+function refreshScopeWindow(scopeId){
+  const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
+  if(!scopeEl){return false;}
+  const state=getScopeWindowRenderState(scopeId);
+  if(!state){return false;}
+  const title=scopeEl.querySelector('.scope-window__title');
+  if(title){title.textContent=state.node?.props?.name||state.node?.name||'示波器';}
+  updateScopeWindowTag(scopeEl,'ch1',state.ch1Signal,state.ch1);
+  updateScopeWindowTag(scopeEl,'ch2',state.ch2Signal,state.ch2);
+  updateScopeWindowReadout(scopeEl,'ch1',state.ch1);
+  updateScopeWindowReadout(scopeEl,'ch2',state.ch2);
+  syncScopeWindowControls(scopeId);
+  positionScopeWindowElement(scopeId);
+  drawScopeWindow(scopeId);
+  return true;
+}
+
+function refreshOpenScopeWindows(){
+  let needsRender=false;
+  listOpenScopeWindows().forEach(scopeWindow=>{
+    if(!refreshScopeWindow(scopeWindow.scopeId)){
+      needsRender=true;
+    }
+  });
+  if(needsRender){
+    renderScopeWindows();
+  }
+}
+
+function syncScopeWindowsAfterModelRender(){
+  if(SIM.running&&!SIM.paused&&listOpenScopeWindows().length){
+    refreshOpenScopeWindows();
+    return;
+  }
+  renderScopeWindows();
+}
+
 function setScopeDisplayMode(scopeId,mode){
   const scopeWindow=ensureScopeWindow(scopeId);
-  scopeWindow.mode=mode;
-  renderScopeWindows();
+  scopeWindow.mode=['overlay','ch1','ch2'].includes(mode)?mode:'overlay';
+  if(!refreshScopeWindow(scopeId)){
+    renderScopeWindows();
+  }
 }
 
 function setScopeWindowSize(scopeId,value){
   const scopeWindow=ensureScopeWindow(scopeId);
   scopeWindow.windowSeconds=normalizeScopeWindowSeconds(value);
-  renderScopeWindows();
+  if(!refreshScopeWindow(scopeId)){
+    renderScopeWindows();
+  }
 }
 
 function startScopeWindowDrag(event,scopeId){
@@ -7486,7 +7612,9 @@ function bindScopeWindowDragListeners(){
     scopeWindow.x=Math.round(SCOPE_WINDOW_DRAG.originX+(event.clientX-SCOPE_WINDOW_DRAG.startX));
     scopeWindow.y=Math.round(SCOPE_WINDOW_DRAG.originY+(event.clientY-SCOPE_WINDOW_DRAG.startY));
     clampScopeWindowPosition(scopeWindow);
-    renderScopeWindows();
+    if(!positionScopeWindowElement(SCOPE_WINDOW_DRAG.scopeId)){
+      renderScopeWindows();
+    }
   };
   runtimeListeners.scopeWindowDragPointerUp=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
@@ -7525,9 +7653,17 @@ recordScopeSamples = function(time,dt){
     const referenceBucket=ensureScopeChannelBucket(SIM.reference,scopeNode.id);
     getIncomingEdgesForNode(scopeNode.id).forEach(edge=>{
       const channelKey=getScopeChannelKey(edge.targetPortIndex||0);
-      const actualValue=resolveNodeOutput(edge.sourceNodeId,edge.sourcePortIndex||0,'actual',time,dt,actualCache,actualVisiting);
-      const referenceValue=resolveNodeOutput(edge.sourceNodeId,edge.sourcePortIndex||0,'reference',time,dt,referenceCache,referenceVisiting);
-      pushLimitedSample(actualBucket[channelKey],{t:time,actual:actualValue});
+      const actualSourceValue=resolveNodeOutput(edge.sourceNodeId,edge.sourcePortIndex||0,'actual',time,dt,actualCache,actualVisiting);
+      const referenceSourceValue=resolveNodeOutput(edge.sourceNodeId,edge.sourcePortIndex||0,'reference',time,dt,referenceCache,referenceVisiting);
+      const actualValue=transmitEdgeSignal(edge,actualSourceValue,'actual',time);
+      const referenceValue=transmitEdgeSignal(edge,referenceSourceValue,'reference',time);
+      const actualEdgeState=SIM.actual.edgeStates?.[edge.id]||{};
+      pushLimitedSample(
+        actualBucket[channelKey],
+        actualEdgeState.lastTransmissionDropped
+          ?{t:time,actual:null,dropped:true}
+          :{t:time,actual:actualValue}
+      );
       pushLimitedSample(referenceBucket[channelKey],{t:time,actual:referenceValue});
     });
   });
@@ -7542,9 +7678,17 @@ recordScopeSamples = function(time,dt){
     if(!Array.isArray(SIM.reference.instrumentSamples[instrumentNode.id])){
       SIM.reference.instrumentSamples[instrumentNode.id]=[];
     }
-    const actualValue=resolveNodeOutput(incoming.sourceNodeId,incoming.sourcePortIndex||0,'actual',time,dt,actualCache,actualVisiting);
-    const referenceValue=resolveNodeOutput(incoming.sourceNodeId,incoming.sourcePortIndex||0,'reference',time,dt,referenceCache,referenceVisiting);
-    pushLimitedSample(SIM.actual.instrumentSamples[instrumentNode.id],{t:time,actual:actualValue,reference:referenceValue});
+    const actualSourceValue=resolveNodeOutput(incoming.sourceNodeId,incoming.sourcePortIndex||0,'actual',time,dt,actualCache,actualVisiting);
+    const referenceSourceValue=resolveNodeOutput(incoming.sourceNodeId,incoming.sourcePortIndex||0,'reference',time,dt,referenceCache,referenceVisiting);
+    const actualValue=transmitEdgeSignal(incoming,actualSourceValue,'actual',time);
+    const referenceValue=transmitEdgeSignal(incoming,referenceSourceValue,'reference',time);
+    const actualEdgeState=SIM.actual.edgeStates?.[incoming.id]||{};
+    pushLimitedSample(
+      SIM.actual.instrumentSamples[instrumentNode.id],
+      actualEdgeState.lastTransmissionDropped
+        ?{t:time,actual:null,reference:referenceValue,dropped:true}
+        :{t:time,actual:actualValue,reference:referenceValue}
+    );
     pushLimitedSample(SIM.reference.instrumentSamples[instrumentNode.id],{t:time,actual:referenceValue,reference:referenceValue});
   });
 };
@@ -7659,6 +7803,11 @@ renderScopeWindows = function(){
       const scopeWindow=focusScopeWindow(el.dataset.scopeId||'');
       el.style.zIndex=scopeWindow.z;
     });
+    ['pointerdown','mousedown','pointerup','mouseup','click','dblclick','pointermove','mousemove'].forEach(type=>{
+      el.addEventListener(type,event=>{
+        event.stopPropagation();
+      });
+    });
   });
   host.querySelectorAll('[data-scope-drag-handle]').forEach(header=>{
     header.addEventListener('pointerdown',event=>{
@@ -7707,13 +7856,13 @@ renderModelNodes = function(){
       });
     }
   });
-  renderScopeWindows();
+  syncScopeWindowsAfterModelRender();
 };
 
 runSimulationTick = function(){
   const completed=__dualScopeRunSimulationTick();
   if(listOpenScopeWindows().length){
-    renderScopeWindows();
+    refreshOpenScopeWindows();
   }
   return completed;
 };
@@ -18724,6 +18873,10 @@ function decorateDataflowEdges(){
   const __bridgeTransmitEdgeSignal=transmitEdgeSignal;
   transmitEdgeSignal=function(edge,value,modeKey,time){
     const api=getFaultRuntimeApi();
+    const runtimeBucket=modeKey==='reference'?SIM.reference:SIM.actual;
+    const runtimeEdgeState=ensureEdgeRuntime(runtimeBucket,edge);
+    runtimeEdgeState.lastTransmissionDropped=false;
+    runtimeEdgeState.lastTransmissionDropTime=null;
     const activeBindings=api?.getFaultBindings?.(edge,{activeOnly:true})||[];
     const executableBindings=getExecutableFaultBindings(edge,api);
     const hasProtocolFault=edge?.injectedFault?.layer==='protocol'||activeBindings.some(binding=>binding.layer==='protocol'||binding.propagationMode==='protocolEdge');
@@ -18742,6 +18895,8 @@ function decorateDataflowEdges(){
           seed:getNodeSeed(edge.id)
         });
         edgeState.lastOutput=nextValue;
+        edgeState.lastTransmissionDropped=Boolean(edgeState.lastDropout);
+        edgeState.lastTransmissionDropTime=edgeState.lastTransmissionDropped?time:null;
         pushLimitedSample(edgeState.history,base,40);
         return nextValue;
       }
@@ -18759,6 +18914,8 @@ function decorateDataflowEdges(){
           seed:getNodeSeed(edge.id)
         });
         edgeState.lastOutput=nextValue;
+        edgeState.lastTransmissionDropped=Boolean(edgeState.lastDropout);
+        edgeState.lastTransmissionDropTime=edgeState.lastTransmissionDropped?time:null;
         pushLimitedSample(edgeState.history,base,40);
         return nextValue;
       }

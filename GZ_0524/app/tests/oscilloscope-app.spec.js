@@ -431,6 +431,68 @@ describe('Oscilloscope app integration', () => {
     wrapper.unmount();
   });
 
+  it('keeps floating scope controls stable while simulation samples update', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.doCreateBlankWorkspace();
+    const source = window.createNode('signal_source', 300, 260);
+    const scope = window.createNode('instrument_scope', 560, 260);
+    const canvas = window.getActiveCanvasRecord();
+    canvas.edges.push(window.makeTask5Edge(
+      'normal',
+      source.id,
+      scope.id,
+      0,
+      0,
+      window.getNodePorts(source).outputs[0],
+      window.getNodePorts(scope).inputs[0],
+      null
+    ));
+    window.renderEdges();
+    await flushRuntime();
+
+    window.openScope(scope.id);
+    await flushRuntime();
+
+    document.getElementById('sim-dur').value = '5';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+
+    const ch2Button = document.querySelector(`[data-scope-id="${scope.id}"] [data-scope-mode="ch2"]`);
+    const windowButton = document.querySelector(`[data-scope-id="${scope.id}"] [data-scope-window-size="8"]`);
+    expect(ch2Button).not.toBeNull();
+    expect(windowButton).not.toBeNull();
+
+    window.runSimulationTick();
+    await flushRuntime();
+
+    expect(ch2Button.isConnected).toBe(true);
+    expect(windowButton.isConnected).toBe(true);
+
+    let viewportClicks = 0;
+    document.getElementById('canvas-viewport').addEventListener('click', () => {
+      viewportClicks += 1;
+    });
+
+    dispatchClick(ch2Button);
+    await flushRuntime();
+    expect(window.__GZ_SIM__.scopeWindows[scope.id].mode).toBe('ch2');
+    expect(ch2Button.classList.contains('is-active')).toBe(true);
+    expect(viewportClicks).toBe(0);
+
+    window.runSimulationTick();
+    await flushRuntime();
+    expect(ch2Button.isConnected).toBe(true);
+    expect(ch2Button.classList.contains('is-active')).toBe(true);
+
+    dispatchClick(windowButton);
+    await flushRuntime();
+    expect(window.__GZ_SIM__.scopeWindows[scope.id].windowSeconds).toBe(8);
+    expect(windowButton.classList.contains('is-active')).toBe(true);
+
+    wrapper.unmount();
+  });
+
   it('shows icons for every simulation toolbar action button', async () => {
     const wrapper = await mountWorkbench();
 

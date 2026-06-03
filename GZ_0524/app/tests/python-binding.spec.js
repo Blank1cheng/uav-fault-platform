@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import PythonBindingDialog from '../src/components/dialogs/PythonBindingDialog.vue';
 import { createSimulationBlockPythonBinding } from '../src/composables/useWorkbenchState.js';
 import { getPythonBindingPortCounts } from '../src/services/canvasGraph.js';
-import { executePythonBinding } from '../src/services/pythonExecutionAdapter.js';
+import { executePythonBinding, executePythonBindingSync } from '../src/services/pythonExecutionAdapter.js';
 
 const parsedInterface = {
   fileName: 'pid_controller.py',
@@ -131,5 +131,31 @@ describe('Python binding UI and state helpers', () => {
     expect(serializedBody.source).toBe(source);
     expect(result.outputs.output_0).toBe(0.61);
     expect(result.middleVars.half_error).toBe(0.25);
+  });
+
+  it('runs simple bound Python source locally when no backend sync adapter is present', () => {
+    const source = [
+      'def process(pitch_command=0.0):',
+      '    value = float(pitch_command)',
+      '    shaped_command = max(min(value, 1.0), -1.0)',
+      '    filtered_command = shaped_command',
+      '    return {"shaped_command": shaped_command}, {"filtered_command": filtered_command}'
+    ].join('\n');
+
+    const result = executePythonBindingSync({
+      adapterMode: 'backend',
+      payload: {
+        moduleName: 'command_shaper',
+        fileName: 'command_shaper.py',
+        entryFunction: 'process',
+        source,
+        inputs: { pitch_command: 1.8 },
+        outputNames: ['shaped_command'],
+        middleVarNames: ['filtered_command']
+      }
+    });
+
+    expect(result.outputs.shaped_command).toBe(1);
+    expect(result.middleVars.filtered_command).toBe(1);
   });
 });

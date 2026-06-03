@@ -2196,6 +2196,7 @@ header{
   font-size:12px;
   font-weight:600;
   white-space:nowrap;
+  word-break:keep-all;
 }
 
 .props-panel-shell--fault-tag .fault-tag-param-edit:hover{
@@ -2281,6 +2282,8 @@ header{
   font-family:var(--font-ui);
   font-size:12px;
   font-weight:600;
+  white-space:nowrap;
+  word-break:keep-all;
 }
 
 .props-panel-shell--fault-tag .fault-tag-param-reset:not(:disabled){
@@ -2298,6 +2301,928 @@ header{
   border:1px solid var(--blue);
   background:var(--blue);
   color:#ffffff;
+}
+
+/* Measurement and instrument inspectors: align cards and typography with the workbench shell. */
+.props-panel-shell--scope,
+.props-panel-shell--instrument{
+  gap:12px;
+}
+
+.props-panel-shell--scope .props-panel-hero,
+.props-panel-shell--instrument .props-panel-hero{
+  padding:14px 16px;
+  border:1px solid var(--border);
+  border-left:3px solid var(--green);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--scope .props-target-card,
+.props-panel-shell--instrument .props-target-card{
+  align-items:flex-start;
+  margin:0;
+  padding:14px 16px;
+  border:1px solid var(--border);
+  border-left:3px solid var(--green);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--instrument .props-target-card{
+  border-left-color:var(--teal);
+}
+
+.props-panel-shell--scope .props-target-card strong,
+.props-panel-shell--instrument .props-target-card strong{
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:14px;
+  font-weight:600;
+  line-height:1.35;
+}
+
+.props-panel-shell--scope .props-target-card span,
+.props-panel-shell--instrument .props-target-card span{
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:400;
+}
+
+.props-panel-shell--scope .props-state-pill.is-normal,
+.props-panel-shell--instrument .props-state-pill.is-normal{
+  border:1px solid #a7f0ba;
+  border-radius:2px;
+  background:#defbe6;
+  color:#0e6027;
+  font-size:11px;
+  font-weight:600;
+}
+
+.props-panel-shell--instrument .props-panel-hero{
+  border-left-color:var(--teal);
+}
+
+.props-panel-shell--instrument .props-panel-hero--instrument{
+  border-left-color:var(--teal);
+}
+
+.props-panel-shell--scope .props-panel-hero__eyebrow,
+.props-panel-shell--instrument .props-panel-hero__eyebrow{
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+}
+
+.props-panel-shell--scope .props-panel-hero__eyebrow{
+  color:#0e6027;
+}
+
+.props-panel-shell--instrument .props-panel-hero__eyebrow{
+  color:#00697a;
+}
+
+.props-panel-shell--scope .props-panel-hero__title,
+.props-panel-shell--instrument .props-panel-hero__title{
+  color:var(--text);
+  font-size:15px;
+  font-weight:600;
+  line-height:1.35;
+}
+
+.props-panel-shell--scope .props-panel-hero__meta,
+.props-panel-shell--instrument .props-panel-hero__meta{
+  gap:0;
+  margin-top:12px;
+  border:1px solid var(--border);
+}
+
+.props-panel-shell--scope .props-panel-hero__meta{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.props-panel-shell--instrument .props-panel-hero__meta{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.props-panel-shell--scope .props-panel-hero__pill,
+.props-panel-shell--instrument .props-panel-hero__pill{
+  padding:8px 10px;
+  border:0;
+  border-right:1px solid var(--border);
+  border-radius:0;
+  background:#f8fbff;
+}
+
+.props-panel-shell--scope .props-panel-hero__pill:last-child,
+.props-panel-shell--instrument .props-panel-hero__pill:last-child{
+  border-right:0;
+}
+
+.props-panel-shell--scope .props-panel-hero__pill span,
+.props-panel-shell--instrument .props-panel-hero__pill span,
+.props-panel-shell--scope .scope-mini-channel span,
+.props-panel-shell--scope .scope-export-option em,
+.props-panel-shell--scope .scope-export-chip,
+.props-panel-shell--instrument .instrument-copy,
+.props-panel-shell--instrument .instrument-count span,
+.props-panel-shell--instrument .instrument-metrics em,
+.props-panel-shell--instrument .instrument-table-head{
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0;
+  line-height:1.35;
+  text-transform:none;
+}
+
+.props-panel-shell--scope .props-panel-hero__pill strong,
+.props-panel-shell--instrument .props-panel-hero__pill strong,
+.props-panel-shell--scope .scope-mini-channel strong,
+.props-panel-shell--instrument .instrument-title{
+  margin:0;
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.45;
+}
+
+.props-panel-shell--scope .scope-overview-compact,
+.props-panel-shell--instrument .instrument-props{
+  gap:12px;
+}
+
+.props-panel-shell--scope .scope-overview-open,
+.props-panel-shell--instrument .instrument-primary,
+.props-panel-shell--instrument .instrument-secondary{
+  min-height:34px;
+  border-radius:0;
+  box-shadow:none;
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+}
+
+.props-panel-shell--scope .scope-overview-open{
+  border:1px solid var(--green);
+  background:#ffffff;
+  color:#0e6027;
+}
+
+.props-panel-shell--scope .scope-overview-open:hover{
+  background:#f0fdf4;
+}
+
+.props-panel-shell--scope .scope-mini-channel-list{
+  gap:0;
+  border:1px solid var(--border);
+  background:#ffffff;
+}
+
+.props-panel-shell--scope .scope-mini-channel{
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  padding:10px 12px;
+  border:0;
+  border-left:3px solid var(--border-dark);
+  border-bottom:1px solid var(--border);
+  border-radius:0;
+  background:#ffffff;
+}
+
+.props-panel-shell--scope .scope-mini-channel:last-child{
+  border-bottom:0;
+}
+
+.props-panel-shell--scope .scope-mini-channel.is-connected{
+  border-left-color:var(--green);
+  background:#ffffff;
+}
+
+.props-panel-shell--scope .scope-mini-channel span,
+.props-panel-shell--scope .scope-mini-channel strong{
+  margin:0;
+}
+
+.props-panel-shell--scope .scope-mini-channel.is-connected span{
+  color:#0e6027;
+  font-weight:600;
+}
+
+.props-panel-shell--scope .scope-export-panel,
+.props-panel-shell--scope .scope-export-options,
+.props-panel-shell--scope .scope-export-fields{
+  gap:8px;
+}
+
+.props-panel-shell--scope .scope-export-summary,
+.props-panel-shell--scope .scope-export-option,
+.props-panel-shell--scope .scope-export-chip,
+.props-panel-shell--instrument .instrument-hero,
+.props-panel-shell--instrument .instrument-count,
+.props-panel-shell--instrument .instrument-metrics span,
+.props-panel-shell--instrument .instrument-table,
+.props-panel-shell--instrument .instrument-spectrum-bars{
+  border:1px solid var(--border);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--scope .scope-export-summary{
+  border-left:3px solid var(--green);
+}
+
+.props-panel-shell--scope .scope-export-kicker{
+  color:#0e6027;
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0;
+}
+
+.props-panel-shell--scope .scope-export-summary strong{
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:15px;
+  font-weight:600;
+}
+
+.props-panel-shell--scope .scope-export-summary span,
+.props-panel-shell--scope .scope-export-option strong{
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+}
+
+.props-panel-shell--scope .scope-export-option{
+  padding:10px 12px;
+}
+
+.props-panel-shell--scope .scope-export-option:has(input:checked),
+.props-panel-shell--scope .scope-export-chip:has(input:checked){
+  border-color:var(--green);
+  background:#f0fdf4;
+  box-shadow:none;
+}
+
+.props-panel-shell--scope .scope-export-chip{
+  min-height:30px;
+  padding:0 9px;
+}
+
+.props-panel-shell--scope .scope-export-actions .props-secondary,
+.props-panel-shell--scope .scope-export-actions .props-save{
+  width:auto;
+  min-height:34px;
+  border-radius:0;
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+}
+
+.props-panel-shell--scope .scope-export-actions .props-save{
+  border:1px solid var(--green);
+  background:var(--green);
+  color:#ffffff;
+}
+
+.props-panel-shell--instrument .instrument-hero{
+  padding:13px 14px;
+  border-left:3px solid var(--teal);
+}
+
+.props-panel-shell--instrument .instrument-props--spectrum .instrument-hero{
+  border-left-color:var(--purple);
+}
+
+.props-panel-shell--instrument .instrument-kicker{
+  color:#00697a;
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+}
+
+.props-panel-shell--instrument .instrument-props--spectrum .instrument-kicker{
+  color:#5b21b6;
+}
+
+.props-panel-shell--instrument .instrument-count{
+  flex:0 0 64px;
+  min-height:54px;
+}
+
+.props-panel-shell--instrument .instrument-count strong,
+.props-panel-shell--instrument .instrument-metrics b,
+.props-panel-shell--instrument .instrument-table-row{
+  color:var(--text);
+  font-family:var(--font-data);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+
+.props-panel-shell--instrument .instrument-count strong{
+  font-size:19px;
+}
+
+.props-panel-shell--instrument .instrument-metrics{
+  gap:0;
+  border:1px solid var(--border);
+  background:#ffffff;
+}
+
+.props-panel-shell--instrument .instrument-metrics span{
+  padding:9px 10px;
+  border:0;
+  border-right:1px solid var(--border);
+}
+
+.props-panel-shell--instrument .instrument-metrics span:last-child{
+  border-right:0;
+}
+
+.props-panel-shell--instrument .instrument-metrics b{
+  font-size:13px;
+  line-height:1.2;
+}
+
+.props-panel-shell--instrument .instrument-actions{
+  gap:8px;
+}
+
+.props-panel-shell--instrument .instrument-primary{
+  border:1px solid var(--blue);
+  background:var(--blue);
+  color:#ffffff;
+}
+
+.props-panel-shell--instrument .instrument-secondary{
+  border:1px solid var(--border);
+  background:#ffffff;
+  color:var(--blue);
+}
+
+.props-panel-shell--instrument .instrument-primary:hover,
+.props-panel-shell--instrument .instrument-secondary:hover{
+  transform:none;
+}
+
+.props-panel-shell--instrument .instrument-secondary:hover{
+  border-color:var(--blue);
+  background:#edf5ff;
+}
+
+.props-panel-shell--instrument .instrument-table{
+  overflow:hidden;
+}
+
+.props-panel-shell--instrument .instrument-table-head,
+.props-panel-shell--instrument .instrument-table-row{
+  padding:8px 10px;
+  gap:6px;
+}
+
+.props-panel-shell--instrument .instrument-table-head{
+  border-bottom:1px solid var(--border);
+  background:#f8fbff;
+}
+
+.props-panel-shell--instrument .instrument-table-row{
+  border-top:0;
+  border-bottom:1px solid var(--border);
+  font-size:11px;
+}
+
+.props-panel-shell--instrument .instrument-table-row:last-child{
+  border-bottom:0;
+}
+
+.props-panel-shell--instrument .instrument-spectrum-bars{
+  height:72px;
+  padding:12px;
+}
+
+.props-panel-shell--instrument .instrument-spectrum-bars span{
+  border-radius:0;
+  background:var(--blue);
+  box-shadow:none;
+}
+
+.props-panel-shell--instrument .instrument-props--spectrum .instrument-spectrum-bars span{
+  background:var(--purple);
+}
+
+/* Generic component, edge and injector inspectors. */
+.props-panel-shell--component,
+.props-panel-shell--edge,
+.props-panel-shell--fault-injector{
+  gap:12px;
+}
+
+.props-panel-shell--component .props-panel-hero,
+.props-panel-shell--edge .props-panel-hero,
+.props-panel-shell--fault-injector .props-panel-hero{
+  padding:14px 16px;
+  border:1px solid var(--border);
+  border-left:3px solid var(--blue);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--edge .props-panel-hero{
+  border-left-color:var(--purple);
+}
+
+.props-panel-shell--fault-injector .props-panel-hero{
+  border-left-color:var(--red);
+}
+
+.props-panel-shell--component .props-panel-hero__eyebrow,
+.props-panel-shell--edge .props-panel-hero__eyebrow,
+.props-panel-shell--fault-injector .props-panel-hero__eyebrow{
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+}
+
+.props-panel-shell--component .props-panel-hero__eyebrow{
+  color:#0043ce;
+}
+
+.props-panel-shell--edge .props-panel-hero__eyebrow{
+  color:#5b21b6;
+}
+
+.props-panel-shell--fault-injector .props-panel-hero__eyebrow{
+  color:#a2191f;
+}
+
+.props-panel-shell--component .props-panel-hero__title,
+.props-panel-shell--edge .props-panel-hero__title,
+.props-panel-shell--fault-injector .props-panel-hero__title{
+  color:var(--text);
+  font-size:15px;
+  font-weight:600;
+  line-height:1.35;
+}
+
+.props-panel-shell--component .props-panel-hero__meta,
+.props-panel-shell--edge .props-panel-hero__meta,
+.props-panel-shell--fault-injector .props-panel-hero__meta{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:12px;
+  border:1px solid var(--border);
+}
+
+.props-panel-shell--component .props-panel-hero__pill,
+.props-panel-shell--edge .props-panel-hero__pill,
+.props-panel-shell--fault-injector .props-panel-hero__pill{
+  padding:8px 10px;
+  border:0;
+  border-right:1px solid var(--border);
+  border-radius:0;
+  background:#f8fbff;
+}
+
+.props-panel-shell--component .props-panel-hero__pill:last-child,
+.props-panel-shell--edge .props-panel-hero__pill:last-child,
+.props-panel-shell--fault-injector .props-panel-hero__pill:last-child{
+  border-right:0;
+}
+
+.props-panel-shell--component .props-panel-hero__pill span,
+.props-panel-shell--edge .props-panel-hero__pill span,
+.props-panel-shell--fault-injector .props-panel-hero__pill span,
+.props-panel-shell--component .pglbl,
+.props-panel-shell--edge .pglbl,
+.props-panel-shell--fault-injector .pglbl,
+.props-panel-shell--component .props-field label,
+.props-panel-shell--edge .props-field label,
+.props-panel-shell--fault-injector .props-field label,
+.props-panel-shell--component .sim-intf-meta,
+.props-panel-shell--fault-injector .sim-intf-meta,
+.props-panel-shell--component .props-help,
+.props-panel-shell--edge .props-help,
+.props-panel-shell--fault-injector .props-help{
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0;
+  line-height:1.35;
+  text-transform:none;
+}
+
+.props-panel-shell--component .props-panel-hero__pill strong,
+.props-panel-shell--edge .props-panel-hero__pill strong,
+.props-panel-shell--fault-injector .props-panel-hero__pill strong{
+  margin:0;
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.45;
+}
+
+.props-panel-shell--component .props-target-card,
+.props-panel-shell--edge .props-target-card,
+.props-panel-shell--fault-injector .props-target-card{
+  align-items:flex-start;
+  margin:0;
+  padding:14px 16px;
+  border:1px solid var(--border);
+  border-left:3px solid var(--blue);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--edge .props-target-card{
+  border-left-color:var(--purple);
+}
+
+.props-panel-shell--fault-injector .props-target-card{
+  border-left-color:var(--red);
+}
+
+.props-panel-shell--component .props-target-card.is-faulted,
+.props-panel-shell--edge .props-target-card.is-faulted,
+.props-panel-shell--fault-injector .props-target-card.is-faulted{
+  border-color:var(--border);
+  border-left-color:var(--red);
+  background:#ffffff;
+}
+
+.props-panel-shell--component .props-title,
+.props-panel-shell--edge .props-title,
+.props-panel-shell--fault-injector .props-title{
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:14px;
+  font-weight:600;
+  line-height:1.35;
+}
+
+.props-panel-shell--component .props-sub,
+.props-panel-shell--edge .props-sub,
+.props-panel-shell--fault-injector .props-sub{
+  margin-top:4px;
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:400;
+  line-height:1.4;
+}
+
+.props-panel-shell--component .props-state-pill,
+.props-panel-shell--edge .props-state-pill,
+.props-panel-shell--fault-injector .props-state-pill{
+  padding:3px 8px;
+  border:1px solid transparent;
+  border-radius:2px;
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+}
+
+.props-panel-shell--component .props-state-pill.is-normal,
+.props-panel-shell--edge .props-state-pill.is-normal,
+.props-panel-shell--fault-injector .props-state-pill.is-normal{
+  border-color:#a7f0ba;
+  background:#defbe6;
+  color:#0e6027;
+}
+
+.props-panel-shell--component .props-state-pill.is-faulted,
+.props-panel-shell--edge .props-state-pill.is-faulted,
+.props-panel-shell--fault-injector .props-state-pill.is-faulted{
+  border-color:#ffb3b8;
+  background:#fff1f1;
+  color:#a2191f;
+}
+
+.props-panel-shell--component .pgroup,
+.props-panel-shell--edge .pgroup,
+.props-panel-shell--fault-injector .pgroup{
+  margin:0;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--component .pglbl,
+.props-panel-shell--edge .pglbl,
+.props-panel-shell--fault-injector .pglbl{
+  margin:0;
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  background:#f8fbff;
+  color:var(--text);
+  font-size:13px;
+  font-weight:600;
+}
+
+.props-panel-shell--component .prow,
+.props-panel-shell--edge .prow,
+.props-panel-shell--fault-injector .prow{
+  display:grid;
+  grid-template-columns:minmax(92px,.46fr) minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  min-height:34px;
+  padding:8px 12px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--font-ui);
+  font-size:12px;
+}
+
+.props-panel-shell--component .prow:last-child,
+.props-panel-shell--edge .prow:last-child,
+.props-panel-shell--fault-injector .prow:last-child{
+  border-bottom:0;
+}
+
+.props-panel-shell--component .pk,
+.props-panel-shell--edge .pk,
+.props-panel-shell--fault-injector .pk{
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-weight:500;
+}
+
+.props-panel-shell--component .pv,
+.props-panel-shell--edge .pv,
+.props-panel-shell--fault-injector .pv{
+  min-width:0;
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-weight:600;
+  overflow-wrap:anywhere;
+  text-align:right;
+}
+
+.props-panel-shell--component .props-form,
+.props-panel-shell--edge .props-form,
+.props-panel-shell--fault-injector .props-form{
+  gap:12px;
+}
+
+.props-panel-shell--component .props-row,
+.props-panel-shell--edge .props-row,
+.props-panel-shell--fault-injector .props-row{
+  gap:10px;
+}
+
+.props-panel-shell--component .props-field,
+.props-panel-shell--edge .props-field,
+.props-panel-shell--fault-injector .props-field{
+  gap:6px;
+  min-width:0;
+}
+
+.props-panel-shell--component .props-field input,
+.props-panel-shell--component .props-field select,
+.props-panel-shell--component .props-field textarea,
+.props-panel-shell--edge .props-field input,
+.props-panel-shell--edge .props-field select,
+.props-panel-shell--edge .props-field textarea,
+.props-panel-shell--fault-injector .props-field input,
+.props-panel-shell--fault-injector .props-field select,
+.props-panel-shell--fault-injector .props-field textarea{
+  width:100%;
+  min-width:0;
+  min-height:34px;
+  padding:0 10px;
+  border:1px solid var(--border);
+  border-radius:0;
+  background:#ffffff;
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.4;
+  box-shadow:none;
+}
+
+.props-panel-shell--component .props-field textarea,
+.props-panel-shell--edge .props-field textarea,
+.props-panel-shell--fault-injector .props-field textarea{
+  min-height:76px;
+  padding:8px 10px;
+}
+
+.props-panel-shell--component .props-field input:focus,
+.props-panel-shell--component .props-field select:focus,
+.props-panel-shell--component .props-field textarea:focus,
+.props-panel-shell--edge .props-field input:focus,
+.props-panel-shell--edge .props-field select:focus,
+.props-panel-shell--edge .props-field textarea:focus,
+.props-panel-shell--fault-injector .props-field input:focus,
+.props-panel-shell--fault-injector .props-field select:focus,
+.props-panel-shell--fault-injector .props-field textarea:focus{
+  outline:2px solid var(--blue);
+  outline-offset:-2px;
+  border-color:var(--blue);
+  background:#f8fbff;
+  box-shadow:none;
+}
+
+.props-panel-shell--component .props-actions,
+.props-panel-shell--edge .props-actions,
+.props-panel-shell--fault-injector .props-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:0;
+}
+
+.props-panel-shell--component .props-save,
+.props-panel-shell--component .props-secondary,
+.props-panel-shell--component .props-danger,
+.props-panel-shell--edge .props-save,
+.props-panel-shell--edge .props-secondary,
+.props-panel-shell--edge .props-danger,
+.props-panel-shell--fault-injector .props-save,
+.props-panel-shell--fault-injector .props-secondary,
+.props-panel-shell--fault-injector .props-danger{
+  width:100%;
+  min-height:38px;
+  border-radius:0;
+  box-shadow:none;
+  font-family:var(--font-ui);
+  font-size:13px;
+  font-weight:600;
+}
+
+.props-panel-shell--component .props-save,
+.props-panel-shell--edge .props-save,
+.props-panel-shell--fault-injector .props-save{
+  border:1px solid var(--blue);
+  background:var(--blue);
+  color:#ffffff;
+}
+
+.props-panel-shell--component .props-secondary,
+.props-panel-shell--edge .props-secondary,
+.props-panel-shell--fault-injector .props-secondary{
+  border:1px solid var(--border);
+  background:#ffffff;
+  color:var(--blue);
+}
+
+.props-panel-shell--component .props-secondary:hover,
+.props-panel-shell--edge .props-secondary:hover,
+.props-panel-shell--fault-injector .props-secondary:hover{
+  border-color:var(--blue);
+  background:#edf5ff;
+}
+
+.props-panel-shell--component .props-danger,
+.props-panel-shell--edge .props-danger,
+.props-panel-shell--fault-injector .props-danger{
+  border:1px solid var(--red);
+  background:#ffffff;
+  color:var(--red);
+}
+
+.props-panel-shell--component .props-danger:hover,
+.props-panel-shell--edge .props-danger:hover,
+.props-panel-shell--fault-injector .props-danger:hover{
+  background:#fff1f1;
+}
+
+.props-panel-shell--component .props-port-list,
+.props-panel-shell--component .sim-intf-list,
+.props-panel-shell--fault-injector .sim-intf-list{
+  gap:0;
+}
+
+.props-panel-shell--component .props-port-card,
+.props-panel-shell--component .sim-intf-group,
+.props-panel-shell--component .subsystem-boundary-note,
+.props-panel-shell--edge .props-edge-connection,
+.props-panel-shell--edge .props-channel-card,
+.props-panel-shell--edge .props-channel-summary,
+.props-panel-shell--edge .props-edge-route-meta,
+.props-panel-shell--edge .props-chip,
+.props-panel-shell--fault-injector .sim-intf-group{
+  border:1px solid var(--border);
+  border-radius:0;
+  background:#ffffff;
+  box-shadow:none;
+}
+
+.props-panel-shell--component .props-port-card{
+  padding:10px 12px;
+  border-bottom:0;
+}
+
+.props-panel-shell--component .props-port-card:last-child{
+  border-bottom:1px solid var(--border);
+}
+
+.props-panel-shell--component .props-port-card__name,
+.props-panel-shell--component .sim-intf-title,
+.props-panel-shell--fault-injector .sim-intf-title,
+.props-panel-shell--edge .props-edge-connection-title,
+.props-panel-shell--edge .props-channel-card__head strong{
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+}
+
+.props-panel-shell--component .props-port-card__var,
+.props-panel-shell--component .props-port-card__meta,
+.props-panel-shell--component .sim-intf-note,
+.props-panel-shell--fault-injector .sim-intf-note{
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:400;
+}
+
+.props-panel-shell--component .sim-intf-group,
+.props-panel-shell--fault-injector .sim-intf-group{
+  padding:0;
+  gap:0;
+}
+
+.props-panel-shell--component .sim-intf-head,
+.props-panel-shell--fault-injector .sim-intf-head{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  background:#f8fbff;
+}
+
+.props-panel-shell--component .sim-intf-meta,
+.props-panel-shell--fault-injector .sim-intf-meta{
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.props-panel-shell--component .sim-intf-row,
+.props-panel-shell--fault-injector .sim-intf-row{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+.props-panel-shell--component .sim-intf-row:last-child,
+.props-panel-shell--fault-injector .sim-intf-row:last-child{
+  border-bottom:0;
+}
+
+.props-panel-shell--edge .props-edge-connection,
+.props-panel-shell--edge .props-channel-card,
+.props-panel-shell--edge .props-channel-summary,
+.props-panel-shell--edge .props-edge-route-meta{
+  margin-top:8px;
+  padding:10px 12px;
+}
+
+.props-panel-shell--edge .props-chip-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.props-panel-shell--edge .props-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:26px;
+  padding:0 8px;
+  color:var(--text2);
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:500;
+}
+
+.props-panel-shell--edge .props-channel-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
 .props-fault-remove{

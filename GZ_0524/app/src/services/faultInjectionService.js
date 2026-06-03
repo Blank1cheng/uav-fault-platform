@@ -316,6 +316,9 @@ export function applyScalarFault(value, options = {}) {
   const stepIndex = asNumber(options.stepIndex, 0);
   const input = asNumber(value, 0);
 
+  state.lastDropout = false;
+  state.lastFaultGap = false;
+
   if (!behavior || !isFaultActive(params, time)) {
     state.previousValue = input;
     state.holdValue = input;
@@ -446,6 +449,8 @@ export function applyScalarFault(value, options = {}) {
   if (behavior === 'packet_loss') {
     const dropRate = clamp(asNumber(readParam(params, ['drop_rate', 'loss_rate'], 0.08), 0.08), 0, 1);
     if (unitNoise(seed, stepIndex, time) <= dropRate) {
+      state.lastDropout = true;
+      state.lastFaultGap = true;
       return params.strategy === 'zero' ? 0 : asNumber(state.previousValue, 0);
     }
     state.previousValue = input;
@@ -456,11 +461,15 @@ export function applyScalarFault(value, options = {}) {
     state.burstRemaining = Math.max(Math.round(asNumber(state.burstRemaining, 0)), 0);
     if (state.burstRemaining > 0) {
       state.burstRemaining -= 1;
+      state.lastDropout = true;
+      state.lastFaultGap = true;
       return params.strategy === 'zero' ? 0 : asNumber(state.previousValue, 0);
     }
     const probability = clamp(asNumber(params.start_probability, 0.02), 0, 1);
     if (unitNoise(seed, stepIndex, time) <= probability) {
       state.burstRemaining = Math.max(Math.round(asNumber(params.burst_length, 5)) - 1, 0);
+      state.lastDropout = true;
+      state.lastFaultGap = true;
       return params.strategy === 'zero' ? 0 : asNumber(state.previousValue, 0);
     }
     state.previousValue = input;
@@ -474,6 +483,8 @@ export function applyScalarFault(value, options = {}) {
 
   if (behavior === 'interrupt') {
     if (asBoolean(params.enable, true)) {
+      state.lastDropout = true;
+      state.lastFaultGap = true;
       return params.strategy === 'zero' ? 0 : asNumber(state.previousValue, 0);
     }
     state.previousValue = input;
@@ -705,6 +716,8 @@ export function applyScalarFaultBindings(value, options = {}) {
 
   const bucket = options.stateBucket ?? options.state ?? {};
   bucket.bindingStates = isPlainObject(bucket.bindingStates) ? bucket.bindingStates : {};
+  bucket.lastDropout = false;
+  bucket.lastFaultGap = false;
   const resolveFaultModel = typeof options.resolveFaultModel === 'function'
     ? options.resolveFaultModel
     : null;
@@ -723,7 +736,7 @@ export function applyScalarFaultBindings(value, options = {}) {
       ? bucket.bindingStates[stateKey]
       : {};
 
-    return applyScalarFault(currentValue, {
+    const nextValue = applyScalarFault(currentValue, {
       faultModel: resolvedModel,
       injectedFault: binding.injectedFault ?? binding,
       params: binding.parameters,
@@ -734,6 +747,13 @@ export function applyScalarFaultBindings(value, options = {}) {
       stepIndex: options.stepIndex,
       seed: asNumber(options.seed, 1) + index
     });
+
+    if (bucket.bindingStates[stateKey].lastDropout) {
+      bucket.lastDropout = true;
+      bucket.lastFaultGap = true;
+    }
+
+    return nextValue;
   }, value);
 }
 

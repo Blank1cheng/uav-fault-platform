@@ -118,6 +118,12 @@ function maxScopeDiff(actualSamples = [], referenceSamples = [], start = 1, end 
     }, 0);
 }
 
+function countDroppedScopeSamples(samples = [], start = 0, end = Number.POSITIVE_INFINITY) {
+  return samples
+    .filter((sample) => sample?.t >= start && sample?.t <= end && sample?.dropped === true)
+    .length;
+}
+
 function createCanvasContextStub() {
   return {
     clearRect() {},
@@ -1895,6 +1901,78 @@ describe('canvas layout cleanup', () => {
 
     wrapper.unmount();
   }, 15000);
+
+  it('routes Python-bound output through protocol dropout faults before scope sampling', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => createCanvasContextStub());
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    const state = window.__GZ_STATE__;
+    const commandShaper = state.modelNodes.find((node) => node.id === 'node-command-shaper');
+    const scopeEdge = state.modelEdges.find((edge) => edge.id === 'edge-command-scope');
+
+    expect(commandShaper?.pythonBinding?.bound).toBe(true);
+    expect(commandShaper?.pythonBinding?.rawSource).toContain('shaped_command');
+    expect(scopeEdge).toBeTruthy();
+
+    scopeEdge.lineType = 'can';
+    scopeEdge.channelId = 'CAN-FC-SCOPE';
+    scopeEdge.messageId = '0x121';
+    scopeEdge.faultSlots = [
+      {
+        slotId: 'protocol:edge-command-scope:can',
+        slotName: 'Scope CAN payload',
+        layer: 'protocol',
+        targetField: 'can.payload',
+        allowedModels: ['dropout', 'tamper', 'delay', 'stale'],
+        bindingObject: 'scope.command',
+        targetVariable: 'scope.command',
+        signalId: 'scope.command',
+        channelId: 'CAN-FC-SCOPE',
+        messageId: '0x121'
+      }
+    ];
+
+    const injector = window.createNode('protocol_fault_injector', 420, 260);
+    await flushRuntime();
+
+    const result = window.bindLayeredFaultInjectorToTarget(injector.id, {
+      targetKind: 'edge',
+      targetId: scopeEdge.id,
+      slotId: 'protocol:edge-command-scope:can',
+      mathModel: 'dropout',
+      parameters: { drop_rate: 1, strategy: 'gap', start: 1, duration: 1 }
+    });
+    await flushRuntime();
+
+    expect(result).toMatchObject({ ok: true, targetId: scopeEdge.id });
+    expect(scopeEdge.faultBindings?.[0]?.runtimeBehavior).toBe('dropout');
+
+    document.getElementById('sim-dur').value = '2.2';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+    for (let step = 0; step < 23; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    const actual = window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch1 ?? [];
+    const reference = window.__GZ_SIM__?.reference?.scopeSamples?.['node-scope']?.ch1 ?? [];
+    const beforeFault = actual.filter((sample) => sample.t < 1 && sample.dropped !== true);
+
+    expect(beforeFault.length).toBeGreaterThan(0);
+    expect(reference.filter((sample) => sample.t >= 1 && sample.t <= 2)).toHaveLength(11);
+    expect(countDroppedScopeSamples(actual, 1, 2)).toBeGreaterThanOrEqual(10);
+    expect(actual.filter((sample) => sample.t >= 1 && sample.t <= 2 && sample.dropped !== true)).toHaveLength(0);
+
+    wrapper.unmount();
+  });
 
   it('loads the 0526 fault task presets from the top fault-model button', async () => {
     const wrapper = mount(App, { attachTo: document.body });
