@@ -7709,9 +7709,14 @@ function bindScopeWindowDragListeners(){
   document.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
   document.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel);
+  document.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove,true);
+  document.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp,true);
+  document.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel,true);
   document.addEventListener('lostpointercapture',runtimeListeners.scopeWindowDragLostPointerCapture);
   document.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
+  document.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove,true);
+  document.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp,true);
 }
 
 const __dualScopeRecordScopeSamples = recordScopeSamples;

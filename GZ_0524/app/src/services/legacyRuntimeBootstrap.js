@@ -250,16 +250,21 @@ export function __resetLegacyRuntimeForTests() {
       window.removeEventListener('mousemove', runtimeListeners.scopeWindowDragPointerMove);
       document.removeEventListener('pointermove', runtimeListeners.scopeWindowDragPointerMove);
       document.removeEventListener('mousemove', runtimeListeners.scopeWindowDragPointerMove);
+      document.removeEventListener('pointermove', runtimeListeners.scopeWindowDragPointerMove, true);
+      document.removeEventListener('mousemove', runtimeListeners.scopeWindowDragPointerMove, true);
     }
     if (runtimeListeners.scopeWindowDragPointerUp) {
       window.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp);
       window.removeEventListener('mouseup', runtimeListeners.scopeWindowDragPointerUp);
       document.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp);
       document.removeEventListener('mouseup', runtimeListeners.scopeWindowDragPointerUp);
+      document.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp, true);
+      document.removeEventListener('mouseup', runtimeListeners.scopeWindowDragPointerUp, true);
     }
     if (runtimeListeners.scopeWindowDragPointerCancel) {
       window.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
       document.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
+      document.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel, true);
     }
     if (runtimeListeners.scopeWindowDragLostPointerCapture) {
       document.removeEventListener('lostpointercapture', runtimeListeners.scopeWindowDragLostPointerCapture);

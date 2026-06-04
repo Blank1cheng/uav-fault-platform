@@ -588,6 +588,33 @@ describe('Oscilloscope app integration', () => {
     wrapper.unmount();
   });
 
+  it('keeps dragging when captured pointer movement is retargeted to the scope header', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.createNode('instrument_scope', 400, 240);
+    await flushRuntime();
+
+    const scopeNode = document.querySelector('.blk.b-inst');
+    dispatchDoubleClick(scopeNode);
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window');
+    const header = scopeWindow.querySelector('.scope-window__header');
+    const title = scopeWindow.querySelector('.scope-window__title');
+    const beforeLeft = scopeWindow.style.left;
+    const beforeTop = scopeWindow.style.top;
+
+    dispatchPointer(title, 'pointerdown', { pointerId: 41, clientX: 120, clientY: 120 });
+    dispatchPointer(header, 'pointermove', { pointerId: 41, clientX: 180, clientY: 168 });
+    dispatchPointer(header, 'pointerup', { pointerId: 41, clientX: 180, clientY: 168 });
+    await flushRuntime();
+
+    expect(scopeWindow.style.left).not.toBe(beforeLeft);
+    expect(scopeWindow.style.top).not.toBe(beforeTop);
+
+    wrapper.unmount();
+  });
+
   it('defers scope canvas redraw while a running simulation window is being dragged', async () => {
     const wrapper = await mountWorkbench();
 
