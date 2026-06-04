@@ -588,6 +588,47 @@ describe('Oscilloscope app integration', () => {
     wrapper.unmount();
   });
 
+  it('defers scope canvas redraw while a running simulation window is being dragged', async () => {
+    const wrapper = await mountWorkbench();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    expect(window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg)).toMatchObject({ ok: true });
+    await flushRuntime();
+
+    document.getElementById('sim-dur').value = '4';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+    for (let step = 0; step < 4; step += 1) {
+      window.simStep();
+    }
+    window.openScope('node-scope');
+    window.simRun();
+    await flushRuntime();
+
+    const getContextMock = HTMLCanvasElement.prototype.getContext;
+    getContextMock.mockClear();
+
+    const scopeWindow = document.querySelector('.scope-window[data-scope-id="node-scope"]');
+    const header = scopeWindow.querySelector('[data-scope-drag-handle]');
+    const beforeLeft = scopeWindow.style.left;
+
+    dispatchPointer(header, 'pointerdown', { pointerId: 77, clientX: 120, clientY: 120 });
+    dispatchPointer(window, 'pointermove', { pointerId: 77, clientX: 180, clientY: 160 });
+    window.runSimulationTick();
+    window.runSimulationTick();
+    await flushRuntime();
+
+    expect(scopeWindow.style.left).not.toBe(beforeLeft);
+    expect(getContextMock).not.toHaveBeenCalled();
+
+    dispatchPointer(window, 'pointerup', { pointerId: 77, clientX: 180, clientY: 160 });
+    await flushRuntime();
+
+    expect(getContextMock).toHaveBeenCalled();
+    window.simStop('stopped');
+    wrapper.unmount();
+  });
+
   it('opens scope windows below the simulation toolbar and clamps upward dragging', async () => {
     const wrapper = await mountWorkbench();
 

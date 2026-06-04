@@ -261,6 +261,9 @@ export function __resetLegacyRuntimeForTests() {
       window.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
       document.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
     }
+    if (runtimeListeners.scopeWindowDragLostPointerCapture) {
+      document.removeEventListener('lostpointercapture', runtimeListeners.scopeWindowDragLostPointerCapture);
+    }
     if (runtimeListeners.scopeWindowDragWindowBlur) {
       window.removeEventListener('blur', runtimeListeners.scopeWindowDragWindowBlur);
     }

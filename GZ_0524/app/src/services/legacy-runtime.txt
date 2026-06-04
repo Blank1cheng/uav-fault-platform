@@ -7557,16 +7557,36 @@ function positionScopeWindowElement(scopeId){
   return true;
 }
 
-function resetScopeWindowDrag(){
+function isScopeWindowDragActive(scopeId=''){
+  return Boolean(SCOPE_WINDOW_DRAG.active&&(!scopeId||SCOPE_WINDOW_DRAG.scopeId===scopeId));
+}
+
+function setScopeWindowDraggingClass(scopeId,dragging){
+  if(!scopeId){return;}
+  const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
+  if(scopeEl){scopeEl.classList.toggle('is-dragging',Boolean(dragging));}
+}
+
+function resetScopeWindowDrag(options={}){
+  const scopeId=SCOPE_WINDOW_DRAG.scopeId;
+  const wasActive=SCOPE_WINDOW_DRAG.active;
   SCOPE_WINDOW_DRAG.active=false;
   SCOPE_WINDOW_DRAG.engaged=false;
   SCOPE_WINDOW_DRAG.pointerId=null;
   SCOPE_WINDOW_DRAG.scopeId='';
+  setScopeWindowDraggingClass(scopeId,false);
+  if(wasActive&&options.refresh&&scopeId){
+    refreshScopeWindow(scopeId);
+  }
 }
 
 function refreshScopeWindow(scopeId){
   const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
   if(!scopeEl){return false;}
+  if(isScopeWindowDragActive(scopeId)){
+    positionScopeWindowElement(scopeId);
+    return true;
+  }
   const state=getScopeWindowRenderState(scopeId);
   if(!state){return false;}
   const title=scopeEl.querySelector('.scope-window__title');
@@ -7630,6 +7650,7 @@ function startScopeWindowDrag(event,scopeId){
   SCOPE_WINDOW_DRAG.startY=event.clientY;
   SCOPE_WINDOW_DRAG.originX=scopeWindow.x;
   SCOPE_WINDOW_DRAG.originY=scopeWindow.y;
+  setScopeWindowDraggingClass(scopeId,true);
   if(event.currentTarget?.setPointerCapture&&event.pointerId!==undefined){
     try{event.currentTarget.setPointerCapture(event.pointerId);}catch(error){}
   }
@@ -7661,14 +7682,19 @@ function bindScopeWindowDragListeners(){
   runtimeListeners.scopeWindowDragPointerUp=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
     if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
-    resetScopeWindowDrag();
+    resetScopeWindowDrag({refresh:true});
   };
   runtimeListeners.scopeWindowDragPointerCancel=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
     if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
-    resetScopeWindowDrag();
+    resetScopeWindowDrag({refresh:true});
   };
-  runtimeListeners.scopeWindowDragWindowBlur=()=>resetScopeWindowDrag();
+  runtimeListeners.scopeWindowDragLostPointerCapture=event=>{
+    if(!SCOPE_WINDOW_DRAG.active){return;}
+    if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
+    resetScopeWindowDrag({refresh:true});
+  };
+  runtimeListeners.scopeWindowDragWindowBlur=()=>resetScopeWindowDrag({refresh:true});
   window.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   window.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
   window.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel);
@@ -7678,6 +7704,7 @@ function bindScopeWindowDragListeners(){
   document.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
   document.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel);
+  document.addEventListener('lostpointercapture',runtimeListeners.scopeWindowDragLostPointerCapture);
   document.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
 }
