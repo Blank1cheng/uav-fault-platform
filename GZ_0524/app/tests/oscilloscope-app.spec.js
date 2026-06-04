@@ -685,4 +685,44 @@ describe('Oscilloscope app integration', () => {
 
     wrapper.unmount();
   });
+
+  it('does not start dragging when scope header action buttons are pressed', async () => {
+    const wrapper = await mountWorkbench();
+
+    window.createNode('instrument_scope', 420, 260);
+    await flushRuntime();
+
+    const scopeNode = document.querySelector('.blk.b-inst');
+    dispatchDoubleClick(scopeNode);
+    await flushRuntime();
+
+    const scopeWindow = document.querySelector('.scope-window');
+    const beforeLeft = scopeWindow.style.left;
+    const beforeTop = scopeWindow.style.top;
+    const clearButton = scopeWindow.querySelector('.scope-window__clear');
+    const closeButton = scopeWindow.querySelector('.scope-window__close');
+
+    dispatchPointer(clearButton, 'pointerdown', { pointerId: 31, clientX: 480, clientY: 124 });
+    dispatchPointer(window, 'pointermove', { pointerId: 31, clientX: 620, clientY: 230 });
+    dispatchPointer(window, 'pointerup', { pointerId: 31, clientX: 620, clientY: 230 });
+    await flushRuntime();
+
+    expect(scopeWindow.style.left).toBe(beforeLeft);
+    expect(scopeWindow.style.top).toBe(beforeTop);
+
+    dispatchPointer(closeButton, 'pointerdown', { pointerId: 32, clientX: 540, clientY: 124 });
+    dispatchPointer(window, 'pointermove', { pointerId: 32, clientX: 680, clientY: 230 });
+    dispatchPointer(window, 'pointerup', { pointerId: 32, clientX: 680, clientY: 230 });
+    await flushRuntime();
+
+    expect(scopeWindow.style.left).toBe(beforeLeft);
+    expect(scopeWindow.style.top).toBe(beforeTop);
+
+    dispatchClick(closeButton);
+    await flushRuntime();
+
+    expect(document.querySelector('.scope-window')).toBeNull();
+
+    wrapper.unmount();
+  });
 });

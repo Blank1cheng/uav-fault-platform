@@ -7637,8 +7637,13 @@ function setScopeWindowSize(scopeId,value){
   }
 }
 
+function isScopeWindowInteractiveTarget(event){
+  return Boolean(event?.target?.closest?.('[data-scope-close],[data-scope-clear],[data-scope-mode],[data-scope-window-size],button,input,select,textarea,a'));
+}
+
 function startScopeWindowDrag(event,scopeId){
   if(event.button!==undefined&&event.button!==0){return;}
+  if(isScopeWindowInteractiveTarget(event)){return;}
   if(!scopeId){return;}
   const scopeWindow=ensureScopeWindow(scopeId);
   focusScopeWindow(scopeId);
@@ -7889,16 +7894,23 @@ renderScopeWindows = function(){
   });
   host.querySelectorAll('[data-scope-drag-handle]').forEach(header=>{
     header.addEventListener('pointerdown',event=>{
+      if(isScopeWindowInteractiveTarget(event)){return;}
       startScopeWindowDrag(event,header.dataset.scopeDragHandle||'');
     });
   });
   host.querySelectorAll('[data-scope-close]').forEach(btn=>{
+    ['pointerdown','mousedown'].forEach(type=>{
+      btn.addEventListener(type,event=>event.stopPropagation());
+    });
     btn.addEventListener('click',event=>{
       event.stopPropagation();
       closeScopeWindow(btn.dataset.scopeClose||'');
     });
   });
   host.querySelectorAll('[data-scope-clear]').forEach(btn=>{
+    ['pointerdown','mousedown'].forEach(type=>{
+      btn.addEventListener(type,event=>event.stopPropagation());
+    });
     btn.addEventListener('click',event=>{
       event.stopPropagation();
       clearScopeWindowSamples(btn.dataset.scopeClear||'');
