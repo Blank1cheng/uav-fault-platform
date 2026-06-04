@@ -1688,11 +1688,7 @@ describe('canvas layout cleanup', () => {
     expect(edgeFaultToggle?.textContent).toContain('F');
     expect(edgeFaultToggle?.querySelector('.edge-fault-toggle__hit')).not.toBeNull();
 
-    edgeFaultToggle?.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, cancelable: true }));
-    await flushRuntime();
-    document.querySelector(`[data-edge-fault-toggle][data-edge-id="${canEdge.id}"]`)?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true })
-    );
+    edgeFaultToggle?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     await flushRuntime();
     expect(edgeTag.expanded).toBe(true);
     expect(document.getElementById(`visual-${edgeTag.id}`)).not.toBeNull();
@@ -1700,17 +1696,10 @@ describe('canvas layout cleanup', () => {
     expect(document.querySelector(`[data-fault-tag-inspector="${edgeTag.id}"]`)).not.toBeNull();
 
     const openEdgeFaultToggle = document.querySelector(`[data-edge-fault-toggle][data-edge-id="${canEdge.id}"]`);
-    openEdgeFaultToggle?.dispatchEvent(new MouseEvent('pointerup', {
+    openEdgeFaultToggle?.dispatchEvent(new MouseEvent('click', {
       bubbles: true,
       cancelable: true
     }));
-    await flushRuntime();
-    document.querySelector(`[data-edge-fault-toggle][data-edge-id="${canEdge.id}"]`)?.dispatchEvent(
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-    );
     await flushRuntime();
     expect(edgeTag.expanded).toBe(false);
     expect(document.getElementById(`visual-${edgeTag.id}`)).toBeNull();
@@ -1971,6 +1960,148 @@ describe('canvas layout cleanup', () => {
     expect(countDroppedScopeSamples(actual, 1, 2)).toBeGreaterThanOrEqual(10);
     expect(actual.filter((sample) => sample.t >= 1 && sample.t <= 2 && sample.dropped !== true)).toHaveLength(0);
 
+    wrapper.unmount();
+  });
+
+  it('keeps the flight-control demo response bounded during a long nominal run', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => createCanvasContextStub());
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    const importResult = window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg);
+    await flushRuntime();
+
+    expect(importResult).toMatchObject({ ok: true });
+
+    document.getElementById('sim-dur').value = '80';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+    for (let step = 0; step < 801; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    const feedback = window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch2 ?? [];
+    const values = feedback.map(scopeSampleValue).filter(Number.isFinite);
+    const lateValues = feedback
+      .filter((sample) => sample.t >= 60)
+      .map(scopeSampleValue)
+      .filter(Number.isFinite);
+
+    expect(values.length).toBeGreaterThan(0);
+    expect(Math.max(...values.map(Math.abs))).toBeLessThan(0.4);
+    expect(Math.max(...lateValues.map(Math.abs))).toBeLessThan(0.16);
+
+    wrapper.unmount();
+  }, 15000);
+
+  it('stops dragging a scope window after pointer cancellation', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => createCanvasContextStub());
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    expect(window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg)).toMatchObject({ ok: true });
+    await flushRuntime();
+
+    window.openScope('node-scope');
+    await flushRuntime();
+
+    const scopeWindow = window.__GZ_SIM__.scopeWindows['node-scope'];
+    const header = document.querySelector('.scope-window[data-scope-id="node-scope"] [data-scope-drag-handle]');
+    expect(header).not.toBeNull();
+    const original = { x: scopeWindow.x, y: scopeWindow.y };
+
+    dispatchPointer(header, 'pointerdown', { pointerId: 91, clientX: 120, clientY: 120 });
+    dispatchPointer(window, 'pointercancel', { pointerId: 91, clientX: 120, clientY: 120 });
+    dispatchPointer(window, 'pointermove', { pointerId: 91, clientX: 260, clientY: 260 });
+    await flushRuntime();
+
+    expect(scopeWindow.x).toBe(original.x);
+    expect(scopeWindow.y).toBe(original.y);
+
+    wrapper.unmount();
+  });
+
+  it('clears the active scope window samples without changing the simulation clock', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => createCanvasContextStub());
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    expect(window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg)).toMatchObject({ ok: true });
+    await flushRuntime();
+
+    document.getElementById('sim-dur').value = '3';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+    for (let step = 0; step < 16; step += 1) {
+      window.simStep();
+    }
+    await flushRuntime();
+
+    window.openScope('node-scope');
+    await flushRuntime();
+
+    expect((window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch1 ?? []).length).toBeGreaterThan(0);
+    expect((window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch2 ?? []).length).toBeGreaterThan(0);
+    const timeBeforeClear = window.__GZ_SIM__.time;
+
+    const clearButton = document.querySelector('[data-scope-clear="node-scope"]');
+    expect(clearButton).not.toBeNull();
+    clearButton.click();
+    await flushRuntime();
+
+    expect(window.__GZ_SIM__.time).toBe(timeBeforeClear);
+    expect(window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch1 ?? []).toHaveLength(0);
+    expect(window.__GZ_SIM__?.actual?.scopeSamples?.['node-scope']?.ch2 ?? []).toHaveLength(0);
+    expect(window.__GZ_SIM__?.reference?.scopeSamples?.['node-scope']?.ch1 ?? []).toHaveLength(0);
+    expect(window.__GZ_SIM__?.reference?.scopeSamples?.['node-scope']?.ch2 ?? []).toHaveLength(0);
+    expect(document.querySelector('[data-scope-channel="ch1"] [data-field="current"]')?.textContent).toBe('--');
+
+    wrapper.unmount();
+  });
+
+  it('switches scope channels and time windows while the simulation is running', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => createCanvasContextStub());
+    const wrapper = mount(App, { attachTo: document.body });
+    await flushRuntime();
+
+    const pkg = loadPublicPackage('evtol_closed_loop_fault_demo.json');
+    expect(window.__GZ_FLIGHT_MODEL_PACKAGE__.importObject(pkg)).toMatchObject({ ok: true });
+    await flushRuntime();
+
+    document.getElementById('sim-dur').value = '4';
+    document.getElementById('sim-step').value = '0.1';
+    window.simInit(true);
+    for (let step = 0; step < 8; step += 1) {
+      window.simStep();
+    }
+    window.openScope('node-scope');
+    window.simRun();
+    await flushRuntime();
+
+    document.querySelector('[data-scope-mode="ch2"][data-scope-id="node-scope"]')?.click();
+    document.querySelector('[data-scope-window-size="2"][data-scope-id="node-scope"]')?.click();
+    await flushRuntime();
+
+    expect(window.__GZ_SIM__.scopeWindows['node-scope'].mode).toBe('ch2');
+    expect(window.__GZ_SIM__.scopeWindows['node-scope'].windowSeconds).toBe(2);
+    expect(document.querySelector('[data-scope-mode="ch2"].is-active')).not.toBeNull();
+    expect(document.querySelector('[data-scope-window-size="2"].is-active')).not.toBeNull();
+
+    const countBeforeTick = window.__GZ_SIM__.actual.scopeSamples['node-scope'].ch2.length;
+    window.runSimulationTick();
+    await flushRuntime();
+
+    expect(window.__GZ_SIM__.scopeWindows['node-scope'].mode).toBe('ch2');
+    expect(window.__GZ_SIM__.scopeWindows['node-scope'].windowSeconds).toBe(2);
+    expect(document.querySelector('[data-scope-mode="ch2"].is-active')).not.toBeNull();
+    expect(document.querySelector('[data-scope-window-size="2"].is-active')).not.toBeNull();
+    expect(window.__GZ_SIM__.actual.scopeSamples['node-scope'].ch2.length).toBeGreaterThan(countBeforeTick);
+
+    window.simStop('stopped');
     wrapper.unmount();
   });
 

@@ -247,9 +247,22 @@ export function __resetLegacyRuntimeForTests() {
     }
     if (runtimeListeners.scopeWindowDragPointerMove) {
       window.removeEventListener('pointermove', runtimeListeners.scopeWindowDragPointerMove);
+      window.removeEventListener('mousemove', runtimeListeners.scopeWindowDragPointerMove);
+      document.removeEventListener('pointermove', runtimeListeners.scopeWindowDragPointerMove);
+      document.removeEventListener('mousemove', runtimeListeners.scopeWindowDragPointerMove);
     }
     if (runtimeListeners.scopeWindowDragPointerUp) {
       window.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp);
+      window.removeEventListener('mouseup', runtimeListeners.scopeWindowDragPointerUp);
+      document.removeEventListener('pointerup', runtimeListeners.scopeWindowDragPointerUp);
+      document.removeEventListener('mouseup', runtimeListeners.scopeWindowDragPointerUp);
+    }
+    if (runtimeListeners.scopeWindowDragPointerCancel) {
+      window.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
+      document.removeEventListener('pointercancel', runtimeListeners.scopeWindowDragPointerCancel);
+    }
+    if (runtimeListeners.scopeWindowDragWindowBlur) {
+      window.removeEventListener('blur', runtimeListeners.scopeWindowDragWindowBlur);
     }
     if (runtimeListeners.canvasCommandPointerEnd) {
       window.removeEventListener('pointerup', runtimeListeners.canvasCommandPointerEnd);

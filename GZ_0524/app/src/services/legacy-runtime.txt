@@ -7306,6 +7306,31 @@ function getScopeWindowEndTime(bucket){
   return Number.isFinite(SIM.time)?SIM.time:0;
 }
 
+function hasAnyScopeSamples(){
+  return Object.values(SIM.actual?.scopeSamples||{}).some(bucket=>{
+    if(Array.isArray(bucket)){return bucket.length>0;}
+    return Boolean(bucket?.ch1?.length||bucket?.ch2?.length);
+  });
+}
+
+function clearScopeWindowSamples(scopeId){
+  if(!scopeId){return false;}
+  const actualBucket=ensureScopeChannelBucket(SIM.actual,scopeId);
+  const referenceBucket=ensureScopeChannelBucket(SIM.reference,scopeId);
+  actualBucket.ch1=[];
+  actualBucket.ch2=[];
+  referenceBucket.ch1=[];
+  referenceBucket.ch2=[];
+  SIM.hasSamples=hasAnyScopeSamples();
+  if(!refreshScopeWindow(scopeId)){
+    renderScopeWindows();
+  }
+  if(typeof toast==='function'){
+    toast('示波器内容已清空','s');
+  }
+  return true;
+}
+
 function filterScopeSamplesByWindow(series,endTime,windowSeconds){
   const samples=Array.isArray(series)?series:[];
   if(windowSeconds==='all'){return samples.slice();}
@@ -7532,6 +7557,13 @@ function positionScopeWindowElement(scopeId){
   return true;
 }
 
+function resetScopeWindowDrag(){
+  SCOPE_WINDOW_DRAG.active=false;
+  SCOPE_WINDOW_DRAG.engaged=false;
+  SCOPE_WINDOW_DRAG.pointerId=null;
+  SCOPE_WINDOW_DRAG.scopeId='';
+}
+
 function refreshScopeWindow(scopeId){
   const scopeEl=document.querySelector(`.scope-window[data-scope-id="${scopeId}"]`);
   if(!scopeEl){return false;}
@@ -7586,6 +7618,8 @@ function setScopeWindowSize(scopeId,value){
 }
 
 function startScopeWindowDrag(event,scopeId){
+  if(event.button!==undefined&&event.button!==0){return;}
+  if(!scopeId){return;}
   const scopeWindow=ensureScopeWindow(scopeId);
   focusScopeWindow(scopeId);
   SCOPE_WINDOW_DRAG.active=true;
@@ -7596,6 +7630,9 @@ function startScopeWindowDrag(event,scopeId){
   SCOPE_WINDOW_DRAG.startY=event.clientY;
   SCOPE_WINDOW_DRAG.originX=scopeWindow.x;
   SCOPE_WINDOW_DRAG.originY=scopeWindow.y;
+  if(event.currentTarget?.setPointerCapture&&event.pointerId!==undefined){
+    try{event.currentTarget.setPointerCapture(event.pointerId);}catch(error){}
+  }
   if(event.stopPropagation){event.stopPropagation();}
   if(event.preventDefault){event.preventDefault();}
 }
@@ -7624,17 +7661,23 @@ function bindScopeWindowDragListeners(){
   runtimeListeners.scopeWindowDragPointerUp=event=>{
     if(!SCOPE_WINDOW_DRAG.active){return;}
     if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
-    SCOPE_WINDOW_DRAG.active=false;
-    SCOPE_WINDOW_DRAG.engaged=false;
-    SCOPE_WINDOW_DRAG.pointerId=null;
-    SCOPE_WINDOW_DRAG.scopeId='';
+    resetScopeWindowDrag();
   };
+  runtimeListeners.scopeWindowDragPointerCancel=event=>{
+    if(!SCOPE_WINDOW_DRAG.active){return;}
+    if(SCOPE_WINDOW_DRAG.pointerId!==null&&event.pointerId!==SCOPE_WINDOW_DRAG.pointerId){return;}
+    resetScopeWindowDrag();
+  };
+  runtimeListeners.scopeWindowDragWindowBlur=()=>resetScopeWindowDrag();
   window.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   window.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
+  window.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel);
   window.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
   window.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
+  window.addEventListener('blur',runtimeListeners.scopeWindowDragWindowBlur);
   document.addEventListener('pointermove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('pointerup',runtimeListeners.scopeWindowDragPointerUp);
+  document.addEventListener('pointercancel',runtimeListeners.scopeWindowDragPointerCancel);
   document.addEventListener('mousemove',runtimeListeners.scopeWindowDragPointerMove);
   document.addEventListener('mouseup',runtimeListeners.scopeWindowDragPointerUp);
 }
@@ -7749,7 +7792,10 @@ renderScopeWindows = function(){
               <div class="scope-window__identity">
                 <div class="scope-window__title">${escapeHtml(node?.props?.name||node?.name||'示波器')}</div>
               </div>
-              <button type="button" class="scope-window__close" data-scope-close="${scopeWindow.scopeId}">关闭 ×</button>
+              <div class="scope-window__actions">
+                <button type="button" class="scope-window__clear" data-scope-clear="${scopeWindow.scopeId}">清空</button>
+                <button type="button" class="scope-window__close" data-scope-close="${scopeWindow.scopeId}">关闭 ×</button>
+              </div>
             </div>
           </header>
           <div class="scope-window__toolbar" data-scope-toolbar>
@@ -7804,7 +7850,7 @@ renderScopeWindows = function(){
     .join('');
   host.querySelectorAll('.scope-window').forEach(el=>{
     el.addEventListener('pointerdown',event=>{
-      if(event.target.closest('[data-scope-close],[data-scope-mode],[data-scope-window-size],[data-scope-drag-handle]')){return;}
+      if(event.target.closest('[data-scope-close],[data-scope-clear],[data-scope-mode],[data-scope-window-size],[data-scope-drag-handle]')){return;}
       const scopeWindow=focusScopeWindow(el.dataset.scopeId||'');
       el.style.zIndex=scopeWindow.z;
     });
@@ -7823,6 +7869,12 @@ renderScopeWindows = function(){
     btn.addEventListener('click',event=>{
       event.stopPropagation();
       closeScopeWindow(btn.dataset.scopeClose||'');
+    });
+  });
+  host.querySelectorAll('[data-scope-clear]').forEach(btn=>{
+    btn.addEventListener('click',event=>{
+      event.stopPropagation();
+      clearScopeWindowSamples(btn.dataset.scopeClear||'');
     });
   });
   host.querySelectorAll('[data-scope-mode]').forEach(btn=>{
@@ -24639,4 +24691,124 @@ function decorateDataflowEdges(){
   setTimeout(clearLegacyFaultLibraryPanel,0);
   setTimeout(syncFaultTaskButton,20);
   setTimeout(clearLegacyFaultLibraryPanel,20);
+})();
+
+// --- Stable closed-loop runtime for the UAV demo model ---
+(function(){
+  const stableModuleTypes=new Set([
+    'control-conditioning',
+    'control',
+    'control_allocation',
+    'motor_mixer',
+    'motor_model',
+    'vehicle_dynamics',
+    'imu_gyro'
+  ]);
+  const previousBuildSimulationResult=buildSimulationResult;
+
+  function stableClamp(value,min,max){
+    const numeric=Number(value);
+    if(!Number.isFinite(numeric)){return 0;}
+    return Math.max(min,Math.min(max,numeric));
+  }
+
+  function stableInputValue(value){
+    return Array.isArray(value)
+      ?value.reduce((sum,item)=>sum+stableInputValue(item),0)
+      :sanitizeSignalValue(value);
+  }
+
+  function stableAverageInput(values){
+    const list=Array.isArray(values)?values.map(stableInputValue):[];
+    if(!list.length){return 0;}
+    return list.reduce((sum,value)=>sum+value,0)/list.length;
+  }
+
+  function stableFirstOrder(nodeState,key,target,tau,dt){
+    const previous=Number.isFinite(nodeState[key])?nodeState[key]:0;
+    const alpha=stableClamp(dt/(Math.max(tau,0.001)+dt),0,1);
+    const next=previous+alpha*(target-previous);
+    nodeState[key]=next;
+    return next;
+  }
+
+  function applyStableOutputFault(node,modeKey,inputValue,outputValue,time){
+    if(modeKey!=='actual'){return sanitizeSignalValue(outputValue);}
+    return sanitizeSignalValue(applyElectricalFault(node,inputValue,outputValue,time));
+  }
+
+  function expandStableOutputs(node,values){
+    normalizeSimulationInterfaces(node.props);
+    const requested=Math.max(node.props.outputs.length,1);
+    const source=Array.isArray(values)?values:[values];
+    return Array.from({length:requested},(_,index)=>sanitizeSignalValue(source[index]??source[0]??0));
+  }
+
+  function expandStableMiddleValues(node,values){
+    normalizeSimulationInterfaces(node.props);
+    const requested=Math.max(node.props.middleVars.length,0);
+    const source=Array.isArray(values)?values:[values];
+    return Array.from({length:requested},(_,index)=>sanitizeSignalValue(source[index]??source[0]??0));
+  }
+
+  buildSimulationResult=function(node,nodeState,inputValues,modeKey,time,dt){
+    const moduleType=String(node?.props?.moduleType||'').toLowerCase();
+    if(!stableModuleTypes.has(moduleType)){
+      return previousBuildSimulationResult(node,nodeState,inputValues,modeKey,time,dt);
+    }
+
+    normalizeSimulationInterfaces(node.props);
+    const primaryInput=stableInputValue(inputValues?.[0]??0);
+    const averageInput=stableAverageInput(inputValues);
+    let rawOutputs=[0];
+    let rawMiddle=[0];
+
+    if(moduleType==='control-conditioning'){
+      const command=stableClamp(primaryInput,-0.12,0.12);
+      const filtered=stableFirstOrder(nodeState,'commandFilter',command,0.18,dt);
+      rawOutputs=[filtered];
+      rawMiddle=[filtered];
+    }else if(moduleType==='control'){
+      const error=stableClamp(primaryInput,-0.3,0.3);
+      nodeState.integrator=stableClamp((nodeState.integrator||0)+error*dt,-0.22,0.22);
+      const torque=stableClamp(1.18*error+0.16*nodeState.integrator,-0.26,0.26);
+      rawOutputs=[stableFirstOrder(nodeState,'controllerOutput',torque,0.12,dt)];
+      rawMiddle=[nodeState.integrator];
+    }else if(moduleType==='control_allocation'){
+      const allocated=stableClamp(primaryInput,-0.24,0.24);
+      rawOutputs=[stableFirstOrder(nodeState,'allocationOutput',allocated,0.14,dt)];
+      rawMiddle=[rawOutputs[0]];
+    }else if(moduleType==='motor_mixer'){
+      const command=stableClamp(primaryInput,-0.22,0.22);
+      const mixed=stableFirstOrder(nodeState,'mixOutput',command,0.1,dt);
+      rawOutputs=[mixed,mixed,mixed,mixed];
+      rawMiddle=[mixed];
+    }else if(moduleType==='motor_model'){
+      const command=stableClamp(primaryInput,-0.22,0.22);
+      const motor=stableFirstOrder(nodeState,'motorResponse',command,0.28,dt);
+      rawOutputs=[motor];
+      rawMiddle=[motor];
+    }else if(moduleType==='vehicle_dynamics'){
+      const torque=stableClamp(averageInput,-0.22,0.22);
+      const previous=Number.isFinite(nodeState.pitchRate)?nodeState.pitchRate:0;
+      const next=previous+dt*(1.04*torque-1.65*previous);
+      nodeState.pitchRate=stableClamp(next,-0.18,0.18);
+      rawOutputs=[nodeState.pitchRate];
+      rawMiddle=[nodeState.pitchRate];
+    }else if(moduleType==='imu_gyro'){
+      const measurement=stableFirstOrder(nodeState,'imuMeasurement',stableClamp(primaryInput,-0.2,0.2),0.08,dt);
+      rawOutputs=[measurement];
+      rawMiddle=[measurement-primaryInput];
+    }
+
+    const faultInput=inputValues?.length
+      ?inputValues.map(stableInputValue).reduce((sum,value)=>sum+value,0)
+      :primaryInput;
+    const outputs=expandStableOutputs(node,rawOutputs)
+      .map(value=>applyStableOutputFault(node,modeKey,faultInput,value,time));
+    const middleValues=expandStableMiddleValues(node,rawMiddle);
+    nodeState.prevInput=primaryInput;
+    nodeState.prevAggregateInput=faultInput;
+    return {outputs,middleValues};
+  };
 })();
