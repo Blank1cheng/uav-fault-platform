@@ -1,56 +1,120 @@
-# UAV Fault Platform
+# 故障注入平台 GZ_0524 部署说明
 
-无人机飞控系统故障注入与测点诊断演示平台。当前仓库面向一个固定的 eVTOL 闭环飞控 Demo，重点展示故障库、故障注入、画布状态变化、固定测点安装、点击检测和人工确认候选故障。
+这是无人机飞控故障注入平台的 `GZ_0524` 独立版本。当前版本面向 eVTOL 闭环飞控演示模型，包含系统建模、故障注入、示波器观测、多信号流图、D 矩阵与测点诊断流程。
 
-在线演示：
+线上演示地址：
 
+```text
 https://blank1cheng.github.io/uav-fault-platform/
+```
 
-## 当前 Demo
+## 环境要求
 
-打开平台后会默认加载 `public/model-packages/evtol_closed_loop_fault_demo.json`，不需要手动导入模型即可演示。该模型和当前故障库一一对应，暂不面向其他系统通用复用。
+- Node.js 20 或更高版本
+- npm 10 或更高版本
+- 一个静态文件服务器或 GitHub Pages，用于部署 `dist/` 构建产物
 
-推荐演示流程：
-
-1. 打开在线演示或本地开发地址。
-2. 点击“注入故障”，在故障库中选择一个或多个故障。
-3. 调整故障参数，点击“确认注入”。弹窗会保持打开，便于继续注入多个故障。
-4. 画布中受故障影响的组件或连线会同步变为故障态；已注入故障可在故障库中撤销。
-5. 切换到“多信号流图”，进入“测点诊断台”。
-6. 在固定位置安装测点，点击“检测故障”后系统才计算每个测点的候选故障。
-7. 人工确认窗口按测点折叠显示候选故障，异常测点高亮，可逐项勾选确认。
+压缩包不包含 `node_modules/`。首次部署需要安装依赖。
 
 ## 本地运行
 
+进入项目目录后执行：
+
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-启动后打开终端输出的本地地址，通常是：
+开发服务器启动后，打开终端输出的地址，通常为：
 
 ```text
 http://127.0.0.1:5173/
 ```
 
-## 构建与验证
+如果端口被占用，Vite 会自动使用新的端口。
+
+## 构建与本地预览
 
 ```bash
-npm test
 npm run build
+npm run preview -- --host 127.0.0.1 --port 5190
 ```
 
-构建产物在 `dist/`，当前 GitHub Pages 使用 `gh-pages` 分支发布。
+构建产物位于：
 
-## 主要文件
+```text
+dist/
+```
 
-- `public/model-packages/evtol_closed_loop_fault_demo.json`：默认加载的完整飞控 Demo 模型。
-- `public/demo/uav_fault_diagnostic_demo.json`：测点诊断演示数据。
-- `fault-types/fault-type-catalog.json`：无人机飞控故障类型库。
-- `src/services/legacy-runtime.txt`：当前平台主要运行时桥接逻辑，包括故障注入、撤销、测点诊断台和画布同步。
-- `src/styles/`：平台界面、画布和诊断台样式。
-- `tests/`：故障库、画布、测点诊断和运行时契约测试。
+`dist/` 可以直接部署到 GitHub Pages、Nginx、Apache、OSS 静态站点或其他静态文件服务。
 
-## 说明
+## GitHub Pages 部署
 
-当前版本优先保证一个完整、可演示的无人机飞控故障平台闭环。后续如果需要支持其他系统，应为新系统单独设计模型、故障库、故障传播关系和测点位置。
+推荐做法：
+
+1. 执行 `npm ci`。
+2. 执行 `npm run build`。
+3. 将 `dist/` 目录内的所有文件复制到 GitHub Pages 发布分支或发布目录。
+4. 确保发布目录根部存在 `.nojekyll` 文件。
+5. 访问 GitHub Pages 地址验证页面是否正常加载。
+
+当前工程的 Vite `base` 为 `./`，因此可以部署在仓库子路径，例如：
+
+```text
+https://<user>.github.io/uav-fault-platform/
+```
+
+## 演示流程
+
+1. 打开平台后，默认加载 `public/model-packages/evtol_closed_loop_fault_demo.json`。
+2. 在画布上查看飞控闭环模型、故障标签和测量仪器。
+3. 使用故障模型加载或故障注入流程，分别演示陀螺仪零偏、单电机卡死和控制指令篡改。
+4. 双击示波器打开故障前后对比示波器。
+5. 示波器支持拖动、关闭、清空、CH1/CH2 切换和时间窗口切换。
+6. 切换到多信号流图和 D 矩阵视图，查看信号关系与诊断结构。
+7. 人工添加测点后，可进入测点诊断流程。
+
+## 主要目录
+
+- `src/`：Vue 入口、运行时桥接、界面片段和样式。
+- `public/model-packages/`：演示模型包。
+- `public/samples/`：示例 Python 组件文件。
+- `fault-types/`：故障类型目录。
+- `docs/`：组件、Python 绑定和平台文件说明。
+- `tests/`：平台关键交互和运行时回归测试。
+- `tools/`：UI 审计脚本。
+- `dist/`：已经构建好的静态演示产物。
+
+## 验证命令
+
+```bash
+npm test -- --run
+npm run build
+npm run audit:ui
+```
+
+当前发布前验证结果：
+
+- Vitest：24 个测试文件、283 个用例通过。
+- Vite build：通过。
+- UI audit：通过。
+
+## 常见问题
+
+如果页面空白，优先检查：
+
+- 是否已经执行 `npm run build`。
+- 静态服务根目录是否指向 `dist/` 内容。
+- `assets/*.js` 和 `assets/*.css` 是否能返回 HTTP 200。
+- GitHub Pages 是否已经完成最新分支部署。
+
+如果默认模型没有加载，检查：
+
+- `public/model-packages/evtol_closed_loop_fault_demo.json` 是否存在。
+- 部署后对应 URL 是否能直接访问。
+
+如果示波器不能拖动或关闭，确认部署的是当前版本，并检查浏览器缓存。可在 URL 后增加时间戳参数强制刷新：
+
+```text
+https://blank1cheng.github.io/uav-fault-platform/?v=latest
+```
